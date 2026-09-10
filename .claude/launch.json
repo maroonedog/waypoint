@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "playground",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--config", "examples/playground/vite.config.ts", "examples/playground"],
+      "port": 5178
+    }
+  ]
+}
