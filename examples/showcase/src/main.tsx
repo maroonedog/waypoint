@@ -57,4 +57,13 @@ function Page() {
 
 const host = document.getElementById("root");
 if (host === null) throw new Error("The page has no #root element.");
-createRoot(host).render(<Page />);
+
+// The root is kept on the element. A hot reload re-runs this module, and
+// calling createRoot on a container that already has one mounts a second copy
+// of the app over the first.
+interface MountedHost extends HTMLElement {
+  __root?: ReturnType<typeof createRoot>;
+}
+const mounted = host as MountedHost;
+mounted.__root ??= createRoot(mounted);
+mounted.__root.render(<Page />);
