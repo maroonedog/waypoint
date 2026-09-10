@@ -9,6 +9,11 @@
 // Scanned character by character rather than matched with a RegExp. A pattern
 // built from a path is a compiled string, and compiling a string is what this
 // library promises never to do.
+//
+// The grammar has no escape, so a member whose name contains a dot or a
+// bracket cannot be addressed: the key `"a.b"` is read as `a` then `b`. An
+// escape would have to be understood by every path a vendor emits as well, and
+// no vendor spells one today, so the limit is stated rather than papered over.
 // ===========================================================================
 
 export type PathSegment =

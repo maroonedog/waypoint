@@ -70,6 +70,17 @@ export const STORE_CONTRACT_CASES: readonly StoreContractCase[] = [
     },
   },
   {
+    what: "a read inside a batch sees a write made earlier in the same batch",
+    run: (store, held) => {
+      store.write(A, 1);
+      store.batch(() => {
+        store.write(A, 2);
+        held(store.read(A) === 2);
+      });
+      held(store.read(A) === 2);
+    },
+  },
+  {
     what: "a nested batch collapses into the outermost",
     run: (store, held) => {
       const seen = countCalls();

@@ -12,6 +12,7 @@ import type { FormFieldDescriptor, FormIssue } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import { ROOT_CELL, errorCountCell, valueCell } from "../store/cell-key.js";
 import { createCellStore } from "../store/create-cell-store.js";
+import { assertConcretePath } from "../path/assert-concrete-path.js";
 import { readValueAt } from "../path/read-value-at.js";
 import { seedRootValue } from "../descriptors/seed-root-value.js";
 import { createCellSourceRegistry } from "./cell-source.js";
@@ -42,6 +43,14 @@ export function createForm<T, TPath extends string = string>(
   const sources = createCellSourceRegistry(store, (key) => {
     if (!key.startsWith(VALUE_CHANNEL_PREFIX)) return () => undefined;
     const path = key.slice(VALUE_CHANNEL_PREFIX.length);
+    // Re-derive before opening. The fan-out writes only cells someone is
+    // reading, so a cell that was closed while the root moved under it holds a
+    // value the form no longer has; painting that on remount and then writing
+    // it back on the next keystroke destroys the real one. Reading the root
+    // here is what makes a cell authoritative from its first frame, and it
+    // costs nothing when the cell was already current: the store gates an
+    // Object.is-equal write.
+    store.write(valueCell(path), readValueAt(store.read(ROOT_CELL), path));
     openCells.open(path);
     return () => openCells.close(path);
   });
@@ -77,6 +86,7 @@ export function createForm<T, TPath extends string = string>(
     store,
     errorCount: sources.of(errorCountCell, 0),
     field(path) {
+      assertConcretePath(path);
       return handles.of(path, () =>
         createFieldHandle({
           store,

@@ -79,6 +79,12 @@ export interface FormCellStore {
    * One user action is routinely many writes: a leaf edit touches the root,
    * the leaf and every live ancestor. Outside a React event handler each
    * notification would otherwise schedule its own synchronous render.
+   *
+   * A read inside the batch MUST see a write made earlier in the same batch.
+   * The runtime reads the root, replaces one path in it and writes it back;
+   * an adapter that defers writes without also answering reads from them
+   * would start the second such pair from the pre-batch root and drop the
+   * first write, producing a root the form never held.
    */
   batch(writes: () => void): void;
 }

@@ -27,8 +27,14 @@ const { z } = await import("zod");
 const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
-const { createForm, createCellStore, assertFormStoreContract, issuesCell } =
-  await import("form-core");
+const {
+  createForm,
+  createCellStore,
+  assertFormStoreContract,
+  issuesCell,
+  readValueAt,
+  ROOT_CELL,
+} = await import("form-core");
 const { FormProvider, Field } = await import("form-react");
 const { createZustandCellStore } = await import("form-store-zustand");
 const { createStore } = await import("zustand/vanilla");
@@ -64,25 +70,41 @@ function makeScreen(form, counters) {
   const Input = ({ path, testId }) =>
     h(Field, { path }, (field) => {
       counters[testId] += 1;
-      return h("input", { ...field.inputProps, "data-testid": testId });
+      return h(
+        Fragment,
+        null,
+        h("input", { ...field.inputProps, "data-testid": testId }),
+        h(
+          "span",
+          { "data-testid": testId + "-error" },
+          field.issues.map((issue) => issue.message).join(" ")
+        )
+      );
     });
 
   return function Screen() {
     counters.shell += 1;
     const [showShipping, setShowShipping] = useState(true);
+    const [showBilling, setShowBilling] = useState(true);
     return h(
       FormProvider,
       { form },
       h(
         Fragment,
         null,
-        h(Input, { path: "billing.postcode", testId: "billing" }),
+        showBilling
+          ? h(Input, { path: "billing.postcode", testId: "billing" })
+          : null,
         showShipping
           ? h(Input, { path: "shipping.postcode", testId: "shipping" })
           : null,
         h("button", {
           "data-testid": "toggle",
           onClick: () => setShowShipping((shown) => !shown),
+        }),
+        h("button", {
+          "data-testid": "toggle-billing",
+          onClick: () => setShowBilling((shown) => !shown),
         })
       )
     );
@@ -213,16 +235,62 @@ test("editing one field moves the error onto the other path", async () => {
 });
 
 // 4b - remounting paints the right error immediately
-test("a field remounted later paints its error immediately", async () => {
+test("a field remounted later paints its error on its first render", async () => {
   const { form, counters, container, root } = await renderSlice();
+
+  // Unmount the field that will carry the error, then create the error while
+  // it is off screen.
+  await act(async () => find(container, "toggle-billing").click());
+  assert.equal(find(container, "billing"), null, "billing is unmounted");
   await type(container, "shipping", "999");
   await act(async () => undefined);
-  await act(async () => find(container, "toggle").click());
-  await act(async () => find(container, "toggle").click());
-
   assert.equal(form.store.read(issuesCell("billing.postcode")).length, 1);
-  assert.ok(counters.shipping > 0, "shipping painted");
+
+  const before = counters.billing;
+  await act(async () => find(container, "toggle-billing").click());
+  assert.equal(
+    counters.billing,
+    before + 1,
+    "billing painted once, with the error already in hand"
+  );
+  assert.equal(
+    find(container, "billing-error").textContent,
+    "must match shipping"
+  );
   await act(async () => root.unmount());
+});
+
+// The defect this closes: the fan-out writes only cells someone is reading, so
+// a cell closed while the root moved under it kept a value the form no longer
+// held. It painted on remount and the next keystroke wrote it back.
+test("a field remounted after a write it did not see paints the current value", async () => {
+  const { form, container, root } = await renderSlice();
+  await type(container, "billing", "aaa");
+  await act(async () => find(container, "toggle-billing").click());
+
+  await act(async () => form.field("billing").setValue({ postcode: "zzz" }));
+  assert.equal(readValueAt(form.readRoot(), "billing.postcode"), "zzz");
+
+  await act(async () => find(container, "toggle-billing").click());
+  assert.equal(find(container, "billing").value, "zzz", "painted the root");
+
+  await type(container, "billing", "zzz1");
+  assert.equal(
+    readValueAt(form.readRoot(), "billing.postcode"),
+    "zzz1",
+    "the keystroke built on the real value"
+  );
+  await act(async () => root.unmount());
+});
+
+// The defect this closes: `[*]` has no case in the concrete grammar, so it
+// parsed as a member named "*" and a write replaced the whole array.
+test("addressing a field by a declared path is refused, not guessed", () => {
+  const form = buildForm();
+  assert.throws(
+    () => form.field("items[*].quantity"),
+    (error) => error instanceof TypeError && /declared path/.test(error.message)
+  );
 });
 
 // 5 - R3
@@ -252,6 +320,30 @@ test("the slice behaves identically with the zustand store injected", async () =
     ["must match shipping"]
   );
   await act(async () => root.unmount());
+});
+
+// The defect this closes: the adapter staged writes but answered reads from
+// zustand, so a second read-modify-write of the root inside one batch started
+// from the pre-batch value and dropped the first.
+test("batched writes to the same cell build on each other in every store", () => {
+  for (const build of [
+    () => createCellStore(),
+    () => createZustandCellStore(createStore(() => ({}))),
+  ]) {
+    const form = createForm({
+      adapter: zodFormResolver(SCHEMA),
+      defaultValues: structuredClone(DEFAULTS),
+      store: build(),
+    });
+    form.store.batch(() => {
+      form.field("billing.postcode").setValue("111");
+      form.field("shipping.postcode").setValue("222");
+    });
+    assert.deepEqual(form.store.read(ROOT_CELL), {
+      billing: { postcode: "111" },
+      shipping: { postcode: "222" },
+    });
+  }
 });
 
 // 6 - the diff
