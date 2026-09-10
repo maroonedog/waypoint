@@ -1,7 +1,7 @@
 {
   "name": "form-contract-resolver-zod",
   "version": "0.1.0",
-  "description": "Describes a zod schema through the form contract",
+  "description": "Describes and judges a zod schema through the form contract",
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,7 +9,8 @@
   "exports": { ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
   "sideEffects": false,
   "files": ["dist"],
-  "scripts": { "typecheck": "tsc -p tsconfig.json --noEmit" },
+  "scripts": { "build": "tsc -p tsconfig.json", "typecheck": "tsc -p tsconfig.json --noEmit" },
   "dependencies": {},
-  "peerDependencies": { "form-contract": "^0.1.0" }
+  "peerDependencies": { "form-contract": "^0.1.0", "zod": "^4.0.0" },
+  "peerDependenciesMeta": { "zod": { "optional": true } }
 }

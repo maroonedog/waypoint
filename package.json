@@ -5,7 +5,9 @@
   "workspaces": ["packages/*"],
   "scripts": {
     "build": "npm run build -w form-contract && npm run build -w form-contract-resolver-zod",
-    "test": "node --test test/"
+    "test": "node --test test/*.test.mjs",
+    "test:types": "tsc -p test/types/tsconfig.json",
+    "verify": "npm run build && npm run test && npm run test:types"
   },
   "devDependencies": {
     "typescript": "^5.9.0",

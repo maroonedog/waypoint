@@ -3,27 +3,28 @@
 **A form renderer needs to know what a field accepts before anyone types in
 it. A validator knows, and has no way to say so.**
 
-Validation contracts answer one question: is this value acceptable? That
-answer arrives after a value exists, which is too late to decide whether to
-draw a number input or a select, whether to put a required mark on a label, or
-what to write in `minlength`.
+Validation answers one question: is this value acceptable? That answer arrives
+after a value exists, which is too late to decide whether to draw a number
+input or a select, whether to put a required mark on a label, or what to write
+in `minlength`.
 
-This contract is the other half. A schema describes its fields; a renderer
-draws them; neither knows which validator produced the description.
+This contract is the other half, and it is one function.
 
 ## The contract
 
-A schema implements it by carrying one property:
-
 ```ts
-interface StandardFormV1 {
-  readonly "~form": {
-    readonly version: 1;
-    readonly vendor: string;
-    readonly fields: () => readonly FormFieldDescriptor[];
-  };
+type FormResolver<TSchema, T, TPath extends string = string> =
+  (schema: TSchema) => FormAdapter<T, TPath>;
+
+interface FormAdapter<T, TPath extends string = string> {
+  readonly fields: readonly FormFieldDescriptor[];
+  validate(root: unknown): readonly FormIssue[];
 }
 ```
+
+A resolver is a plain function, named at the call site. There is no registry,
+no vendor tag and no dispatch, because whoever writes the call already knows
+which validator they are using.
 
 Each descriptor is one field a renderer can draw:
 
@@ -40,42 +41,67 @@ interface FormFieldDescriptor {
 Constraint values are carried as declared. A pattern stays a `RegExp`, because
 how a renderer spells one is that renderer's business.
 
-## Validators that do not implement it
+## The type survives
 
-A resolver describes a vendor's schemas from outside, so the description works
-without the validator's cooperation:
+`T` is the form's value type and `TPath` the paths that may be addressed, so a
+misspelt path is a compile error rather than a field that silently never
+renders.
 
 ```ts
-import { resolveFormFields, eraseFormResolver } from "form-contract";
 import { zodFormResolver } from "form-contract-resolver-zod";
+import type { FormPaths, FormValues } from "form-contract";
 
-const resolvers = [eraseFormResolver(zodFormResolver)];
-
-const fields = resolveFormFields(
-  z.object({ name: z.string().min(3), age: z.number().min(18) }),
-  resolvers
+const adapter = zodFormResolver(
+  z.object({ owner: z.object({ email: z.string() }) })
 );
-// [
-//   { path: "name", kind: "string", isRequired: true, constraints: { minLength: 3 } },
-//   { path: "age",  kind: "number", isRequired: true, constraints: { minimum: 18 } },
-// ]
+
+type Values = FormValues<typeof adapter>;   // { owner: { email: string } }
+type Paths  = FormPaths<typeof adapter>;    // "owner" | "owner.email"
+
+const good: Paths = "owner.email";
+const typo: Paths = "owner.emial";          // compile error
 ```
 
-Self-description wins over every resolver. The vendor that produced the schema
-knows what it declared; a resolver reads the same schema from outside and can
-only approximate it.
+Carrying the type is also what keeps the contract neutral about direction. A
+type-first validator passes the type its rules were written against; a
+schema-first one passes what its schema infers. Both arrive as the same form.
 
-A schema nothing can describe raises `UnresolvableSchemaError` rather than
-returning an empty list. A form with no declared fields renders nothing, and a
-schema nobody understands is a wiring mistake — a caller that cannot tell them
-apart ships the second one as the first.
+## Describing and judging
+
+```ts
+const adapter = zodFormResolver(z.object({ name: z.string().min(3) }));
+
+adapter.fields;
+// [{ path: "name", kind: "string", isRequired: true, constraints: { minLength: 3 } }]
+
+adapter.validate({ name: "ab" });
+// [{ path: "name", message: "…", code: "too_small" }]
+```
+
+An issue is addressed at the **concrete** path it belongs to —
+`items[1].quantity`, never `items[*].quantity`. A wildcard describes the shape;
+an issue is about one value.
+
+`validate` judges the whole root rather than one field, which is what lets a
+rule comparing two fields report against either of them.
 
 ## Packages
 
 | Package | What it is |
 |---|---|
-| `form-contract` | The contract and the resolution entry point. No dependencies. |
-| `form-contract-resolver-zod` | Describes a zod schema. Reads it structurally, so zod is not a dependency. |
+| `form-contract` | The contract and the path types. No dependencies. |
+| `form-contract-resolver-zod` | Describes and judges a zod schema. zod is a type-only import, erased at build time. |
+
+## Path types
+
+`FieldPath<T>` yields the paths of a value type: dots for members, `[*]` for
+array elements, and array members are never enumerated — which removes
+`items.name`, `items[0].name`, `tags.length` and `items.map` with one rule.
+Built-ins stop a path, so `when.getTime` is not a field.
+
+Recursion is bounded, so a self-referential model yields a finite union rather
+than a compiler error. A vendor that tracks which paths were actually declared
+should publish those instead; this exists for the vendors that do not.
 
 ## License
 
