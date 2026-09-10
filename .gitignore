@@ -3,3 +3,4 @@ dist/
 *.tsbuildinfo
 probe-*.mjs
 zz*
+tmp-probe*
