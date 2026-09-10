@@ -1,4 +1,4 @@
-Verified against source before writing: Luq 2.3.1 has **no `~form`** (grep: zero hits), `rememberDeclaredCalls` runs unconditionally at `create-field-builder.ts:43` but stores `calls: null` per field unless a recorder was installed first (`chain/declaration-recorder.port.ts` — `declarationRecorder` starts `null`), `readDeclaredCalls` reaches no barrel, `package.json` has 88 explicit subpaths with no wildcard and `"sideEffects": false`, and `resolveFormFields` checks `~form` structurally before any resolver.
+Verified against source before writing: `rememberDeclaredCalls` runs unconditionally at `create-field-builder.ts:43` but stores `calls: null` per field unless a recorder was installed first (`chain/declaration-recorder.port.ts` — `declarationRecorder` starts `null`), the only installer is a module-scope side effect of `standard-schema/to-standard-json-schema.ts`, `readDeclaredCalls` reaches no barrel, and `package.json` has 88 explicit subpaths with no wildcard and `"sideEffects": false`.
 
 ---
 
@@ -297,7 +297,7 @@ import {
   AutoForm, Field, FieldRows, FieldScope, FormProvider,
   useCreateForm, useField, useFieldIssues, useFormStatus,
 } from "form-contract-react";
-import { createLuqValidationPort } from "@maroonedog/luq/form";
+import { luqResolver } from "@maroonedog/luq/form";
 
 interface Order {
   owner: { name: string; email: string };
@@ -311,8 +311,7 @@ export function OrderScreen(): ReactElement {
   // module-scope runtime is one mutable cell space shared by concurrent
   // requests. useCreateForm holds it in a useState initialiser.
   const form = useCreateForm<Order>(() => ({
-    schema: orderValidator,                             // carries `~form`
-    validation: createLuqValidationPort(orderValidator),
+    resolver: luqResolver(orderValidator),              // carries T and its paths
     defaultValues: { items: [] },
     validateOn: "change",
   }));
@@ -449,7 +448,7 @@ export interface FieldInputProps {
 
 `billing.postcode` is in `<BillingSection>`, rendered through `createPortal` into `document.body`. `shipping.postcode` is in `<ShippingSection>`, behind `React.lazy`, not mounted. The rule is `.compareField("shipping.postcode")` declared on `billing.postcode`, plus `.requiredIf(root => root.needsShipping)` on `shipping.postcode` — an opaque `RootPredicate` whose dependency set is undecidable.
 
-**Before anything mounts.** `createForm` calls `resolveFormFields(schema, resolvers)` once and `seed-root-value.ts` builds the complete root from `defaultValues` plus one entry per descriptor plus `[]` per array container. `ROOT_CELL` and one `valueCell` per declared wildcard-free path are written before the first render. `value:shipping.postcode` is authoritative from the first tick with no component anywhere near it. This is the one policy that makes R2 fall out for free, and it is three lines.
+**Before anything mounts.** `createForm` calls the resolver once and `seed-root-value.ts` builds the complete root from `defaultValues` plus one entry per descriptor plus `[]` per array container. `ROOT_CELL` and one `valueCell` per declared wildcard-free path are written before the first render. `value:shipping.postcode` is authoritative from the first tick with no component anywhere near it. This is the one policy that makes R2 fall out for free, and it is three lines.
 
 **Mounting.** `<BillingSection>` resolves and renders `<Field path="billing.postcode">`. `useField` opens four subscriptions on four existing cells. It does not register, does not seed, does not reset, and does not trigger a catch-up validation; the input paints with the right value and the right error on its first frame. Unmount cancels four subscriptions and touches no value. There is **no `shouldUnregister`, no ref callback, no `isConnected` check, and no React-tree inspection anywhere in the runtime** — a portal, a lazy chunk and a conditional branch are the same case, because none of them is a case.
 
@@ -566,16 +565,16 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | File | Single responsibility |
 |---|---|
 | `src/chain/default-declaration-recorder.ts` | The recorder moved out of `standard-schema/`, installed from `src/builder/index.ts` at module scope |
-| `src/form/describe-luq-form.ts` | Builds `StandardFormProps` from the declared calls and the plan |
+| `src/form/describe-luq-fields.ts` | Builds the descriptor list from the declared calls and the plan |
 | `src/form/slot-to-form-kind.ts` | `DeclaredCall.slot` → `FormFieldKind` |
 | `src/form/declared-calls-to-constraints.ts` | `min`/`max`/`pattern`/`step`/`format` off `DeclaredCall.args` |
 | `src/form/declared-calls-to-choices.ts` | `literal`/`oneOf` → `choices` |
 | `src/form/is-unconditionally-required.ts` | `required` yes; `requiredIf` no, and why |
-| `src/form/create-luq-validation-port.ts` | `Validator<T>` → `FormValidationPort` |
+| `src/form/create-luq-form-adapter.ts` | `Validator<T, T, TDeclared>` → `FormAdapter<T, TDeclared>` |
 | `src/form/luq-issues-to-form-issues.ts` | `ValidationIssue` → `FormIssue` |
 | `src/form/index.ts` | The new `@maroonedog/luq/form` subpath |
 
-**`build()` attaches `~form`.** This is the decisive upstream call, and it kills four separate blockers at once, every one of which a judge raised as fatal: `readDeclaredCalls` reaches no barrel and Node's subpath encapsulation blocks a deep import; the recorder installs only as a module-scope side effect of `to-standard-json-schema.ts`, which `"sideEffects": false` permits a production bundler to drop, so descriptors would be empty in the prod build and correct in dev; that same import drags the whole JSON Schema emitter into a browser form bundle; and `zodFormResolver.canResolve` is structural and rejects a Luq validator, so there is no resolver route either. Making the recorder the default costs one array copy per chain step at `build()` time — once per validator, never per `validate()` — and gives Luq exact self-description, which `resolveFormFields` prefers over every resolver by design. Luq declares `~form` structurally in its own types and takes **no dependency on form-contract**; that is the entire point of a structural contract.
+**Luq ships a `/form` subpath exporting `luqResolver`, and the declaration recorder becomes the default.** Both halves are load-bearing, and each one closes a blocker a judge raised as fatal. The recorder installs only as a module-scope side effect of `to-standard-json-schema.ts`, which `"sideEffects": false` permits a production bundler to drop — so descriptors would be empty in the production build and correct in development, which is the worst failure shape available; that same import also drags the whole JSON Schema emitter into a browser form bundle. And `readDeclaredCalls` reaches no barrel, so nothing outside the package can read what was declared without a deep import that Node's subpath encapsulation refuses. Making the recorder the default costs one array copy per chain step at `build()` time — once per validator, never per `validate()`. `luqResolver` returns a `FormAdapter<T, TDeclared>`; `build()` gains no member and Luq takes **no dependency on form-contract**, because the adapter is built by the subpath rather than carried by the validator. `build(): Validator<T, T, TDeclared>` is the one signature change, and its third parameter defaults to `FieldPath<T> & string`, so every existing `Validator<T>` is unaffected.
 
 ---
 
@@ -616,7 +615,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 
 Two flat string fields, `billing.postcode` and `shipping.postcode`, with `compareField` between them and shipping behind a toggle that unmounts it. Layer 3 only. **No arrays, no `AutoForm`, no widgets, no `FieldScope`, no async, no participation, no submit, no `parseRoot`.** It is deliberately the smallest thing that exercises all four requirements at once.
 
-**Luq (7 files):** `src/chain/default-declaration-recorder.ts` and its install line in `src/builder/index.ts`; `src/form/slot-to-form-kind.ts`, `declared-calls-to-constraints.ts` (four plugins: `required`, `stringMin`, `stringMax`, `stringPattern`), `is-unconditionally-required.ts`, `describe-luq-form.ts`, `create-luq-validation-port.ts`, `luq-issues-to-form-issues.ts`, `index.ts`; plus attaching `~form` in `buildValidator`.
+**Luq (7 files):** `src/chain/default-declaration-recorder.ts` and its install line in `src/builder/index.ts`; `src/form/slot-to-form-kind.ts`, `declared-calls-to-constraints.ts` (four plugins: `required`, `stringMin`, `stringMax`, `stringPattern`), `is-unconditionally-required.ts`, `describe-luq-fields.ts`, `create-luq-form-adapter.ts`, `luq-issues-to-form-issues.ts`, `index.ts`; plus widening `build()` to carry `TDeclared`.
 
 **form-core (14 files):** `form-cell-store.types.ts`, `cell-key.ts`, `cell-listener-index.ts`, `create-cell-store.ts`, `store-contract-cases.ts`, `assert-form-store-contract.ts`, `concrete-path.ts`, `path-relation.ts`, `read-value-at.ts`, `write-value-at.ts`, `seed-root-value.ts`, `interned-defaults.ts`, `cell-source.ts`, `fan-out-write.ts`, `group-issues-by-path.ts`, `same-issue-list.ts`, `distribute-issues.ts`, `schedule-validation.ts`, `create-field-handle.ts`, `field-handle-cache.ts`, `create-form.ts`.
 
