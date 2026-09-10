@@ -4,13 +4,19 @@
   "type": "module",
   "workspaces": ["packages/*"],
   "scripts": {
-    "build": "npm run build -w form-contract && npm run build -w form-contract-resolver-zod",
+    "build": "npm run build -w form-contract && npm run build -w form-contract-resolver-zod && npm run build -w form-core && npm run build -w form-react && npm run build -w form-store-zustand",
     "test": "node --test test/*.test.mjs",
     "test:types": "tsc -p test/types/tsconfig.json",
     "verify": "npm run build && npm run test && npm run test:types"
   },
   "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.5",
+    "jsdom": "^26.1.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
     "typescript": "^5.9.0",
-    "zod": "^4.0.14"
+    "zod": "^4.0.14",
+    "zustand": "^5.0.9"
   }
 }
