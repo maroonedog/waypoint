@@ -33,3 +33,11 @@ export const dirtyCell = (path: string): CellKey<boolean> =>
   mint<boolean>("dirty", path);
 
 export const errorCountCell = "form:errorCount" as CellKey<number>;
+
+/**
+ * The row ORDER of an array, as opaque ids. It changes when a row is inserted,
+ * removed or moved, and never when a member of a row is edited — which is what
+ * lets a list re-key without every input in it re-rendering.
+ */
+export const rowsCell = (arrayPath: string): CellKey<readonly string[]> =>
+  mint<readonly string[]>("rows", arrayPath);

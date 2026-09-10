@@ -16,10 +16,13 @@ import type { FieldBinding } from "./field-binding.types.js";
 import { buildInputProps } from "./build-input-props.js";
 import { useCell } from "./use-cell.js";
 import { useForm } from "./use-form.js";
+import { useFieldScope } from "./use-field-scope.js";
+import { resolveScopedPath } from "./resolve-scoped-path.js";
 
-export function useField<TValue>(path: string): FieldBinding<TValue> {
+export function useField<TValue>(localPath: string): FieldBinding<TValue> {
   const form = useForm();
-  const handle = form.field(path);
+  const scope = useFieldScope();
+  const handle = form.field(resolveScopedPath(localPath, scope));
 
   const value = useCell(handle.sources.value) as TValue | undefined;
   const issues = useCell(handle.sources.issues);

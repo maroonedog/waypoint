@@ -12,3 +12,6 @@
 import type { FormIssue } from "form-contract";
 
 export const NO_ISSUES: readonly FormIssue[] = Object.freeze([]);
+
+/** The empty row order, for an array that holds nothing yet. */
+export const NO_ROWS: readonly string[] = Object.freeze([]);

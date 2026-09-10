@@ -8,13 +8,22 @@
 // The adapter is the only thing that knows a validator. Nothing below this
 // line mentions a vendor.
 // ===========================================================================
-import type { FormFieldDescriptor, FormIssue } from "form-contract";
+import type { FormIssue } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
-import { ROOT_CELL, errorCountCell, valueCell } from "../store/cell-key.js";
+import {
+  ROOT_CELL,
+  errorCountCell,
+  rowsCell,
+  valueCell,
+} from "../store/cell-key.js";
 import { createCellStore } from "../store/create-cell-store.js";
 import { assertConcretePath } from "../path/assert-concrete-path.js";
+import { declaredPathOf } from "../path/declared-path-of.js";
 import { readValueAt } from "../path/read-value-at.js";
+import { createDescriptorIndex } from "../descriptors/descriptor-index.js";
 import { seedRootValue } from "../descriptors/seed-root-value.js";
+import { createRowIdMinter, mintRowIds } from "./row-index.js";
+import { createRowsHandle, type RowsHandle } from "./create-rows-handle.js";
 import { createCellSourceRegistry } from "./cell-source.js";
 import { createOpenValueCells } from "./open-value-cells.js";
 import { createFieldHandle } from "./create-field-handle.js";
@@ -36,8 +45,8 @@ export function createForm<T, TPath extends string = string>(
   const descriptors = adapter.fields;
   const initialRoot = seedRootValue(descriptors, options.defaultValues);
 
-  const byPath = new Map<string, FormFieldDescriptor>();
-  for (const descriptor of descriptors) byPath.set(descriptor.path, descriptor);
+  const index = createDescriptorIndex(descriptors);
+  const minter = createRowIdMinter();
 
   const openCells = createOpenValueCells();
   const sources = createCellSourceRegistry(store, (key) => {
@@ -76,10 +85,20 @@ export function createForm<T, TPath extends string = string>(
       if (descriptor.path.includes("[*]")) continue;
       store.write(valueCell(descriptor.path), readValueAt(initialRoot, descriptor.path));
     }
+    // A row already in the defaults gets an id now, so the list has keys on
+    // its first render rather than acquiring them on its first edit.
+    for (const arrayPath of index.arrayPaths) {
+      if (arrayPath.includes("[*]")) continue;
+      const held = readValueAt(initialRoot, arrayPath);
+      const length = Array.isArray(held) ? held.length : 0;
+      store.write(valueCell(arrayPath), held);
+      store.write(rowsCell(arrayPath), mintRowIds(minter, length));
+    }
     store.write(errorCountCell, 0);
   });
 
   const handles = createFieldHandleCache();
+  const rowsByPath = new Map<string, RowsHandle>();
 
   return {
     descriptors,
@@ -94,12 +113,27 @@ export function createForm<T, TPath extends string = string>(
           openCells,
           initialRoot,
           path,
-          descriptor: byPath.get(path),
+          descriptor: index.at(path),
           judgeRoot,
           commitVerdict,
           requestValidation: scheduler.request,
         })
       ) as FieldHandle<never>;
+    },
+    rows(arrayPath) {
+      assertConcretePath(arrayPath);
+      const existing = rowsByPath.get(arrayPath);
+      if (existing !== undefined) return existing;
+      const created = createRowsHandle({
+        store,
+        sources,
+        arrayPath,
+        members: index.membersOf(declaredPathOf(arrayPath)),
+        minter,
+        requestValidation: scheduler.request,
+      });
+      rowsByPath.set(arrayPath, created);
+      return created;
     },
     readRoot: () => store.read(ROOT_CELL),
     validate: () => scheduler.runNow(),

@@ -36,3 +36,14 @@ export type {
   FormHandle,
   FormOptions,
 } from "./runtime/form.types.js";
+export { declaredPathOf } from "./path/declared-path-of.js";
+export { bindDeclaredPath } from "./path/bind-declared-path.js";
+export { expandDeclaredPath } from "./path/expand-declared-path.js";
+export { assertConcretePath } from "./path/assert-concrete-path.js";
+export { rowsCell } from "./store/cell-key.js";
+export { NO_ROWS } from "./runtime/interned-defaults.js";
+export type { RowsHandle } from "./runtime/create-rows-handle.js";
+export {
+  createDescriptorIndex,
+  type DescriptorIndex,
+} from "./descriptors/descriptor-index.js";

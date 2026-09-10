@@ -13,6 +13,7 @@ import type {
 } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import type { CellSource } from "./cell-source.js";
+import type { RowsHandle } from "./create-rows-handle.js";
 
 /** The four channels a field publishes, each subscribed to separately. */
 export interface FieldSources<TValue> {
@@ -46,6 +47,12 @@ export interface FormHandle<T, TPath extends string = string> {
   readonly store: FormCellStore;
   readonly errorCount: CellSource<number>;
   field<K extends TPath>(path: K): FieldHandle<ValueAtPath<T, K>>;
+  /**
+   * The row order of one array, and the three edits that change it. Addressed
+   * by a concrete path, so an array nested in a row is reached by binding the
+   * outer row first.
+   */
+  rows(arrayPath: string): RowsHandle;
   readRoot(): unknown;
   /** Judges the whole root now and writes the verdict back. */
   validate(): readonly FormIssue[];
