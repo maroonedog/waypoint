@@ -1,25 +1,45 @@
 // ===========================================================================
-// field.tsx — layer 3.
+// field.tsx — layers 2 and 3, in one component.
 //
-// The children function receives the binding and returns whatever it likes.
-// It is called as the return value of this component rather than invoked
-// inside its body for its own bookkeeping, so nothing here decides what the
-// caller may render — and passing the binding on to a child component is
-// ordinary React rather than a case this library has to know about.
+// A children function is layer 3: it receives the binding and returns whatever
+// it likes, and it is called as this component's return value rather than
+// invoked inside its body for bookkeeping, so passing the binding on to a
+// child component is ordinary React.
 //
-// Layer 2 arrives with the widget registry and reuses this component; the
-// binding is the same object either way, so the two heights cannot diverge.
+// Without one, a widget is resolved and given the same binding. Layer 2 is
+// therefore layer 3 with the caller's function looked up instead of written
+// inline, and there is no second implementation for the two to diverge
+// between.
+//
+// A field nothing can draw renders nothing rather than throwing. A registry is
+// allowed to be partial, and a form that loses one input is easier to diagnose
+// than one that fails to render at all.
 // ===========================================================================
-import type { ReactElement, ReactNode } from "react";
+import { useContext, type ReactElement, type ReactNode } from "react";
 import type { FieldBinding } from "./field-binding.types.js";
 import { useField } from "./use-field.js";
+import { WidgetRegistryContext } from "./widget-registry-context.js";
+import { resolveWidget } from "./resolve-widget.js";
 
 export interface FieldProps<TValue> {
   readonly path: string;
-  readonly children: (binding: FieldBinding<TValue>) => ReactNode;
+  /** Layer 3. When present, nothing else is consulted. */
+  readonly children?: (binding: FieldBinding<TValue>) => ReactNode;
+  /** Layer 2: the widget to draw this field with, by name. */
+  readonly as?: string;
 }
 
 export function Field<TValue>(props: FieldProps<TValue>): ReactElement {
   const binding = useField<TValue>(props.path);
-  return <>{props.children(binding)}</>;
+  const registry = useContext(WidgetRegistryContext);
+
+  if (props.children !== undefined) {
+    return <>{props.children(binding)}</>;
+  }
+  const widget = resolveWidget(
+    registry,
+    binding as FieldBinding<unknown>,
+    props.as
+  );
+  return <>{widget === undefined ? null : widget({ field: binding as FieldBinding<unknown> })}</>;
 }

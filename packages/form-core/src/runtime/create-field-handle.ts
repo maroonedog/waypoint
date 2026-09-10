@@ -17,6 +17,7 @@ import {
   ROOT_CELL,
   dirtyCell,
   issuesCell,
+  participatingCell,
   touchedCell,
   valueCell,
 } from "../store/cell-key.js";
@@ -37,6 +38,7 @@ export interface FieldHandleRequest {
   readonly judgeRoot: (root: unknown) => readonly FormIssue[];
   readonly commitVerdict: (produced: readonly FormIssue[]) => void;
   readonly requestValidation: () => void;
+  readonly setParticipating: (path: string, participating: boolean) => void;
 }
 
 export function createFieldHandle<TValue>(
@@ -52,6 +54,7 @@ export function createFieldHandle<TValue>(
     judgeRoot,
     commitVerdict,
     requestValidation,
+    setParticipating,
   } = request;
 
   const mine = (produced: readonly FormIssue[]): readonly FormIssue[] => {
@@ -70,6 +73,7 @@ export function createFieldHandle<TValue>(
       issues: sources.of(issuesCell(path), NO_ISSUES),
       touched: sources.of(touchedCell(path), false),
       dirty: sources.of(dirtyCell(path), false),
+      participating: sources.of(participatingCell(path), true),
     },
     setValue(next) {
       fanOutWrite({ store, openCells, initialRoot, path, next });
@@ -77,6 +81,11 @@ export function createFieldHandle<TValue>(
     },
     markTouched() {
       store.write(touchedCell(path), true);
+    },
+    setParticipating(participating) {
+      setParticipating(path, participating);
+      store.write(participatingCell(path), participating);
+      requestValidation();
     },
     validate() {
       const produced = judgeRoot(store.read(ROOT_CELL));

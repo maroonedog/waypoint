@@ -28,6 +28,7 @@ export function useField<TValue>(localPath: string): FieldBinding<TValue> {
   const issues = useCell(handle.sources.issues);
   const isTouched = useCell(handle.sources.touched);
   const isDirty = useCell(handle.sources.dirty);
+  const isParticipating = useCell(handle.sources.participating);
 
   const onChangeValue = useCallback(
     (next: string) => handle.setValue(next as unknown as TValue),
@@ -42,8 +43,10 @@ export function useField<TValue>(localPath: string): FieldBinding<TValue> {
     issues,
     isTouched,
     isDirty,
+    isParticipating,
     setValue: (next) => handle.setValue(next),
     markTouched: () => handle.markTouched(),
+    setParticipating: (participating) => handle.setParticipating(participating),
     validate: () => handle.validate(),
     check: (candidate) => handle.check(candidate),
     inputProps: buildInputProps({

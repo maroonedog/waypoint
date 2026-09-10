@@ -4,7 +4,9 @@ export { useCreateForm } from "./use-create-form.js";
 export { useForm } from "./use-form.js";
 export { useCell } from "./use-cell.js";
 export { useField } from "./use-field.js";
+export { useFieldValue } from "./use-field-value.js";
 export { useFieldIssues } from "./use-field-issues.js";
+export { useFormStatus, type FormStatus } from "./use-form-status.js";
 export { Field, type FieldProps } from "./field.js";
 export {
   FieldScope,
@@ -17,12 +19,21 @@ export {
   type FieldScopeValue,
 } from "./field-scope-context.js";
 export { useFieldScope } from "./use-field-scope.js";
-export {
-  declaredPathIn,
-  resolveScopedPath,
-} from "./resolve-scoped-path.js";
+export { useParticipation } from "./use-participation.js";
+export { declaredPathIn, resolveScopedPath } from "./resolve-scoped-path.js";
 export { useRows, type RowsBinding } from "./use-rows.js";
 export { FieldRows, type FieldRowsProps } from "./field-rows.js";
+export { AutoForm, type AutoFormProps } from "./auto-form.js";
+export {
+  EMPTY_REGISTRY,
+  WidgetRegistryContext,
+} from "./widget-registry-context.js";
+export { resolveWidget } from "./resolve-widget.js";
+export type {
+  FormWidget,
+  WidgetProps,
+  WidgetRegistry,
+} from "./widget-registry.types.js";
 export { buildInputProps } from "./build-input-props.js";
 export type {
   FieldBinding,

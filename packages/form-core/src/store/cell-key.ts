@@ -41,3 +41,16 @@ export const errorCountCell = "form:errorCount" as CellKey<number>;
  */
 export const rowsCell = (arrayPath: string): CellKey<readonly string[]> =>
   mint<readonly string[]>("rows", arrayPath);
+
+/**
+ * Whether a field takes part in whether the form can be submitted. It defaults
+ * to true, so a field nobody has said anything about blocks in the ordinary
+ * way, and a subtree switched off keeps its VALUES — only its verdict stops
+ * counting.
+ */
+export const participatingCell = (path: string): CellKey<boolean> =>
+  mint<boolean>("participating", path);
+
+export const submittingCell = "form:submitting" as CellKey<boolean>;
+export const submitCountCell = "form:submitCount" as CellKey<number>;
+export const validatingCell = "form:validating" as CellKey<boolean>;

@@ -1,5 +1,6 @@
 // ===========================================================================
-// form-provider.tsx — puts one handle in reach of a subtree.
+// form-provider.tsx — puts one handle, and the widgets to draw it with, in
+// reach of a subtree.
 //
 // The handle is passed straight through as the context value. Wrapping it in
 // an object built here would give the context a new identity every render and
@@ -18,9 +19,16 @@
 import type { ReactElement, ReactNode } from "react";
 import type { FormHandle } from "form-core";
 import { FormContext } from "./form-context.js";
+import {
+  EMPTY_REGISTRY,
+  WidgetRegistryContext,
+} from "./widget-registry-context.js";
+import type { WidgetRegistry } from "./widget-registry.types.js";
 
 export interface FormProviderProps<T, TPath extends string> {
   readonly form: FormHandle<T, TPath>;
+  /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */
+  readonly widgets?: WidgetRegistry;
   readonly children: ReactNode;
 }
 
@@ -31,7 +39,9 @@ export function FormProvider<T, TPath extends string>(
     <FormContext.Provider
       value={props.form as unknown as FormHandle<unknown, string>}
     >
-      {props.children}
+      <WidgetRegistryContext.Provider value={props.widgets ?? EMPTY_REGISTRY}>
+        {props.children}
+      </WidgetRegistryContext.Provider>
     </FormContext.Provider>
   );
 }

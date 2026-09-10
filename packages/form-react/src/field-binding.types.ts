@@ -38,8 +38,10 @@ export interface FieldBinding<TValue> {
   readonly issues: readonly FormIssue[];
   readonly isTouched: boolean;
   readonly isDirty: boolean;
+  readonly isParticipating: boolean;
   setValue(next: TValue | undefined): void;
   markTouched(): void;
+  setParticipating(participating: boolean): void;
   validate(): readonly FormIssue[];
   /** Judges a value that is NOT in the store and writes nothing. */
   check(candidate: unknown): readonly FormIssue[];

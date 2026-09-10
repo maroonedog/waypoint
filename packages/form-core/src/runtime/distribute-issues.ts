@@ -25,12 +25,20 @@ export const createIssuedPathRecord = (): IssuedPathRecord => ({
   paths: new Set<string>(),
 });
 
+/**
+ * A dormant path is written as having no issues rather than skipped. Skipping
+ * would leave whatever it last showed on screen, and the point of switching a
+ * subtree off is that it stops reporting.
+ */
 export function distributeIssues(
   store: FormCellStore,
   record: IssuedPathRecord,
-  produced: readonly FormIssue[]
+  produced: readonly FormIssue[],
+  isParticipating: (path: string) => boolean = () => true
 ): void {
-  const byPath = groupIssuesByPath(produced);
+  const byPath = groupIssuesByPath(
+    produced.filter((issue) => isParticipating(issue.path))
+  );
   store.batch(() => {
     for (const previous of record.paths) {
       if (byPath.has(previous)) continue;

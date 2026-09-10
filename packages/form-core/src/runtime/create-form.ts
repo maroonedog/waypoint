@@ -1,41 +1,47 @@
 // ===========================================================================
 // create-form.ts — assembles the runtime around one adapter.
 //
-// Every cell a declared path needs is written here, before any component
-// exists. What a component does later is subscribe; it does not register a
-// field, seed a default, or reset anything on unmount.
+// The adapter is the only thing here that knows a validator. Nothing below
+// this line mentions a vendor, which is what lets the same runtime serve a
+// type-first validator and a schema-first one.
 //
-// The adapter is the only thing that knows a validator. Nothing below this
-// line mentions a vendor.
+// Every handle is cached by path for the life of the form. The handle owns the
+// callbacks an input is given, so a fresh one per render would hand every
+// input a new onChange every render.
 // ===========================================================================
 import type { FormIssue } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   ROOT_CELL,
   errorCountCell,
-  rowsCell,
-  valueCell,
+  participatingCell,
+  submitCountCell,
+  submittingCell,
+  validatingCell,
 } from "../store/cell-key.js";
 import { createCellStore } from "../store/create-cell-store.js";
 import { assertConcretePath } from "../path/assert-concrete-path.js";
 import { declaredPathOf } from "../path/declared-path-of.js";
-import { readValueAt } from "../path/read-value-at.js";
+import { buildDescriptorTree } from "../descriptors/build-descriptor-tree.js";
 import { createDescriptorIndex } from "../descriptors/descriptor-index.js";
+import { seedFormCells } from "../descriptors/seed-form-cells.js";
 import { seedRootValue } from "../descriptors/seed-root-value.js";
-import { createRowIdMinter, mintRowIds } from "./row-index.js";
+import { createRowIdMinter } from "./row-index.js";
 import { createRowsHandle, type RowsHandle } from "./create-rows-handle.js";
-import { createCellSourceRegistry } from "./cell-source.js";
+import { createFormCellSources } from "./create-form-cell-sources.js";
 import { createOpenValueCells } from "./open-value-cells.js";
 import { createFieldHandle } from "./create-field-handle.js";
 import { createFieldHandleCache } from "./field-handle-cache.js";
+import { createParticipationIndex } from "./participation-index.js";
+import { blockingIssues, writeErrorCount } from "./form-state-cells.js";
 import {
   createIssuedPathRecord,
   distributeIssues,
 } from "./distribute-issues.js";
 import { createValidationScheduler } from "./schedule-validation.js";
+import { submitForm } from "./submit-form.js";
+import { resetForm } from "./reset-form.js";
 import type { FieldHandle, FormHandle, FormOptions } from "./form.types.js";
-
-const VALUE_CHANNEL_PREFIX = "value:";
 
 export function createForm<T, TPath extends string = string>(
   options: FormOptions<T, TPath>
@@ -43,32 +49,21 @@ export function createForm<T, TPath extends string = string>(
   const { adapter } = options;
   const store: FormCellStore = options.store ?? createCellStore();
   const descriptors = adapter.fields;
-  const initialRoot = seedRootValue(descriptors, options.defaultValues);
-
   const index = createDescriptorIndex(descriptors);
+  const tree = buildDescriptorTree(descriptors);
   const minter = createRowIdMinter();
+  const participation = createParticipationIndex();
 
   const openCells = createOpenValueCells();
-  const sources = createCellSourceRegistry(store, (key) => {
-    if (!key.startsWith(VALUE_CHANNEL_PREFIX)) return () => undefined;
-    const path = key.slice(VALUE_CHANNEL_PREFIX.length);
-    // Re-derive before opening. The fan-out writes only cells someone is
-    // reading, so a cell that was closed while the root moved under it holds a
-    // value the form no longer has; painting that on remount and then writing
-    // it back on the next keystroke destroys the real one. Reading the root
-    // here is what makes a cell authoritative from its first frame, and it
-    // costs nothing when the cell was already current: the store gates an
-    // Object.is-equal write.
-    store.write(valueCell(path), readValueAt(store.read(ROOT_CELL), path));
-    openCells.open(path);
-    return () => openCells.close(path);
-  });
+  const sources = createFormCellSources(store, openCells);
 
   const issued = createIssuedPathRecord();
+  const blockingOf = (produced: readonly FormIssue[]): readonly FormIssue[] =>
+    blockingIssues(produced, participation.isParticipating);
   const commitVerdict = (produced: readonly FormIssue[]): void => {
     store.batch(() => {
-      distributeIssues(store, issued, produced);
-      store.write(errorCountCell, produced.length);
+      distributeIssues(store, issued, produced, participation.isParticipating);
+      writeErrorCount(store, blockingOf(produced));
     });
   };
   const judgeRoot = (root: unknown): readonly FormIssue[] =>
@@ -79,31 +74,32 @@ export function createForm<T, TPath extends string = string>(
     return produced;
   });
 
-  store.batch(() => {
-    store.write(ROOT_CELL, initialRoot);
-    for (const descriptor of descriptors) {
-      if (descriptor.path.includes("[*]")) continue;
-      store.write(valueCell(descriptor.path), readValueAt(initialRoot, descriptor.path));
-    }
-    // A row already in the defaults gets an id now, so the list has keys on
-    // its first render rather than acquiring them on its first edit.
-    for (const arrayPath of index.arrayPaths) {
-      if (arrayPath.includes("[*]")) continue;
-      const held = readValueAt(initialRoot, arrayPath);
-      const length = Array.isArray(held) ? held.length : 0;
-      store.write(valueCell(arrayPath), held);
-      store.write(rowsCell(arrayPath), mintRowIds(minter, length));
-    }
-    store.write(errorCountCell, 0);
+  const initialRoot = seedRootValue(descriptors, options.defaultValues);
+  seedFormCells({
+    store,
+    descriptors,
+    arrayPaths: index.arrayPaths,
+    minter,
+    root: initialRoot,
   });
+
+  const setParticipating = (path: string, participating: boolean): void => {
+    participation.set(path, participating);
+    store.write(participatingCell(path), participating);
+  };
 
   const handles = createFieldHandleCache();
   const rowsByPath = new Map<string, RowsHandle>();
 
   return {
     descriptors,
+    tree,
     store,
     errorCount: sources.of(errorCountCell, 0),
+    submitting: sources.of(submittingCell, false),
+    submitCount: sources.of(submitCountCell, 0),
+    validating: sources.of(validatingCell, false),
+
     field(path) {
       assertConcretePath(path);
       return handles.of(path, () =>
@@ -117,9 +113,11 @@ export function createForm<T, TPath extends string = string>(
           judgeRoot,
           commitVerdict,
           requestValidation: scheduler.request,
+          setParticipating,
         })
       ) as FieldHandle<never>;
     },
+
     rows(arrayPath) {
       assertConcretePath(arrayPath);
       const existing = rowsByPath.get(arrayPath);
@@ -135,6 +133,35 @@ export function createForm<T, TPath extends string = string>(
       rowsByPath.set(arrayPath, created);
       return created;
     },
+
+    setParticipating(path, participating) {
+      setParticipating(path, participating);
+      scheduler.request();
+    },
+
+    submit: (handler) =>
+      submitForm({
+        store,
+        judgeNow: () => scheduler.runNow(),
+        blockingOf,
+        handler,
+      }),
+
+    reset(defaultValues) {
+      resetForm({
+        store,
+        descriptors,
+        arrayPaths: index.arrayPaths,
+        minter,
+        nextRoot: seedRootValue(
+          descriptors,
+          defaultValues === undefined ? options.defaultValues : defaultValues
+        ),
+      });
+      issued.paths.clear();
+      scheduler.request();
+    },
+
     readRoot: () => store.read(ROOT_CELL),
     validate: () => scheduler.runNow(),
   };

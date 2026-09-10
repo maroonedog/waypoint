@@ -11,6 +11,9 @@ import {
   type FieldScopeValue,
 } from "./field-scope-context.js";
 import { useFieldScope } from "./use-field-scope.js";
+import { useForm } from "./use-form.js";
+import { useParticipation } from "./use-participation.js";
+import { resolveScopedPath } from "./resolve-scoped-path.js";
 
 /** One row, as a list renders it: an opaque key and the index it sits at. */
 export interface FieldRow {
@@ -23,12 +26,19 @@ export interface FieldScopeProps {
   readonly prefix?: string;
   /** The row everything inside belongs to. */
   readonly row?: FieldRow;
+  /**
+   * Whether everything inside blocks a submit. The values stay in the store
+   * either way, so a rule that compares against this subtree goes on reading
+   * it; what stops is its verdict counting.
+   */
+  readonly participating?: boolean;
   readonly children: ReactNode;
 }
 
 export function FieldScope(props: FieldScopeProps): ReactElement {
   const enclosing = useFieldScope();
-  const { prefix, row } = props;
+  const form = useForm();
+  const { prefix, row, participating } = props;
   const rowIndex = row?.index;
 
   const scope = useMemo<FieldScopeValue>(
@@ -46,6 +56,8 @@ export function FieldScope(props: FieldScopeProps): ReactElement {
     }),
     [enclosing, prefix, rowIndex]
   );
+
+  useParticipation(form, resolveScopedPath("", scope), participating);
 
   return (
     <FieldScopeContext.Provider value={scope}>

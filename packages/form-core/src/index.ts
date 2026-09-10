@@ -47,3 +47,22 @@ export {
   createDescriptorIndex,
   type DescriptorIndex,
 } from "./descriptors/descriptor-index.js";
+export {
+  participatingCell,
+  submitCountCell,
+  submittingCell,
+  validatingCell,
+} from "./store/cell-key.js";
+export { splitDeclaredPath } from "./path/split-declared-path.js";
+export { buildDescriptorTree } from "./descriptors/build-descriptor-tree.js";
+export type {
+  DescriptorFieldNode,
+  DescriptorGroupNode,
+  DescriptorListNode,
+  DescriptorNode,
+} from "./descriptors/descriptor-tree.types.js";
+export type { SubmitHandler, SubmitOutcome } from "./runtime/submit-form.js";
+export {
+  createParticipationIndex,
+  type ParticipationIndex,
+} from "./runtime/participation-index.js";
