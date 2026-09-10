@@ -33,7 +33,7 @@ export function useRows(localPath: string): RowsBinding {
 
   return {
     path,
-    rows: ids.map((key, index) => ({ key, index })),
+    rows: ids.map((key, index) => ({ key, index, path: `${path}[${index}]` })),
     insert: (at, value) => handle.insert(at, value),
     remove: (at) => handle.remove(at),
     move: (from, to) => handle.move(from, to),

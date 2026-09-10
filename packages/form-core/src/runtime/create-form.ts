@@ -28,6 +28,7 @@ import { seedFormCells } from "../descriptors/seed-form-cells.js";
 import { seedRootValue } from "../descriptors/seed-root-value.js";
 import { createRowIdMinter } from "./row-index.js";
 import { createRowsHandle, type RowsHandle } from "./create-rows-handle.js";
+import type { RowCellMove } from "./row-cell-move.js";
 import { createFormCellSources } from "./create-form-cell-sources.js";
 import { createOpenValueCells } from "./open-value-cells.js";
 import { createFieldHandle } from "./create-field-handle.js";
@@ -37,6 +38,7 @@ import { blockingIssues, writeErrorCount } from "./form-state-cells.js";
 import {
   createIssuedPathRecord,
   distributeIssues,
+  followIssuedPaths,
 } from "./distribute-issues.js";
 import { createValidationScheduler } from "./schedule-validation.js";
 import { submitForm } from "./submit-form.js";
@@ -88,6 +90,18 @@ export function createForm<T, TPath extends string = string>(
     store.write(participatingCell(path), participating);
   };
 
+  // Two things hold concrete paths OUTSIDE the store, so renumbering the
+  // cells alone would leave both pointing at whichever row moved into that
+  // index: the record of which paths carried issues, and the set of subtrees
+  // that were switched off.
+  const followMovedCells = (moves: readonly RowCellMove[]): void => {
+    followIssuedPaths(issued, moves);
+    const movedTo = new Map(moves.map((move) => [move.source, move.target]));
+    participation.remap((path) =>
+      movedTo.has(path) ? movedTo.get(path) : path
+    );
+  };
+
   const handles = createFieldHandleCache();
   const rowsByPath = new Map<string, RowsHandle>();
 
@@ -125,10 +139,12 @@ export function createForm<T, TPath extends string = string>(
       const created = createRowsHandle({
         store,
         sources,
+        openCells,
         arrayPath,
-        members: index.membersOf(declaredPathOf(arrayPath)),
+        declaredUnder: index.declaredUnder(declaredPathOf(arrayPath)),
         minter,
         requestValidation: scheduler.request,
+        onCellsMoved: followMovedCells,
       });
       rowsByPath.set(arrayPath, created);
       return created;

@@ -53,3 +53,27 @@ export function distributeIssues(
   record.paths.clear();
   for (const path of byPath.keys()) record.paths.add(path);
 }
+
+/**
+ * Re-addresses the record after a structural edit moved issue cells behind its
+ * back. Without this the record still names the old path, so the next pass
+ * clears a cell nobody is reading and leaves the moved error on screen with
+ * nothing left that will ever write it away.
+ *
+ * Collected before it is applied: one move's target can be another move's
+ * source, and applying as it goes would drop a path that had just arrived.
+ */
+export function followIssuedPaths(
+  record: IssuedPathRecord,
+  moves: readonly { readonly source: string; readonly target: string | undefined }[]
+): void {
+  const removed = new Set<string>();
+  const added = new Set<string>();
+  for (const move of moves) {
+    if (!record.paths.has(move.source)) continue;
+    removed.add(move.source);
+    if (move.target !== undefined) added.add(move.target);
+  }
+  for (const path of removed) record.paths.delete(path);
+  for (const path of added) record.paths.add(path);
+}

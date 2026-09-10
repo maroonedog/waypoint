@@ -15,10 +15,17 @@ import { useForm } from "./use-form.js";
 import { useParticipation } from "./use-participation.js";
 import { resolveScopedPath } from "./resolve-scoped-path.js";
 
-/** One row, as a list renders it: an opaque key and the index it sits at. */
+/** One row, as a list renders it. */
 export interface FieldRow {
+  /** Opaque, stable for the life of the row: the React key and never an address. */
   readonly key: string;
   readonly index: number;
+  /**
+   * Where this row lives, concretely: `items[2]`. A row scope needs an address
+   * of its own, because a prefix scope has one and a row scope that fell back
+   * to the enclosing prefix would silently switch off the wrong subtree.
+   */
+  readonly path: string;
 }
 
 export interface FieldScopeProps {
@@ -57,7 +64,9 @@ export function FieldScope(props: FieldScopeProps): ReactElement {
     [enclosing, prefix, rowIndex]
   );
 
-  useParticipation(form, resolveScopedPath("", scope), participating);
+  // A row addresses itself; anything else addresses its prefix.
+  const ownPath = row === undefined ? resolveScopedPath("", scope) : row.path;
+  useParticipation(form, ownPath, participating);
 
   return (
     <FieldScopeContext.Provider value={scope}>

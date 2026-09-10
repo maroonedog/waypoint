@@ -17,6 +17,12 @@ export interface ParticipationIndex {
   isParticipating(path: string): boolean;
   /** The paths explicitly switched off, for a caller that has to write cells. */
   readonly dormantRoots: ReadonlySet<string>;
+  /**
+   * Re-addresses the switched-off paths after a structural edit. A dormant
+   * root is a concrete path held OUTSIDE the store, so renumbering the cells
+   * alone would leave it pointing at whichever row moved into that index.
+   */
+  remap(moved: (path: string) => string | undefined): void;
 }
 
 export function createParticipationIndex(): ParticipationIndex {
@@ -26,6 +32,15 @@ export function createParticipationIndex(): ParticipationIndex {
     set(path, participating) {
       if (participating) dormant.delete(path);
       else dormant.add(path);
+    },
+    remap(moved) {
+      const rewritten = new Set<string>();
+      for (const root of dormant) {
+        const next = moved(root);
+        if (next !== undefined) rewritten.add(next);
+      }
+      dormant.clear();
+      for (const root of rewritten) dormant.add(root);
     },
     isParticipating(path) {
       if (dormant.size === 0) return true;

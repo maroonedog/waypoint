@@ -16,6 +16,12 @@ export interface DescriptorIndex {
   at(concretePath: string): FormFieldDescriptor | undefined;
   /** Every declared path that lies under `arrayPath[*]`, including deeper ones. */
   membersOf(arrayPath: string): readonly string[];
+  /**
+   * Everything a splice of `arrayPath` has to renumber: the row itself, the
+   * fields in it, and any list nested inside it. The row is included because
+   * a row carries cells of its own — its issues, and whether it takes part.
+   */
+  declaredUnder(arrayPath: string): readonly string[];
   /** Every declared path that names an array, outermost first. */
   readonly arrayPaths: readonly string[];
 }
@@ -50,6 +56,16 @@ export function createDescriptorIndex(
       return Array.from(byDeclared.keys()).filter((declared) =>
         declared.startsWith(under)
       );
+    },
+    declaredUnder: (arrayPath) => {
+      const under = `${arrayPath}[*]`;
+      const nested = arrayPaths.filter((candidate) =>
+        candidate.startsWith(under)
+      );
+      const leaves = Array.from(byDeclared.keys()).filter((declared) =>
+        declared.startsWith(under)
+      );
+      return [under, ...leaves, ...nested];
     },
     arrayPaths,
   };

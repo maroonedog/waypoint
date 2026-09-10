@@ -218,3 +218,63 @@ test("a field outside the row scope it needs fails loudly", async () => {
     (error) => /needs a row index/.test(error.message)
   );
 });
+
+// The defect: a row scope had no address of its own, so `participating` on one
+// resolved to the empty path and was silently dropped.
+test("a row can be switched off without being removed", async () => {
+  const { z } = await import("zod");
+  const { createForm, errorCountCell } = await import("form-core");
+  const { useFormStatus } = await import("form-react");
+
+  const schema = z.object({
+    items: z.array(z.object({ sku: z.string().min(1, "required") })),
+  });
+  const form = createForm({
+    adapter: zodFormResolver(schema),
+    defaultValues: { items: [{ sku: "a" }, { sku: "" }] },
+  });
+
+  const Screen = ({ silenceSecond }) =>
+    h(
+      FormProvider,
+      { form },
+      h(FieldRows, { path: "items" }, ({ rows }) =>
+        rows.map((row) =>
+          h(
+            FieldScope,
+            {
+              key: row.key,
+              row,
+              participating: !(silenceSecond && row.index === 1),
+            },
+            h(Field, { path: "items[*].sku" }, (field) =>
+              h("input", { ...field.inputProps, "data-testid": "sku-" + row.key })
+            )
+          )
+        )
+      )
+    );
+
+  const container = dom.window.document.createElement("div");
+  dom.window.document.body.appendChild(container);
+  const root = createRoot(container);
+  await act(async () => root.render(h(Screen, { silenceSecond: false })));
+  await act(async () => {
+    form.validate();
+  });
+  assert.equal(form.store.read(errorCountCell), 1, "the empty sku blocks");
+
+  await act(async () => root.render(h(Screen, { silenceSecond: true })));
+  await act(async () => undefined);
+  assert.equal(
+    form.store.read(errorCountCell),
+    0,
+    "the row was switched off without being unmounted"
+  );
+  assert.equal(
+    form.readRoot().items[1].sku,
+    "",
+    "and its value is still there"
+  );
+  await act(async () => root.unmount());
+});

@@ -66,3 +66,7 @@ export {
   createParticipationIndex,
   type ParticipationIndex,
 } from "./runtime/participation-index.js";
+export { writeDeclaredCells } from "./descriptors/write-declared-cells.js";
+export { planRowCellMoves } from "./runtime/row-cell-move.js";
+export type { RowCellMove, RowOrigins } from "./runtime/row-cell-move.js";
+export { refreshOpenAround } from "./runtime/refresh-open-cells.js";

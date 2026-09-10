@@ -2,56 +2,49 @@
 // splice-row-cells.ts — moves the cells a structural edit renumbers.
 //
 // Cell keys carry the concrete index, so removing row 1 of five means every
-// cell under rows 2 to 4 now belongs to rows 1 to 3. The value would repair
-// itself on the next subscription, but the touched and dirty flags and the
-// issue list would not: they live nowhere else.
+// cell under rows 2 to 4 now belongs to rows 1 to 3.
+//
+// EVERY channel travels, not only the ones a value repairs. A value cell is
+// re-derived when it is subscribed, so leaving it behind is survivable; the
+// touched and dirty flags, the issue list, the participation mark and a nested
+// list's row ORDER live nowhere else, and a survivor left holding the removed
+// row's participation mark is silently exempt from blocking a submit.
 //
 // Everything is READ first and written afterwards. A move is a permutation,
 // and writing as it is computed lets a later row overwrite a cell an earlier
 // one has not been read from yet.
 //
-// The paths to move come from the value as it was BEFORE the edit, because a
-// wildcard covers as many places as the value held then. Reading them from the
-// new root would miss the row that was removed.
+// The value is taken from the pre-edit ROOT rather than from the cell, because
+// a cell nobody ever subscribed to holds nothing while the root holds the
+// value — reading the cell would carry undefined over a live neighbour.
 // ===========================================================================
 import type { FormIssue } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   dirtyCell,
   issuesCell,
+  participatingCell,
+  rowsCell,
   touchedCell,
   valueCell,
 } from "../store/cell-key.js";
-import { expandDeclaredPath } from "../path/expand-declared-path.js";
+import { readValueAt } from "../path/read-value-at.js";
+import {
+  planRowCellMoves,
+  type RowCellMove,
+  type RowOrigins,
+} from "./row-cell-move.js";
 
-/** For each new row position, which old row moved into it; undefined is new. */
-export type RowOrigins = readonly (number | undefined)[];
+export type { RowOrigins, RowCellMove };
 
 export interface SpliceRowCellsRequest {
   readonly store: FormCellStore;
   readonly arrayPath: string;
-  /** The declared paths that live under `arrayPath[*]`. */
-  readonly members: readonly string[];
+  /** Every declared path under `arrayPath[*]`, leaves and nested arrays alike. */
+  readonly declaredUnder: readonly string[];
   readonly rootBefore: unknown;
   readonly origins: RowOrigins;
 }
-
-const rowIndexOf = (
-  concretePath: string,
-  arrayPath: string
-): { readonly index: number; readonly rest: string } | undefined => {
-  const opens = `${arrayPath}[`;
-  if (!concretePath.startsWith(opens)) return undefined;
-  const closes = concretePath.indexOf("]", opens.length);
-  if (closes === -1) return undefined;
-  const index = Number(concretePath.slice(opens.length, closes));
-  return Number.isInteger(index)
-    ? { index, rest: concretePath.slice(closes + 1) }
-    : undefined;
-};
-
-const atRow = (arrayPath: string, index: number, rest: string): string =>
-  `${arrayPath}[${index}]${rest}`;
 
 interface HeldCell {
   readonly target: string;
@@ -59,54 +52,57 @@ interface HeldCell {
   readonly issues: readonly FormIssue[] | undefined;
   readonly touched: boolean | undefined;
   readonly dirty: boolean | undefined;
+  readonly participating: boolean | undefined;
+  readonly rows: readonly string[] | undefined;
 }
 
-export function spliceRowCells(request: SpliceRowCellsRequest): void {
-  const { store, arrayPath, members, rootBefore, origins } = request;
-
-  const destinationOf = new Map<number, number>();
-  origins.forEach((origin, position) => {
-    if (origin !== undefined) destinationOf.set(origin, position);
+/** @returns the moves, so a caller holding paths outside the store can follow. */
+export function spliceRowCells(
+  request: SpliceRowCellsRequest
+): readonly RowCellMove[] {
+  const { store, arrayPath, declaredUnder, rootBefore, origins } = request;
+  const moves = planRowCellMoves({
+    rootBefore,
+    arrayPath,
+    declaredUnder,
+    origins,
   });
 
   const carried: HeldCell[] = [];
-  const vacated: string[] = [];
-
-  for (const member of members) {
-    for (const source of expandDeclaredPath(rootBefore, member)) {
-      const row = rowIndexOf(source, arrayPath);
-      if (row === undefined) continue;
-      const destination = destinationOf.get(row.index);
-      if (destination === row.index) continue;
-      if (destination !== undefined) {
-        carried.push({
-          target: atRow(arrayPath, destination, row.rest),
-          value: store.read(valueCell(source)),
-          issues: store.read(issuesCell(source)),
-          touched: store.read(touchedCell(source)),
-          dirty: store.read(dirtyCell(source)),
-        });
-      }
-      vacated.push(source);
-    }
+  for (const move of moves) {
+    if (move.target === undefined) continue;
+    carried.push({
+      target: move.target,
+      value: readValueAt(rootBefore, move.source),
+      issues: store.read(issuesCell(move.source)),
+      touched: store.read(touchedCell(move.source)),
+      dirty: store.read(dirtyCell(move.source)),
+      participating: store.read(participatingCell(move.source)),
+      rows: store.read(rowsCell(move.source)),
+    });
   }
 
   store.batch(() => {
-    // Vacate first: a source that nothing moved into must not keep a cell, and
-    // a source that something DID move into is written back below.
-    for (const source of vacated) {
-      store.forget(valueCell(source));
-      store.forget(issuesCell(source));
-      store.forget(touchedCell(source));
-      store.forget(dirtyCell(source));
+    for (const move of moves) {
+      store.forget(valueCell(move.source));
+      store.forget(issuesCell(move.source));
+      store.forget(touchedCell(move.source));
+      store.forget(dirtyCell(move.source));
+      store.forget(participatingCell(move.source));
+      store.forget(rowsCell(move.source));
     }
     // Only what the source actually held is carried. Writing an absent flag
-    // would turn "never touched" into a cell holding undefined, which is a
-    // cell nobody needs and one more thing to reclaim later.
+    // would turn "never touched" into a cell holding undefined.
     for (const held of carried) {
       store.write(valueCell(held.target), held.value);
       if (held.issues !== undefined) {
-        store.write(issuesCell(held.target), held.issues);
+        // The issue is addressed at the path it belongs to, so moving the cell
+        // without re-addressing the issue would leave the two disagreeing and
+        // make the next pass rewrite what it had just been handed.
+        store.write(
+          issuesCell(held.target),
+          held.issues.map((issue) => ({ ...issue, path: held.target }))
+        );
       }
       if (held.touched !== undefined) {
         store.write(touchedCell(held.target), held.touched);
@@ -114,6 +110,13 @@ export function spliceRowCells(request: SpliceRowCellsRequest): void {
       if (held.dirty !== undefined) {
         store.write(dirtyCell(held.target), held.dirty);
       }
+      if (held.participating !== undefined) {
+        store.write(participatingCell(held.target), held.participating);
+      }
+      if (held.rows !== undefined) {
+        store.write(rowsCell(held.target), held.rows);
+      }
     }
   });
+  return moves;
 }

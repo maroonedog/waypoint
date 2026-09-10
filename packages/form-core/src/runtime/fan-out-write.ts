@@ -10,15 +10,11 @@
 // write rather than once per write.
 // ===========================================================================
 import type { FormCellStore } from "../store/form-cell-store.types.js";
-import {
-  ROOT_CELL,
-  dirtyCell,
-  valueCell,
-} from "../store/cell-key.js";
-import { ancestorPathsOf, isAncestorPath } from "../path/path-relation.js";
+import { ROOT_CELL, dirtyCell, valueCell } from "../store/cell-key.js";
 import { readValueAt } from "../path/read-value-at.js";
 import { writeValueAt } from "../path/write-value-at.js";
 import type { OpenValueCells } from "./open-value-cells.js";
+import { refreshOpenAround } from "./refresh-open-cells.js";
 
 export interface FanOutWriteRequest {
   readonly store: FormCellStore;
@@ -35,16 +31,6 @@ export function fanOutWrite(request: FanOutWriteRequest): void {
     store.write(ROOT_CELL, root);
     store.write(valueCell(path), next);
     store.write(dirtyCell(path), !Object.is(readValueAt(initialRoot, path), next));
-
-    for (const ancestor of ancestorPathsOf(path)) {
-      if (openCells.isOpen(ancestor)) {
-        store.write(valueCell(ancestor), readValueAt(root, ancestor));
-      }
-    }
-    openCells.forEachOpen((open) => {
-      if (isAncestorPath(path, open)) {
-        store.write(valueCell(open), readValueAt(root, open));
-      }
-    });
+    refreshOpenAround(store, openCells, root, path);
   });
 }

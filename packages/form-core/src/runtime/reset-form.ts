@@ -8,7 +8,9 @@
 // nothing else would ever correct.
 //
 // The paths to forget are expanded over the OLD root, because that is the only
-// place a row that is about to disappear is still enumerable.
+// place a row that is about to disappear is still enumerable. What replaces
+// them is written by the same function that seeds a new form, so a reset form
+// and a fresh one cannot hold different cells.
 // ===========================================================================
 import type { FormFieldDescriptor } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
@@ -16,14 +18,14 @@ import {
   ROOT_CELL,
   dirtyCell,
   issuesCell,
+  participatingCell,
   rowsCell,
   touchedCell,
   valueCell,
 } from "../store/cell-key.js";
 import { expandDeclaredPath } from "../path/expand-declared-path.js";
-import { readValueAt } from "../path/read-value-at.js";
+import { writeDeclaredCells } from "../descriptors/write-declared-cells.js";
 import type { RowIdMinter } from "./row-index.js";
-import { mintRowIds } from "./row-index.js";
 
 export interface ResetFormRequest {
   readonly store: FormCellStore;
@@ -44,29 +46,25 @@ export function resetForm(request: ResetFormRequest): void {
         store.forget(issuesCell(path));
         store.forget(touchedCell(path));
         store.forget(dirtyCell(path));
+        store.forget(participatingCell(path));
       }
     }
     for (const arrayPath of arrayPaths) {
       for (const path of expandDeclaredPath(rootBefore, arrayPath)) {
         store.forget(valueCell(path));
+        store.forget(issuesCell(path));
         store.forget(rowsCell(path));
+        store.forget(participatingCell(path));
       }
     }
 
     store.write(ROOT_CELL, nextRoot);
-
-    for (const descriptor of descriptors) {
-      for (const path of expandDeclaredPath(nextRoot, descriptor.path)) {
-        store.write(valueCell(path), readValueAt(nextRoot, path));
-      }
-    }
-    for (const arrayPath of arrayPaths) {
-      for (const path of expandDeclaredPath(nextRoot, arrayPath)) {
-        const held = readValueAt(nextRoot, path);
-        const length = Array.isArray(held) ? held.length : 0;
-        store.write(valueCell(path), held);
-        store.write(rowsCell(path), mintRowIds(minter, length));
-      }
-    }
+    writeDeclaredCells({
+      store,
+      descriptors,
+      arrayPaths,
+      minter,
+      root: nextRoot,
+    });
   });
 }
