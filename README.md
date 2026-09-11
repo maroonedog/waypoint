@@ -19,6 +19,18 @@ it.
 | `form-react` | React bindings. |
 | `form-store-zustand` | A zustand-backed store, as a worked example of substituting one. |
 
+Nothing here is published yet. Build it from source:
+
+```bash
+git clone https://github.com/maroonedog/form-contract
+cd form-contract
+npm install
+npm run verify     # build every package, run the tests, run the type tests
+```
+
+The packages are npm workspaces, so `form-core` and the rest resolve to each
+other with no linking step.
+
 ---
 
 ## The contract
@@ -239,8 +251,9 @@ Content-Security-Policy.
 
 ## The showcase
 
-`examples/showcase` — a real申込 form, 23 inputs across six sections, drawn with
-Tailwind and Material Design 3. See its README for what each part demonstrates.
+`examples/showcase` — a real application form: 23 inputs across six sections,
+drawn with Tailwind and Material Design 3. Its README says what each part of
+the screen demonstrates.
 
 ```bash
 node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts examples/showcase
@@ -248,13 +261,21 @@ node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts exa
 
 ---
 
-## Verifying
+## Where it stands
 
-```bash
-npm run verify     # build every package, run the tests, run the type tests
-```
+The runtime is complete against its design and is exercised by 76 tests, a
+compile-time test that pins the path union, and a screen that uses all of it.
+It has not been published, and it has not been run in production by anyone.
 
-The design this was built from is `docs/design/form-runtime.md`.
+Two limits are stated rather than papered over. The concrete path grammar has
+no escape, so a field whose key contains a dot cannot be addressed. And
+validation is proportional to the schema on every settled change: the diff
+keeps *notification* proportional to what actually moved, but the pass itself
+judges the whole root, which is what lets a cross-field rule report against a
+field that did not move.
+
+The design this was built from is `docs/design/form-runtime.md`. Sections 7
+and 8 record what was rejected and why.
 
 ## License
 
