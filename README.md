@@ -307,7 +307,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 76 tests, a
+The runtime is complete against its design and is exercised by 81 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 

@@ -8,15 +8,15 @@ Injected into `hand-written-per-field-state` at `leaves-201`, judged against the
 
 | injected | synchronous | microtask | macrotask |
 |---|---|---|---|
-| 0 ms | not resolved (-47.5 µs, ratio 0.973) | not resolved (23 µs, ratio 1.01) | not resolved (-19 µs, ratio 0.971) |
-| 0.1 ms | not resolved (199.5 µs, ratio 1.111) | not resolved (-97 µs, ratio 1) | not resolved (54 µs, ratio 1.081) |
-| 0.25 ms | not resolved (331.5 µs, ratio 1.254) | not resolved (47 µs, ratio 1.054) | not resolved (34.5 µs, ratio 1.007) |
-| 0.5 ms | **resolved** (613 µs, ratio 1.447) | not resolved (-26 µs, ratio 0.996) | not resolved (28.5 µs, ratio 1.045) |
-| 1 ms | **resolved** (1157 µs, ratio 1.771) | not resolved (-40.5 µs, ratio 0.982) | not resolved (51 µs, ratio 1.034) |
-| 2 ms | **resolved** (2158.5 µs, ratio 2.693) | not resolved (-25 µs, ratio 0.966) | not resolved (95 µs, ratio 1.126) |
-| 4 ms | **resolved** (4098.5 µs, ratio 4.485) | not resolved (55 µs, ratio 1.066) | not resolved (-26 µs, ratio 0.965) |
+| 0 ms | not resolved (24 µs, ratio 1.004) | not resolved (0 µs, ratio 0.998) | not resolved (2 µs, ratio 1.002) |
+| 0.1 ms | not resolved (122.5 µs, ratio 1.187) | not resolved (9 µs, ratio 1.025) | not resolved (18.5 µs, ratio 1.057) |
+| 0.25 ms | **resolved** (277.5 µs, ratio 1.668) | not resolved (27.5 µs, ratio 1.051) | not resolved (-4.5 µs, ratio 1.042) |
+| 0.5 ms | **resolved** (607 µs, ratio 2.19) | not resolved (16.5 µs, ratio 0.999) | not resolved (12 µs, ratio 1.024) |
+| 1 ms | **resolved** (1052 µs, ratio 2.97) | not resolved (56.5 µs, ratio 1.064) | not resolved (4 µs, ratio 1.045) |
+| 2 ms | **resolved** (2022 µs, ratio 4.978) | not resolved (14.5 µs, ratio 1.051) | not resolved (26.5 µs, ratio 1.048) |
+| 4 ms | **resolved** (4097.5 µs, ratio 10.299) | not resolved (-31 µs, ratio 1.036) | not resolved (16.5 µs, ratio 1.058) |
 
-**This harness sees 0.5 ms at the synchronous position, nothing at all up to 4 ms at the microtask position, nothing at all up to 4 ms at the macrotask position.**
+**This harness sees 0.25 ms at the synchronous position, nothing at all up to 4 ms at the microtask position, nothing at all up to 4 ms at the macrotask position.**
 
 The headline metric is `EventDispatch` filtered to `input`, and that event closes before a microtask runs. A runtime that defers its work — form-contract coalesces its validation pass to a microtask — is therefore cheap on this metric BY CONSTRUCTION, and the microtask and macrotask columns above are the measurement that says so rather than an argument that it might be true.
 
@@ -26,30 +26,30 @@ Two byte-identical pages measured as sequential halves once reported **0.8891** 
 
 | shape | subject | p10 | median | p90 | pairs | dropped | spread |
 |---|---|---|---|---|---|---|---|
-| leaves-31 | `hand-written-per-field-state` | 0.87 | 0.98 | 1.063 | 21 | 0 | 27.8% |
-| leaves-31 | `form-contract-use-field` | 0.887 | 0.983 | 1.151 | 21 | 0 | 43.4% |
-| leaves-31 | `react-hook-form-scoped` | 0.866 | 0.997 | 1.263 | 21 | 0 | 59.8% |
-| leaves-31 | `react-hook-form-deps` | 0.942 | 0.982 | 1.27 | 21 | 0 | 68% |
-| leaves-31 | `react-hook-form-on-submit` | 0.786 | 0.965 | 1.093 | 21 | 0 | 41% |
-| leaves-31 | `formik-use-field` | 0.856 | 0.977 | 1.145 | 21 | 0 | 48.4% |
-| leaves-31 | `formik-fast-field` | 0.929 | 1.03 | 1.178 | 21 | 0 | 55.7% |
-| leaves-31 | `tanstack-form-level` | 0.863 | 0.945 | 1.106 | 21 | 0 | 48.7% |
-| leaves-61 | `hand-written-per-field-state` | 0.875 | 0.988 | 1.065 | 21 | 0 | 66.4% |
-| leaves-61 | `form-contract-use-field` | 0.852 | 0.979 | 1.27 | 21 | 0 | 69.9% |
-| leaves-61 | `react-hook-form-scoped` | 0.868 | 1.038 | 1.178 | 21 | 0 | 45.3% |
-| leaves-61 | `react-hook-form-deps` | 0.904 | 1.013 | 1.064 | 21 | 0 | 30.7% |
-| leaves-61 | `react-hook-form-on-submit` | 0.87 | 0.968 | 1.122 | 21 | 0 | 43.2% |
-| leaves-61 | `formik-use-field` | 0.774 | 1.001 | 1.192 | 21 | 0 | 72.1% |
-| leaves-61 | `formik-fast-field` | 0.874 | 0.953 | 1.205 | 21 | 0 | 61.3% |
-| leaves-61 | `tanstack-form-level` | 0.909 | 0.982 | 1.22 | 21 | 0 | 88.5% |
-| leaves-201 | `hand-written-per-field-state` | 0.799 | 0.938 | 1.171 | 21 | 0 | 57.2% |
-| leaves-201 | `form-contract-use-field` | 0.866 | 0.983 | 1.256 | 21 | 0 | 101.8% |
-| leaves-201 | `react-hook-form-scoped` | 0.924 | 1.02 | 1.167 | 21 | 0 | 58.5% |
-| leaves-201 | `react-hook-form-deps` | 0.939 | 1.033 | 1.197 | 21 | 0 | 45.5% |
-| leaves-201 | `react-hook-form-on-submit` | 0.895 | 0.974 | 1.053 | 21 | 0 | 36.3% |
-| leaves-201 | `formik-use-field` | 0.835 | 0.985 | 1.166 | 21 | 0 | 66.8% |
-| leaves-201 | `formik-fast-field` | 0.918 | 0.984 | 1.157 | 21 | 0 | 68.1% |
-| leaves-201 | `tanstack-form-level` | 0.871 | 1.017 | 1.227 | 21 | 0 | 58.1% |
+| leaves-31 | `hand-written-per-field-state` | 0.874 | 0.972 | 1.143 | 21 | 0 | 37.7% |
+| leaves-31 | `form-contract-use-field` | 0.877 | 1.006 | 1.076 | 21 | 0 | 32.3% |
+| leaves-31 | `react-hook-form-scoped` | 0.884 | 0.984 | 1.164 | 21 | 0 | 60.2% |
+| leaves-31 | `react-hook-form-deps` | 0.903 | 0.992 | 1.078 | 21 | 0 | 53.5% |
+| leaves-31 | `react-hook-form-on-submit` | 0.782 | 0.96 | 1.145 | 21 | 0 | 88.4% |
+| leaves-31 | `formik-use-field` | 0.914 | 1.013 | 1.087 | 21 | 0 | 82.5% |
+| leaves-31 | `formik-fast-field` | 0.895 | 0.969 | 1.066 | 21 | 0 | 54.8% |
+| leaves-31 | `tanstack-form-level` | 0.931 | 0.978 | 1.065 | 21 | 0 | 23.6% |
+| leaves-61 | `hand-written-per-field-state` | 0.857 | 0.945 | 1.09 | 21 | 0 | 72.3% |
+| leaves-61 | `form-contract-use-field` | 0.787 | 1.021 | 1.227 | 21 | 0 | 73.7% |
+| leaves-61 | `react-hook-form-scoped` | 0.87 | 0.978 | 1.047 | 21 | 0 | 37% |
+| leaves-61 | `react-hook-form-deps` | 0.881 | 1.034 | 1.114 | 21 | 0 | 46% |
+| leaves-61 | `react-hook-form-on-submit` | 0.798 | 1.07 | 1.212 | 21 | 0 | 94.6% |
+| leaves-61 | `formik-use-field` | 0.888 | 1.037 | 1.151 | 21 | 0 | 58.7% |
+| leaves-61 | `formik-fast-field` | 0.951 | 1.058 | 1.19 | 21 | 0 | 43.3% |
+| leaves-61 | `tanstack-form-level` | 0.943 | 0.994 | 1.071 | 21 | 0 | 21.6% |
+| leaves-201 | `hand-written-per-field-state` | 0.87 | 0.949 | 1.126 | 21 | 0 | 46.9% |
+| leaves-201 | `form-contract-use-field` | 0.912 | 1.005 | 1.149 | 21 | 0 | 35.4% |
+| leaves-201 | `react-hook-form-scoped` | 0.948 | 0.996 | 1.046 | 21 | 0 | 18.3% |
+| leaves-201 | `react-hook-form-deps` | 0.844 | 0.996 | 1.14 | 21 | 0 | 43.4% |
+| leaves-201 | `react-hook-form-on-submit` | 0.785 | 0.943 | 1.101 | 21 | 0 | 46.7% |
+| leaves-201 | `formik-use-field` | 0.964 | 0.999 | 1.024 | 21 | 0 | 15.6% |
+| leaves-201 | `formik-fast-field` | 0.961 | 1.001 | 1.03 | 21 | 0 | 17.7% |
+| leaves-201 | `tanstack-form-level` | 0.991 | 1.046 | 1.186 | 21 | 0 | 28.7% |
 
 ## §1 — The comparisons
 
@@ -63,23 +63,20 @@ The policy column is not decoration. A subject whose policy is on-submit does no
 
 | subject | policy | ratio (p10–p90) | input handler | denominator | of which validator | inside the dispatch | runtime (a subtraction) | full range | pairs / dropped | spread | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `tanstack-form-level` | on-change | 2.484 (2.203–2.715) | 805.5 µs | 322.5 µs | 56.7 µs | 100% | 748.8 µs | 1.969–3.229 | 21 / 0 | 50.8% | **indistinguishable** |
-| `formik-use-field` | on-change | 2.253 (1.771–3.099) | 760.5 µs | 345.5 µs | 57.1 µs | 100% | 703.4 µs | 1.685–3.2 | 21 / 0 | 67.2% | **indistinguishable** |
-| `formik-fast-field` | on-change | 1.769 (1.425–2.234) | 759.5 µs | 402 µs | 62.9 µs | 100% | 696.6 µs | 1.279–2.508 | 21 / 0 | 69.5% | **indistinguishable** |
-| `form-contract-use-field` | on-change | 1.003 (0.774–1.117) | 437 µs | 435.5 µs | 70.8 µs | 0% | n/a — the pass is outside the dispatch | 0.71–1.429 | 21 / 0 | 71.7% | **indistinguishable** |
-| `react-hook-form-deps` | on-change | 0.906 (0.778–1.009) | 330.5 µs | 344.5 µs | 68.8 µs | 100% | 261.8 µs | 0.758–1.097 | 21 / 0 | 37.5% | **indistinguishable** |
-| `react-hook-form-scoped` | on-change | 0.899 (0.756–1.026) | 339 µs | 369.5 µs | 80.8 µs | 100% | 258.2 µs | 0.68–1.183 | 21 / 0 | 56% | **indistinguishable** |
-| `react-hook-form-on-submit` | on-submit | 0.541 (0.457–0.636) | 223.5 µs | 426 µs | 0 µs | 0% | n/a — the pass is outside the dispatch | 0.406–0.657 | 21 / 0 | 46.5% | **indistinguishable** |
+| `tanstack-form-level` | on-change | 2.844 (2.523–3.243) | 888 µs | 309.5 µs | 52.1 µs | 100% | 835.9 µs | 2.49–3.592 | 21 / 0 | 38.8% | **slower** |
+| `formik-use-field` | on-change | 2.6 (2.234–3.045) | 612 µs | 223.5 µs | 37.5 µs | 100% | 574.5 µs | 1.97–3.261 | 21 / 0 | 49.6% | **slower** |
+| `formik-fast-field` | on-change | 1.954 (1.784–2.141) | 594 µs | 305.5 µs | 47.1 µs | 100% | 546.9 µs | 1.762–2.214 | 21 / 0 | 23.1% | **slower** |
+| `react-hook-form-deps` | on-change | 1.003 (0.959–1.133) | 192.5 µs | 192.5 µs | 38.3 µs | 100% | 154.2 µs | 0.882–1.151 | 21 / 0 | 26.8% | **indistinguishable** |
+| `form-contract-use-field` | on-change | 0.984 (0.882–1.073) | 176.5 µs | 179 µs | 20 µs | 0% | n/a — the pass is outside the dispatch | 0.815–1.121 | 21 / 0 | 31.1% | **indistinguishable** |
+| `react-hook-form-scoped` | on-change | 0.973 (0.866–1.092) | 203 µs | 212 µs | 39.6 µs | 100% | 163.4 µs | 0.754–1.292 | 21 / 0 | 55.3% | **indistinguishable** |
+| `react-hook-form-on-submit` | on-submit | 0.54 (0.499–0.615) | 125 µs | 229.5 µs | 0 µs | 0% | n/a — the pass is outside the dispatch | 0.461–0.695 | 21 / 0 | 43.2% | **indistinguishable** |
 
-- `tanstack-form-level`: 483 µs is under the smallest cost this harness resolved (500 µs)
-- `formik-use-field`: 415 µs is under the smallest cost this harness resolved (500 µs)
-- `formik-fast-field`: 357.5 µs is under the smallest cost this harness resolved (500 µs)
-- `form-contract-use-field`: the band 0.774–1.117 overlaps the null band 0.87–1.151
-- `react-hook-form-deps`: the band 0.778–1.009 overlaps the null band 0.87–1.27
-- `react-hook-form-scoped`: the band 0.756–1.026 overlaps the null band 0.866–1.263
-- `react-hook-form-on-submit`: 202.5 µs is under the smallest cost this harness resolved (500 µs)
+- `react-hook-form-deps`: the band 0.959–1.133 overlaps the null band 0.874–1.143
+- `form-contract-use-field`: the band 0.882–1.073 overlaps the null band 0.874–1.143
+- `react-hook-form-scoped`: the band 0.866–1.092 overlaps the null band 0.874–1.164
+- `react-hook-form-on-submit`: 104.5 µs is under the smallest cost this harness resolved (250 µs)
 
-**Read the deferring rows with the ladder in hand.** `form-contract-use-field` ran 1 pass(es) per keystroke, 70.8 µs of them, with 0% inside the dispatch. That work is real and it is not in the input-handler figure, because this harness's own ladder shows the metric cannot resolve a cost at the microtask position at all. The counts lane is where that work is counted rather than timed.
+**Read the deferring rows with the ladder in hand.** `form-contract-use-field` ran 1 pass(es) per keystroke, 20 µs of them, with 0% inside the dispatch. That work is real and it is not in the input-handler figure, because this harness's own ladder shows the metric cannot resolve a cost at the microtask position at all. The counts lane is where that work is counted rather than timed.
 
 ### leaves-61 — 61 rendered fields
 
@@ -91,21 +88,20 @@ The policy column is not decoration. A subject whose policy is on-submit does no
 
 | subject | policy | ratio (p10–p90) | input handler | denominator | of which validator | inside the dispatch | runtime (a subtraction) | full range | pairs / dropped | spread | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `tanstack-form-level` | on-change | 3.118 (2.762–3.848) | 1174 µs | 388 µs | 78.8 µs | 100% | 1095.3 µs | 2.724–3.983 | 21 / 0 | 40.4% | **slower** |
-| `formik-use-field` | on-change | 2.69 (2.445–3.057) | 1167 µs | 426 µs | 100.4 µs | 100% | 1066.6 µs | 2.083–3.361 | 21 / 0 | 47.5% | **slower** |
-| `formik-fast-field` | on-change | 1.774 (1.674–2.008) | 670 µs | 376.5 µs | 79.2 µs | 100% | 590.8 µs | 1.6–2.294 | 21 / 0 | 39.1% | **indistinguishable** |
-| `react-hook-form-scoped` | on-change | 0.923 (0.797–1.097) | 553.5 µs | 616 µs | 136.3 µs | 100% | 417.3 µs | 0.748–1.192 | 21 / 0 | 48.1% | **indistinguishable** |
-| `react-hook-form-deps` | on-change | 0.902 (0.757–0.992) | 368.5 µs | 424 µs | 96.7 µs | 100% | 271.8 µs | 0.701–1.126 | 21 / 0 | 47.1% | **indistinguishable** |
-| `form-contract-use-field` | on-change | 0.888 (0.768–1.089) | 365 µs | 422 µs | 72.5 µs | 0% | n/a — the pass is outside the dispatch | 0.673–1.263 | 21 / 0 | 66.5% | **indistinguishable** |
-| `react-hook-form-on-submit` | on-submit | 0.466 (0.415–0.524) | 223.5 µs | 492 µs | 0 µs | 0% | n/a — the pass is outside the dispatch | 0.405–0.572 | 21 / 0 | 35.9% | **indistinguishable** |
+| `tanstack-form-level` | on-change | 4.5 (3.785–5.024) | 924.5 µs | 195 µs | 31.3 µs | 100% | 893.3 µs | 3.357–5.75 | 21 / 0 | 53.2% | **slower** |
+| `formik-use-field` | on-change | 3.414 (2.547–4.465) | 907.5 µs | 295 µs | 71.3 µs | 100% | 836.3 µs | 2.377–4.543 | 21 / 0 | 63.4% | **slower** |
+| `formik-fast-field` | on-change | 2.544 (2.158–2.746) | 504.5 µs | 201 µs | 37.5 µs | 100% | 467 µs | 1.307–3.301 | 21 / 0 | 78.4% | **slower** |
+| `react-hook-form-scoped` | on-change | 0.923 (0.842–1.115) | 369.5 µs | 390.5 µs | 83.3 µs | 100% | 286.2 µs | 0.818–1.223 | 21 / 0 | 43.9% | **indistinguishable** |
+| `react-hook-form-deps` | on-change | 0.918 (0.821–1.064) | 360.5 µs | 392.5 µs | 91.3 µs | 100% | 269.3 µs | 0.535–1.083 | 21 / 0 | 59.7% | **indistinguishable** |
+| `form-contract-use-field` | on-change | 0.857 (0.619–0.983) | 175 µs | 206 µs | 35.4 µs | 0% | n/a — the pass is outside the dispatch | 0.612–1.197 | 21 / 0 | 68.2% | **indistinguishable** |
+| `react-hook-form-on-submit` | on-submit | 0.542 (0.456–0.596) | 210 µs | 394 µs | 0 µs | 0% | n/a — the pass is outside the dispatch | 0.282–0.658 | 21 / 0 | 69.3% | **indistinguishable** |
 
-- `formik-fast-field`: 293.5 µs is under the smallest cost this harness resolved (500 µs)
-- `react-hook-form-scoped`: the band 0.797–1.097 overlaps the null band 0.868–1.178
-- `react-hook-form-deps`: the band 0.757–0.992 overlaps the null band 0.875–1.065
-- `form-contract-use-field`: the band 0.768–1.089 overlaps the null band 0.852–1.27
-- `react-hook-form-on-submit`: 268.5 µs is under the smallest cost this harness resolved (500 µs)
+- `react-hook-form-scoped`: the band 0.842–1.115 overlaps the null band 0.857–1.09
+- `react-hook-form-deps`: the band 0.821–1.064 overlaps the null band 0.857–1.114
+- `form-contract-use-field`: the band 0.619–0.983 overlaps the null band 0.787–1.227
+- `react-hook-form-on-submit`: 184 µs is under the smallest cost this harness resolved (250 µs)
 
-**Read the deferring rows with the ladder in hand.** `form-contract-use-field` ran 1 pass(es) per keystroke, 72.5 µs of them, with 0% inside the dispatch. That work is real and it is not in the input-handler figure, because this harness's own ladder shows the metric cannot resolve a cost at the microtask position at all. The counts lane is where that work is counted rather than timed.
+**Read the deferring rows with the ladder in hand.** `form-contract-use-field` ran 1 pass(es) per keystroke, 35.4 µs of them, with 0% inside the dispatch. That work is real and it is not in the input-handler figure, because this harness's own ladder shows the metric cannot resolve a cost at the microtask position at all. The counts lane is where that work is counted rather than timed.
 
 ### leaves-201 — 201 rendered fields
 
@@ -117,19 +113,19 @@ The policy column is not decoration. A subject whose policy is on-submit does no
 
 | subject | policy | ratio (p10–p90) | input handler | denominator | of which validator | inside the dispatch | runtime (a subtraction) | full range | pairs / dropped | spread | verdict |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| `tanstack-form-level` | on-change | 4.056 (3.741–4.942) | 5920.5 µs | 1355.5 µs | 570.4 µs | 100% | 5350.1 µs | 3.541–5.091 | 21 / 0 | 38.2% | **slower** |
-| `formik-use-field` | on-change | 3.874 (3.483–5.914) | 2581 µs | 650 µs | 248.3 µs | 100% | 2332.7 µs | 2.977–7.993 | 21 / 0 | 129.5% | **slower** |
-| `formik-fast-field` | on-change | 2.278 (1.996–2.652) | 2063.5 µs | 1034 µs | 303.3 µs | 100% | 1760.2 µs | 1.839–2.703 | 21 / 0 | 37.9% | **slower** |
-| `react-hook-form-scoped` | on-change | 0.924 (0.746–1.088) | 686.5 µs | 743 µs | 268.3 µs | 100% | 418.2 µs | 0.711–1.385 | 21 / 0 | 72.9% | **indistinguishable** |
-| `react-hook-form-deps` | on-change | 0.848 (0.798–0.95) | 1132 µs | 1328 µs | 463.8 µs | 100% | 668.3 µs | 0.745–0.993 | 21 / 0 | 29.3% | **indistinguishable** |
-| `form-contract-use-field` | on-change | 0.629 (0.518–0.703) | 475.5 µs | 783 µs | 294.2 µs | 0% | n/a — the pass is outside the dispatch | 0.484–0.759 | 21 / 0 | 43.6% | **indistinguishable** |
-| `react-hook-form-on-submit` | on-submit | 0.316 (0.26–0.429) | 323 µs | 1017.5 µs | 0 µs | 0% | n/a — the pass is outside the dispatch | 0.236–0.442 | 21 / 0 | 65.3% | **faster** |
+| `tanstack-form-level` | on-change | 5.908 (5.323–6.359) | 2520 µs | 420 µs | 140.4 µs | 100% | 2379.6 µs | 4.753–7.027 | 21 / 0 | 38.5% | **slower** |
+| `formik-use-field` | on-change | 5.688 (5.311–6.083) | 2375.5 µs | 417 µs | 132.9 µs | 100% | 2242.6 µs | 4.681–6.519 | 21 / 0 | 32.3% | **slower** |
+| `formik-fast-field` | on-change | 3.131 (2.908–3.332) | 1318.5 µs | 413.5 µs | 127.9 µs | 100% | 1190.6 µs | 2.813–3.584 | 21 / 0 | 24.6% | **slower** |
+| `react-hook-form-scoped` | on-change | 1.058 (0.889–1.115) | 463.5 µs | 443.5 µs | 189.2 µs | 100% | 274.3 µs | 0.816–1.397 | 21 / 0 | 54.9% | **indistinguishable** |
+| `react-hook-form-deps` | on-change | 0.995 (0.889–1.202) | 541.5 µs | 524.5 µs | 227.9 µs | 100% | 313.6 µs | 0.794–1.323 | 21 / 0 | 53.1% | **indistinguishable** |
+| `form-contract-use-field` | on-change | 0.546 (0.508–0.592) | 223 µs | 410.5 µs | 132.1 µs | 0% | n/a — the pass is outside the dispatch | 0.448–0.611 | 21 / 0 | 30% | **indistinguishable** |
+| `react-hook-form-on-submit` | on-submit | 0.28 (0.231–0.294) | 129.5 µs | 490.5 µs | 0 µs | 0% | n/a — the pass is outside the dispatch | 0.229–0.309 | 21 / 0 | 28.5% | **faster** |
 
-- `react-hook-form-scoped`: the band 0.746–1.088 overlaps the null band 0.799–1.171
-- `react-hook-form-deps`: the band 0.798–0.95 overlaps the null band 0.799–1.197
-- `form-contract-use-field`: 307.5 µs is under the smallest cost this harness resolved (500 µs)
+- `react-hook-form-scoped`: the band 0.889–1.115 overlaps the null band 0.87–1.126
+- `react-hook-form-deps`: the band 0.889–1.202 overlaps the null band 0.844–1.14
+- `form-contract-use-field`: only 0% of its 132.1 µs of validator work per keystroke ran inside the dispatch this metric measures, and the ladder resolves nothing at all at the microtask position; a smaller handler figure here is partly about where the work was scheduled
 
-**Read the deferring rows with the ladder in hand.** `form-contract-use-field` ran 1 pass(es) per keystroke, 294.2 µs of them, with 0% inside the dispatch. That work is real and it is not in the input-handler figure, because this harness's own ladder shows the metric cannot resolve a cost at the microtask position at all. The counts lane is where that work is counted rather than timed.
+**Read the deferring rows with the ladder in hand.** `form-contract-use-field` ran 1 pass(es) per keystroke, 132.1 µs of them, with 0% inside the dispatch. That work is real and it is not in the input-handler figure, because this harness's own ladder shows the metric cannot resolve a cost at the microtask position at all. The counts lane is where that work is counted rather than timed.
 
 ## §2 — Frame work
 
@@ -137,27 +133,27 @@ Style, layout and paint are the part of a keystroke that jsdom cannot see at all
 
 | shape | subject | UpdateLayoutTree | RecalcStyleCount | Layout | LayoutCount | Paint+PrePaint+Commit | GC |
 |---|---|---|---|---|---|---|---|
-| leaves-31 | `form-contract-use-field` | 39.9 µs | 1 | 393.7 µs | 1 | 861.3 µs | 0 µs |
-| leaves-31 | `react-hook-form-scoped` | 36.8 µs | 1 | 385.9 µs | 1 | 801.3 µs | 0 µs |
-| leaves-31 | `react-hook-form-deps` | 37 µs | 1 | 396.7 µs | 1 | 910.7 µs | 0 µs |
-| leaves-31 | `react-hook-form-on-submit` | 41.8 µs | 1 | 444.8 µs | 1 | 1044.3 µs | 0 µs |
-| leaves-31 | `formik-use-field` | 37.1 µs | 1 | 401.1 µs | 1 | 914.1 µs | 226.7 µs |
-| leaves-31 | `formik-fast-field` | 40.1 µs | 1 | 431.9 µs | 1 | 1084.1 µs | 277.6 µs |
-| leaves-31 | `tanstack-form-level` | 35.3 µs | 1 | 369.4 µs | 1 | 832.8 µs | 0 µs |
-| leaves-61 | `form-contract-use-field` | 37.3 µs | 1 | 569.3 µs | 1 | 1573.4 µs | 0 µs |
-| leaves-61 | `react-hook-form-scoped` | 53.8 µs | 1 | 978.4 µs | 1 | 2195.2 µs | 0 µs |
-| leaves-61 | `react-hook-form-deps` | 42 µs | 1 | 602.2 µs | 1 | 1446.9 µs | 0 µs |
-| leaves-61 | `react-hook-form-on-submit` | 42.6 µs | 1 | 673 µs | 1 | 1573.5 µs | 0 µs |
-| leaves-61 | `formik-use-field` | 40.7 µs | 1 | 591.6 µs | 1 | 1391.4 µs | 291.6 µs |
-| leaves-61 | `formik-fast-field` | 37.7 µs | 1 | 534.4 µs | 1 | 1195.2 µs | 0 µs |
-| leaves-61 | `tanstack-form-level` | 40.1 µs | 1 | 621.2 µs | 1 | 1342.6 µs | 0 µs |
-| leaves-201 | `form-contract-use-field` | 44.8 µs | 1 | 1654.7 µs | 1 | 4535.3 µs | 0 µs |
-| leaves-201 | `react-hook-form-scoped` | 42.2 µs | 1 | 1411.3 µs | 1 | 3962.5 µs | 0 µs |
-| leaves-201 | `react-hook-form-deps` | 66.3 µs | 1 | 2743.4 µs | 1 | 8529.8 µs | 0 µs |
-| leaves-201 | `react-hook-form-on-submit` | 47.9 µs | 1 | 1834.1 µs | 1 | 6435.3 µs | 0 µs |
-| leaves-201 | `formik-use-field` | 38.3 µs | 1 | 1309.4 µs | 1 | 4420.2 µs | 525.8 µs |
-| leaves-201 | `formik-fast-field` | 41.7 µs | 1 | 1666.1 µs | 1 | 5449.7 µs | 0 µs |
-| leaves-201 | `tanstack-form-level` | 58.2 µs | 1 | 2316.2 µs | 1 | 8745.3 µs | 0 µs |
+| leaves-31 | `form-contract-use-field` | 13.3 µs | 1 | 194.7 µs | 1 | 488.2 µs | 0 µs |
+| leaves-31 | `react-hook-form-scoped` | 15.5 µs | 1 | 200.3 µs | 1 | 484.2 µs | 0 µs |
+| leaves-31 | `react-hook-form-deps` | 13.5 µs | 1 | 190.1 µs | 1 | 477.7 µs | 0 µs |
+| leaves-31 | `react-hook-form-on-submit` | 18 µs | 1 | 211.6 µs | 1 | 502.1 µs | 0 µs |
+| leaves-31 | `formik-use-field` | 19.6 µs | 1 | 212 µs | 1 | 517.2 µs | 389.9 µs |
+| leaves-31 | `formik-fast-field` | 27.9 µs | 1 | 261.5 µs | 1 | 568 µs | 0 µs |
+| leaves-31 | `tanstack-form-level` | 28.3 µs | 1 | 262.9 µs | 1 | 569.8 µs | 216.5 µs |
+| leaves-61 | `form-contract-use-field` | 14.4 µs | 1 | 293.3 µs | 1 | 792.3 µs | 0 µs |
+| leaves-61 | `react-hook-form-scoped` | 26 µs | 1 | 351.2 µs | 1 | 924.1 µs | 0 µs |
+| leaves-61 | `react-hook-form-deps` | 30.4 µs | 1 | 377.5 µs | 1 | 944.5 µs | 0 µs |
+| leaves-61 | `react-hook-form-on-submit` | 28.6 µs | 1 | 381.8 µs | 1 | 973.3 µs | 0 µs |
+| leaves-61 | `formik-use-field` | 16.3 µs | 1 | 323.8 µs | 1 | 824.2 µs | 381.1 µs |
+| leaves-61 | `formik-fast-field` | 14.1 µs | 1 | 309.7 µs | 1 | 802.2 µs | 0 µs |
+| leaves-61 | `tanstack-form-level` | 13.5 µs | 1 | 306.9 µs | 1 | 795.8 µs | 0 µs |
+| leaves-201 | `form-contract-use-field` | 13.8 µs | 1 | 901.4 µs | 1 | 2140.2 µs | 0 µs |
+| leaves-201 | `react-hook-form-scoped` | 15.8 µs | 1 | 856.1 µs | 1 | 2213.1 µs | 0 µs |
+| leaves-201 | `react-hook-form-deps` | 18.3 µs | 1 | 866.2 µs | 1 | 2346.3 µs | 0 µs |
+| leaves-201 | `react-hook-form-on-submit` | 14.5 µs | 1 | 834.7 µs | 1 | 2213.7 µs | 0 µs |
+| leaves-201 | `formik-use-field` | 17.7 µs | 1 | 1067.3 µs | 1 | 2602.6 µs | 427.8 µs |
+| leaves-201 | `formik-fast-field` | 15.1 µs | 1 | 859 µs | 1 | 2138.1 µs | 0 µs |
+| leaves-201 | `tanstack-form-level` | 16.3 µs | 1 | 974.1 µs | 1 | 2643.5 µs | 0 µs |
 
 ### EventDispatch by type — the evidence for the filter
 
@@ -165,37 +161,37 @@ Style, layout and paint are the part of a keystroke that jsdom cannot see at all
 
 | shape | subject | input dispatches | input | selectionchange |
 |---|---|---|---|---|
-| leaves-31 | `form-contract-use-field` | 12 | 437 µs | — |
-| leaves-31 | `react-hook-form-scoped` | 12 | 339 µs | — |
-| leaves-31 | `react-hook-form-deps` | 12 | 330.5 µs | — |
-| leaves-31 | `react-hook-form-on-submit` | 12 | 223.5 µs | — |
-| leaves-31 | `formik-use-field` | 12 | 760.5 µs | — |
-| leaves-31 | `formik-fast-field` | 12 | 759.5 µs | — |
-| leaves-31 | `tanstack-form-level` | 12 | 805.5 µs | 82 µs |
-| leaves-61 | `form-contract-use-field` | 12 | 365 µs | — |
-| leaves-61 | `react-hook-form-scoped` | 12 | 553.5 µs | — |
-| leaves-61 | `react-hook-form-deps` | 12 | 368.5 µs | — |
-| leaves-61 | `react-hook-form-on-submit` | 12 | 223.5 µs | — |
-| leaves-61 | `formik-use-field` | 12 | 1167 µs | — |
-| leaves-61 | `formik-fast-field` | 12 | 670 µs | — |
-| leaves-61 | `tanstack-form-level` | 12 | 1174 µs | — |
-| leaves-201 | `form-contract-use-field` | 12 | 475.5 µs | — |
-| leaves-201 | `react-hook-form-scoped` | 12 | 686.5 µs | — |
-| leaves-201 | `react-hook-form-deps` | 12 | 1132 µs | — |
-| leaves-201 | `react-hook-form-on-submit` | 12 | 323 µs | — |
-| leaves-201 | `formik-use-field` | 12 | 2581 µs | — |
-| leaves-201 | `formik-fast-field` | 12 | 2063.5 µs | — |
-| leaves-201 | `tanstack-form-level` | 12 | 5920.5 µs | — |
+| leaves-31 | `form-contract-use-field` | 12 | 176.5 µs | — |
+| leaves-31 | `react-hook-form-scoped` | 12 | 203 µs | — |
+| leaves-31 | `react-hook-form-deps` | 12 | 192.5 µs | — |
+| leaves-31 | `react-hook-form-on-submit` | 12 | 125 µs | — |
+| leaves-31 | `formik-use-field` | 12 | 612 µs | — |
+| leaves-31 | `formik-fast-field` | 12 | 594 µs | — |
+| leaves-31 | `tanstack-form-level` | 12 | 888 µs | 43 µs |
+| leaves-61 | `form-contract-use-field` | 12 | 175 µs | — |
+| leaves-61 | `react-hook-form-scoped` | 12 | 369.5 µs | — |
+| leaves-61 | `react-hook-form-deps` | 12 | 360.5 µs | — |
+| leaves-61 | `react-hook-form-on-submit` | 12 | 210 µs | — |
+| leaves-61 | `formik-use-field` | 12 | 907.5 µs | — |
+| leaves-61 | `formik-fast-field` | 12 | 504.5 µs | — |
+| leaves-61 | `tanstack-form-level` | 12 | 924.5 µs | — |
+| leaves-201 | `form-contract-use-field` | 12 | 223 µs | — |
+| leaves-201 | `react-hook-form-scoped` | 12 | 463.5 µs | — |
+| leaves-201 | `react-hook-form-deps` | 12 | 541.5 µs | — |
+| leaves-201 | `react-hook-form-on-submit` | 12 | 129.5 µs | — |
+| leaves-201 | `formik-use-field` | 12 | 2375.5 µs | — |
+| leaves-201 | `formik-fast-field` | 12 | 1318.5 µs | — |
+| leaves-201 | `tanstack-form-level` | 12 | 2520 µs | — |
 
 ## §3 — What was run on
 
 | what | value |
 |---|---|
-| product | Chrome/152.0.7977.84 |
-| revision | @4334922f44c77b1208072c4deac29db3af39bbea |
+| product | Chrome/152.0.7977.82 |
+| revision | @d04cdb24d67b081f6cf80200ffc5233f44b61109 |
 | V8 | 15.2.124.21 |
 | CDP protocol | 1.3 |
-| user agent | Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 |
+| user agent | Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/152.0.0.0 Safari/537.36 |
 | headless | true |
 | flags | `--disable-background-timer-throttling` `--disable-backgrounding-occluded-windows` `--disable-renderer-backgrounding` `--disable-ipc-flooding-protection` `--force-device-scale-factor=1` `--hide-scrollbars` `--disable-features=CalculateNativeWinOcclusion` |
 | devicePixelRatio | 1 |
@@ -203,9 +199,9 @@ Style, layout and paint are the part of a keystroke that jsdom cannot see at all
 | CPU throttle | 1x |
 | crossOriginIsolated | true |
 | performance.now() tick | 5 µs |
-| hardwareConcurrency | 16 |
+| hardwareConcurrency | 2 |
 
-Machine: AMD Ryzen 7 5825U with Radeon Graphics, 16 cores, 15.3 GB, win32 10.0.26200, node v23.11.0. react 19.3.0, react-dom 19.3.0, zod 4.6.1, react-hook-form 7.87.0, formik 2.4.9, @tanstack/react-form 1.33.5. Bundle 473 kB across both origins (http://127.0.0.1:5191 and http://127.0.0.1:5192). Run took 13.4 minutes.
+Machine: AMD EPYC 7763 64-Core Processor, 2 cores, 7.8 GB, linux 6.17.0-1022-azure, node v23.11.1. react 19.3.0, react-dom 19.3.0, zod 4.6.1, react-hook-form 7.87.0, formik 2.4.9, @tanstack/react-form 1.33.5. Bundle 473 kB across both origins (http://127.0.0.1:5191 and http://127.0.0.1:5192). Run took 11 minutes.
 
 How a sample was taken: 21 interleaved pairs per comparison, 12 keystrokes per sample, each keystroke followed by a presented frame and a macrotask; both members of a pair inside ONE tracing session, on two origins so that they are two renderer processes; order alternating every pair and origin alternating at the half-way point. Trace categories: `devtools.timeline`, `blink.user_timing`, `v8`, `disabled-by-default-v8.gc`.
 
