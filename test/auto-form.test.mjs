@@ -28,7 +28,7 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, AutoForm, Field, FieldScope, useFormStatus } =
+const { FormProvider, AutoForm, Field, useParticipation, useFormStatus } =
   await import("form-react");
 
 const { act, createElement: h, Fragment } = React;
@@ -165,7 +165,15 @@ test("the status reflects what blocks and how often it was tried", async () => {
   await act(async () => root.unmount());
 });
 
-test("a scope switched off stops blocking while it is mounted", async () => {
+// Participation is addressed by a path now. It used to be a prop on a scope
+// wrapper, which meant switching a subtree off also rewrote every path inside
+// it — two unrelated things wearing one component.
+const Dormancy = ({ form, path, participating }) => {
+  useParticipation(form, path, participating);
+  return null;
+};
+
+test("a subtree switched off stops blocking while it is mounted", async () => {
   const form = newForm({ ...GOOD, owner: { name: "A", email: "nope" } });
   const Status = () => {
     const status = useFormStatus();
@@ -179,7 +187,7 @@ test("a scope switched off stops blocking while it is mounted", async () => {
         Fragment,
         null,
         h(Status, null),
-        h(FieldScope, { prefix: "owner", participating: !dormant }, null)
+        h(Dormancy, { form, path: "owner", participating: !dormant })
       )
     );
 

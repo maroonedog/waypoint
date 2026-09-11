@@ -1,7 +1,7 @@
 import { useState, type ReactElement } from "react";
 import {
   Field,
-  FieldScope,
+  useParticipation,
   FormProvider,
   useCreateForm,
   useFieldValue,
@@ -75,13 +75,15 @@ function CompanySection(): ReactElement {
 }
 
 function AddressSections(): ReactElement {
+  const form = useForm();
   const sameAsBilling = useFieldValue<boolean>("sameAsBilling") === true;
+  // The values stay in the store either way; what stops is the verdict
+  // counting toward whether the form can be submitted.
+  useParticipation(form, "shipping", !sameAsBilling);
   return (
     <>
       <SectionCard icon="receipt_long" title="請求先住所">
-        <FieldScope prefix="billing">
-          <AddressFields />
-        </FieldScope>
+        <AddressFields at="billing" />
       </SectionCard>
 
       <SectionCard
@@ -104,9 +106,7 @@ function AddressSections(): ReactElement {
       >
         {/* The values stay in the store either way; what stops is the verdict
             counting toward whether the form can be submitted. */}
-        <FieldScope prefix="shipping" participating={!sameAsBilling}>
-          {sameAsBilling ? null : <AddressFields />}
-        </FieldScope>
+        {sameAsBilling ? null : <AddressFields at="shipping" />}
       </SectionCard>
     </>
   );

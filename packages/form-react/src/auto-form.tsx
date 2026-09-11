@@ -7,16 +7,21 @@
 // authored, and an application that supplies its own widgets must not have to
 // override one.
 //
-// A list becomes a FieldRows with a FieldScope per row, so nothing the tree
-// produces spells a row number. What surrounds a row — the remove button, the
-// heading, the add control — is left to `renderList`, because a list that
-// looked the same in every application would be a list nobody could use.
+// A list becomes a FieldRows, and the row's index is bound onto the child
+// paths HERE. It used to be supplied by a <FieldScope row> wrapper, which
+// meant every path below that wrapper was rewritten whether it wanted to be —
+// a component inside it asking for a path elsewhere in the form silently got a
+// nonexistent one. Binding where the walk already knows the index keeps that
+// from being anybody else's problem.
+//
+// What surrounds a row — the remove button, the heading, the add control — is
+// left to `renderList`, because a list that looked the same in every
+// application would be a list nobody could use.
 // ===========================================================================
-import type { ReactElement, ReactNode } from "react";
-import type { DescriptorNode } from "form-core";
+import { Fragment, type ReactElement, type ReactNode } from "react";
+import { bindDeclaredPath, type DescriptorNode } from "form-core";
 import { Field } from "./field.js";
 import { FieldRows } from "./field-rows.js";
-import { FieldScope } from "./field-scope.js";
 import { useForm } from "./use-form.js";
 import type { RowsBinding } from "./use-rows.js";
 
@@ -34,27 +39,35 @@ export interface AutoFormProps {
   ) => ReactNode;
 }
 
+/** The declared path with this walk's row indices already in it. */
+const at = (declaredPath: string, indices: readonly number[]): string =>
+  bindDeclaredPath(declaredPath, indices) ?? declaredPath;
+
 function renderNode(
   node: DescriptorNode,
-  renderList: AutoFormProps["renderList"]
+  renderList: AutoFormProps["renderList"],
+  indices: readonly number[]
 ): ReactElement {
+  const here = at(node.path, indices);
   if (node.kind === "field") {
-    return <Field key={node.path} path={node.path} />;
+    return <Field key={here} path={here} />;
   }
   if (node.kind === "group") {
     return (
-      <div key={node.path} data-field-group={node.path}>
-        {node.children.map((child) => renderNode(child, renderList))}
+      <div key={here} data-field-group={here}>
+        {node.children.map((child) => renderNode(child, renderList, indices))}
       </div>
     );
   }
   return (
-    <FieldRows key={node.path} path={node.path}>
+    <FieldRows key={here} path={here}>
       {(binding) => {
         const rows = binding.rows.map((row) => (
-          <FieldScope key={row.key} row={row}>
-            {node.children.map((child) => renderNode(child, renderList))}
-          </FieldScope>
+          <Fragment key={row.key}>
+            {node.children.map((child) =>
+              renderNode(child, renderList, [...indices, row.index])
+            )}
+          </Fragment>
         ));
         return renderList === undefined ? rows : renderList(binding, rows);
       }}
@@ -69,5 +82,5 @@ export function AutoForm(props: AutoFormProps): ReactElement {
     only === undefined
       ? form.tree
       : form.tree.filter((node) => only.includes(node.path));
-  return <>{drawn.map((node) => renderNode(node, renderList))}</>;
+  return <>{drawn.map((node) => renderNode(node, renderList, []))}</>;
 }

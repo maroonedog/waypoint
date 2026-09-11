@@ -27,7 +27,7 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, Field, FieldRows, FieldScope } = await import(
+const { FormProvider, Field, FieldRows, useParticipation } = await import(
   "form-react"
 );
 
@@ -52,9 +52,9 @@ function makeScreen(form, counters) {
   // its id rather than by the slot it happens to sit in. The count is taken
   // inside the children function, which is where the subscription lives: the
   // wrapper around it reads nothing and is not expected to move.
-  const Row = ({ rowKey }) => {
+  const Row = ({ rowKey, at }) => {
     counters.wrappers[rowKey] = (counters.wrappers[rowKey] ?? 0) + 1;
-    return h(Field, { path: "items[*].sku" }, (field) => {
+    return h(Field, { path: `${at}.sku` }, (field) => {
       counters.rows[rowKey] = (counters.rows[rowKey] ?? 0) + 1;
       return h("input", {
         ...field.inputProps,
@@ -74,11 +74,7 @@ function makeScreen(form, counters) {
           Fragment,
           null,
           rows.map((row) =>
-            h(
-              FieldScope,
-              { key: row.key, row },
-              h(Row, { rowKey: row.key })
-            )
+            h(Row, { key: row.key, rowKey: row.key, at: row.path })
           ),
           h("button", {
             "data-testid": "add",
@@ -200,7 +196,7 @@ test("moving a row takes its value with it", async () => {
   await act(async () => root.unmount());
 });
 
-test("a field outside the row scope it needs fails loudly", async () => {
+test("a rule used where a place is needed fails loudly", async () => {
   const form = createForm({
     adapter: zodFormResolver(SCHEMA),
     defaultValues: structuredClone(DEFAULTS),
@@ -215,12 +211,15 @@ test("a field outside the row scope it needs fails loudly", async () => {
     async () => {
       await act(async () => root.render(h(Bare)));
     },
-    (error) => /needs a row index/.test(error.message)
+    (error) =>
+      /is a rule, not a place/.test(error.message) &&
+      /useFieldValues/.test(error.message)
   );
 });
 
-// The defect: a row scope had no address of its own, so `participating` on one
-// resolved to the empty path and was silently dropped.
+// Participation is addressed like everything else now: a path, not a wrapper.
+// The defect this keeps closed is that a row must be silenceable by its own
+// address rather than by whatever scope happened to enclose it.
 test("a row can be switched off without being removed", async () => {
   const { z } = await import("zod");
   const { createForm, errorCountCell } = await import("form-core");
@@ -234,23 +233,25 @@ test("a row can be switched off without being removed", async () => {
     defaultValues: { items: [{ sku: "a" }, { sku: "" }] },
   });
 
+  const Row = ({ rowKey, at, participating }) => {
+    useParticipation(form, at, participating);
+    return h(Field, { path: `${at}.sku` }, (field) =>
+      h("input", { ...field.inputProps, "data-testid": "sku-" + rowKey })
+    );
+  };
+
   const Screen = ({ silenceSecond }) =>
     h(
       FormProvider,
       { form },
       h(FieldRows, { path: "items" }, ({ rows }) =>
         rows.map((row) =>
-          h(
-            FieldScope,
-            {
-              key: row.key,
-              row,
-              participating: !(silenceSecond && row.index === 1),
-            },
-            h(Field, { path: "items[*].sku" }, (field) =>
-              h("input", { ...field.inputProps, "data-testid": "sku-" + row.key })
-            )
-          )
+          h(Row, {
+            key: row.key,
+            rowKey: row.key,
+            at: row.path,
+            participating: !(silenceSecond && row.index === 1),
+          })
         )
       )
     );

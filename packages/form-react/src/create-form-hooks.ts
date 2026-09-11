@@ -41,8 +41,6 @@ import { useFieldValues } from "./use-field-values.js";
 import { useFieldIssues } from "./use-field-issues.js";
 import { useUncontrolledField } from "./use-uncontrolled-field.js";
 import { useForm } from "./use-form.js";
-import { useFieldScope } from "./use-field-scope.js";
-import { declaredPathIn } from "./resolve-scoped-path.js";
 
 export interface FormHooks<T, TPath extends string> {
   useField<TValue = unknown>(path: AddressablePath<TPath>): FieldBinding<TValue>;
@@ -130,8 +128,7 @@ export function createFormHooks<T, TPath extends string>(
   // catches a typo, so both cost one set probe.
   const useCheckedPath = (path: string): string => {
     const form = useForm();
-    const scope = useFieldScope();
-    const wanted = declaredPathIn(path, scope);
+    const wanted = path;
     // A concrete index is a place, not a rule, so it is checked as its rule.
     const asRule = declaredPathOf(wanted);
     const here = declaredPathsOf(form);

@@ -1,14 +1,17 @@
 // A form that does not fit in one file, which is nearly all of them.
 //
-// The two questions any form library has to answer once the screen is split
-// across components: how does a value get DOWN to a nested component, and how
-// does a value get back OUT of one. The answer here is that neither happens.
-// A nested component names the field it wants and subscribes to it; the value
-// never travels through props, and nothing above it holds state to lift.
+// The two questions any form library has to answer once the screen is split:
+// how does a value get DOWN to a nested component, and how does one get back
+// OUT. The answer here is that neither travels. A component is handed an
+// ADDRESS — a short, stable string — and subscribes to what it wants. Nothing
+// above it holds state to lift, and a value moving never re-renders a parent.
 //
-// What that buys is the reusable subtree: <AddressFields /> takes no props at
-// all and is correct under billing and under shipping, because the prefix is
-// supplied by where it is rendered rather than by what it is passed.
+// An address is a prop, and that is deliberate. There was a <FieldScope> that
+// put it in context instead, and it was removed: it rewrote EVERY path below
+// it with no way out, so a component inside `prefix="billing"` asking for
+// `shipping.postcode` silently resolved to `billing.shipping.postcode` and
+// rendered nothing at all. A prop cannot do that to a component that did not
+// ask for it.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";
@@ -37,14 +40,8 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const {
-  FormProvider,
-  FieldRows,
-  FieldScope,
-  useField,
-  useFieldValue,
-  useUncontrolledField,
-} = await import("form-react");
+const { FormProvider, FieldRows, useField, useFieldValue, useUncontrolledField } =
+  await import("form-react");
 
 const { act, createElement: h, Fragment } = React;
 
@@ -57,7 +54,7 @@ const SCHEMA = z.object({
   billing: ADDRESS,
   shipping: ADDRESS,
   company: z.object({ office: ADDRESS }),
-  items: z.array(z.object({ sku: z.string().min(1) })),
+  items: z.array(z.object({ sku: z.string() })),
 });
 
 const DEFAULTS = {
@@ -68,12 +65,13 @@ const DEFAULTS = {
 };
 
 /**
- * THE POINT OF THE FILE: no props. It knows the names of the fields it draws
- * and nothing about where in the form it has been placed.
+ * THE POINT OF THE FILE. One prop, and it is a location: never a value, never
+ * a setter, never a change handler. It does not move when the value does, so
+ * passing it costs nothing and re-renders nobody.
  */
-function AddressFields() {
-  const postcode = useField("postcode");
-  const city = useField("city");
+function AddressFields({ at }) {
+  const postcode = useField(`${at}.postcode`);
+  const city = useField(`${at}.city`);
   return h(
     Fragment,
     null,
@@ -91,9 +89,8 @@ function AddressFields() {
   );
 }
 
-/** Also no props, and also uncontrolled — the scope has to reach both hooks. */
-function UncontrolledAddress() {
-  const postcode = useUncontrolledField("postcode");
+function UncontrolledAddress({ at }) {
+  const postcode = useUncontrolledField(`${at}.postcode`);
   return h("input", {
     "data-testid": `u-${postcode.path}`,
     defaultValue: postcode.defaultValue,
@@ -102,10 +99,7 @@ function UncontrolledAddress() {
   });
 }
 
-/**
- * A reader somewhere else entirely: not a parent of the field, not a child of
- * it, holding no state and given no props.
- */
+/** Somewhere else entirely: not a parent of the field, not a child of it. */
 function ElsewhereOnTheScreen() {
   const billing = useFieldValue("billing.postcode");
   return h("span", { "data-testid": "readout" }, String(billing ?? ""));
@@ -139,14 +133,14 @@ const typeInto = (element, value) => {
   element.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
 };
 
-test("one propless component is correct under two different prefixes", async () => {
+test("one component is correct at two different addresses", async () => {
   const form = newForm();
   const { at, root } = await mount(
     h(
       FormProvider,
       { form },
-      h(FieldScope, { prefix: "billing" }, h(AddressFields)),
-      h(FieldScope, { prefix: "shipping" }, h(AddressFields))
+      h(AddressFields, { at: "billing" }),
+      h(AddressFields, { at: "shipping" })
     )
   );
 
@@ -154,7 +148,6 @@ test("one propless component is correct under two different prefixes", async () 
   assert.equal(at("pc-billing.postcode").value, "100-0001");
   assert.equal(at("pc-shipping.postcode").value, "150-0001");
   assert.equal(at("city-billing.city").value, "Chiyoda");
-
   root.unmount();
 });
 
@@ -164,8 +157,8 @@ test("typing in one copy does not reach the other", async () => {
     h(
       FormProvider,
       { form },
-      h(FieldScope, { prefix: "billing" }, h(AddressFields)),
-      h(FieldScope, { prefix: "shipping" }, h(AddressFields))
+      h(AddressFields, { at: "billing" }),
+      h(AddressFields, { at: "shipping" })
     )
   );
 
@@ -182,34 +175,22 @@ test("a value is read from elsewhere with no props and nothing lifted", async ()
     h(
       FormProvider,
       { form },
-      h(FieldScope, { prefix: "billing" }, h(AddressFields)),
-      // A sibling of the scope, not an ancestor of the field.
+      h(AddressFields, { at: "billing" }),
       h(ElsewhereOnTheScreen)
     )
   );
 
   assert.equal(at("readout").textContent, "100-0001");
-
   await act(async () => typeInto(at("pc-billing.postcode"), "777-7777"));
-
   assert.equal(at("readout").textContent, "777-7777");
   root.unmount();
 });
 
-test("prefixes compose, so a subtree can be placed inside another one", async () => {
+test("an address composes, so a subtree can be placed inside another one", async () => {
   const form = newForm();
   const { at, root } = await mount(
-    h(
-      FormProvider,
-      { form },
-      h(
-        FieldScope,
-        { prefix: "company" },
-        h(FieldScope, { prefix: "office" }, h(AddressFields))
-      )
-    )
+    h(FormProvider, { form }, h(AddressFields, { at: "company.office" }))
   );
-
   assert.equal(at("pc-company.office.postcode").value, "060-0001");
   root.unmount();
 });
@@ -220,8 +201,8 @@ test("an issue lands on the right copy, not on both", async () => {
     h(
       FormProvider,
       { form },
-      h(FieldScope, { prefix: "billing" }, h(AddressFields)),
-      h(FieldScope, { prefix: "shipping" }, h(AddressFields))
+      h(AddressFields, { at: "billing" }),
+      h(AddressFields, { at: "shipping" })
     )
   );
 
@@ -232,21 +213,37 @@ test("an issue lands on the right copy, not on both", async () => {
   root.unmount();
 });
 
-test("the uncontrolled binding resolves through a prefix too", async () => {
+test("a nested component can read ANYWHERE, not only under its own address", async () => {
+  // The thing the removed scope made impossible. This component sits at
+  // `billing` and reads `shipping`, which is an ordinary thing for a form to
+  // want and used to resolve silently to billing.shipping.postcode.
+  function CrossReader({ at }) {
+    const mine = useFieldValue(`${at}.postcode`);
+    const other = useFieldValue("shipping.postcode");
+    return h("span", { "data-testid": "cross" }, `${mine}|${other}`);
+  }
+  const form = newForm();
+  const { at, root } = await mount(
+    h(FormProvider, { form }, h(CrossReader, { at: "billing" }))
+  );
+  assert.equal(at("cross").textContent, "100-0001|150-0001");
+  root.unmount();
+});
+
+test("the uncontrolled binding takes an address too", async () => {
   const form = newForm();
   const { at, root } = await mount(
     h(
       FormProvider,
       { form },
-      h(FieldScope, { prefix: "billing" }, h(UncontrolledAddress)),
-      h(FieldScope, { prefix: "shipping" }, h(UncontrolledAddress))
+      h(UncontrolledAddress, { at: "billing" }),
+      h(UncontrolledAddress, { at: "shipping" })
     )
   );
 
   assert.equal(at("u-billing.postcode").value, "100-0001");
   assert.equal(at("u-shipping.postcode").value, "150-0001");
 
-  // And a programmatic write still finds the right node of the two.
   await act(async () => form.field("shipping.postcode").setValue("500-0005"));
 
   assert.equal(at("u-shipping.postcode").value, "500-0005");
@@ -254,15 +251,9 @@ test("the uncontrolled binding resolves through a prefix too", async () => {
   root.unmount();
 });
 
-/**
- * Propless, and inside a row. Its ADDRESS changes when the list is spliced
- * while the component itself survives — the row keeps its opaque key, so React
- * does not remount it. That asymmetry is where this repository has had a real
- * bug before: value cells re-derive themselves on subscribe, row order does
- * not, and an uncontrolled node is written by an effect rather than by React.
- */
-function RowSku() {
-  const sku = useUncontrolledField("items[*].sku");
+/** Propless is gone; the row hands down its own address instead. */
+function RowSku({ at }) {
+  const sku = useUncontrolledField(`${at}.sku`);
   return h("input", {
     "data-testid": `sku-${sku.path}`,
     defaultValue: sku.defaultValue,
@@ -271,31 +262,29 @@ function RowSku() {
   });
 }
 
-test("an uncontrolled field inside a row follows the splice", async () => {
-  const form = newForm();
-  let removeFirst;
-  const { at, root } = await mount(
-    h(
-      FormProvider,
-      { form },
-      h(FieldRows, { path: "items" }, ({ rows, remove }) => {
-        removeFirst = () => remove(0);
-        return h(
-          Fragment,
-          null,
-          rows.map((row) => h(FieldScope, { key: row.key, row }, h(RowSku)))
-        );
-      })
-    )
+const listOf = (form, capture) =>
+  h(
+    FormProvider,
+    { form },
+    h(FieldRows, { path: "items" }, (binding) => {
+      capture(binding);
+      return binding.rows.map((row) =>
+        h(RowSku, { key: row.key, at: row.path })
+      );
+    })
   );
+
+test("a row hands its own address down, with no wrapper", async () => {
+  const form = newForm();
+  let binding;
+  const { at, root } = await mount(listOf(form, (b) => (binding = b)));
 
   assert.equal(at("sku-items[0].sku").value, "a");
   assert.equal(at("sku-items[1].sku").value, "b");
   assert.equal(at("sku-items[2].sku").value, "c");
 
-  await act(async () => removeFirst());
+  await act(async () => binding.remove(0));
 
-  // Two rows left, and each node shows the value that moved into its slot.
   assert.equal(at("sku-items[0].sku").value, "b");
   assert.equal(at("sku-items[1].sku").value, "c");
   assert.equal(at("sku-items[2].sku"), null);
@@ -304,24 +293,11 @@ test("an uncontrolled field inside a row follows the splice", async () => {
 
 test("a row edited before the splice keeps the edit afterwards", async () => {
   const form = newForm();
-  let removeFirst;
-  const { at, root } = await mount(
-    h(
-      FormProvider,
-      { form },
-      h(FieldRows, { path: "items" }, ({ rows, remove }) => {
-        removeFirst = () => remove(0);
-        return h(
-          Fragment,
-          null,
-          rows.map((row) => h(FieldScope, { key: row.key, row }, h(RowSku)))
-        );
-      })
-    )
-  );
+  let binding;
+  const { at, root } = await mount(listOf(form, (b) => (binding = b)));
 
   await act(async () => typeInto(at("sku-items[2].sku"), "edited"));
-  await act(async () => removeFirst());
+  await act(async () => binding.remove(0));
 
   assert.equal(at("sku-items[1].sku").value, "edited");
   root.unmount();

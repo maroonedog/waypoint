@@ -11,9 +11,7 @@
 // ===========================================================================
 import { useCell } from "./use-cell.js";
 import { useForm } from "./use-form.js";
-import { useFieldScope } from "./use-field-scope.js";
-import { resolveScopedPath } from "./resolve-scoped-path.js";
-import type { FieldRow } from "./field-scope.js";
+import type { FieldRow } from "./field-row.types.js";
 
 export interface RowsBinding {
   /** The concrete path this list lives at. */
@@ -24,10 +22,8 @@ export interface RowsBinding {
   move(from: number, to: number): void;
 }
 
-export function useRows(localPath: string): RowsBinding {
+export function useRows(path: string): RowsBinding {
   const form = useForm();
-  const scope = useFieldScope();
-  const path = resolveScopedPath(localPath, scope);
   const handle = form.rows(path);
   const ids = useCell(handle.ids);
 

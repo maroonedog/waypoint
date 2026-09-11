@@ -23,19 +23,16 @@ import { useCallback, useEffect, useRef } from "react";
 import type { UncontrolledFieldBinding } from "./field-binding.types.js";
 import { useCell } from "./use-cell.js";
 import { useForm } from "./use-form.js";
-import { useFieldScope } from "./use-field-scope.js";
-import { resolveScopedPath } from "./resolve-scoped-path.js";
 
 /** The same coercion buildInputProps applies, so both hooks agree on empty. */
 const displayValue = (value: unknown): string =>
   value === undefined || value === null ? "" : String(value);
 
 export function useUncontrolledField<TValue>(
-  localPath: string
+  path: string
 ): UncontrolledFieldBinding<TValue> {
   const form = useForm();
-  const scope = useFieldScope();
-  const handle = form.field(resolveScopedPath(localPath, scope));
+  const handle = form.field(path);
 
   // The channels a message is drawn from. NOT the value: subscribing to that
   // is precisely what this hook exists not to do.

@@ -18,8 +18,11 @@ const WILDCARD = "[*]";
 export function assertConcretePath(path: string): void {
   if (path.includes(WILDCARD)) {
     throw new TypeError(
-      `"${path}" is a declared path, not a concrete one. A field is addressed ` +
-        `by a real index, so bind the row first.`
+      `"${path}" is a rule, not a place. One field is one place, so give the ` +
+        "row a real index — a list hands each row its own address as " +
+        "`row.path`, and `${row.path}` plus the rest of the name is the " +
+        "whole of it. If you meant every place the rule covers, that is a " +
+        "column: read it with useFieldValues."
     );
   }
 }

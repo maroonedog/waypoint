@@ -7,12 +7,9 @@
 // ===========================================================================
 import { useCell } from "./use-cell.js";
 import { useForm } from "./use-form.js";
-import { useFieldScope } from "./use-field-scope.js";
-import { resolveScopedPath } from "./resolve-scoped-path.js";
 
-export function useFieldValue<TValue>(localPath: string): TValue | undefined {
+export function useFieldValue<TValue>(path: string): TValue | undefined {
   const form = useForm();
-  const scope = useFieldScope();
-  const source = form.field(resolveScopedPath(localPath, scope)).sources.value;
+  const source = form.field(path).sources.value;
   return useCell(source) as TValue | undefined;
 }

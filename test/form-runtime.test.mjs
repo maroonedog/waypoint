@@ -289,7 +289,8 @@ test("addressing a field by a declared path is refused, not guessed", () => {
   const form = buildForm();
   assert.throws(
     () => form.field("items[*].quantity"),
-    (error) => error instanceof TypeError && /declared path/.test(error.message)
+    (error) =>
+      error instanceof TypeError && /is a rule, not a place/.test(error.message)
   );
 });
 

@@ -15,6 +15,7 @@ export type { FieldPath } from "./field-path.types.js";
 export type {
   AddressablePath,
   ConcretePath,
+  DeclaredOf,
 } from "./addressable-path.types.js";
 export type { ValueAtPath } from "./value-at-path.types.js";
 export type { ElementOf } from "./element-of.types.js";

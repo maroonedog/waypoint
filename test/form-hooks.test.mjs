@@ -36,8 +36,9 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, FieldScope, createFormHooks, forgetWarnings } =
-  await import("form-react");
+const { FormProvider, createFormHooks, forgetWarnings } = await import(
+  "form-react"
+);
 
 const { act, createElement: h } = React;
 
@@ -158,36 +159,6 @@ test("the same path is warned about once, not once per render", async () => {
   root.unmount();
 });
 
-test("a local name is checked against the scope it is rendered in", async () => {
-  function Inner() {
-    const postcode = OrderForm.useField("postcode");
-    return h("span", { id: "v" }, String(postcode.value));
-  }
-  const { container, root, escaped, warned } = await mountCatching(
-    h(
-      FormProvider,
-      { form: orderForm() },
-      h(FieldScope, { prefix: "shipping" }, h(Inner))
-    )
-  );
-  assert.equal(escaped, null);
-  assert.equal(warned, "");
-  assert.equal(text(container, "v"), "150-0001");
-  root.unmount();
-});
-
-test("the same local name outside its scope warns", async () => {
-  function Inner() {
-    OrderForm.useField("postcode");
-    return null;
-  }
-  const { root, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Inner))
-  );
-  assert.match(warned, /"postcode"/);
-  root.unmount();
-});
-
 test("hooks rendered under a DIFFERENT form's provider warn", async () => {
   // The one mistake the types cannot see: these hooks carry the order form's
   // paths, and nothing stops them being rendered somewhere else.
@@ -226,9 +197,8 @@ test("two forms on one screen stay independent", async () => {
   root.unmount();
 });
 
-test("no FieldScope is needed for an absolute path", async () => {
-  // The scope defaults to the root, so a component that knows the whole path
-  // needs nothing wrapped around it at all.
+test("a component needs nothing wrapped around it", async () => {
+  // There is no scope to be inside or outside of. A path is a path.
   function Screen() {
     const postcode = OrderForm.useField("billing.postcode");
     return h("span", { id: "v" }, String(postcode.value));
@@ -241,7 +211,7 @@ test("no FieldScope is needed for an absolute path", async () => {
   root.unmount();
 });
 
-test("a wildcard path outside a row scope still throws, and says which scope", async () => {
+test("a rule where a place is needed throws, and names the column reading", async () => {
   // Not a mis-addressing: the path is declared and correct, and binding index
   // zero instead would silently address a row nobody asked for.
   function Screen() {
@@ -251,9 +221,9 @@ test("a wildcard path outside a row scope still throws, and says which scope", a
   const { escaped } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
-  assert.ok(escaped !== null, "expected the unbound wildcard to throw");
-  assert.match(escaped.message, /needs a row index/);
-  assert.match(escaped.message, /FieldScope row=/);
+  assert.ok(escaped !== null, "expected the rule-as-place to throw");
+  assert.match(escaped.message, /is a rule, not a place/);
+  assert.match(escaped.message, /useFieldValues/);
 });
 
 test("a concrete index is addressable, and reads that row", async () => {

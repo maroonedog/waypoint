@@ -32,9 +32,7 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, FieldScope, FieldRows, useFieldValues } = await import(
-  "form-react"
-);
+const { FormProvider, FieldRows, useFieldValues } = await import("form-react");
 
 const { act, createElement: h } = React;
 
@@ -137,20 +135,12 @@ test("a removal shortens it", async () => {
   root.unmount();
 });
 
-test("inside a row scope the outer wildcard is bound and only the inner stays open", async () => {
-  // The component is inside grid[1]; it must read that row's column, not
-  // every row's.
+test("one row's column is addressed by naming that row", async () => {
+  // Binding the outer index is now spelled where it is meant, in the path,
+  // rather than inherited from a wrapper that also rewrote everything else.
   const form = newForm();
   const { at, root } = await mount(
-    h(
-      FormProvider,
-      { form },
-      h(
-        FieldScope,
-        { row: { key: "r1", index: 1, path: "grid[1]" } },
-        h(makeColumn("grid[*].cells[*].n", "v"))
-      )
-    )
+    h(FormProvider, { form }, h(makeColumn("grid[1].cells[*].n", "v")))
   );
   assert.equal(at("v").textContent, "[3]");
   root.unmount();

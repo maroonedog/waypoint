@@ -8,11 +8,8 @@
 import type { FormIssue } from "form-contract";
 import { useCell } from "./use-cell.js";
 import { useForm } from "./use-form.js";
-import { useFieldScope } from "./use-field-scope.js";
-import { resolveScopedPath } from "./resolve-scoped-path.js";
 
-export function useFieldIssues(localPath: string): readonly FormIssue[] {
+export function useFieldIssues(path: string): readonly FormIssue[] {
   const form = useForm();
-  const scope = useFieldScope();
-  return useCell(form.field(resolveScopedPath(localPath, scope)).sources.issues);
+  return useCell(form.field(path).sources.issues);
 }

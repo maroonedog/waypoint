@@ -42,3 +42,15 @@ export type ConcretePath<
  * no array in it is only itself, so nothing widens for a flat form.
  */
 export type AddressablePath<P extends string> = P | ConcretePath<P>;
+
+/**
+ * The rule a place obeys: every `[0]` back to `[*]`.
+ *
+ * The reverse of ConcretePath, and the reason `field()` can accept a place
+ * while still computing its value type — ValueAtPath descends through `[*]`
+ * and has no case for an index, so the index is removed before it is asked.
+ */
+export type DeclaredOf<P extends string> =
+  P extends `${infer Head}[${number}]${infer Tail}`
+    ? `${Head}[*]${DeclaredOf<Tail>}`
+    : P;

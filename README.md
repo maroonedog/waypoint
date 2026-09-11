@@ -133,44 +133,6 @@ caller's function looked up instead of written inline. There is no second
 implementation for the heights to diverge between, and the library ships no
 input and no class name of its own.
 
-### `<FieldScope>` is optional
-
-A hook with no scope around it reads the root — `{ prefix: "", indices: [] }` —
-so an absolute path needs nothing wrapped around it:
-
-```tsx
-// no FieldScope anywhere
-const postcode = OrderForm.useField("billing.postcode");
-```
-
-There are exactly two reasons to reach for one:
-
-| | why |
-|---|---|
-| `<FieldScope prefix="billing">` | so a nested component can be **propless and reusable**. Optional. |
-| `<FieldScope row={row}>` | so a wildcard path gets an index. **Required** — `items[*].sku` has nowhere else to get one, and the error says so rather than binding row 0. |
-
-A declared path is a RULE and a value has PLACES, and both are addressable:
-
-```tsx
-OrderForm.useField("items[*].sku")      // inside a row scope
-OrderForm.useField("items[0].sku")      // a fixed row, no scope needed
-OrderForm.useField(`items[${i}].sku`)   // i: number — a computed row
-```
-
-The index position is typed `${number}`, so a template literal tells a row
-index from a string spliced into a path, which is how a mis-built path is
-usually made:
-
-```tsx
-const i: number, name: string;
-OrderForm.useField(`items[${i}].sku`)      // ok
-OrderForm.useField(`items[${name}].sku`)   // compile error
-```
-
-A wildcard with nowhere to get an index is still an error rather than a guess —
-binding row 0 would silently address a row nobody asked for.
-
 ### A wildcard read as the whole column
 
 Outside a row scope, `items[*].sku` ordinarily means every sku the list holds.
@@ -182,8 +144,8 @@ const one  = OrderForm.useField<string>("items[0].sku");         // string
 ```
 
 Two hooks rather than one, for a reason worth stating: the same expression
-cannot be a `string` inside `<FieldScope row={row}>` and a `string[]` outside
-it. That would be a type that depends on where the component was rendered,
+cannot be a `string` at `items[0].sku` and a `string[]` at `items[*].sku`
+without the spelling saying which. That would be a type that depends on where the component was rendered,
 which TypeScript cannot express and a reader could not predict.
 
 It binds what the scope supplies and leaves the rest open, so inside one row of
@@ -237,6 +199,51 @@ Taking the whole form down for that would be the larger failure.
 
 Plain `useField` remains, unnarrowed, as the escape hatch: a record field
 addressed dynamically has no declared path to check against.
+
+### A form split across components
+
+A nested component is handed an **address** and subscribes to what it wants.
+Nothing travels down but a short, stable string:
+
+```tsx
+function AddressFields({ at }: { at: string }) {
+  const postcode = useField(`${at}.postcode`);   // no props but the address
+  ...
+}
+
+<AddressFields at="billing" />
+<AddressFields at="shipping" />
+```
+
+A list hands each row its own address:
+
+```tsx
+<FieldRows path="items">
+  {({ rows, remove }) =>
+    rows.map((row) => <RowFields key={row.key} at={row.path} />)
+  }
+</FieldRows>
+```
+
+An address is not a value: it does not change when the value does, so passing
+it re-renders nobody, and there is no state above to lift. A component may read
+**anywhere** in the form at the same time — a total, a field in another
+section — because its own address constrains nothing else.
+
+There was a `<FieldScope>` that put the address in context instead. It was
+removed. Wrapping a subtree rewrote **every** path inside it with no way out,
+so a component asking for `shipping.postcode` from inside
+`prefix="billing"` silently resolved to `billing.shipping.postcode` and drew
+nothing at all — and a component written against absolute paths broke the day
+somebody wrapped it, without changing. For rows it was worse than that: the
+list already had the row, and passing it to a wrapper so the wrapper could put
+it back into context was a round trip for information the caller was holding.
+
+Switching a subtree off is its own thing now, addressed like everything else:
+
+```tsx
+useParticipation(form, "shipping", !sameAsBilling);
+```
 
 ### Typing without waking React
 
@@ -321,12 +328,12 @@ diff writes wherever the verdict moved.
   {({ rows, insert, remove }) => (
     <>
       {rows.map((row) => (
-        <FieldScope key={row.key} row={row}>
-          <Field<string> path="items[*].sku">
+        <div key={row.key}>
+          <Field<string> path={`${row.path}.sku`}>
             {(field) => <input {...field.inputProps} />}
           </Field>
           <button onClick={() => remove(row.index)}>削除</button>
-        </FieldScope>
+        </div>
       ))}
       <button onClick={() => insert(rows.length, blankRow)}>追加</button>
     </>
@@ -339,18 +346,13 @@ the DOM node, the focus and any local state inside the row survive a splice.
 The cells underneath stay keyed by the concrete index and the splice moves
 them. The stated cost: splicing at index 0 re-subscribes every following row.
 
-`FieldScope` also carries a prefix, so a group can be written once against
-local names and placed wherever it belongs:
-
-```tsx
-<FieldScope prefix="billing"><AddressFields /></FieldScope>
-<FieldScope prefix="shipping"><AddressFields /></FieldScope>
-```
+`row.path` is the whole mechanism: a nested component builds the paths it
+wants from it and needs nothing else.
 
 ### Presentation and blocking are different axes
 
 ```tsx
-<FieldScope prefix="shipping" participating={false}>…</FieldScope>
+useParticipation(form, "shipping", false);
 ```
 
 A dormant subtree stops counting toward what blocks a submit and **keeps its
@@ -447,7 +449,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 115 tests, a
+The runtime is complete against its design and is exercised by 114 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 

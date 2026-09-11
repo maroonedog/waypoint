@@ -4,14 +4,15 @@ import { MdTextField } from "../md/text-field.js";
 import { MdSelectField } from "../md/select-field.js";
 
 /**
- * One address, written against LOCAL names. It is placed twice — once under
- * `billing`, once under `shipping` — and nothing in it knows which. The
- * enclosing FieldScope is what binds it.
+ * One address, placed twice — once under `billing`, once under `shipping`.
+ * It is told WHERE by a prop, and that prop is the only thing it is told: no
+ * value, no setter, no change handler. An address does not move when a value
+ * does, so passing it re-renders nobody and there is nothing above to lift.
  */
-export function AddressFields(): ReactElement {
+export function AddressFields({ at }: { readonly at: string }): ReactElement {
   return (
     <>
-      <Field path="postcode">
+      <Field path={`${at}.postcode`}>
         {(field) => (
           <MdTextField
             field={field}
@@ -21,23 +22,23 @@ export function AddressFields(): ReactElement {
           />
         )}
       </Field>
-      <Field path="prefecture">
+      <Field path={`${at}.prefecture`}>
         {(field) => <MdSelectField field={field} label="都道府県" />}
       </Field>
       <div className="sm:col-span-2">
-        <Field path="city">
+        <Field path={`${at}.city`}>
           {(field) => (
             <MdTextField field={field} label="市区町村" leading="location_city" />
           )}
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field path="street">
+        <Field path={`${at}.street`}>
           {(field) => <MdTextField field={field} label="番地" />}
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field path="building">
+        <Field path={`${at}.building`}>
           {(field) => (
             <MdTextField
               field={field}

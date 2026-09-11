@@ -17,19 +17,8 @@ export { useFieldValues } from "./use-field-values.js";
 export { useFieldIssues } from "./use-field-issues.js";
 export { useFormStatus, type FormStatus } from "./use-form-status.js";
 export { Field, type FieldProps } from "./field.js";
-export {
-  FieldScope,
-  type FieldRow,
-  type FieldScopeProps,
-} from "./field-scope.js";
-export {
-  FieldScopeContext,
-  ROOT_SCOPE,
-  type FieldScopeValue,
-} from "./field-scope-context.js";
-export { useFieldScope } from "./use-field-scope.js";
+export type { FieldRow } from "./field-row.types.js";
 export { useParticipation } from "./use-participation.js";
-export { declaredPathIn, resolveScopedPath } from "./resolve-scoped-path.js";
 export { useRows, type RowsBinding } from "./use-rows.js";
 export { FieldRows, type FieldRowsProps } from "./field-rows.js";
 export { AutoForm, type AutoFormProps } from "./auto-form.js";

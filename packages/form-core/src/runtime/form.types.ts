@@ -6,6 +6,8 @@
 // with no component at all.
 // ===========================================================================
 import type {
+  AddressablePath,
+  DeclaredOf,
   FormAdapter,
   FormFieldDescriptor,
   FormIssue,
@@ -70,7 +72,17 @@ export interface FormHandle<T, TPath extends string = string> {
   setParticipating(path: string, participating: boolean): void;
   /** Back to the supplied defaults, or to the ones the form was made with. */
   reset(defaultValues?: unknown): void;
-  field<K extends TPath>(path: K): FieldHandle<ValueAtPath<T, K>>;
+  /**
+   * One field, addressed by the PLACE it occupies. A declared path carries
+   * `[*]`, a place carries an index, and this takes the second — which is what
+   * the runtime has always required. The type used to take the first, so the
+   * spelling that type-checked was the one that threw and the spelling that
+   * worked was a type error. The value type is still computed from the rule,
+   * because that is what ValueAtPath descends through.
+   */
+  field<K extends AddressablePath<TPath>>(
+    path: K
+  ): FieldHandle<ValueAtPath<T, DeclaredOf<K>>>;
   /**
    * The row order of one array, and the three edits that change it. Addressed
    * by a concrete path, so an array nested in a row is reached by binding the

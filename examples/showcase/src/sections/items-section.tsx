@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { Field, FieldRows, FieldScope, useFieldIssues } from "form-react";
+import { Field, FieldRows, useFieldIssues } from "form-react";
 import { MdTextField } from "../md/text-field.js";
 import { MdNumberField } from "../md/number-field.js";
 import { MdButton } from "../md/button.js";
@@ -49,27 +49,26 @@ export function ItemsSection(): ReactElement {
         >
           <OrderTotalNotice />
           {rows.map((row) => (
-            <FieldScope key={row.key} row={row}>
-              <div className="mb-2 grid gap-x-4 gap-y-1 rounded-md bg-surface-container p-4 sm:col-span-2 sm:grid-cols-12">
+            <div key={row.key} className="mb-2 grid gap-x-4 gap-y-1 rounded-md bg-surface-container p-4 sm:col-span-2 sm:grid-cols-12">
                 <div className="sm:col-span-3">
-                  <Field path="items[*].sku">
+                  <Field path={`${row.path}.sku`}>
                     {(field) => (
                       <MdTextField field={field} label="商品コード" />
                     )}
                   </Field>
                 </div>
                 <div className="sm:col-span-4">
-                  <Field path="items[*].name">
+                  <Field path={`${row.path}.name`}>
                     {(field) => <MdTextField field={field} label="品名" />}
                   </Field>
                 </div>
                 <div className="sm:col-span-2">
-                  <Field path="items[*].quantity">
+                  <Field path={`${row.path}.quantity`}>
                     {(field) => <MdNumberField field={field} label="数量" />}
                   </Field>
                 </div>
                 <div className="sm:col-span-2">
-                  <Field path="items[*].unitPrice">
+                  <Field path={`${row.path}.unitPrice`}>
                     {(field) => (
                       <MdNumberField field={field} label="単価" suffix="円" />
                     )}
@@ -91,8 +90,7 @@ export function ItemsSection(): ReactElement {
                     </span>
                   </button>
                 </div>
-              </div>
-            </FieldScope>
+            </div>
           ))}
         </SectionCard>
       )}
