@@ -29,7 +29,7 @@ type FormResolver<TSchema, T, TPath extends string = string> =
 
 interface FormAdapter<T, TPath extends string = string> {
   readonly fields: readonly FormFieldDescriptor[];
-  validate(root: unknown): readonly FormIssue[];
+  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
 }
 ```
 
@@ -120,6 +120,31 @@ Layer 1 is layer 2 with a default widget table; layer 2 is layer 3 with the
 caller's function looked up instead of written inline. There is no second
 implementation for the heights to diverge between, and the library ships no
 input and no class name of its own.
+
+### A validator that has to ask something
+
+`validate` may return a promise. A vendor that answers synchronously returns
+the list itself, and nothing downstream pays for the possibility — which is why
+this is one member that may be async rather than a second member that always
+is.
+
+```ts
+const adapter = {
+  fields: base.fields,
+  async validate(root) {
+    const local = base.validate(root);
+    const taken = await isHandleTaken(root.handle);
+    return taken ? [...local, { path: "handle", message: "すでに使われています" }] : local;
+  },
+};
+```
+
+Passes are numbered, so an answer overtaken by a newer one is dropped rather
+than written: a late verdict describes a root that is no longer there, and
+committing it would flicker the form back to what was typed before. While a
+pass is in flight `useFormStatus().isValidating` is true, and a pass that
+throws leaves the previous verdict standing — an error reaching the network is
+not evidence that the form became acceptable.
 
 ### One field, on its own
 

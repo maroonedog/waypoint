@@ -12,7 +12,7 @@
 // The handler runs only when nothing blocks, and a handler that throws leaves
 // the form not submitted rather than half submitted.
 // ===========================================================================
-import type { FormIssue } from "form-contract";
+import type { FormIssue, MaybeAsync } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   ROOT_CELL,
@@ -30,7 +30,7 @@ export type SubmitHandler = (root: unknown) => void | Promise<void>;
 
 export interface SubmitFormRequest {
   readonly store: FormCellStore;
-  readonly judgeNow: () => readonly FormIssue[];
+  readonly judgeNow: () => MaybeAsync<readonly FormIssue[]>;
   readonly blockingOf: (produced: readonly FormIssue[]) => readonly FormIssue[];
   readonly handler: SubmitHandler;
 }
@@ -41,7 +41,7 @@ export async function submitForm(
   const { store, judgeNow, blockingOf, handler } = request;
   store.write(submittingCell, true);
   try {
-    const blockedBy = blockingOf(judgeNow());
+    const blockedBy = blockingOf(await judgeNow());
     if (blockedBy.length > 0) return { submitted: false, blockedBy };
     await handler(store.read(ROOT_CELL));
     return { submitted: true, blockedBy: [] };

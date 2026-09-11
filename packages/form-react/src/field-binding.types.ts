@@ -10,7 +10,11 @@
 // which is the one thing an IME-aware caller needs.
 // ===========================================================================
 import type { ChangeEvent } from "react";
-import type { FormFieldDescriptor, FormIssue } from "form-contract";
+import type {
+  FormFieldDescriptor,
+  FormIssue,
+  MaybeAsync,
+} from "form-contract";
 
 export type FieldChangeEvent = ChangeEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -42,8 +46,9 @@ export interface FieldBinding<TValue> {
   setValue(next: TValue | undefined): void;
   markTouched(): void;
   setParticipating(participating: boolean): void;
-  validate(): readonly FormIssue[];
+  /** A promise when the validator answers asynchronously. */
+  validate(): MaybeAsync<readonly FormIssue[]>;
   /** Judges a value that is NOT in the store and writes nothing. */
-  check(candidate: unknown): readonly FormIssue[];
+  check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
   readonly inputProps: FieldInputProps;
 }

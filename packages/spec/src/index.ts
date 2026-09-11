@@ -15,3 +15,5 @@ export type { FieldPath } from "./field-path.types.js";
 export type { ValueAtPath } from "./value-at-path.types.js";
 export type { ElementOf } from "./element-of.types.js";
 export type { IsOpaqueObject, OpaqueObject } from "./opaque-object.types.js";
+export { isPending } from "./maybe-async.types.js";
+export type { MaybeAsync } from "./maybe-async.types.js";

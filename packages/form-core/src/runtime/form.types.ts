@@ -9,6 +9,7 @@ import type {
   FormAdapter,
   FormFieldDescriptor,
   FormIssue,
+  MaybeAsync,
   ValueAtPath,
 } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
@@ -38,9 +39,9 @@ export interface FieldHandle<TValue> {
    */
   setParticipating(participating: boolean): void;
   /** Judges the whole root, writes the verdict back, returns this path's part. */
-  validate(): readonly FormIssue[];
+  validate(): MaybeAsync<readonly FormIssue[]>;
   /** Judges a value that is NOT in the store, and writes nothing. */
-  check(candidate: unknown): readonly FormIssue[];
+  check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
 }
 
 export interface FormOptions<T, TPath extends string> {
@@ -78,5 +79,5 @@ export interface FormHandle<T, TPath extends string = string> {
   rows(arrayPath: string): RowsHandle;
   readRoot(): unknown;
   /** Judges the whole root now and writes the verdict back. */
-  validate(): readonly FormIssue[];
+  validate(): MaybeAsync<readonly FormIssue[]>;
 }

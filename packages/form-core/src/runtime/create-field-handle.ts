@@ -11,7 +11,12 @@
 // not the same as putting it in the form, and a probe that mutated the store
 // would move every cross-field verdict as a side effect of asking.
 // ===========================================================================
-import type { FormFieldDescriptor, FormIssue } from "form-contract";
+import {
+  isPending,
+  type FormFieldDescriptor,
+  type FormIssue,
+  type MaybeAsync,
+} from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   ROOT_CELL,
@@ -35,8 +40,9 @@ export interface FieldHandleRequest {
   readonly initialRoot: unknown;
   readonly path: string;
   readonly descriptor: FormFieldDescriptor | undefined;
-  readonly judgeRoot: (root: unknown) => readonly FormIssue[];
-  readonly commitVerdict: (produced: readonly FormIssue[]) => void;
+  readonly judgeRoot: (root: unknown) => MaybeAsync<readonly FormIssue[]>;
+  /** Judges now, through the scheduler, so a late answer is discarded. */
+  readonly runValidation: () => MaybeAsync<readonly FormIssue[]>;
   readonly requestValidation: () => void;
   readonly setParticipating: (path: string, participating: boolean) => void;
 }
@@ -52,7 +58,7 @@ export function createFieldHandle<TValue>(
     path,
     descriptor,
     judgeRoot,
-    commitVerdict,
+    runValidation,
     requestValidation,
     setParticipating,
   } = request;
@@ -88,13 +94,13 @@ export function createFieldHandle<TValue>(
       requestValidation();
     },
     validate() {
-      const produced = judgeRoot(store.read(ROOT_CELL));
-      commitVerdict(produced);
-      return mine(produced);
+      const outcome = runValidation();
+      return isPending(outcome) ? outcome.then(mine) : mine(outcome);
     },
     check(candidate) {
       const probe = writeValueAt(store.read(ROOT_CELL), path, candidate);
-      return mine(judgeRoot(probe));
+      const outcome = judgeRoot(probe);
+      return isPending(outcome) ? outcome.then(mine) : mine(outcome);
     },
   };
 }

@@ -20,6 +20,7 @@
 // ===========================================================================
 import type { FormFieldDescriptor } from "./form-field-descriptor.types.js";
 import type { FormIssue } from "./form-issue.types.js";
+import type { MaybeAsync } from "./maybe-async.types.js";
 
 /** What one validator's schema offers a form runtime. */
 export interface FormAdapter<T, TPath extends string = string> {
@@ -29,8 +30,13 @@ export interface FormAdapter<T, TPath extends string = string> {
    * Judges a whole root value and returns every issue, each at its concrete
    * path. Judging the whole root rather than one field is what lets a rule
    * that compares two fields report against either of them.
+   *
+   * A promise is allowed, for a rule that has to ask something. A vendor that
+   * judges synchronously returns the list itself and nothing downstream pays
+   * for the possibility — which is why this is one member that may be async
+   * rather than a second member that always is.
    */
-  validate(root: unknown): readonly FormIssue[];
+  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
 }
 
 /**

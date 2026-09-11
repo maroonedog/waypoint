@@ -9,7 +9,7 @@
 // callbacks an input is given, so a fresh one per render would hand every
 // input a new onChange every render.
 // ===========================================================================
-import type { FormIssue } from "form-contract";
+import type { FormIssue, MaybeAsync } from "form-contract";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   ROOT_CELL,
@@ -68,12 +68,12 @@ export function createForm<T, TPath extends string = string>(
       writeErrorCount(store, blockingOf(produced));
     });
   };
-  const judgeRoot = (root: unknown): readonly FormIssue[] =>
+  const judgeRoot = (root: unknown): MaybeAsync<readonly FormIssue[]> =>
     adapter.validate(root);
-  const scheduler = createValidationScheduler(() => {
-    const produced = judgeRoot(store.read(ROOT_CELL));
-    commitVerdict(produced);
-    return produced;
+  const scheduler = createValidationScheduler({
+    store,
+    judge: () => judgeRoot(store.read(ROOT_CELL)),
+    commit: commitVerdict,
   });
 
   const initialRoot = seedRootValue(descriptors, options.defaultValues);
@@ -125,7 +125,7 @@ export function createForm<T, TPath extends string = string>(
           path,
           descriptor: index.at(path),
           judgeRoot,
-          commitVerdict,
+          runValidation: scheduler.runNow,
           requestValidation: scheduler.request,
           setParticipating,
         })
