@@ -29,28 +29,11 @@ const { renderCountsTable, renderEnvironment, NO_MILLISECONDS_NOTICE } =
   await import("./report/render-markdown-tables.ts");
 const { readBaseline, toBaseline, compareBaseline, writeBaseline } =
   await import("./report/baseline.ts");
-const { formContractUseFieldSubject } = await import("./subjects/form-contract-use-field-subject.ts");
-const { handWrittenPerFieldStateSubject } = await import("./subjects/hand-written-per-field-state-subject.ts");
-const {
-  reactHookFormScopedSubject,
-  reactHookFormOnSubmitSubject,
-  reactHookFormDepsSubject,
-} = await import("./subjects/react-hook-form-scoped-subject.ts");
-const { formikUseFieldSubject, formikFastFieldSubject } = await import(
-  "./subjects/formik-use-field-subject.ts"
-);
-const { tanstackFormSubject } = await import("./subjects/tanstack-form-subject.ts");
-
-const SUBJECTS = [
-  formContractUseFieldSubject,
-  handWrittenPerFieldStateSubject,
-  reactHookFormScopedSubject,
-  reactHookFormDepsSubject,
-  reactHookFormOnSubmitSubject,
-  formikUseFieldSubject,
-  formikFastFieldSubject,
-  tanstackFormSubject,
-];
+// The SAME list the browser lane mounts. Dynamically, because this import
+// pulls react-dom in and the devtools hook above only sees commits from a
+// react-dom that loaded after it.
+const { SUBJECTS } = await import("./subjects/subject-registry.ts");
+const { PRIMARY } = await import("./subjects/subject-ids.ts");
 
 const target = { document: dom.document, window: dom.window as never };
 const checking = process.argv.includes("--check");
@@ -111,7 +94,7 @@ const sections: string[] = [
 for (const run of runs) {
   const losses = findLosses(
     run.measurements,
-    formContractUseFieldSubject.id,
+    PRIMARY,
     (subjectId, scenarioId) =>
       run.cells.get(`${subjectId}|${scenarioId}`) ?? "unknown"
   );
@@ -159,7 +142,7 @@ for (const run of runs) {
         agreement: (run.cells.get(
           `${measurement.subjectId}|${measurement.scenarioId}`
         ) ?? "disagrees") as never,
-        isSubject: measurement.subjectId === formContractUseFieldSubject.id,
+        isSubject: measurement.subjectId === PRIMARY,
       }))
     ),
     "",

@@ -261,6 +261,50 @@ node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts exa
 
 ---
 
+## The comparison
+
+`bench/` measures this runtime against react-hook-form, Formik and TanStack
+Form, in two lanes, against one zod schema the harness owns and instruments and
+one DOM it owns and hashes.
+
+```bash
+npm run bench:forms         # counts, in jsdom — writes docs/measurements-forms.md
+npm run bench:forms:check   # the same counts, against the recorded baseline
+npm run bench:forms:time    # microseconds, in the installed Chrome
+```
+
+**The counts lane is gated.** Commits, changed fibers, DOM mutations,
+validator passes and paths judged are integers that do not depend on the
+machine, so a drift is never noise and CI fails on one. Nothing is printed
+until six proofs hold — that every subject reached the same schema instance,
+judged the same root, rendered the same DOM, is actually wired up, and that the
+oracle would have noticed had it not been.
+
+**The time lane is printed and never gated,** and it publishes its own
+resolution above its results: a null experiment per subject per size, and a
+calibration ladder injecting a known cost at three scheduling positions. A band
+that overlaps the null band prints `indistinguishable` rather than a win.
+
+The ladder is the part worth reading first. On the machine in the report it
+resolves **0.5 ms of synchronous work and nothing at all up to 4 ms of work
+deferred to a microtask** — which is exactly where form-contract puts its
+validation pass. So at 201 fields, where form-contract's keystroke measures
+0.63× the hand-written reference, the harness **refuses to call that a win**:
+the 308 µs difference is under its own resolved floor, and it separately
+measures that 0% of form-contract's validator passes ran inside the event the
+metric can see. Both sentences are generated, and they sit directly under the
+row they contradict.
+
+What the lane does resolve at 201 fields is that TanStack Form is 4.1× and
+Formik 3.9× the reference per keystroke, while react-hook-form is
+indistinguishable from it.
+
+Where form-contract loses, those rows sort first and carry the winner's
+agreement cell. `docs/design/form-benchmark.md` is the design; Appendix A lists
+every attack on the method and what was done about it.
+
+---
+
 ## Where it stands
 
 The runtime is complete against its design and is exercised by 76 tests, a

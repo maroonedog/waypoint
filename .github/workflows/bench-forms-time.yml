@@ -1,0 +1,47 @@
+# ===========================================================================
+# bench-forms-time.yml — the time lane, which never fails this repository.
+#
+# It is deliberately NOT on push. Every figure it produces is a microsecond,
+# microseconds move when the runner does, and a job that fails on one teaches
+# everybody to re-run it until it passes — which is the same thing as having no
+# check at all. The counts gate in bench-forms.yml is the one that can fail,
+# because integers taken in jsdom do not depend on the machine.
+#
+# So this runs on request and once a week, uploads the report as an artifact,
+# and commits nothing. What it is for is noticing that a library update changed
+# the shape of the answer, by a human reading two reports side by side.
+# ===========================================================================
+name: bench-forms-time
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Mondays, 03:00 UTC. Nothing depends on it having run.
+    - cron: "0 3 * * 1"
+
+jobs:
+  time:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "23"
+      - run: npm ci
+      - run: npm run build
+
+      # `channel: "chrome"` drives the locally installed browser rather than a
+      # pinned download, so the runner has to have one. The report records the
+      # exact build beside every figure it prints.
+      - run: npx playwright-core install-deps chrome || true
+      - name: Report the Chrome that will be measured
+        run: google-chrome --version || echo "no google-chrome on PATH"
+
+      - run: npm run bench:forms:time
+        continue-on-error: true
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: measurements-forms-time-${{ github.run_id }}
+          path: docs/measurements-forms-time.md
+          if-no-files-found: warn

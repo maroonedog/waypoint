@@ -24,6 +24,15 @@ export interface ValidatorWork {
   pathsJudged: number;
   /** Wall time inside the schema alone, so a slow schema is not a slow store. */
   nanoseconds: bigint;
+  /**
+   * How many of those passes ran INSIDE the input event dispatch. The browser
+   * lane's headline metric is EventDispatch filtered to `input`, and its own
+   * calibration ladder shows that metric cannot see a cost deferred to a
+   * microtask at all — so whether a subject's pass is inside the dispatch
+   * decides whether subtracting the validator time from the handler time means
+   * anything. It is measured rather than declared.
+   */
+  passesInsideDispatch: number;
   /** Every root the subject submitted, for assert-validated-root-matches. */
   readonly rootsSeen: unknown[];
 }
@@ -33,6 +42,17 @@ export interface CountedSchema<TSchema> {
   readonly work: ValidatorWork;
   reset(): void;
 }
+
+/**
+ * Nanoseconds, from whichever clock the lane has. `process.hrtime` in Node,
+ * `performance.now()` in the browser bundle — the same file runs in both, and
+ * a second copy of this counter is exactly how the two lanes would come to
+ * wrap different things.
+ */
+const nanoClock: () => bigint =
+  typeof process === "object" && typeof process?.hrtime?.bigint === "function"
+    ? () => process.hrtime.bigint()
+    : () => BigInt(Math.round(performance.now() * 1e6));
 
 const countPresentPaths = (
   root: unknown,
@@ -51,24 +71,27 @@ const countPresentPaths = (
  */
 export function countValidatorWork<TSchema extends object>(
   schema: TSchema,
-  concretePaths: readonly string[]
+  concretePaths: readonly string[],
+  isInsideDispatch: () => boolean = () => false
 ): CountedSchema<TSchema> {
   const work: ValidatorWork = {
     passes: 0,
     pathsJudged: 0,
     nanoseconds: 0n,
+    passesInsideDispatch: 0,
     rootsSeen: [],
   };
 
   const record = <TResult>(root: unknown, run: () => TResult): TResult => {
     work.passes += 1;
+    if (isInsideDispatch()) work.passesInsideDispatch += 1;
     work.pathsJudged += countPresentPaths(root, concretePaths);
     work.rootsSeen.push(root);
-    const start = process.hrtime.bigint();
+    const start = nanoClock();
     try {
       return run();
     } finally {
-      work.nanoseconds += process.hrtime.bigint() - start;
+      work.nanoseconds += nanoClock() - start;
     }
   };
 
@@ -133,6 +156,7 @@ export function countValidatorWork<TSchema extends object>(
       work.passes = 0;
       work.pathsJudged = 0;
       work.nanoseconds = 0n;
+      work.passesInsideDispatch = 0;
       work.rootsSeen.length = 0;
     },
   };
