@@ -41,6 +41,7 @@ const { act, createElement: h } = React;
 const ORDER = z.object({
   billing: z.object({ postcode: z.string().min(3), city: z.string() }),
   shipping: z.object({ postcode: z.string().min(3), city: z.string() }),
+  items: z.array(z.object({ sku: z.string() })),
 });
 const OTHER = z.object({ unrelated: z.object({ token: z.string() }) });
 
@@ -49,6 +50,7 @@ const OrderForm = createFormHooks(zodFormResolver(ORDER));
 const DEFAULTS = {
   billing: { postcode: "100-0001", city: "Chiyoda" },
   shipping: { postcode: "150-0001", city: "Shibuya" },
+  items: [{ sku: "a" }, { sku: "b" }],
 };
 
 const orderForm = () =>
@@ -182,4 +184,51 @@ test("two forms on one screen stay independent", async () => {
   assert.equal(container.querySelector("#a").textContent, "100-0001");
   assert.equal(container.querySelector("#b").textContent, "999-9999");
   root.unmount();
+});
+
+test("no FieldScope is needed for an absolute path", async () => {
+  // The scope defaults to the root, so a component that knows the whole path
+  // needs nothing wrapped around it at all.
+  function Screen() {
+    const postcode = OrderForm.useField("billing.postcode");
+    return h("span", { id: "v" }, String(postcode.value));
+  }
+  const { container, root, escaped } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.equal(escaped, null);
+  assert.equal(container.querySelector("#v").textContent, "100-0001");
+  root.unmount();
+});
+
+test("a wildcard path outside a row scope says which scope is missing", async () => {
+  function Screen() {
+    OrderForm.useField("items[*].sku");
+    return null;
+  }
+  const { escaped } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.match(escaped.message, /needs a row index/);
+  assert.match(escaped.message, /FieldScope row=/);
+});
+
+test("a concrete index is explained as a row, not as a typo", async () => {
+  // Descriptors are keyed by the rule, so items[0].sku is a real place in the
+  // value that is simply not a declared path. Saying only "not declared" would
+  // send somebody hunting a spelling mistake that is not there.
+  function Screen() {
+    OrderForm.useField("items[0].sku");
+    return null;
+  }
+  const { escaped } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.ok(escaped instanceof UndeclaredPathError);
+  assert.ok(
+    escaped.message.includes('names one row of "items[*].sku"'),
+    escaped.message
+  );
+  assert.match(escaped.message, /FieldScope row=/);
+  assert.doesNotMatch(escaped.message, /Did you mean/);
 });

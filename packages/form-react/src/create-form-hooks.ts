@@ -30,7 +30,7 @@
 // a thrown error in JavaScript too, where the types are not there to help.
 // ===========================================================================
 import type { FormAdapter, FormIssue } from "form-contract";
-import type { FormHandle } from "form-core";
+import { declaredPathOf, type FormHandle } from "form-core";
 import type {
   FieldBinding,
   UncontrolledFieldBinding,
@@ -60,15 +60,36 @@ export type ValuesOf<H> = H extends FormHooks<infer T, string> ? T : never;
 export type PathsOf<H> = H extends FormHooks<unknown, infer P> ? P : never;
 
 export class UndeclaredPathError extends Error {
-  constructor(wanted: string, known: readonly string[]) {
-    const near = known.filter(
-      (one) => one.startsWith(wanted.slice(0, 4)) || wanted.startsWith(one.slice(0, 4))
-    );
-    super(
-      `"${wanted}" is not a field this form declares.` +
-        (near.length === 0 ? "" : ` Did you mean: ${near.slice(0, 4).join(", ")}?`)
-    );
+  constructor(wanted: string, known: ReadonlySet<string>) {
+    super(UndeclaredPathError.explain(wanted, known));
     this.name = "UndeclaredPathError";
+  }
+
+  /**
+   * A concrete index is the interesting case rather than a typo. Descriptors
+   * are keyed by the rule — `items[*].sku` — so `items[0].sku` is a real place
+   * in the value that simply is not a declared path, and saying only "not
+   * declared" would send somebody looking for a spelling mistake that is not
+   * there.
+   */
+  private static explain(wanted: string, known: ReadonlySet<string>): string {
+    const asRule = declaredPathOf(wanted);
+    if (asRule !== wanted && known.has(asRule)) {
+      return (
+        `"${wanted}" names one row of "${asRule}", and a declared path never ` +
+        "carries an index. Address it as " +
+        `"${asRule}" inside a <FieldScope row={row}>, which is what binds the ` +
+        "index — or use the untyped useField if the index really is fixed."
+      );
+    }
+    const near = [...known].filter(
+      (one) =>
+        one.startsWith(wanted.slice(0, 4)) || wanted.startsWith(one.slice(0, 4))
+    );
+    return (
+      `"${wanted}" is not a field this form declares.` +
+      (near.length === 0 ? "" : ` Did you mean: ${near.slice(0, 4).join(", ")}?`)
+    );
   }
 }
 
@@ -101,10 +122,10 @@ export function createFormHooks<T, TPath extends string>(
     const scope = useFieldScope();
     const wanted = declaredPathIn(path, scope);
     if (!fromAdapter.has(wanted)) {
-      throw new UndeclaredPathError(wanted, [...fromAdapter]);
+      throw new UndeclaredPathError(wanted, fromAdapter);
     }
     const here = declaredPathsOf(form);
-    if (!here.has(wanted)) throw new UndeclaredPathError(wanted, [...here]);
+    if (!here.has(wanted)) throw new UndeclaredPathError(wanted, here);
     return path;
   };
 

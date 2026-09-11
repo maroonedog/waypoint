@@ -133,6 +133,35 @@ caller's function looked up instead of written inline. There is no second
 implementation for the heights to diverge between, and the library ships no
 input and no class name of its own.
 
+### `<FieldScope>` is optional
+
+A hook with no scope around it reads the root — `{ prefix: "", indices: [] }` —
+so an absolute path needs nothing wrapped around it:
+
+```tsx
+// no FieldScope anywhere
+const postcode = OrderForm.useField("billing.postcode");
+```
+
+There are exactly two reasons to reach for one:
+
+| | why |
+|---|---|
+| `<FieldScope prefix="billing">` | so a nested component can be **propless and reusable**. Optional. |
+| `<FieldScope row={row}>` | so a wildcard path gets an index. **Required** — `items[*].sku` has nowhere else to get one, and the error says so rather than binding row 0. |
+
+A declared path never carries an index, so `items[0].sku` is not one:
+
+```
+"items[0].sku" names one row of "items[*].sku", and a declared path never
+carries an index. Address it as "items[*].sku" inside a <FieldScope row={row}>,
+which is what binds the index — or use the untyped useField if the index
+really is fixed.
+```
+
+That last clause is real: plain `useField("items[0].sku")` works. It is the
+fixed-index escape hatch, outside the path union on purpose.
+
 ### The path a hook is allowed to ask for
 
 `useField` takes a `string`, and it has to. One React context object serves
@@ -378,7 +407,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 102 tests, a
+The runtime is complete against its design and is exercised by 105 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 
