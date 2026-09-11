@@ -47,6 +47,9 @@ export const formContractUseFieldSubject: Subject = {
   notes:
     "No validation-mode knob exists; every settled change is judged. " +
     "inputProps is not used, so the DOM matches the shared leaf exactly.",
+  policyCitation:
+    "README: one whole-root validation pass per settled change; FormOptions " +
+    "carries no validation mode",
   Leaf,
 
   mount(container, schema, paths) {
@@ -65,6 +68,9 @@ export const formContractUseFieldSubject: Subject = {
     const mounted: MountedSubject = {
       setValue: (path, value) => form.field(path).setValue(value as never),
       readValue: (path) => readValueAt(form.readRoot(), path),
+      submit: async () => {
+        await form.submit(() => undefined);
+      },
       unmount: () => root.unmount(),
     };
     return mounted;

@@ -31,6 +31,12 @@ export interface MountedSubject {
   setValue(path: string, value: unknown): void;
   /** Reads back through the library's OWN getter, for the same canary. */
   readValue(path: string): unknown;
+  /**
+   * Attempts a submit. Read at a designated, UNTIMED observation point: it is
+   * how a subject whose policy is on-submit is asked for its verdict, and its
+   * cost is never charged to the interaction that preceded it.
+   */
+  submit(): Promise<void>;
   unmount(): void;
 }
 
@@ -47,6 +53,11 @@ export interface Subject {
   readonly capabilities: readonly string[];
   /** Written by whoever wrote the subject, and printed beside its rows. */
   readonly notes: string;
+  /**
+   * Where the library documents the policy it ships. Printed beside a
+   * `by design` cell so the reader can check it rather than take our word.
+   */
+  readonly policyCitation: string;
   readonly Leaf: ComponentType<LeafProps>;
   /** `paths` is empty when the harness is measuring the wiring overhead. */
   mount(

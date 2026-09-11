@@ -131,6 +131,7 @@ export const handWrittenPerFieldStateSubject: Subject = {
   notes:
     "One useState per leaf, a mutable root, one whole-root pass per change, " +
     "per-path notification. No store, no library.",
+  policyCitation: "written for this benchmark to judge on every change",
   Leaf,
 
   mount(container, schema, paths) {
@@ -151,6 +152,9 @@ export const handWrittenPerFieldStateSubject: Subject = {
         judge(form);
       },
       readValue: (path) => readValueAt(form.root, path),
+      submit: async () => {
+        judge(form);
+      },
       unmount: () => root.unmount(),
     };
     return mounted;

@@ -21,12 +21,17 @@ export interface LossRow {
   readonly headline: number;
   readonly bestSubjectId: string;
   readonly best: number;
+  /** What the cheaper subject was scored as. A cheap row that disagreed is
+   *  still a loss, and printing the number without this word beside it would
+   *  be misleading in the other direction. */
+  readonly bestAgreement: string;
 }
 
 /** Every scenario where the named subject is not the cheapest on the count. */
 export function findLosses(
   measurements: readonly ScenarioMeasurement[],
-  subjectId: string
+  subjectId: string,
+  agreementOf: (subjectId: string, scenarioId: string) => string
 ): readonly LossRow[] {
   const byScenario = new Map<string, ScenarioMeasurement[]>();
   for (const measurement of measurements) {
@@ -48,6 +53,7 @@ export function findLosses(
         headline: HEADLINE(mine),
         bestSubjectId: best.subjectId,
         best: HEADLINE(best),
+        bestAgreement: agreementOf(best.subjectId, scenarioId),
       });
     }
   }

@@ -41,10 +41,31 @@ const { renderCountsTable, renderEnvironment, NO_MILLISECONDS_NOTICE } =
   await import("./report/render-markdown-tables.ts");
 const { formContractUseFieldSubject } = await import("./subjects/form-contract-use-field-subject.ts");
 const { handWrittenPerFieldStateSubject } = await import("./subjects/hand-written-per-field-state-subject.ts");
+const {
+  reactHookFormScopedSubject,
+  reactHookFormOnSubmitSubject,
+  reactHookFormDepsSubject,
+} = await import("./subjects/react-hook-form-scoped-subject.ts");
+const { decideByPolicy } = await import("./agreement/policy.ts");
+const { readObservableState } = await import("./agreement/read-observable-state.ts");
 const { settle } = await import("./react-work/settle.ts");
 const { measureWiringOverhead } = await import("./measure-wiring-overhead.ts");
 
-const SUBJECTS = [formContractUseFieldSubject, handWrittenPerFieldStateSubject];
+const SUBJECTS = [
+  formContractUseFieldSubject,
+  handWrittenPerFieldStateSubject,
+  reactHookFormScopedSubject,
+  reactHookFormDepsSubject,
+  reactHookFormOnSubmitSubject,
+];
+
+/**
+ * The verdict each subject showed, read at the moment its OWN policy claims to
+ * have one. Kept apart from the measurement, because a submit driven to read a
+ * verdict is an observation and must never be charged to the interaction.
+ */
+const verdicts = new Map<string, ReturnType<typeof readObservableState>>();
+const cells = new Map<string, string>();
 const target = { document: dom.document, window: dom.window as never };
 
 // ---- proof: the build under measurement -----------------------------------
@@ -84,6 +105,29 @@ for (const subject of SUBJECTS) {
   bare.remove();
 }
 
+// ---- proof: every subject is actually wired up -----------------------------
+// On a mount of its own. The canary writes a value, and a value written into a
+// scenario is a value the reducer never wrote — the root-match proof would
+// then fail every subject for the harness having touched it.
+for (const subject of SUBJECTS) {
+  const container = dom.newContainer();
+  const mounted = subject.mount(container, counted.schema);
+  await settle();
+  commitLog.clear();
+  const before = container.innerHTML;
+  await assertSubjectIsLive({
+    subjectId: subject.id,
+    mounted,
+    path: "company.department",
+    value: "Canary",
+    domChanged: () => container.innerHTML !== before,
+    commitsHappened: () => commitLog.commits.length > 0,
+    settle,
+  });
+  mounted.unmount();
+  container.remove();
+}
+
 for (const subject of SUBJECTS) {
   for (const scenario of scenarios) {
     if (scenario.requires.some((need) => !subject.capabilities.includes(need))) {
@@ -99,18 +143,11 @@ for (const subject of SUBJECTS) {
       target,
     });
 
-    assertSharedSchemaWasReached(subject.id, scenario.id, counted.work);
     const oracle = oracleVerdict(
       orderSchema,
       scenario.steps.flatMap((step) =>
         step.kind === "type" ? [{ path: step.path, value: step.value }] : []
       )
-    );
-    assertValidatedRootMatches(
-      subject.id,
-      scenario.id,
-      measurement.rootsSeen,
-      oracle.root
     );
 
     if (scenario.id === scenarios[0]?.id) {
@@ -119,20 +156,31 @@ for (const subject of SUBJECTS) {
         treeFibers: measurement.treeFibers,
         wiringFibers: wiring.get(subject.id) ?? 0,
       });
-
-      // ---- proof: the subject is actually wired up -------------------------
-      commitLog.clear();
-      const before = container.innerHTML;
-      await assertSubjectIsLive({
-        subjectId: subject.id,
-        mounted,
-        path: "company.department",
-        value: "Canary",
-        domChanged: () => container.innerHTML !== before,
-        commitsHappened: () => commitLog.commits.length > 0,
-        settle,
-      });
     }
+
+    // ---- the observation point, after the counters are read ----------------
+    // A subject whose policy is on-submit does not validate during a
+    // keystroke, by design. So the proofs that it reached the shared schema
+    // and judged the same root are applied HERE, at the moment it claims a
+    // verdict — applying them after the interaction would fail a library for
+    // doing exactly what its documentation says it does.
+    const decision = decideByPolicy(subject.policy);
+    if (decision.submitBeforeReading) {
+      await mounted.submit();
+      await settle();
+    }
+    assertSharedSchemaWasReached(subject.id, scenario.id, counted.work);
+    assertValidatedRootMatches(
+      subject.id,
+      scenario.id,
+      counted.work.rootsSeen,
+      oracle.root
+    );
+    const shown = readObservableState(container);
+    const comparison = compareVerdicts(subject.id, shown, oracle.state);
+    const key = `${subject.id}|${scenario.id}`;
+    verdicts.set(key, shown);
+    cells.set(key, comparison.agrees ? decision.agreeingCell : "disagrees");
 
     measurements.push(measurement);
     mounted.unmount();
@@ -145,12 +193,18 @@ assertDomShapeMatches(domShapes);
 assertTreeFibersMatch(trees);
 
 // ---- the report ------------------------------------------------------------
-const losses = findLosses(measurements, formContractUseFieldSubject.id);
+const losses = findLosses(
+  measurements,
+  formContractUseFieldSubject.id,
+  (subjectId, scenarioId) => cells.get(`${subjectId}|${scenarioId}`) ?? "unknown"
+);
 const ordered = orderLossesFirst(measurements, losses);
 
 // Every disagreement is printed in full. A cell that says "disagrees" and
 // nothing else is an accusation; the strings are what let a reader judge it.
 const disagreements = ordered.flatMap((measurement) => {
+  const key = `${measurement.subjectId}|${measurement.scenarioId}`;
+  if (cells.get(key) !== "disagrees") return [];
   const scenario = scenarios.find((one) => one.id === measurement.scenarioId);
   const oracle = oracleVerdict(
     orderSchema,
@@ -158,20 +212,16 @@ const disagreements = ordered.flatMap((measurement) => {
       step.kind === "type" ? [{ path: step.path, value: step.value }] : []
     )
   );
-  const comparison = compareVerdicts(
-    measurement.subjectId,
-    measurement.state,
-    oracle.state
-  );
-  return comparison.agrees
-    ? []
-    : comparison.differences.map(
-        (difference) =>
-          `- \`${measurement.subjectId}\` / ${measurement.scenarioId} / ` +
-          `${difference.channel} at \`${difference.path}\`: subject ` +
-          `${JSON.stringify(difference.subject)}, oracle ` +
-          `${JSON.stringify(difference.oracle)}`
-      );
+  const shown = verdicts.get(key);
+  if (shown === undefined) return [];
+  return compareVerdicts(measurement.subjectId, shown, oracle.state)
+    .differences.map(
+      (difference) =>
+        `- \`${measurement.subjectId}\` / ${measurement.scenarioId} / ` +
+        `${difference.channel} at \`${difference.path}\`: subject ` +
+        `${JSON.stringify(difference.subject)}, oracle ` +
+        `${JSON.stringify(difference.oracle)}`
+    );
 });
 
 const lines = [
@@ -202,31 +252,37 @@ const lines = [
         .map(
           (loss) =>
             `- **${loss.scenarioId}**: ${loss.headline} changed fibers against ` +
-            `${loss.best} for \`${loss.bestSubjectId}\``
+            `${loss.best} for \`${loss.bestSubjectId}\`, which was scored ` +
+            `**${loss.bestAgreement}**`
         )
         .join("\n"),
   "",
   renderCountsTable(
-    ordered.map((measurement) => {
-      const oracle = oracleVerdict(
-        orderSchema,
-        (scenarios.find((one) => one.id === measurement.scenarioId)?.steps ?? [])
-          .flatMap((step) =>
-            step.kind === "type" ? [{ path: step.path, value: step.value }] : []
-          )
-      );
-      const comparison = compareVerdicts(
-        measurement.subjectId,
-        measurement.state,
-        oracle.state
-      );
-      return {
-        measurement,
-        agreement: comparison.agrees ? ("agrees" as const) : ("disagrees" as const),
-        isSubject: measurement.subjectId === formContractUseFieldSubject.id,
-      };
-    })
+    ordered.map((measurement) => ({
+      measurement,
+      agreement: (cells.get(
+        `${measurement.subjectId}|${measurement.scenarioId}`
+      ) ?? "disagrees") as never,
+      isSubject: measurement.subjectId === formContractUseFieldSubject.id,
+    }))
   ),
+  "",
+  "## Policies",
+  "",
+  "Each subject is scored at the moment its OWN policy claims a verdict, and " +
+    "the citation is the library documentation rather than our reading of it. " +
+    "The on-change policy is form-contract only policy; the default of the " +
+    "library it is compared against here is not.",
+  "",
+  [
+    "| subject | policy | documented as | notes |",
+    "|---|---|---|---|",
+    ...SUBJECTS.map(
+      (subject) =>
+        `| ${subject.id} | ${subject.policy} | ${subject.policyCitation} | ` +
+        `${subject.notes} |`
+    ),
+  ].join("\n"),
   "",
   "## Disagreements",
   "",
