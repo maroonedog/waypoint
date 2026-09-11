@@ -37,6 +37,7 @@ import type {
 } from "./field-binding.types.js";
 import { useField } from "./use-field.js";
 import { useFieldValue } from "./use-field-value.js";
+import { useFieldValues } from "./use-field-values.js";
 import { useFieldIssues } from "./use-field-issues.js";
 import { useUncontrolledField } from "./use-uncontrolled-field.js";
 import { useForm } from "./use-form.js";
@@ -49,6 +50,8 @@ export interface FormHooks<T, TPath extends string> {
     path: AddressablePath<TPath>
   ): UncontrolledFieldBinding<TValue>;
   useFieldValue<TValue = unknown>(path: AddressablePath<TPath>): TValue | undefined;
+  /** Every place a wildcard covers. See useFieldValues. */
+  useFieldValues<TValue = unknown>(path: AddressablePath<TPath>): readonly TValue[];
   useFieldIssues(path: AddressablePath<TPath>): readonly FormIssue[];
   /** The adapter these were built from, so a caller keeps one import. */
   readonly adapter: FormAdapter<T, TPath>;
@@ -148,6 +151,8 @@ export function createFormHooks<T, TPath extends string>(
       useUncontrolledField<TValue>(useCheckedPath(path)),
     useFieldValue: <TValue,>(path: AddressablePath<TPath>): TValue | undefined =>
       useFieldValue<TValue>(useCheckedPath(path)),
+    useFieldValues: <TValue,>(path: AddressablePath<TPath>): readonly TValue[] =>
+      useFieldValues<TValue>(useCheckedPath(path)),
     useFieldIssues: (path: AddressablePath<TPath>): readonly FormIssue[] =>
       useFieldIssues(useCheckedPath(path)),
   };

@@ -35,7 +35,9 @@ export function resolveScopedPath(
   if (bound === undefined) {
     throw new Error(
       `"${declared}" needs a row index this scope does not supply. Render it ` +
-        `inside a <FieldScope row={row}> for each of its arrays.`
+        "inside a <FieldScope row={row}> for each of its arrays — or, if you " +
+        "meant the whole column rather than one place in it, read it with " +
+        "useFieldValues, which is what an unbound wildcard ordinarily means."
     );
   }
   return bound;

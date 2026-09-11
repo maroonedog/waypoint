@@ -171,6 +171,32 @@ OrderForm.useField(`items[${name}].sku`)   // compile error
 A wildcard with nowhere to get an index is still an error rather than a guess —
 binding row 0 would silently address a row nobody asked for.
 
+### A wildcard read as the whole column
+
+Outside a row scope, `items[*].sku` ordinarily means every sku the list holds.
+That reading has its own hook:
+
+```tsx
+const skus = OrderForm.useFieldValues<string>("items[*].sku");   // readonly string[]
+const one  = OrderForm.useField<string>("items[0].sku");         // string
+```
+
+Two hooks rather than one, for a reason worth stating: the same expression
+cannot be a `string` inside `<FieldScope row={row}>` and a `string[]` outside
+it. That would be a type that depends on where the component was rendered,
+which TypeScript cannot express and a reader could not predict.
+
+It binds what the scope supplies and leaves the rest open, so inside one row of
+an outer array a nested wildcard reads **that row's** column rather than every
+row's. And it is the one hook here that is not O(1): it subscribes to one cell
+per place the wildcard covers, plus the row order of every array it crosses.
+Two hundred rows is two hundred subscriptions — the honest price of the
+question, paid only by the component that asks it.
+
+`useField` with an unbound wildcard still refuses, because one field is one
+place and binding row 0 would silently address a row nobody asked for. The
+error now names `useFieldValues` as the other thing you might have meant.
+
 ### The path a hook is allowed to ask for
 
 `useField` takes a `string`, and it has to. One React context object serves
@@ -421,7 +447,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 107 tests, a
+The runtime is complete against its design and is exercised by 115 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 

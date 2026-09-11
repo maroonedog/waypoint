@@ -70,6 +70,15 @@ function indices(): void {
 }
 void indices;
 
+// ---- the aggregate is an array, and one place is not ---------------------
+// The same path spelled the same way, read two ways, with two types. That is
+// only possible because they are two hooks: one expression cannot be a number
+// inside a row scope and an array outside one.
+declare const column: ReturnType<typeof OrderForm.useFieldValues<number>>;
+declare const place: ReturnType<typeof OrderForm.useFieldValue<number>>;
+assertExact<Exact<typeof column, readonly number[]>>(true);
+assertExact<Exact<typeof place, number | undefined>>(true);
+
 function rejected(): void {
   // @ts-expect-error a misspelt path is not a member of the path union
   OrderForm.useField("owner.emial");

@@ -13,6 +13,7 @@ export {
   type ValuesOf,
 } from "./create-form-hooks.js";
 export { useFieldValue } from "./use-field-value.js";
+export { useFieldValues } from "./use-field-values.js";
 export { useFieldIssues } from "./use-field-issues.js";
 export { useFormStatus, type FormStatus } from "./use-form-status.js";
 export { Field, type FieldProps } from "./field.js";
