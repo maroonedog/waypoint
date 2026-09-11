@@ -40,8 +40,13 @@ jobs:
       - run: npm run bench:forms:time
         continue-on-error: true
 
+      # Both files. The markdown is for a person; the JSON is what the
+      # documentation site renders from, so a figure on the website is a figure
+      # some named run produced rather than one somebody retyped.
       - uses: actions/upload-artifact@v4
         with:
           name: measurements-forms-time-${{ github.run_id }}
-          path: docs/measurements-forms-time.md
-          if-no-files-found: warn
+          path: |
+            docs/measurements-forms-time.md
+            docs/measurements-forms-time.json
+          if-no-files-found: error

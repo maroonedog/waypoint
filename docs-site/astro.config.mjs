@@ -17,6 +17,11 @@ export default defineConfig({
   integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    // The pages read the repository's own measurement artefacts — the CI-gated
+    // counts baseline and, when a CI run has produced one, the timing summary.
+    // Rendering from those rather than from retyped figures is what stops a
+    // number on the website and a number in the report from disagreeing.
+    server: { fs: { allow: [".."] } },
   },
   server: { port: 5180 },
   build: {

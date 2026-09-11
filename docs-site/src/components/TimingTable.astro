@@ -1,0 +1,190 @@
+---
+// ===========================================================================
+// TimingTable.astro — microseconds, but only somebody else's machine's.
+//
+// This renders nothing unless `docs/measurements-forms-time.json` exists AND
+// was produced by a CI run. A timing taken on the author's laptop is not
+// evidence a reader can use: they cannot reproduce it, they cannot inspect the
+// machine, and they have only the author's word that nothing else was running.
+// The page would rather show the method and no numbers than show those.
+//
+// The file is committed by hand from a CI artefact, deliberately: this lane is
+// printed and never gated, so publishing a figure from it should be an act
+// somebody performed rather than something that happened on a push.
+// ===========================================================================
+import { DENOMINATOR, PRIMARY, label } from "../subjects.ts";
+
+interface Side {
+  readonly label: string;
+  readonly inputHandlerMicroseconds: number;
+  readonly validatorMicroseconds: number;
+  readonly insideDispatchShare: number;
+}
+interface Comparison {
+  readonly one: Side;
+  readonly other: Side;
+  readonly band: { low: number; middle: number; high: number };
+  readonly relativeSpreadPercent: number;
+  readonly pairs: number;
+  readonly skipped: number;
+  readonly verdict: string;
+  readonly why: string;
+}
+interface Summary {
+  readonly takenBy: string;
+  readonly takenAt: string;
+  readonly browser: { product: string; headless: boolean; crossOriginIsolated: boolean };
+  readonly machine: { cpu: string; cores: number; platform: string };
+  readonly sampling: { pairs: number; keystrokes: number; warmMilliseconds: number };
+  readonly result: {
+    readonly ladder?: {
+      readonly smallestResolved: Record<string, number>;
+      readonly rungs: readonly { position: string; injectedMilliseconds: number; resolved: boolean }[];
+    };
+    readonly rungs: readonly {
+      shapeId: string;
+      leaves: number;
+      comparisons: readonly Comparison[];
+    }[];
+  };
+}
+
+const modules = import.meta.glob<{ default: Summary }>(
+  "../../../docs/measurements-forms-time.json",
+  { eager: true }
+);
+const summary = Object.values(modules)[0]?.default;
+const fromCi = summary?.takenBy?.startsWith("github actions") === true;
+
+const rung = fromCi ? summary!.result.rungs.at(-1) : undefined;
+const ordered = rung === undefined
+  ? []
+  : [...rung.comparisons].sort((one, other) => other.band.middle - one.band.middle);
+
+const ladder = fromCi ? summary!.result.ladder : undefined;
+const resolvedAt = (position: string): string => {
+  const any = ladder?.rungs.some((one) => one.position === position && one.resolved);
+  if (ladder === undefined) return "—";
+  const smallest = (ladder.smallestResolved[position] ?? 0) / 1000;
+  return any === true ? `${smallest} ms` : "nothing up to 4 ms";
+};
+
+const policy: Readonly<Record<string, string>> = {
+  "react-hook-form-on-submit": "on-submit",
+};
+---
+
+{
+  !fromCi && (
+    <div class="mt-6 rounded-lg border border-outline-variant p-6">
+      <p class="font-medium">No timings are published here yet.</p>
+      <p class="mt-3 leading-relaxed text-on-surface-variant">
+        The lane runs, and its report is in the repository. What is not here is
+        a table of microseconds taken on the author's own machine — a reader
+        cannot reproduce those, cannot inspect the machine, and has only the
+        author's word that nothing else was running on it. Figures will appear
+        on this page when a CI run has produced them and somebody has committed
+        that run's summary, with the run it came from printed beside it.
+      </p>
+      <p class="mt-3 leading-relaxed text-on-surface-variant">
+        The deterministic lane above is unaffected: those integers do not depend
+        on the machine at all, which is the whole reason CI can gate them.
+      </p>
+    </div>
+  )
+}
+
+{
+  fromCi && (
+    <div class="mt-6">
+      <div class="rounded-lg bg-surface-container p-5 leading-relaxed">
+        <p class="font-medium">What this harness could see, on that machine</p>
+        <p class="mt-2 text-sm text-on-surface-variant">
+          Injected cost resolved at{" "}
+          <strong class="text-on-surface">{resolvedAt("synchronous")}</strong>{" "}
+          synchronously,{" "}
+          <strong class="text-on-surface">{resolvedAt("microtask")}</strong> at
+          the microtask position, and{" "}
+          <strong class="text-on-surface">{resolvedAt("macrotask")}</strong> at
+          the macrotask position. The headline metric is the{" "}
+          <code>EventDispatch</code> trace event filtered to <code>input</code>,
+          and that event closes before a microtask runs — so a runtime that
+          defers its work, as form-contract does, is cheap on this metric{" "}
+          <em>by construction</em>.
+        </p>
+      </div>
+
+      <p class="mt-8 font-medium">
+        Per keystroke at {rung!.leaves} fields, against {label(DENOMINATOR)}
+      </p>
+      <div class="mt-3 overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead class="text-left text-on-surface-variant">
+            <tr class="hairline">
+              <th class="py-2 pr-4 font-medium">subject</th>
+              <th class="py-2 pr-4 font-medium">ratio</th>
+              <th class="py-2 pr-4 font-medium">handler</th>
+              <th class="py-2 pr-4 font-medium">pass inside it</th>
+              <th class="py-2 pr-4 font-medium">spread</th>
+              <th class="py-2 font-medium">verdict</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ordered.map((row) => (
+              <tr
+                class:list={[
+                  "hairline",
+                  row.one.label === PRIMARY && "bg-surface-low",
+                ]}
+              >
+                <td
+                  class:list={[
+                    "py-2 pr-4",
+                    row.one.label === PRIMARY && "font-medium",
+                  ]}
+                >
+                  {label(row.one.label)}
+                  {policy[row.one.label] !== undefined && (
+                    <span class="text-on-surface-variant">
+                      {" "}
+                      — {policy[row.one.label]}
+                    </span>
+                  )}
+                </td>
+                <td class="py-2 pr-4">{row.band.middle}x</td>
+                <td class="py-2 pr-4">{row.one.inputHandlerMicroseconds} µs</td>
+                <td class="py-2 pr-4">
+                  {Math.round(row.one.insideDispatchShare * 100)}%
+                </td>
+                <td class="py-2 pr-4">{row.relativeSpreadPercent}%</td>
+                <td class="py-2">{row.verdict}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="mt-3 text-xs text-on-surface-variant">
+        {summary!.takenBy}, {summary!.takenAt.slice(0, 10)} —{" "}
+        {summary!.browser.product}, headless {String(summary!.browser.headless)},
+        crossOriginIsolated {String(summary!.browser.crossOriginIsolated)}, on{" "}
+        {summary!.machine.cpu} ({summary!.machine.cores} cores,{" "}
+        {summary!.machine.platform}). {summary!.sampling.pairs} interleaved
+        pairs, {summary!.sampling.keystrokes} keystrokes per sample.
+      </p>
+
+      {ordered.some((row) => row.one.label === PRIMARY) && (
+        <p class="mt-5 rounded-lg bg-surface-container p-5 leading-relaxed">
+          <strong>The row to read carefully is ours.</strong>{" "}
+          {(() => {
+            const mine = ordered.find((row) => row.one.label === PRIMARY)!;
+            return `form-contract reads ${mine.band.middle}x and the verdict says ${mine.verdict} — ${mine.why}.`;
+          })()}{" "}
+          The counts lane above says it does <em>more</em> React work than the
+          reference, so any timing that looks like a win should be read against
+          that before it is believed.
+        </p>
+      )}
+    </div>
+  )
+}

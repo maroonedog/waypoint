@@ -149,6 +149,35 @@ try {
 
   mkdirSync("docs", { recursive: true });
   writeFileSync("docs/measurements-forms-time.md", report, "utf8");
+
+  // The same run, machine readable. The documentation site renders FROM this
+  // rather than from figures somebody retyped, so a number on the website and
+  // a number in the report cannot come to disagree. Provenance travels with
+  // it: a microsecond means nothing without the machine that produced it.
+  writeFileSync(
+    "docs/measurements-forms-time.json",
+    JSON.stringify(
+      {
+        takenBy: process.env["GITHUB_RUN_ID"] === undefined
+          ? "a local run"
+          : `github actions run ${process.env["GITHUB_RUN_ID"]}`,
+        takenAt: new Date().toISOString(),
+        browser: described,
+        machine,
+        packages: react,
+        sampling: {
+          pairs: sampling.pairs,
+          keystrokes: sampling.keystrokes,
+          warmMilliseconds: sampling.warmMilliseconds,
+        },
+        result,
+      },
+      null,
+      2
+    ) + "\n",
+    "utf8"
+  );
+
   console.log(report);
 } finally {
   await browser.close();

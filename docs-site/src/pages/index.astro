@@ -121,12 +121,14 @@ const layers = [
     <p class="mt-4 leading-relaxed text-on-surface-variant">
       Five runtimes are driven through one scripted transcript against one zod
       schema the harness owns and instruments, rendering one DOM the harness
-      owns and hashes. In the timing lane at 201 fields a keystroke through
-      form-contract measures 0.63x the hand-written reference, and the report
-      prints <strong class="text-on-surface">indistinguishable</strong> —
-      because its own calibration ladder says it cannot resolve a difference
-      that small, and because 0% of form-contract's validation passes ran inside
-      the event being timed.
+      owns and hashes. Every count is an integer that does not depend on the
+      machine, and CI fails when one of them moves.
+    </p>
+    <p class="mt-4 leading-relaxed text-on-surface-variant">
+      On the deterministic lane form-contract is <em>not</em> first, and the
+      report sorts the rows it loses first. It does marginally more React work
+      per keystroke than the hand-written reference it is measured against. That
+      table is published here as it comes out of the file CI gates against.
     </p>
     <p class="mt-6">
       <a
