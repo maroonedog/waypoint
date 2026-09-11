@@ -4,8 +4,23 @@
     {
       "name": "playground",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["vite", "--config", "examples/playground/vite.config.ts", "examples/playground"],
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "examples/playground/vite.config.ts",
+        "examples/playground"
+      ],
       "port": 5178
+    },
+    {
+      "name": "docs-site",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "docs-site/vite.config.ts"
+      ],
+      "port": 5180
     }
   ]
 }

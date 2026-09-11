@@ -1,0 +1,69 @@
+# ===========================================================================
+# deploy-docs.yml — formcontract.dev.
+#
+# The site is built by the SAME Vite and Tailwind the showcase uses, and its
+# Material Design 3 roles come from the showcase's own token file, so the page
+# documenting the library cannot drift out of looking like the library.
+#
+# `public/CNAME` carries the domain into the artifact. GitHub Pages reads it on
+# every deploy, so the custom domain survives a redeploy without anybody
+# re-typing it in the repository settings.
+# ===========================================================================
+name: Deploy docs to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docs-site/**"
+      - "examples/showcase/src/md3-tokens.css"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time, and never cancel one half-way: a cancelled deploy
+# leaves the domain serving whichever build happened to win.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "23"
+          cache: "npm"
+
+      - run: npm ci
+      - run: npm run docs:build
+
+      - name: Fail if the CNAME did not reach the artifact
+        run: |
+          test -f docs-site/dist/CNAME || {
+            echo "docs-site/dist/CNAME is missing; a deploy without it drops"
+            echo "the custom domain and the site answers on github.io instead."
+            exit 1
+          }
+          cat docs-site/dist/CNAME
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs-site/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

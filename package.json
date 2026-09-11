@@ -12,7 +12,9 @@
     "verify": "npm run build && npm run test && npm run test:types",
     "bench:forms": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts",
     "bench:forms:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts --check",
-    "bench:forms:time": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-time-bench.ts"
+    "bench:forms:time": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-time-bench.ts",
+    "docs:dev": "vite --config docs-site/vite.config.ts",
+    "docs:build": "vite build --config docs-site/vite.config.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",
