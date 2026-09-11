@@ -1,10 +1,13 @@
 // Hooks that know which paths exist.
 //
 // The types do the work in TypeScript; this file is the half that has to hold
-// in JavaScript, where there are no types to help. A path the form does not
-// declare must THROW rather than render an empty input that is never validated
-// and says nothing — which is what `useField` on its own does, and what this
-// repository criticises other libraries for.
+// in JavaScript, where there are no types to help.
+//
+// A path the form does not declare is WARNED ABOUT, not thrown. Such a field
+// is inert — it draws nothing and validates nothing — but it cannot let bad
+// data through, because the pass judges the whole ROOT: the verdict and the
+// submit gate stay correct, and what actually broke is one field's display.
+// Throwing would take the whole form down for that.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";
@@ -33,7 +36,7 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, FieldScope, createFormHooks, UndeclaredPathError } =
+const { FormProvider, FieldScope, createFormHooks, forgetWarnings } =
   await import("form-react");
 
 const { act, createElement: h } = React;
@@ -65,60 +68,94 @@ const otherForm = () =>
     defaultValues: { unrelated: { token: "x" } },
   });
 
-/** Renders and returns whatever escaped, so a throw during render is catchable. */
+/** Renders, and collects what was warned and whatever escaped. */
 async function mountCatching(element) {
+  forgetWarnings();
   const container = dom.window.document.createElement("div");
   dom.window.document.body.appendChild(container);
   const root = createRoot(container);
+  const warnings = [];
   let escaped = null;
-  // React logs the error it re-throws; the test asserts on the throw itself.
-  const quiet = console.error;
+  const quietWarn = console.warn;
+  const quietError = console.error;
+  console.warn = (...parts) => warnings.push(parts.join(" "));
   console.error = () => {};
   try {
     await act(async () => root.render(element));
   } catch (error) {
     escaped = error;
   } finally {
-    console.error = quiet;
+    console.warn = quietWarn;
+    console.error = quietError;
   }
-  return { container, root, escaped };
+  return { container, root, escaped, warnings, warned: warnings.join("\n") };
 }
+
+const text = (container, id) => container.querySelector("#" + id).textContent;
 
 test("a declared path works exactly as the untyped hook does", async () => {
   function Screen() {
     const postcode = OrderForm.useField("billing.postcode");
     return h("span", { id: "v" }, String(postcode.value));
   }
-  const { container, root, escaped } = await mountCatching(
+  const { container, root, escaped, warned } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
   assert.equal(escaped, null);
-  assert.equal(container.querySelector("#v").textContent, "100-0001");
+  assert.equal(warned, "");
+  assert.equal(text(container, "v"), "100-0001");
   root.unmount();
 });
 
-test("a path the form does not declare throws, rather than rendering nothing", async () => {
+test("a misspelt path warns and leaves the rest of the form standing", async () => {
   function Screen() {
     const typo = OrderForm.useField("billing.postcod");
-    return h("span", null, String(typo.value));
+    const fine = OrderForm.useField("shipping.postcode");
+    return h(
+      "div",
+      null,
+      h("span", { id: "typo" }, String(typo.value)),
+      h("span", { id: "fine" }, String(fine.value))
+    );
   }
-  const { escaped } = await mountCatching(
+  const { container, root, escaped, warned } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
-  assert.ok(escaped instanceof UndeclaredPathError, "expected UndeclaredPathError");
-  assert.match(escaped.message, /billing\.postcod/);
+
+  assert.equal(escaped, null, "a typo must not take the form down");
+  assert.match(warned, /billing\.postcod/);
+  assert.match(warned, /draw nothing and validate nothing/);
+  // The inert field, and its neighbour that is entirely unaffected.
+  assert.equal(text(container, "typo"), "undefined");
+  assert.equal(text(container, "fine"), "150-0001");
+  root.unmount();
 });
 
-test("the error names the paths it might have meant", async () => {
+test("the warning names the paths it might have meant", async () => {
   function Screen() {
     OrderForm.useFieldValue("billing.postcod");
     return null;
   }
-  const { escaped } = await mountCatching(
+  const { root, warned } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
-  assert.match(escaped.message, /Did you mean/);
-  assert.match(escaped.message, /billing\.postcode/);
+  assert.match(warned, /Did you mean/);
+  assert.match(warned, /billing\.postcode/);
+  root.unmount();
+});
+
+test("the same path is warned about once, not once per render", async () => {
+  function Screen() {
+    OrderForm.useFieldValue("billing.nope");
+    return null;
+  }
+  const form = orderForm();
+  const { root, warnings } = await mountCatching(
+    h(FormProvider, { form }, h(Screen))
+  );
+  await act(async () => form.field("billing.postcode").setValue("x"));
+  assert.equal(warnings.length, 1);
+  root.unmount();
 });
 
 test("a local name is checked against the scope it is rendered in", async () => {
@@ -126,7 +163,7 @@ test("a local name is checked against the scope it is rendered in", async () => 
     const postcode = OrderForm.useField("postcode");
     return h("span", { id: "v" }, String(postcode.value));
   }
-  const { container, root, escaped } = await mountCatching(
+  const { container, root, escaped, warned } = await mountCatching(
     h(
       FormProvider,
       { form: orderForm() },
@@ -134,33 +171,36 @@ test("a local name is checked against the scope it is rendered in", async () => 
     )
   );
   assert.equal(escaped, null);
-  assert.equal(container.querySelector("#v").textContent, "150-0001");
+  assert.equal(warned, "");
+  assert.equal(text(container, "v"), "150-0001");
   root.unmount();
 });
 
-test("the same local name outside its scope throws", async () => {
+test("the same local name outside its scope warns", async () => {
   function Inner() {
     OrderForm.useField("postcode");
     return null;
   }
-  const { escaped } = await mountCatching(
+  const { root, warned } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Inner))
   );
-  assert.ok(escaped instanceof UndeclaredPathError);
-  assert.match(escaped.message, /"postcode"/);
+  assert.match(warned, /"postcode"/);
+  root.unmount();
 });
 
-test("hooks rendered under a DIFFERENT form's provider throw", async () => {
+test("hooks rendered under a DIFFERENT form's provider warn", async () => {
   // The one mistake the types cannot see: these hooks carry the order form's
   // paths, and nothing stops them being rendered somewhere else.
   function Screen() {
     OrderForm.useFieldValue("billing.postcode");
     return null;
   }
-  const { escaped } = await mountCatching(
+  const { root, escaped, warned } = await mountCatching(
     h(FormProvider, { form: otherForm() }, h(Screen))
   );
-  assert.ok(escaped instanceof UndeclaredPathError, "expected UndeclaredPathError");
+  assert.equal(escaped, null);
+  assert.match(warned, /not a field this form declares/);
+  root.unmount();
 });
 
 test("two forms on one screen stay independent", async () => {
@@ -181,8 +221,8 @@ test("two forms on one screen stay independent", async () => {
     )
   );
   assert.equal(escaped, null);
-  assert.equal(container.querySelector("#a").textContent, "100-0001");
-  assert.equal(container.querySelector("#b").textContent, "999-9999");
+  assert.equal(text(container, "a"), "100-0001");
+  assert.equal(text(container, "b"), "999-9999");
   root.unmount();
 });
 
@@ -197,11 +237,13 @@ test("no FieldScope is needed for an absolute path", async () => {
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
   assert.equal(escaped, null);
-  assert.equal(container.querySelector("#v").textContent, "100-0001");
+  assert.equal(text(container, "v"), "100-0001");
   root.unmount();
 });
 
-test("a wildcard path outside a row scope says which scope is missing", async () => {
+test("a wildcard path outside a row scope still throws, and says which scope", async () => {
+  // Not a mis-addressing: the path is declared and correct, and binding index
+  // zero instead would silently address a row nobody asked for.
   function Screen() {
     OrderForm.useField("items[*].sku");
     return null;
@@ -209,26 +251,39 @@ test("a wildcard path outside a row scope says which scope is missing", async ()
   const { escaped } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
+  assert.ok(escaped !== null, "expected the unbound wildcard to throw");
   assert.match(escaped.message, /needs a row index/);
   assert.match(escaped.message, /FieldScope row=/);
 });
 
-test("a concrete index is explained as a row, not as a typo", async () => {
-  // Descriptors are keyed by the rule, so items[0].sku is a real place in the
-  // value that is simply not a declared path. Saying only "not declared" would
-  // send somebody hunting a spelling mistake that is not there.
+test("a concrete index is addressable, and reads that row", async () => {
+  // items[0].sku is a PLACE in the value, not a rule. The declared union has
+  // never contained a bare index; what changed is that the hooks now accept
+  // one, and check it as the rule it belongs to.
   function Screen() {
-    OrderForm.useField("items[0].sku");
-    return null;
+    const sku = OrderForm.useField("items[0].sku");
+    return h("span", { id: "v" }, String(sku.value));
   }
-  const { escaped } = await mountCatching(
+  const { container, root, escaped, warned } = await mountCatching(
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
-  assert.ok(escaped instanceof UndeclaredPathError);
-  assert.ok(
-    escaped.message.includes('names one row of "items[*].sku"'),
-    escaped.message
+  assert.equal(escaped, null);
+  assert.equal(warned, "", "a real row is not a mistake");
+  assert.equal(text(container, "v"), "a");
+  root.unmount();
+});
+
+test("a computed row index is addressable too", async () => {
+  function Screen() {
+    const which = 1;
+    const sku = OrderForm.useField(`items[${which}].sku`);
+    return h("span", { id: "v" }, String(sku.value));
+  }
+  const { container, root, escaped, warned } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
   );
-  assert.match(escaped.message, /FieldScope row=/);
-  assert.doesNotMatch(escaped.message, /Did you mean/);
+  assert.equal(escaped, null);
+  assert.equal(warned, "");
+  assert.equal(text(container, "v"), "b");
+  root.unmount();
 });

@@ -29,7 +29,7 @@
 // one the enclosing form actually declares — so the silent empty field becomes
 // a thrown error in JavaScript too, where the types are not there to help.
 // ===========================================================================
-import type { FormAdapter, FormIssue } from "form-contract";
+import type { AddressablePath, FormAdapter, FormIssue } from "form-contract";
 import { declaredPathOf, type FormHandle } from "form-core";
 import type {
   FieldBinding,
@@ -44,12 +44,12 @@ import { useFieldScope } from "./use-field-scope.js";
 import { declaredPathIn } from "./resolve-scoped-path.js";
 
 export interface FormHooks<T, TPath extends string> {
-  useField<TValue = unknown>(path: TPath): FieldBinding<TValue>;
+  useField<TValue = unknown>(path: AddressablePath<TPath>): FieldBinding<TValue>;
   useUncontrolledField<TValue = unknown>(
-    path: TPath
+    path: AddressablePath<TPath>
   ): UncontrolledFieldBinding<TValue>;
-  useFieldValue<TValue = unknown>(path: TPath): TValue | undefined;
-  useFieldIssues(path: TPath): readonly FormIssue[];
+  useFieldValue<TValue = unknown>(path: AddressablePath<TPath>): TValue | undefined;
+  useFieldIssues(path: AddressablePath<TPath>): readonly FormIssue[];
   /** The adapter these were built from, so a caller keeps one import. */
   readonly adapter: FormAdapter<T, TPath>;
 }
@@ -59,39 +59,47 @@ export type ValuesOf<H> = H extends FormHooks<infer T, string> ? T : never;
 /** The paths a set of hooks accepts. */
 export type PathsOf<H> = H extends FormHooks<unknown, infer P> ? P : never;
 
-export class UndeclaredPathError extends Error {
-  constructor(wanted: string, known: ReadonlySet<string>) {
-    super(UndeclaredPathError.explain(wanted, known));
-    this.name = "UndeclaredPathError";
-  }
+/**
+ * WARNED, NOT THROWN. A field addressed at a path the form does not declare is
+ * inert: it draws nothing and it validates nothing. It cannot, however, let
+ * bad data through — the pass judges the whole ROOT, so the verdict and the
+ * submit gate are both still correct, and what has actually broken is one
+ * field's display.
+ *
+ * Throwing takes the entire form down for that. A warning names the mistake
+ * loudly in the console, in development and production alike, and leaves the
+ * other two hundred fields working. TypeScript callers never reach either:
+ * the path is a compile error.
+ *
+ * Once per distinct path, because a form re-renders and a warning repeated on
+ * every keystroke is a warning nobody reads.
+ */
+const alreadyWarned = new Set<string>();
 
-  /**
-   * A concrete index is the interesting case rather than a typo. Descriptors
-   * are keyed by the rule — `items[*].sku` — so `items[0].sku` is a real place
-   * in the value that simply is not a declared path, and saying only "not
-   * declared" would send somebody looking for a spelling mistake that is not
-   * there.
-   */
-  private static explain(wanted: string, known: ReadonlySet<string>): string {
-    const asRule = declaredPathOf(wanted);
-    if (asRule !== wanted && known.has(asRule)) {
-      return (
-        `"${wanted}" names one row of "${asRule}", and a declared path never ` +
-        "carries an index. Address it as " +
-        `"${asRule}" inside a <FieldScope row={row}>, which is what binds the ` +
-        "index — or use the untyped useField if the index really is fixed."
-      );
-    }
-    const near = [...known].filter(
-      (one) =>
-        one.startsWith(wanted.slice(0, 4)) || wanted.startsWith(one.slice(0, 4))
+const warnUndeclared = (wanted: string, known: ReadonlySet<string>): void => {
+  if (alreadyWarned.has(wanted)) return;
+  alreadyWarned.add(wanted);
+  const asRule = declaredPathOf(wanted);
+  if (asRule !== wanted && known.has(asRule)) {
+    console.warn(
+      `[form-contract] "${wanted}" names one row of "${asRule}", and this form ` +
+        "has no such row right now. The field will draw nothing until it does."
     );
-    return (
-      `"${wanted}" is not a field this form declares.` +
-      (near.length === 0 ? "" : ` Did you mean: ${near.slice(0, 4).join(", ")}?`)
-    );
+    return;
   }
-}
+  const near = [...known].filter(
+    (one) =>
+      one.startsWith(wanted.slice(0, 4)) || wanted.startsWith(one.slice(0, 4))
+  );
+  console.warn(
+    `[form-contract] "${wanted}" is not a field this form declares, so it will ` +
+      "draw nothing and validate nothing." +
+      (near.length === 0 ? "" : ` Did you mean: ${near.slice(0, 4).join(", ")}?`)
+  );
+};
+
+/** Test seam: the warning is once per path for the life of the module. */
+export const forgetWarnings = (): void => alreadyWarned.clear();
 
 /**
  * Declared paths per handle, computed once. Building the set per render would
@@ -121,25 +129,26 @@ export function createFormHooks<T, TPath extends string>(
     const form = useForm();
     const scope = useFieldScope();
     const wanted = declaredPathIn(path, scope);
-    if (!fromAdapter.has(wanted)) {
-      throw new UndeclaredPathError(wanted, fromAdapter);
-    }
+    // A concrete index is a place, not a rule, so it is checked as its rule.
+    const asRule = declaredPathOf(wanted);
     const here = declaredPathsOf(form);
-    if (!here.has(wanted)) throw new UndeclaredPathError(wanted, here);
+    if (!fromAdapter.has(asRule) || !here.has(asRule)) {
+      warnUndeclared(wanted, here);
+    }
     return path;
   };
 
   return {
     adapter,
-    useField: <TValue,>(path: TPath): FieldBinding<TValue> =>
+    useField: <TValue,>(path: AddressablePath<TPath>): FieldBinding<TValue> =>
       useField<TValue>(useCheckedPath(path)),
     useUncontrolledField: <TValue,>(
-      path: TPath
+      path: AddressablePath<TPath>
     ): UncontrolledFieldBinding<TValue> =>
       useUncontrolledField<TValue>(useCheckedPath(path)),
-    useFieldValue: <TValue,>(path: TPath): TValue | undefined =>
+    useFieldValue: <TValue,>(path: AddressablePath<TPath>): TValue | undefined =>
       useFieldValue<TValue>(useCheckedPath(path)),
-    useFieldIssues: (path: TPath): readonly FormIssue[] =>
+    useFieldIssues: (path: AddressablePath<TPath>): readonly FormIssue[] =>
       useFieldIssues(useCheckedPath(path)),
   };
 }

@@ -150,17 +150,26 @@ There are exactly two reasons to reach for one:
 | `<FieldScope prefix="billing">` | so a nested component can be **propless and reusable**. Optional. |
 | `<FieldScope row={row}>` | so a wildcard path gets an index. **Required** — `items[*].sku` has nowhere else to get one, and the error says so rather than binding row 0. |
 
-A declared path never carries an index, so `items[0].sku` is not one:
+A declared path is a RULE and a value has PLACES, and both are addressable:
 
-```
-"items[0].sku" names one row of "items[*].sku", and a declared path never
-carries an index. Address it as "items[*].sku" inside a <FieldScope row={row}>,
-which is what binds the index — or use the untyped useField if the index
-really is fixed.
+```tsx
+OrderForm.useField("items[*].sku")      // inside a row scope
+OrderForm.useField("items[0].sku")      // a fixed row, no scope needed
+OrderForm.useField(`items[${i}].sku`)   // i: number — a computed row
 ```
 
-That last clause is real: plain `useField("items[0].sku")` works. It is the
-fixed-index escape hatch, outside the path union on purpose.
+The index position is typed `${number}`, so a template literal tells a row
+index from a string spliced into a path, which is how a mis-built path is
+usually made:
+
+```tsx
+const i: number, name: string;
+OrderForm.useField(`items[${i}].sku`)      // ok
+OrderForm.useField(`items[${name}].sku`)   // compile error
+```
+
+A wildcard with nowhere to get an index is still an error rather than a guess —
+binding row 0 would silently address a row nobody asked for.
 
 ### The path a hook is allowed to ask for
 
@@ -190,10 +199,15 @@ too, since a bare `useField` is a hook name by itself — it just stops naming
 which form. React itself does not care: the runtime only sees call order.
 
 At run time these still read the enclosing `<FormProvider>`, so a nested
-component stays propless. What they add is an assertion that the path is one
-the enclosing form declares, which makes the same mistake loud in JavaScript,
-and catches the one thing the types cannot see — hooks rendered under a
-different form's provider.
+component stays propless. What they add is a check that the path is one the
+enclosing form declares, which makes the same mistake loud in JavaScript and
+catches the one thing the types cannot see — hooks rendered under a different
+form's provider.
+
+It **warns**, once per path; it does not throw. A mis-addressed field is inert,
+but it cannot let bad data through: the pass judges the whole root, so the
+verdict and the submit gate stay correct and what broke is one field's display.
+Taking the whole form down for that would be the larger failure.
 
 Plain `useField` remains, unnarrowed, as the escape hatch: a record field
 addressed dynamically has no declared path to check against.
@@ -407,7 +421,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 105 tests, a
+The runtime is complete against its design and is exercised by 107 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 

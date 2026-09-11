@@ -7,7 +7,7 @@ export { useField } from "./use-field.js";
 export { useUncontrolledField } from "./use-uncontrolled-field.js";
 export {
   createFormHooks,
-  UndeclaredPathError,
+  forgetWarnings,
   type FormHooks,
   type PathsOf,
   type ValuesOf,

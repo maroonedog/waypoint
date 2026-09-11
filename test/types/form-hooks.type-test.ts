@@ -60,6 +60,16 @@ function accepted(): void {
 void accepted;
 void inAComponent;
 
+declare const rowIndex: number;
+declare const rowName: string;
+
+// ---- a place in the value is addressable, and an index is what makes it one
+function indices(): void {
+  OrderForm.useField("items[0].quantity");
+  OrderForm.useFieldValue(`items[${rowIndex}].quantity`);
+}
+void indices;
+
 function rejected(): void {
   // @ts-expect-error a misspelt path is not a member of the path union
   OrderForm.useField("owner.emial");
@@ -67,11 +77,17 @@ function rejected(): void {
   // @ts-expect-error a path from a different form is not a member either
   OrderForm.useFieldValue("billing.postcode");
 
-  // @ts-expect-error an array member is never enumerated, so a bare index is not a path
-  OrderForm.useUncontrolledField("items[0].quantity");
-
   // @ts-expect-error the local name of a scoped field is not a whole path
   OrderForm.useFieldIssues("email");
+
+  // THE DISTINCTION. A number interpolated into the index position is a row;
+  // a string spliced in is how a mis-built path is usually made, and the
+  // template literal type can tell them apart.
+  // @ts-expect-error a string is not an index
+  OrderForm.useField(`items[${rowName}].quantity`);
+
+  // @ts-expect-error and an index does not rescue a misspelt tail
+  OrderForm.useField(`items[${rowIndex}].quantitee`);
 }
 void rejected;
 
