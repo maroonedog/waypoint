@@ -28,7 +28,6 @@ import { createRoot, type Root } from "react-dom/client";
 import { readValueAt, writeValueAt } from "form-core";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
-import { orderDefaults } from "../shape/order-defaults.ts";
 import { issuePathToConcretePath } from "../shape/issue-path-to-concrete-path.ts";
 import type { MountedSubject, Subject } from "./subject.types.ts";
 
@@ -134,16 +133,16 @@ export const handWrittenPerFieldStateSubject: Subject = {
   policyCitation: "written for this benchmark to judge on every change",
   Leaf,
 
-  mount(container, schema, paths) {
+  mount(container, context) {
     live = {
-      root: orderDefaults(),
+      root: context.defaults(),
       listeners: new Map(),
       messages: new Map(),
-      schema: schema as ByHandForm["schema"],
+      schema: context.schema as ByHandForm["schema"],
     };
     const form = live;
     const root: Root = createRoot(container);
-    root.render(h(SharedSkeleton, { Leaf, paths }));
+    root.render(h(SharedSkeleton, { Leaf, paths: context.paths }));
 
     const mounted: MountedSubject = {
       setValue: (path, value) => {

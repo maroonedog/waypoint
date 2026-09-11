@@ -36,14 +36,11 @@ import {
   type UseFormReturn,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { readValueAt } from "form-core";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
-import { orderDefaults } from "../shape/order-defaults.ts";
 import { readErrorAt } from "../shape/read-error-at.ts";
 import type { MountedSubject, Subject, ValidationPolicy } from "./subject.types.ts";
 
-const DEFAULTS = orderDefaults();
 
 /**
  * What react-hook-form has to be TOLD, because it revalidates the field that
@@ -69,7 +66,9 @@ const makeLeaf = (withDeps: boolean) =>
   return h(SharedLeaf, {
     label,
     name: path,
-    defaultValue: String(readValueAt(DEFAULTS, path) ?? ""),
+    // No defaultValue prop. register fills the uncontrolled input from the
+    // defaultValues react-hook-form was given, which is how RHF does it; the
+    // value channel catches it if that stops being true.
     inputRef: registered.ref,
     onChange: registered.onChange as never,
     onBlur: registered.onBlur as never,
@@ -104,13 +103,13 @@ const build = (config: RhfConfig): Subject => ({
   policyCitation: config.policyCitation,
   Leaf: config.withDeps ? DEPS_LEAF : PLAIN_LEAF,
 
-  mount(container, liveSchema, paths) {
+  mount(container, context) {
     let methods: UseFormReturn | undefined;
 
     const Screen = (): ReactElement => {
       methods = useForm({
-        resolver: zodResolver(liveSchema as never) as never,
-        defaultValues: orderDefaults() as never,
+        resolver: zodResolver(context.schema as never) as never,
+        defaultValues: context.defaults() as never,
         mode: config.mode,
         criteriaMode: "all",
         shouldUnregister: false,
@@ -118,7 +117,10 @@ const build = (config: RhfConfig): Subject => ({
       return h(
         FormProvider,
         methods as never,
-        h(SharedSkeleton, { Leaf: config.withDeps ? DEPS_LEAF : PLAIN_LEAF, paths })
+        h(SharedSkeleton, {
+          Leaf: config.withDeps ? DEPS_LEAF : PLAIN_LEAF,
+          paths: context.paths,
+        })
       );
     };
 

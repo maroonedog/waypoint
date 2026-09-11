@@ -11,17 +11,18 @@
 // author choose is the one that decides whether their tree is comparable.
 // ===========================================================================
 import type { Subject } from "./subjects/subject.types.ts";
+import type { MountContext } from "./subjects/mount-context.types.ts";
 
 import { commitLog } from "./react-work/install-devtools-hook.ts";
 import { settle } from "./react-work/settle.ts";
 
 export async function measureWiringOverhead(
   subject: Subject,
-  schema: unknown,
+  context: MountContext,
   container: HTMLElement
 ): Promise<number> {
   commitLog.clear();
-  const mounted = subject.mount(container, schema, []);
+  const mounted = subject.mount(container, context);
   await settle();
   const treeFibers = commitLog.commits.at(-1)?.fibers.size ?? 0;
   mounted.unmount();

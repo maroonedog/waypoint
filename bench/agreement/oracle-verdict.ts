@@ -11,8 +11,7 @@
 // `by design` rather than `disagrees`.
 // ===========================================================================
 import { readValueAt, writeValueAt } from "form-core";
-import { concretePaths } from "../shape/declared-paths.ts";
-import { orderDefaults } from "../shape/order-defaults.ts";
+import type { Shape } from "../shape/build-shape.ts";
 import { issuePathToConcretePath } from "../shape/issue-path-to-concrete-path.ts";
 import type { ObservableState } from "./verdict.types.ts";
 
@@ -42,10 +41,11 @@ export interface OracleReading {
 }
 
 export function oracleVerdict(
+  shape: Shape,
   schema: OracleSchema,
   edits: readonly OracleEdit[]
 ): OracleReading {
-  let root: unknown = orderDefaults();
+  let root: unknown = shape.defaults();
   for (const edit of edits) {
     root = writeValueAt(root, edit.path, edit.value);
   }
@@ -63,7 +63,7 @@ export function oracleVerdict(
   // lets a steady-state scenario prove it did something, and it catches a
   // subject whose typed character never reached the document.
   const values = new Map<string, string>();
-  for (const path of concretePaths) {
+  for (const path of shape.concretePaths) {
     const held = readValueAt(root, path);
     values.set(path, held === undefined ? "" : String(held));
   }

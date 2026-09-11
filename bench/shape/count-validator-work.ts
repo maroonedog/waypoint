@@ -17,7 +17,6 @@
 // It is a measure of what was submitted for judgement, not of what the schema
 // chose to look at, and the report says so.
 // ===========================================================================
-import { concretePaths } from "./declared-paths.ts";
 import { readValueAt } from "form-core";
 
 export interface ValidatorWork {
@@ -35,7 +34,10 @@ export interface CountedSchema<TSchema> {
   reset(): void;
 }
 
-const countPresentPaths = (root: unknown): number => {
+const countPresentPaths = (
+  root: unknown,
+  concretePaths: readonly string[]
+): number => {
   let present = 0;
   for (const path of concretePaths) {
     if (readValueAt(root, path) !== undefined) present += 1;
@@ -48,7 +50,8 @@ const countPresentPaths = (root: unknown): number => {
  * itself, so a library that reads any other member of it sees what it expects.
  */
 export function countValidatorWork<TSchema extends object>(
-  schema: TSchema
+  schema: TSchema,
+  concretePaths: readonly string[]
 ): CountedSchema<TSchema> {
   const work: ValidatorWork = {
     passes: 0,
@@ -59,7 +62,7 @@ export function countValidatorWork<TSchema extends object>(
 
   const record = <TResult>(root: unknown, run: () => TResult): TResult => {
     work.passes += 1;
-    work.pathsJudged += countPresentPaths(root);
+    work.pathsJudged += countPresentPaths(root, concretePaths);
     work.rootsSeen.push(root);
     const start = process.hrtime.bigint();
     try {
@@ -69,21 +72,56 @@ export function countValidatorWork<TSchema extends object>(
     }
   };
 
+  const PARSERS = new Set([
+    "safeParse",
+    "parse",
+    "safeParseAsync",
+    "parseAsync",
+  ]);
+
   const counted = new Proxy(schema, {
     get(target, property, receiver) {
       const held: unknown = Reflect.get(target, property, receiver);
-      if (
-        typeof held === "function" &&
-        (property === "safeParse" ||
-          property === "parse" ||
-          property === "safeParseAsync" ||
-          property === "parseAsync")
-      ) {
+
+      if (typeof held === "function" && PARSERS.has(String(property))) {
         return (root: unknown, ...rest: unknown[]) =>
           record(root, () =>
             (held as (...args: unknown[]) => unknown).call(target, root, ...rest)
           );
       }
+
+      // A library that takes a Standard Schema never touches safeParse: it
+      // calls `~standard.validate`. Wrapping only the zod surface would leave
+      // that library reading zero passes and looking as though it validated
+      // nothing, which is the opposite of what happened.
+      if (
+        property === "~standard" &&
+        held !== null &&
+        typeof held === "object"
+      ) {
+        const standard = held as Record<string, unknown>;
+        return new Proxy(standard, {
+          get(inner, innerProperty, innerReceiver) {
+            const member: unknown = Reflect.get(
+              inner,
+              innerProperty,
+              innerReceiver
+            );
+            if (innerProperty === "validate" && typeof member === "function") {
+              return (root: unknown, ...rest: unknown[]) =>
+                record(root, () =>
+                  (member as (...args: unknown[]) => unknown).call(
+                    inner,
+                    root,
+                    ...rest
+                  )
+                );
+            }
+            return typeof member === "function" ? member.bind(inner) : member;
+          },
+        });
+      }
+
       return typeof held === "function" ? held.bind(target) : held;
     },
   });

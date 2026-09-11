@@ -10,7 +10,8 @@
     "test": "node --test test/*.test.mjs",
     "test:types": "tsc -p test/types/tsconfig.json",
     "verify": "npm run build && npm run test && npm run test:types",
-    "bench:forms": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts"
+    "bench:forms": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts",
+    "bench:forms:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts --check"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",

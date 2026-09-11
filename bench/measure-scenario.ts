@@ -29,6 +29,7 @@ import { commitLog } from "./react-work/install-devtools-hook.ts";
 import { driveBlur, driveInput, type InputTarget } from "./react-work/drive-input.ts";
 import { settle } from "./react-work/settle.ts";
 import { hashDomShape } from "./agreement/assert-dom-shape-matches.ts";
+import type { MountContext } from "./subjects/mount-context.types.ts";
 
 export interface ScenarioMeasurement {
   readonly subjectId: string;
@@ -53,15 +54,16 @@ export interface MeasureRequest {
   readonly counted: CountedSchema<object>;
   readonly container: HTMLElement;
   readonly target: InputTarget;
+  readonly context: MountContext;
 }
 
 export async function measureScenario(request: MeasureRequest): Promise<{
   readonly measurement: ScenarioMeasurement;
   readonly mounted: MountedSubject;
 }> {
-  const { subject, scenario, counted, container, target } = request;
+  const { subject, scenario, counted, container, target, context } = request;
 
-  const mounted = subject.mount(container, counted.schema);
+  const mounted = subject.mount(container, context);
   await settle();
 
   // Everything before this line is start-up, and start-up is measured by its

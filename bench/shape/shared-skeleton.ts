@@ -6,12 +6,11 @@
 // there are, what order they come in, or what wraps them.
 //
 // A subject whose idiom requires a component boundary of its own renders more
-// fibers than one that does not. That is not hidden: such a subject is
-// declared `own-tree` and its fiber count is never printed beside an
-// `equal-tree` subject without the difference on the same row.
+// fibers than one that does not. That is not hidden: the wiring each subject
+// needs is measured by mounting it with no leaves at all, and subtracted
+// before any two trees are compared.
 // ===========================================================================
 import { createElement as h, type ComponentType, type ReactElement } from "react";
-import { concretePaths } from "./declared-paths.ts";
 
 export interface LeafProps {
   readonly path: string;
@@ -20,7 +19,7 @@ export interface LeafProps {
 
 export function SharedSkeleton({
   Leaf,
-  paths = concretePaths,
+  paths,
 }: {
   readonly Leaf: ComponentType<LeafProps>;
   /**
@@ -28,11 +27,14 @@ export function SharedSkeleton({
    * Measuring that is better than letting a subject declare it: a declared
    * overhead is a number the author chooses, and this one is taken.
    */
-  readonly paths?: readonly string[];
+  readonly paths: readonly string[];
 }): ReactElement {
   return h(
     "form",
-    { "data-skeleton": "order", onSubmit: (event: Event) => event.preventDefault() },
+    {
+      "data-skeleton": "order",
+      onSubmit: (event: Event) => event.preventDefault(),
+    },
     paths.map((path) => h(Leaf, { key: path, path, label: path }))
   );
 }

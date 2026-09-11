@@ -14,6 +14,7 @@
 // ===========================================================================
 import type { ComponentType } from "react";
 import type { LeafProps } from "../shape/shared-skeleton.ts";
+import type { MountContext } from "./mount-context.types.ts";
 
 /** When a subject claims to have a verdict. */
 export type ValidationPolicy = "on-change" | "on-blur" | "on-submit";
@@ -59,10 +60,5 @@ export interface Subject {
    */
   readonly policyCitation: string;
   readonly Leaf: ComponentType<LeafProps>;
-  /** `paths` is empty when the harness is measuring the wiring overhead. */
-  mount(
-    container: HTMLElement,
-    schema: unknown,
-    paths?: readonly string[]
-  ): MountedSubject;
+  mount(container: HTMLElement, context: MountContext): MountedSubject;
 }

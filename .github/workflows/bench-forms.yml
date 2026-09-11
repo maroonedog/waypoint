@@ -1,0 +1,28 @@
+# ===========================================================================
+# bench-forms.yml — the counts gate.
+#
+# Every figure in this lane is an integer that does not depend on the machine,
+# which is the only reason it can be gated at all. A drift is therefore never
+# noise: something in a library, in React, or in this repository changed what
+# the form actually does, and somebody has to say which.
+#
+# package-lock.json is watched because that is where the versions move.
+# ===========================================================================
+name: bench-forms
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  counts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "23"
+      - run: npm ci
+      - run: npm run build
+      - run: npm run bench:forms:check

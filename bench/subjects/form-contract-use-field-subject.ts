@@ -18,7 +18,6 @@ import { zodFormResolver } from "form-contract-resolver-zod";
 import { createRoot, type Root } from "react-dom/client";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
-import { orderDefaults } from "../shape/order-defaults.ts";
 import type { MountedSubject, Subject } from "./subject.types.ts";
 
 function Leaf({ path, label }: LeafProps): ReactElement {
@@ -52,17 +51,21 @@ export const formContractUseFieldSubject: Subject = {
     "carries no validation mode",
   Leaf,
 
-  mount(container, schema, paths) {
+  mount(container, context) {
     const adapter = zodFormResolver(
-      schema as Parameters<typeof zodFormResolver>[0]
+      context.schema as Parameters<typeof zodFormResolver>[0]
     ) as FormAdapter<unknown, string>;
     const form: FormHandle<unknown, string> = createForm({
       adapter,
-      defaultValues: orderDefaults(),
+      defaultValues: context.defaults(),
     });
     const root: Root = createRoot(container);
     root.render(
-      h(FormProvider, { form }, h(SharedSkeleton, { Leaf, paths }))
+      h(
+        FormProvider,
+        { form },
+        h(SharedSkeleton, { Leaf, paths: context.paths })
+      )
     );
 
     const mounted: MountedSubject = {
