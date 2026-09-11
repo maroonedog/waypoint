@@ -133,6 +133,42 @@ caller's function looked up instead of written inline. There is no second
 implementation for the heights to diverge between, and the library ships no
 input and no class name of its own.
 
+### The path a hook is allowed to ask for
+
+`useField` takes a `string`, and it has to. One React context object serves
+every form in the application, so the context cannot be generic, and the path
+union dies at that boundary. What that cost was, before it was closed: a
+misspelt path rendered an empty input that was never validated and threw
+nothing.
+
+`createFormHooks` closes it from the other side. The hooks are built once from
+the adapter, so they carry `TPath` without the context having to:
+
+```ts
+export const OrderForm = createFormHooks(zodFormResolver(orderSchema));
+```
+
+```tsx
+const postcode = OrderForm.useField("billing.postcode");   // ok
+const typo     = OrderForm.useField("billing.postcod");    // compile error
+```
+
+**Assign it to a PascalCase name.** `eslint-plugin-react-hooks` only treats a
+member expression as a hook when the object is a single PascalCase identifier
+(`isHook` in v7.1.1): `Order.useField()` is checked by the rules of hooks,
+`order.useField()` and `forms.order.useField()` are not. Destructuring is fine
+too, since a bare `useField` is a hook name by itself — it just stops naming
+which form. React itself does not care: the runtime only sees call order.
+
+At run time these still read the enclosing `<FormProvider>`, so a nested
+component stays propless. What they add is an assertion that the path is one
+the enclosing form declares, which makes the same mistake loud in JavaScript,
+and catches the one thing the types cannot see — hooks rendered under a
+different form's provider.
+
+Plain `useField` remains, unnarrowed, as the escape hatch: a record field
+addressed dynamically has no declared path to check against.
+
 ### Typing without waking React
 
 `useField` subscribes to the value cell, so a keystroke re-renders the field.
@@ -342,7 +378,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 95 tests, a
+The runtime is complete against its design and is exercised by 102 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 
