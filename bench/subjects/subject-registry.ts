@@ -13,6 +13,7 @@
 // ===========================================================================
 import type { Subject } from "./subject.types.ts";
 import { formContractUseFieldSubject } from "./form-contract-use-field-subject.ts";
+import { formContractUncontrolledSubject } from "./form-contract-uncontrolled-subject.ts";
 import { handWrittenPerFieldStateSubject } from "./hand-written-per-field-state-subject.ts";
 import {
   reactHookFormScopedSubject,
@@ -27,6 +28,7 @@ import { tanstackFormSubject } from "./tanstack-form-subject.ts";
 
 export const SUBJECTS: readonly Subject[] = [
   formContractUseFieldSubject,
+  formContractUncontrolledSubject,
   handWrittenPerFieldStateSubject,
   reactHookFormScopedSubject,
   reactHookFormDepsSubject,

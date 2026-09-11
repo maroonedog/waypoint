@@ -4,6 +4,7 @@ export { useCreateForm } from "./use-create-form.js";
 export { useForm } from "./use-form.js";
 export { useCell } from "./use-cell.js";
 export { useField } from "./use-field.js";
+export { useUncontrolledField } from "./use-uncontrolled-field.js";
 export { useFieldValue } from "./use-field-value.js";
 export { useFieldIssues } from "./use-field-issues.js";
 export { useFormStatus, type FormStatus } from "./use-form-status.js";
@@ -39,4 +40,5 @@ export type {
   FieldBinding,
   FieldChangeEvent,
   FieldInputProps,
+  UncontrolledFieldBinding,
 } from "./field-binding.types.js";

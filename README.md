@@ -133,6 +133,41 @@ caller's function looked up instead of written inline. There is no second
 implementation for the heights to diverge between, and the library ships no
 input and no class name of its own.
 
+### Typing without waking React
+
+`useField` subscribes to the value cell, so a keystroke re-renders the field.
+Measured at 201 fields that costs a commit React spends on the **whole sibling
+list** — 212 changed fibers for a keystroke that moves no verdict, of which 201
+are React cloning the children of the form it had to descend through.
+
+`useUncontrolledField` subscribes to the same cell imperatively and writes the
+DOM node instead, so a keystroke reaches React not at all:
+
+```tsx
+const field = useUncontrolledField<string>("owner.name");
+
+<input defaultValue={field.defaultValue} ref={field.ref}
+       onChange={field.onChange} onBlur={field.onBlur} />
+<em>{field.issues[0]?.message}</em>
+```
+
+Mounting is still a subscription and nothing else; it is the same subscription
+with a different effect. Counted at 201 fields:
+
+| per keystroke | typing, verdict unchanged | the field becomes wrong | a rule reports elsewhere |
+|---|---|---|---|
+| `useField` | 1 commit, 212 fibers | 2 commits, 424 | 2 commits, 424 |
+| `useUncontrolledField` | **0 commits, 0** | 1 commit, 212 | 1 commit, 212 |
+
+The double commit is the deferred pass: the value lands in one task and the
+verdict in the next, so React cannot batch them. Uncontrolled, the value write
+stops being React's business and only the verdict commits.
+
+**What it costs, and why it is a second hook rather than the default:** an
+uncontrolled input cannot be transformed as it is typed. Masking, upper-casing,
+inserting separators — anything that rewrites the value on its way to the DOM
+needs it to come back through React, which is what `useField` is for.
+
 ### A validator that has to ask something
 
 `validate` may return a promise. A vendor that answers synchronously returns
@@ -307,7 +342,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 81 tests, a
+The runtime is complete against its design and is exercised by 87 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 

@@ -9,7 +9,7 @@
 // `{ target: { value } }`. Narrowing it removes `nativeEvent.isComposing`,
 // which is the one thing an IME-aware caller needs.
 // ===========================================================================
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, RefObject } from "react";
 import type {
   FormFieldDescriptor,
   FormIssue,
@@ -51,4 +51,30 @@ export interface FieldBinding<TValue> {
   /** Judges a value that is NOT in the store and writes nothing. */
   check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
   readonly inputProps: FieldInputProps;
+}
+
+/**
+ * A field whose value lives in the DOM node rather than in React's state.
+ * There is no `value` and no `isDirty`: both would have to be subscribed to
+ * be correct, and subscribing to them is the cost this binding exists to
+ * avoid. Read either through `useFieldValue` in a component that genuinely
+ * displays it, or through the form handle.
+ */
+export interface UncontrolledFieldBinding<TValue> {
+  readonly path: string;
+  readonly descriptor: FormFieldDescriptor | undefined;
+  /** Never undefined; the empty list is interned, so it is reference-stable. */
+  readonly issues: readonly FormIssue[];
+  readonly isTouched: boolean;
+  readonly isParticipating: boolean;
+  /** Put this on the input. The runtime writes the node through it. */
+  readonly ref: RefObject<HTMLInputElement | null>;
+  /** Only read at mount; React ignores it afterwards, which is intended. */
+  readonly defaultValue: string;
+  onChange(event: { readonly currentTarget: { readonly value: string } }): void;
+  onBlur(): void;
+  setValue(next: TValue | undefined): void;
+  markTouched(): void;
+  validate(): MaybeAsync<readonly FormIssue[]>;
+  check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
 }

@@ -8,10 +8,12 @@
 // ===========================================================================
 
 export const PRIMARY = "form-contract-use-field";
+export const UNCONTROLLED = "form-contract-uncontrolled";
 export const DENOMINATOR = "hand-written-per-field-state";
 
 const LABELS: Readonly<Record<string, string>> = {
-  "form-contract-use-field": "form-contract",
+  "form-contract-use-field": "form-contract (useField)",
+  "form-contract-uncontrolled": "form-contract (uncontrolled)",
   "hand-written-per-field-state": "hand-written per-field state",
   "react-hook-form-scoped": "react-hook-form (scoped)",
   "react-hook-form-deps": "react-hook-form (deps)",

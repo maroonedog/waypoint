@@ -1,6 +1,39 @@
 [
   {
     "shapeId": "leaves-201",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K1",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 1,
+    "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K2",
+    "agreement": "agrees",
+    "commits": 1,
+    "changedFibers": 212,
+    "changedHostFibers": 5,
+    "validatorPasses": 1,
+    "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "X1",
+    "agreement": "agrees",
+    "commits": 1,
+    "changedFibers": 212,
+    "changedHostFibers": 5,
+    "validatorPasses": 1,
+    "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
     "subjectId": "form-contract-use-field",
     "scenarioId": "K1",
     "agreement": "agrees",
@@ -265,6 +298,39 @@
   },
   {
     "shapeId": "leaves-31",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K1",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 1,
+    "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K2",
+    "agreement": "agrees",
+    "commits": 1,
+    "changedFibers": 42,
+    "changedHostFibers": 5,
+    "validatorPasses": 1,
+    "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "X1",
+    "agreement": "agrees",
+    "commits": 1,
+    "changedFibers": 42,
+    "changedHostFibers": 5,
+    "validatorPasses": 1,
+    "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
     "subjectId": "form-contract-use-field",
     "scenarioId": "K1",
     "agreement": "agrees",
@@ -526,6 +592,39 @@
     "changedHostFibers": 9,
     "validatorPasses": 1,
     "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K1",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 1,
+    "pathsJudged": 61
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K2",
+    "agreement": "agrees",
+    "commits": 1,
+    "changedFibers": 72,
+    "changedHostFibers": 5,
+    "validatorPasses": 1,
+    "pathsJudged": 61
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "X1",
+    "agreement": "agrees",
+    "commits": 1,
+    "changedFibers": 72,
+    "changedHostFibers": 5,
+    "validatorPasses": 1,
+    "pathsJudged": 61
   },
   {
     "shapeId": "leaves-61",

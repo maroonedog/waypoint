@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import CountsTable from "../components/CountsTable.astro";
+import ScenarioTable from "../components/ScenarioTable.astro";
 import TimingTable from "../components/TimingTable.astro";
 
 // Both tables are rendered FROM the repository's own measurement artefacts,
@@ -56,9 +57,40 @@ import TimingTable from "../components/TimingTable.astro";
   </p>
 
   <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    form-contract does marginally{" "}
-    <em>more</em> React work than the hand-written reference: 212 changed fibers
-    against 209. Keep that beside anything the timing lane says about it.
+    Read the fiber column carefully: it is{" "}
+    <strong class="text-on-surface">leaves + a constant</strong>, and the
+    constant is what differs. At 31, 61 and 201 fields the hand-written
+    reference reports 39, 69 and 209 — always the field count plus eight. That
+    is React cloning the whole sibling list of the form it had to descend
+    through, and every implementation that commits at all pays it. What
+    form-contract adds on top is 3, at every size.
+  </p>
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    So the question worth asking is not how much a commit costs but whether one
+    happens. <code>useField</code> subscribes to the value cell, which makes the
+    input controlled and a keystroke a render.{" "}
+    <code>useUncontrolledField</code> subscribes to the same cell imperatively
+    and writes the DOM node instead, which is what
+    <code>register</code> does for react-hook-form and why both read zero above.
+  </p>
+
+  <ScenarioTable />
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    The middle column is where the deferred pass shows up as a cost rather than
+    a saving. With <code>useField</code> the value lands in one task and the
+    verdict in the next, so React cannot batch them and commits twice.
+    Uncontrolled, the value write stops being React's business and only the
+    verdict commits.
+  </p>
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    The last column is the one the whole-root pass was built for. A rule
+    reporting against a field nobody touched costs form-contract one commit and
+    one schema pass. react-hook-form in its scoped configuration does not show
+    it at all; the <code>deps</code> configuration that does costs 1213 changed
+    fibers, two passes and 402 paths judged.
   </p>
 
   <!-- ================================================== time -->

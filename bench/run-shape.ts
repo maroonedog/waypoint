@@ -86,13 +86,22 @@ export async function runShape(request: ShapeRunRequest): Promise<ShapeRun> {
     const mounted = subject.mount(container, context);
     await settle();
     commitLog.clear();
-    const before = container.innerHTML;
+    // What the canary compares has to be what the verdict reader compares.
+    // `innerHTML` cannot see an uncontrolled input: writing `element.value` is
+    // a DOM PROPERTY write that never touches the serialised attribute, so an
+    // uncontrolled subject working perfectly reports no DOM change and no
+    // commit, and the proof calls it dead. The OR rule in this proof was
+    // written for exactly that configuration; this is the half of it that had
+    // not caught up.
+    const showing = (): string =>
+      JSON.stringify([...readObservableState(container).values.entries()]);
+    const before = showing();
     await assertSubjectIsLive({
       subjectId: subject.id,
       mounted,
       path: "company.department",
       value: "Canary",
-      domChanged: () => container.innerHTML !== before,
+      domChanged: () => showing() !== before,
       commitsHappened: () => commitLog.commits.length > 0,
       settle,
     });

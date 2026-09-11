@@ -9,7 +9,10 @@
 // go stale while still looking authoritative.
 // ===========================================================================
 import baseline from "../../../config/form-baseline.json";
-import { DENOMINATOR, PRIMARY, label } from "../subjects.ts";
+import { DENOMINATOR, PRIMARY, UNCONTROLLED, label } from "../subjects.ts";
+
+/** Both of ours are highlighted; the point is the difference between them. */
+const ours = (id: string): boolean => id === PRIMARY || id === UNCONTROLLED;
 
 interface Row {
   readonly shapeId: string;
@@ -52,13 +55,13 @@ const leaves = 201;
           <tr
             class:list={[
               "hairline",
-              row.subjectId === PRIMARY && "bg-surface-low",
+              ours(row.subjectId) && "bg-surface-low",
             ]}
           >
             <td
               class:list={[
                 "py-2 pr-4",
-                row.subjectId === PRIMARY && "font-medium",
+                ours(row.subjectId) && "font-medium",
               ]}
             >
               {label(row.subjectId)}
