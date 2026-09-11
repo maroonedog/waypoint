@@ -68,16 +68,41 @@ export function summariseSamples(run: PairRun, resolution: Resolution): Summary 
   const belowLadder =
     Math.abs(difference) < resolution.smallestResolvedMicroseconds;
 
+  // A subject cannot earn `faster` on a metric that cannot see its work.
+  // The ladder establishes that a cost deferred to a microtask is invisible
+  // here — nothing up to 4 ms was ever resolved at that position — and this
+  // harness separately COUNTS how many of a subject's validation passes ran
+  // inside the dispatch. When that share is below 1 and the subject did
+  // validator work at all, a smaller handler figure is partly a statement
+  // about where the work was scheduled rather than about how much there was.
+  //
+  // The test is deliberately one-sided. Being slower WHILE deferring work out
+  // of the measured window is a finding the deferral cannot explain away, so
+  // that direction still stands. And a subject that did no validator work at
+  // all is not deferring anything — react-hook-form in its on-submit mode does
+  // nothing per keystroke by documented design, and that is a policy its own
+  // column reports, not an artefact this rule should hide.
+  const defersUnseenWork =
+    one.insideDispatchShare < 1 && one.validatorMicroseconds > 0;
+
   const verdict: TimeVerdict =
     overlapsNull || belowLadder
       ? "indistinguishable"
       : band.middle > 1
         ? "slower"
-        : "faster";
+        : defersUnseenWork
+          ? "indistinguishable"
+          : "faster";
 
   const why = overlapsNull
     ? `the band ${band.low}–${band.high} overlaps the null band ` +
       `${round(resolution.nullBand.low)}–${round(resolution.nullBand.high)}`
+    : verdict === "indistinguishable" && defersUnseenWork
+      ? `only ${Math.round(one.insideDispatchShare * 100)}% of its ` +
+        `${one.validatorMicroseconds} µs of validator work per keystroke ran ` +
+        "inside the dispatch this metric measures, and the ladder resolves " +
+        "nothing at all at the microtask position; a smaller handler figure " +
+        "here is partly about where the work was scheduled"
     : !resolution.ladderWasRun
       ? "the calibration ladder was not run, so this harness has published no " +
         "resolution and is not entitled to a verdict"
