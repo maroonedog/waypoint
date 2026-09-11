@@ -1,0 +1,228 @@
+---
+import Base from "../layouts/Base.astro";
+
+// Every figure on this page is copied from the generated reports in the
+// repository — docs/measurements-forms.md and docs/measurements-forms-time.md
+// — rather than retyped from memory. Where a number here and a number there
+// disagree, the report is right and this page is stale.
+const counts = [
+  ["react-hook-form (scoped)", "0", "0", "0", false],
+  ["hand-written per-field state", "1", "209", "5", false],
+  ["TanStack Form", "1", "210", "5", false],
+  ["form-contract", "1", "212", "5", true],
+  ["Formik (FastField)", "2", "1623", "6", false],
+  ["Formik (useField)", "2", "2422", "1610", false],
+];
+
+const times = [
+  ["TanStack Form", "on-change", "4.06x", "5920 µs", "100%", "slower", false],
+  ["Formik (useField)", "on-change", "3.87x", "2581 µs", "100%", "slower", false],
+  ["Formik (FastField)", "on-change", "2.28x", "2064 µs", "100%", "slower", false],
+  ["react-hook-form (scoped)", "on-change", "0.92x", "687 µs", "100%", "indistinguishable", false],
+  ["react-hook-form (deps)", "on-change", "0.85x", "1132 µs", "100%", "indistinguishable", false],
+  ["form-contract", "on-change", "0.63x", "476 µs", "0%", "indistinguishable", true],
+  ["react-hook-form (on-submit)", "on-submit", "0.32x", "323 µs", "0%", "faster", false],
+];
+
+const ladder = [
+  ["0.1 ms", "not resolved", "not resolved", "not resolved"],
+  ["0.25 ms", "not resolved", "not resolved", "not resolved"],
+  ["0.5 ms", "resolved", "not resolved", "not resolved"],
+  ["1 ms", "resolved", "not resolved", "not resolved"],
+  ["2 ms", "resolved", "not resolved", "not resolved"],
+  ["4 ms", "resolved", "not resolved", "not resolved"],
+];
+---
+
+<Base
+  title="Benchmark — form-contract"
+  description="Two lanes: deterministic counts gated in CI, and microseconds from Chrome's own trace that are printed and never gated. The harness publishes its own resolution above its results."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">What the benchmark can, and cannot, see</h1>
+
+  <p class="mt-6 leading-relaxed text-on-surface-variant">
+    Five form runtimes plus a hand-written reference are driven through one
+    scripted transcript against <strong class="text-on-surface"
+      >one zod schema the harness owns and instruments</strong
+    >, rendering <strong class="text-on-surface">one DOM the harness owns and
+    hashes</strong>. No count is produced by code an adapter author wrote:
+    renders come from fiber alternates, validation work from a harness-owned
+    schema wrapper, DOM changes from a <code>MutationObserver</code>. There is
+    no counter to place favourably.
+  </p>
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Nothing is printed until six proofs hold — that every subject reached the
+    same schema instance, judged the same root, rendered the same DOM, is
+    actually wired up, and that the oracle would have noticed had it not been.
+  </p>
+
+  <!-- ================================================== counts -->
+  <h2 class="mt-16 text-2xl font-bold">The counts lane, which is gated</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Commits, changed fibers, DOM mutations and validator passes are integers
+    that do not depend on the machine, which is the only reason a CI gate can
+    exist at all. A drift is therefore never noise.
+  </p>
+
+  <p class="mt-8 font-medium">One keystroke that moves no verdict, 201 rendered fields</p>
+  <div class="mt-3 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">subject</th>
+          <th class="py-2 pr-4 font-medium">commits</th>
+          <th class="py-2 pr-4 font-medium">changed fibers</th>
+          <th class="py-2 font-medium">host fibers</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          counts.map(([name, commits, fibers, host, mine]) => (
+            <tr class:list={["hairline", mine && "bg-surface-low"]}>
+              <td class:list={["py-2 pr-4", mine && "font-medium"]}>{name}</td>
+              <td class="py-2 pr-4">{commits}</td>
+              <td class="py-2 pr-4">{fibers}</td>
+              <td class="py-2">{host}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    form-contract is fourth on this table and the report sorts the rows it loses
+    first. The scoped react-hook-form configuration commits nothing for a
+    keystroke that does not move a verdict — and the same row records that it
+    still ran a full schema pass to find that out, which is why{" "}
+    <code>validatorPasses</code> sits on every row beside the render counts: a
+    zero-commit row can never be read as free.
+  </p>
+
+  <!-- ================================================== resolution -->
+  <h2 class="mt-16 text-2xl font-bold">
+    The timing lane publishes its resolution <em>before</em> its results
+  </h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    A known cost is injected at seven sizes and three scheduling positions, and
+    each subject is run against a byte-identical twin of itself at every size.
+    A band that overlaps the twin's band prints{" "}
+    <code>indistinguishable</code>, never a win.
+  </p>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">injected</th>
+          <th class="py-2 pr-4 font-medium">synchronous</th>
+          <th class="py-2 pr-4 font-medium">microtask</th>
+          <th class="py-2 font-medium">macrotask</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          ladder.map(([size, sync, micro, macro]) => (
+            <tr class="hairline">
+              <td class="py-2 pr-4 font-mono text-xs">{size}</td>
+              <td class:list={["py-2 pr-4", sync === "resolved" && "font-medium"]}>
+                {sync}
+              </td>
+              <td class="py-2 pr-4">{micro}</td>
+              <td class="py-2">{macro}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-5 rounded-lg bg-surface-container p-5 leading-relaxed">
+    <strong>This harness sees 0.5 ms of synchronous work, and nothing at all up
+    to 4 ms of work deferred to a microtask.</strong> The headline metric is the{" "}
+    <code>EventDispatch</code> trace event filtered to <code>input</code>, and
+    that event closes before a microtask runs. A runtime that defers its work —
+    form-contract coalesces its validation pass to a microtask — is therefore
+    cheap on this metric <em>by construction</em>.
+  </p>
+
+  <!-- ================================================== times -->
+  <h2 class="mt-16 text-2xl font-bold">The timing lane, which is never gated</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Headless Chrome, 21 interleaved pairs per comparison, both members of a pair
+    inside one tracing session on two origins. Ratios are against the
+    hand-written per-field reference at 201 fields; above 1 means slower.
+    Timings move when the runner does, so this lane prints and CI never fails on
+    it.
+  </p>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">subject</th>
+          <th class="py-2 pr-4 font-medium">policy</th>
+          <th class="py-2 pr-4 font-medium">ratio</th>
+          <th class="py-2 pr-4 font-medium">handler</th>
+          <th class="py-2 pr-4 font-medium">pass inside it</th>
+          <th class="py-2 font-medium">verdict</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          times.map(([name, policy, ratio, handler, inside, verdict, mine]) => (
+            <tr class:list={["hairline", mine && "bg-surface-low"]}>
+              <td class:list={["py-2 pr-4", mine && "font-medium"]}>{name}</td>
+              <td class="py-2 pr-4 text-on-surface-variant">{policy}</td>
+              <td class="py-2 pr-4">{ratio}</td>
+              <td class="py-2 pr-4">{handler}</td>
+              <td class="py-2 pr-4">{inside}</td>
+              <td class="py-2">{verdict}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-5 rounded-lg bg-surface-container p-5 leading-relaxed">
+    <strong>The row to read carefully is ours.</strong> form-contract measures
+    0.63x the reference and the verdict still says{" "}
+    <code>indistinguishable</code>: the 308 µs difference is under the 500 µs
+    floor the ladder above established, and the harness separately{" "}
+    <em>measures</em> — it does not assume — that 0% of form-contract's
+    validation passes ran inside the event being timed. That work is real and it
+    is not in the handler figure. The counts lane is where it is counted rather
+    than timed.
+  </p>
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    The <code>on-submit</code> row is the same caution in the other direction:
+    it is genuinely faster per keystroke because, by documented design, it does
+    no validation during one at all. Policy is an axis of the matrix rather than
+    a defect of the competitor.
+  </p>
+
+  <!-- ================================================== excluded -->
+  <h2 class="mt-16 text-2xl font-bold">What was measured and then thrown away</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Each excluded metric is published with the measurement that excluded it, so
+    a reader can check whether the discarded ones happen to be the flattering
+    ones. <code>ScriptDuration</code> showed a 245% spread between two
+    byte-identical pages. <code>TaskDuration</code> is dominated by the driver's
+    own CDP round trip. <code>PerformanceEventTiming.duration</code> is
+    quantised to 8 ms, larger than everything published here.
+    React's <code>Profiler.actualDuration</code> excludes commit and fires zero
+    times in the production build this lane requires. And every millisecond
+    taken in jsdom, because jsdom has no layout, no style resolution and no
+    paint — on this page layout alone is routinely larger than the script that
+    precedes it.
+  </p>
+
+  <p class="mt-8 text-sm leading-relaxed text-on-surface-variant">
+    Both reports are generated by <code>npm run bench:forms</code> and{" "}
+    <code>npm run bench:forms:time</code>, and the design that argues for every
+    choice above is in <code>docs/design/form-benchmark.md</code>.
+  </p>
+</Base>

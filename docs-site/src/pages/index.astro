@@ -1,0 +1,155 @@
+---
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+
+const resolver = `
+type FormResolver<TSchema, T, TPath extends string = string> =
+  (schema: TSchema) => FormAdapter<T, TPath>;
+
+interface FormAdapter<T, TPath extends string = string> {
+  readonly fields: readonly FormFieldDescriptor[];
+  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
+}
+`;
+
+const layers = [
+  {
+    n: "Layer 1",
+    head: "<AutoForm />",
+    body: "Draws every declared field, in declaration order. Nothing to write.",
+  },
+  {
+    n: "Layer 2",
+    head: '<Field path="…" as="postcode" />',
+    body: "Keeps the layout and names a widget from a registry.",
+  },
+  {
+    n: "Layer 3",
+    head: "<Field>{(field) => …}</Field>",
+    body: "Plain React. No second DSL, and no class name of ours.",
+  },
+];
+---
+
+<Base
+  title="form-contract — one function turns a validator into a form"
+  description="A contract that lets any validator describe itself as a form, and a React runtime that updates only the fields that moved. The benchmark publishes its own resolution before its results."
+>
+  <p class="text-sm font-medium tracking-wide text-primary">form-contract</p>
+  <h1 class="mt-3 text-4xl font-bold leading-tight sm:text-5xl">
+    One function turns a validator into a form.
+  </h1>
+
+  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+    A form renderer needs to know what a field accepts <em>before</em> anyone
+    types in it. A validator knows, and has no way to say so — validation
+    answers whether a value is acceptable, and that answer arrives after the
+    value exists. Too late to decide whether to draw a number input or a
+    select, or what to put in <code>minlength</code>.
+  </p>
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    This is the other half: a contract, and a form runtime built on it.
+  </p>
+
+  <Code code={resolver} />
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    A resolver is a plain function, named at the call site. No registry, no
+    vendor tag, no dispatch — whoever writes the call already knows which
+    validator they are using. <a
+      class="text-primary underline underline-offset-4"
+      href="/contract/">The contract in full →</a
+    >
+  </p>
+
+  <!-- ================================================== layers -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold">Three heights, one primitive</h2>
+    <p class="mt-4 leading-relaxed text-on-surface-variant">
+      Schema-driven form libraries usually buy their convenience by taking the
+      markup away. Here the generated screen is the top layer rather than the
+      only one, and there is no second implementation for the heights to
+      diverge between.
+    </p>
+    <div class="mt-6 grid gap-4 sm:grid-cols-3">
+      {
+        layers.map((layer) => (
+          <div class="rounded-lg bg-surface-low p-5">
+            <p class="text-xs font-medium tracking-wide text-primary">{layer.n}</p>
+            <p class="mt-2 font-mono text-sm break-words">{layer.head}</p>
+            <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+              {layer.body}
+            </p>
+          </div>
+        ))
+      }
+    </div>
+    <p class="mt-6 leading-relaxed text-on-surface-variant">
+      <strong class="text-on-surface">Mounting is a subscription and nothing
+      else.</strong> Every cell exists from <code>createForm</code>, seeded from
+      the descriptors, so a component never registers a field, seeds a default
+      or resets anything on unmount. A field in a portal, in a lazily loaded
+      chunk or behind a condition is therefore not a case: there is no{" "}
+      <code>shouldUnregister</code> and no inspection of the React tree anywhere
+      in the runtime.
+    </p>
+  </section>
+
+  <!-- ================================================== cross-field -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold">A rule can report against a field nobody touched</h2>
+    <p class="mt-4 leading-relaxed text-on-surface-variant">
+      One whole-root pass per settled change, scattered back into per-path issue
+      cells, writing only where the content actually differs. So a cross-field
+      rule lands its error on the <em>other</em> path with no{" "}
+      <code>deps</code> array and no dependents list — and the same computation,
+      filtered to one path, is what <code>form.field(path).validate()</code>{" "}
+      runs, so a conditionally rendered field cannot get a different verdict
+      from a second engine.
+    </p>
+    <p class="mt-4 leading-relaxed text-on-surface-variant">
+      The cost is stated rather than hidden: validation is proportional to the
+      schema on every settled change. The diff keeps <em>notification</em>{" "}
+      proportional to what moved; the pass itself judges the whole root.
+    </p>
+  </section>
+
+  <!-- ================================================== measured -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold">Measured, with the losses printed first</h2>
+    <p class="mt-4 leading-relaxed text-on-surface-variant">
+      Five runtimes are driven through one scripted transcript against one zod
+      schema the harness owns and instruments, rendering one DOM the harness
+      owns and hashes. In the timing lane at 201 fields a keystroke through
+      form-contract measures 0.63x the hand-written reference, and the report
+      prints <strong class="text-on-surface">indistinguishable</strong> —
+      because its own calibration ladder says it cannot resolve a difference
+      that small, and because 0% of form-contract's validation passes ran inside
+      the event being timed.
+    </p>
+    <p class="mt-6">
+      <a
+        class="inline-block rounded-xl bg-primary px-5 py-3 text-sm font-medium text-on-primary"
+        href="/benchmark/">Read what the benchmark can and cannot see →</a
+      >
+    </p>
+  </section>
+
+  <!-- ================================================== status -->
+  <section class="mt-20 rounded-lg border border-outline-variant p-6">
+    <h2 class="text-lg font-bold">Where it stands</h2>
+    <p class="mt-3 leading-relaxed text-on-surface-variant">
+      The runtime is complete against its design and is exercised by 76 tests, a
+      compile-time test that pins the path union, and a screen that uses all of
+      it. <strong class="text-on-surface"
+        >It has not been published to npm, and it has not been run in production
+        by anyone.</strong
+      >
+    </p>
+    <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+      One more limit, stated rather than papered over: the concrete path grammar
+      has no escape, so a field whose key contains a dot cannot be addressed.
+    </p>
+  </section>
+</Base>

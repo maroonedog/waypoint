@@ -1,0 +1,18 @@
+{
+  "name": "form-contract-docs",
+  "private": true,
+  "type": "module",
+  "//": "Its own dependency tree, deliberately. Astro is large and it has nothing to do with the library; keeping it out of the root manifest means `npm ci` for the packages never installs a documentation toolchain, and the library's lockfile never moves because a docs plugin did.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "@tailwindcss/vite": "^4.3.3",
+    "astro": "^7.3.2",
+    "tailwindcss": "^4.3.3"
+  }
+}

@@ -1,0 +1,50 @@
+---
+// ===========================================================================
+// Code.astro — a code block on its own surface.
+//
+// Astro ships Shiki, so the highlighting is done at build time and the page
+// carries no syntax-highlighting JavaScript. The theme follows the reader's
+// colour scheme rather than being pinned to one, because a dark block on a
+// light page is the thing people complain about.
+// ===========================================================================
+import { Code as Shiki } from "astro:components";
+
+interface Props {
+  readonly code: string;
+  readonly lang?: string;
+}
+
+const { code, lang = "ts" } = Astro.props;
+---
+
+<div class="mt-6 overflow-hidden rounded-lg">
+  <Shiki
+    code={code.trim()}
+    lang={lang}
+    themes={{ light: "github-light", dark: "github-dark-dimmed" }}
+    defaultColor={false}
+  />
+</div>
+
+<style is:global>
+  /* Shiki writes both themes as custom properties; this picks one without a
+     second stylesheet and without any script. */
+  .astro-code,
+  .astro-code span {
+    color: var(--shiki-light);
+    background-color: var(--shiki-light-bg);
+  }
+  @media (prefers-color-scheme: dark) {
+    .astro-code,
+    .astro-code span {
+      color: var(--shiki-dark);
+      background-color: var(--shiki-dark-bg);
+    }
+  }
+  .astro-code {
+    padding: 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border-radius: 0.5rem;
+  }
+</style>

@@ -5,3 +5,4 @@ probe-*.mjs
 zz*
 tmp-probe*
 bench-time-*.log
+docs-site/.astro/

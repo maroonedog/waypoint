@@ -1,0 +1,94 @@
+---
+// ===========================================================================
+// Base.astro — the frame every page is drawn in.
+//
+// One header, one footer, one place the description and canonical URL are
+// set. A page supplies a title and a description and nothing else, so a new
+// page cannot arrive without either.
+// ===========================================================================
+import "../styles.css";
+
+interface Props {
+  readonly title: string;
+  readonly description: string;
+}
+
+const { title, description } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const NAV = [
+  { href: "/", label: "Overview" },
+  { href: "/contract/", label: "The contract" },
+  { href: "/benchmark/", label: "Benchmark" },
+];
+
+const here = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body class="bg-surface text-on-surface">
+    <header
+      class="sticky top-0 z-10 border-b border-outline-variant bg-surface/85 backdrop-blur"
+    >
+      <nav
+        class="mx-auto flex max-w-3xl items-center gap-6 px-6 py-3 text-sm"
+        aria-label="Primary"
+      >
+        <a href="/" class="font-medium tracking-wide text-primary">form-contract</a>
+        <div class="flex gap-5">
+          {
+            NAV.slice(1).map((item) => (
+              <a
+                href={item.href}
+                class:list={[
+                  "underline-offset-4 hover:underline",
+                  here === item.href ? "text-on-surface" : "text-on-surface-variant",
+                ]}
+              >
+                {item.label}
+              </a>
+            ))
+          }
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+      <slot />
+    </main>
+
+    <footer
+      class="mx-auto max-w-3xl px-6 pb-16 text-sm leading-relaxed text-on-surface-variant"
+    >
+      <div class="hairline pt-8">
+        <p>
+          MIT licensed. Built alongside{" "}
+          <a class="text-primary underline underline-offset-4" href="https://luq.dev">
+            luq
+          </a>, which is one of the validators it resolves.
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>

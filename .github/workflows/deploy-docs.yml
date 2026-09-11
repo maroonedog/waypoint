@@ -1,32 +1,39 @@
 # ===========================================================================
-# deploy-docs.yml — formcontract.dev.
+# deploy-docs.yml — formcontract.dev, when somebody asks for it.
 #
-# The site is built by the SAME Vite and Tailwind the showcase uses, and its
-# Material Design 3 roles come from the showcase's own token file, so the page
-# documenting the library cannot drift out of looking like the library.
+# NOT on push, deliberately. The domain is registered but nothing is being
+# served from it yet, and GitHub Pages is not available for this repository
+# while it is private on the current plan — so a push trigger would paint every
+# commit with a red X for a deployment nobody asked for.
 #
-# `public/CNAME` carries the domain into the artifact. GitHub Pages reads it on
-# every deploy, so the custom domain survives a redeploy without anybody
-# re-typing it in the repository settings.
+# It builds on every pull request instead, which is the half that is worth
+# having now: a docs page that stops compiling should fail review, not fail
+# silently until the day someone tries to publish it.
+#
+# `public/CNAME` carries the domain into the artifact, and the build fails
+# without it: a deploy missing that file silently drops the custom domain and
+# the site answers on github.io instead.
 # ===========================================================================
-name: Deploy docs to GitHub Pages
+name: Docs
 
 on:
-  push:
-    branches: [master]
+  pull_request:
     paths:
       - "docs-site/**"
       - "examples/showcase/src/md3-tokens.css"
       - ".github/workflows/deploy-docs.yml"
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Also deploy to GitHub Pages (needs Pages enabled first)"
+        type: boolean
+        default: false
 
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# One deployment at a time, and never cancel one half-way: a cancelled deploy
-# leaves the domain serving whichever build happened to win.
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -40,9 +47,12 @@ jobs:
         with:
           node-version: "23"
           cache: "npm"
+          cache-dependency-path: docs-site/package-lock.json
 
       - run: npm ci
-      - run: npm run docs:build
+        working-directory: docs-site
+      - run: npm run build
+        working-directory: docs-site
 
       - name: Fail if the CNAME did not reach the artifact
         run: |
@@ -53,12 +63,20 @@ jobs:
           }
           cat docs-site/dist/CNAME
 
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docs-site
+          path: docs-site/dist
+
+      - if: inputs.publish
+        uses: actions/configure-pages@v5
+      - if: inputs.publish
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./docs-site/dist
 
   deploy:
+    if: inputs.publish
     needs: build
     runs-on: ubuntu-latest
     environment:

@@ -1,0 +1,28 @@
+/* ===========================================================================
+   styles.css — the documentation site's stylesheet.
+
+   The Material Design 3 roles come from the showcase's token file rather than
+   from a copy: the site and the screen it documents are meant to look like the
+   same thing, and two colour ramps drift the moment one of them is touched.
+   =========================================================================== */
+@import "tailwindcss";
+@source "../src";
+@import "../../examples/showcase/src/md3-tokens.css";
+
+/* A code block is read rather than skimmed, and a long type signature must
+   never widen the page to reach it. */
+pre {
+  overflow-x: auto;
+}
+
+/* The one piece of structure MD3 has no token for: a rule that reads as a
+   division rather than as a border around something. */
+.hairline {
+  border-top: 1px solid var(--md-outline-variant);
+}
+
+/* Astro renders headings inside prose we do not control the markup of, so the
+   anchor offset lives here rather than on every heading. */
+:target {
+  scroll-margin-top: 5rem;
+}

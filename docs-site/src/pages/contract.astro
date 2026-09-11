@@ -1,0 +1,160 @@
+---
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+
+const resolver = `
+type FormResolver<TSchema, T, TPath extends string = string> =
+  (schema: TSchema) => FormAdapter<T, TPath>;
+
+interface FormAdapter<T, TPath extends string = string> {
+  readonly fields: readonly FormFieldDescriptor[];
+  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
+}
+`;
+
+const descriptor = `
+interface FormFieldDescriptor {
+  readonly path: string;          // "owner.name", "items[*].quantity"
+  readonly kind: FormFieldKind;   // string | number | boolean | date | array | object | unknown
+  readonly isRequired: boolean;
+  readonly constraints: FormFieldConstraints;    // minimum, maxLength, pattern, format, step...
+  readonly choices?: readonly FormFieldChoice[]; // present only on a closed field
+}
+`;
+
+const types = `
+const adapter = zodFormResolver(
+  z.object({ owner: z.object({ email: z.string() }) })
+);
+
+type Values = FormValues<typeof adapter>;   // { owner: { email: string } }
+type Paths  = FormPaths<typeof adapter>;    // "owner" | "owner.email"
+
+const good: Paths = "owner.email";
+const typo: Paths = "owner.emial";          // compile error
+`;
+
+const asyncOne = `
+const adapter = {
+  fields: base.fields,
+  async validate(root) {
+    const local = base.validate(root);
+    const taken = await isHandleTaken(root.handle);
+    return taken
+      ? [...local, { path: "handle", message: "すでに使われています" }]
+      : local;
+  },
+};
+`;
+
+const packages = [
+  ["form-contract", "The contract and the path types. No dependencies."],
+  [
+    "form-contract-resolver-zod",
+    "Describes and judges a zod schema. zod is a type-only import, erased at build time.",
+  ],
+  ["form-core", "The runtime. No React, no validator."],
+  ["form-react", "React bindings."],
+  ["form-store-zustand", "A zustand-backed store, as a worked example of substituting one."],
+];
+---
+
+<Base
+  title="The contract — form-contract"
+  description="A resolver is a plain function from a schema to a description of the form it implies. The value type survives it, so a misspelt path is a compile error."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">The contract</h1>
+
+  <p class="mt-6 leading-relaxed text-on-surface-variant">
+    Two members. That is the whole thing.
+  </p>
+
+  <Code code={resolver} />
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    A resolver is a plain function, named at the call site. There is no
+    registry, no vendor tag and no dispatch, because whoever writes the call
+    already knows which validator they are using. A validator able to describe
+    its own fields implements this directly; one that cannot gets a resolver
+    written for it once.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">One descriptor is one field</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Enough for a renderer to draw a field before any value exists.
+  </p>
+
+  <Code code={descriptor} />
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Constraint values are carried <em>as declared</em>. A pattern stays a{" "}
+    <code>RegExp</code>, because how a renderer spells one is that renderer's
+    business.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">The type survives</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    <code>T</code> is the form's value type and <code>TPath</code> the paths that
+    may be addressed, so a misspelt path is a compile error rather than a field
+    that silently never renders.
+  </p>
+
+  <Code code={types} />
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Carrying the type is what keeps the contract neutral about direction. A
+    type-first validator passes the type its rules were written against; a
+    schema-first one passes what its schema infers. Both arrive as the same
+    form.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">A validator that has to ask something</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    <code>validate</code> may return a promise. A vendor that answers
+    synchronously returns the list itself and nothing downstream pays for the
+    possibility — which is why this is one member that <em>may</em> be async
+    rather than a second member that always is.
+  </p>
+
+  <Code code={asyncOne} />
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Passes are numbered, so an answer overtaken by a newer one is dropped rather
+    than written: a late verdict describes a root that is no longer there, and
+    committing it would flicker the form back to what was typed before. A pass
+    that throws leaves the previous verdict standing — an error reaching the
+    network is not evidence that the form became acceptable.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">The packages</h2>
+  <div class="mt-4 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">Package</th>
+          <th class="py-2 font-medium">What it is</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          packages.map(([name, what]) => (
+            <tr class="hairline">
+              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
+                {name}
+              </td>
+              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+                {what}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-8 rounded-lg border border-outline-variant p-5 leading-relaxed">
+    <strong>Nothing here is published yet.</strong> The packages are npm
+    workspaces, so they resolve to each other with no linking step; build from
+    source with <code>npm install</code> and <code>npm run verify</code>.
+  </p>
+</Base>
