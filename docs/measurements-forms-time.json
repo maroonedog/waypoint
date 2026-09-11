@@ -1,6 +1,6 @@
 {
-  "takenBy": "github actions run 34598803699",
-  "takenAt": "2026-09-11T12:37:03.939Z",
+  "takenBy": "github actions run 34604664240",
+  "takenAt": "2026-09-11T13:43:04.381Z",
   "browser": {
     "product": "Chrome/152.0.7977.82",
     "revision": "@d04cdb24d67b081f6cf80200ffc5233f44b61109",
@@ -28,7 +28,7 @@
     "platform": "linux",
     "release": "6.17.0-1022-azure",
     "arch": "x64",
-    "cpu": "AMD EPYC 7763 64-Core Processor",
+    "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
     "cores": 2,
     "memoryGb": 7.8,
     "node": "v23.11.1"
@@ -57,6 +57,13 @@
         "policy": "on-change",
         "treeClass": "equal-tree",
         "notes": "No validation-mode knob exists; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly."
+      },
+      {
+        "id": "form-contract-uncontrolled",
+        "library": "form-contract",
+        "policy": "on-change",
+        "treeClass": "equal-tree",
+        "notes": "The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for."
       },
       {
         "id": "hand-written-per-field-state",
@@ -125,6 +132,7 @@
     "warmOrder": [
       "the oracle warms every shape's schema on both lanes, before any mount",
       "form-contract-use-field warms 250 ms",
+      "form-contract-uncontrolled warms 250 ms",
       "hand-written-per-field-state warms 250 ms",
       "react-hook-form-scoped warms 250 ms",
       "react-hook-form-deps warms 250 ms",
@@ -141,53 +149,53 @@
           "position": "synchronous",
           "injectedMilliseconds": 0,
           "band": {
-            "low": 0.932,
-            "middle": 1.004,
-            "high": 1.169
+            "low": 0.95,
+            "middle": 1.029,
+            "high": 1.158
           },
-          "observedMicroseconds": 24,
+          "observedMicroseconds": 24.5,
           "resolved": false
         },
         {
           "position": "synchronous",
           "injectedMilliseconds": 0.1,
           "band": {
-            "low": 1.102,
-            "middle": 1.187,
-            "high": 1.311
+            "low": 1.155,
+            "middle": 1.236,
+            "high": 1.381
           },
-          "observedMicroseconds": 122.5,
+          "observedMicroseconds": 124.5,
           "resolved": false
         },
         {
           "position": "synchronous",
           "injectedMilliseconds": 0.25,
           "band": {
-            "low": 1.511,
-            "middle": 1.668,
-            "high": 1.757
+            "low": 1.518,
+            "middle": 1.616,
+            "high": 1.693
           },
-          "observedMicroseconds": 277.5,
+          "observedMicroseconds": 278.5,
           "resolved": true
         },
         {
           "position": "synchronous",
           "injectedMilliseconds": 0.5,
           "band": {
-            "low": 1.741,
-            "middle": 2.19,
-            "high": 2.517
+            "low": 2.134,
+            "middle": 2.243,
+            "high": 2.475
           },
-          "observedMicroseconds": 607,
+          "observedMicroseconds": 532.5,
           "resolved": true
         },
         {
           "position": "synchronous",
           "injectedMilliseconds": 1,
           "band": {
-            "low": 2.542,
-            "middle": 2.97,
-            "high": 3.529
+            "low": 3.199,
+            "middle": 3.487,
+            "high": 3.819
           },
           "observedMicroseconds": 1052,
           "resolved": true
@@ -196,176 +204,176 @@
           "position": "synchronous",
           "injectedMilliseconds": 2,
           "band": {
-            "low": 4.231,
-            "middle": 4.978,
-            "high": 5.688
+            "low": 5.411,
+            "middle": 5.873,
+            "high": 6.352
           },
-          "observedMicroseconds": 2022,
+          "observedMicroseconds": 2069,
           "resolved": true
         },
         {
           "position": "synchronous",
           "injectedMilliseconds": 4,
           "band": {
-            "low": 8.719,
-            "middle": 10.299,
-            "high": 10.961
+            "low": 9.979,
+            "middle": 10.521,
+            "high": 11.724
           },
-          "observedMicroseconds": 4097.5,
+          "observedMicroseconds": 4042,
           "resolved": true
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 0,
           "band": {
-            "low": 0.878,
-            "middle": 0.998,
-            "high": 1.116
+            "low": 0.882,
+            "middle": 1.021,
+            "high": 1.138
           },
-          "observedMicroseconds": 0,
+          "observedMicroseconds": 8,
           "resolved": false
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 0.1,
           "band": {
-            "low": 0.964,
-            "middle": 1.025,
-            "high": 1.139
+            "low": 0.951,
+            "middle": 1.036,
+            "high": 1.166
           },
-          "observedMicroseconds": 9,
+          "observedMicroseconds": 23.5,
           "resolved": false
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 0.25,
           "band": {
-            "low": 0.977,
-            "middle": 1.051,
-            "high": 1.218
+            "low": 0.919,
+            "middle": 1.043,
+            "high": 1.208
           },
-          "observedMicroseconds": 27.5,
+          "observedMicroseconds": 12.5,
           "resolved": false
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 0.5,
           "band": {
-            "low": 0.869,
-            "middle": 0.999,
-            "high": 1.162
+            "low": 0.95,
+            "middle": 1.033,
+            "high": 1.179
           },
-          "observedMicroseconds": 16.5,
+          "observedMicroseconds": 24,
           "resolved": false
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 1,
           "band": {
-            "low": 0.886,
-            "middle": 1.064,
-            "high": 1.244
+            "low": 0.888,
+            "middle": 1.028,
+            "high": 1.196
           },
-          "observedMicroseconds": 56.5,
+          "observedMicroseconds": 23,
           "resolved": false
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 2,
           "band": {
-            "low": 0.969,
-            "middle": 1.051,
-            "high": 1.166
+            "low": 0.933,
+            "middle": 1.056,
+            "high": 1.133
           },
-          "observedMicroseconds": 14.5,
+          "observedMicroseconds": 12,
           "resolved": false
         },
         {
           "position": "microtask",
           "injectedMilliseconds": 4,
           "band": {
-            "low": 0.963,
-            "middle": 1.036,
-            "high": 1.113
+            "low": 0.936,
+            "middle": 1.038,
+            "high": 1.156
           },
-          "observedMicroseconds": -31,
+          "observedMicroseconds": 3,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 0,
           "band": {
-            "low": 0.89,
-            "middle": 1.002,
-            "high": 1.164
+            "low": 0.901,
+            "middle": 0.995,
+            "high": 1.113
           },
-          "observedMicroseconds": 2,
+          "observedMicroseconds": 0.5,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 0.1,
           "band": {
-            "low": 0.935,
-            "middle": 1.057,
-            "high": 1.265
+            "low": 0.96,
+            "middle": 1.043,
+            "high": 1.179
           },
-          "observedMicroseconds": 18.5,
+          "observedMicroseconds": 19.5,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 0.25,
           "band": {
-            "low": 0.888,
-            "middle": 1.042,
-            "high": 1.092
+            "low": 0.921,
+            "middle": 1.087,
+            "high": 1.275
           },
-          "observedMicroseconds": -4.5,
+          "observedMicroseconds": 30.5,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 0.5,
           "band": {
-            "low": 0.826,
-            "middle": 1.024,
-            "high": 1.185
+            "low": 0.961,
+            "middle": 1.055,
+            "high": 1.153
           },
-          "observedMicroseconds": 12,
+          "observedMicroseconds": 31,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 1,
           "band": {
-            "low": 0.967,
-            "middle": 1.045,
-            "high": 1.231
+            "low": 0.872,
+            "middle": 1.047,
+            "high": 1.174
           },
-          "observedMicroseconds": 4,
+          "observedMicroseconds": 14.5,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 2,
           "band": {
-            "low": 0.998,
-            "middle": 1.048,
-            "high": 1.186
+            "low": 0.948,
+            "middle": 1.053,
+            "high": 1.177
           },
-          "observedMicroseconds": 26.5,
+          "observedMicroseconds": 27.5,
           "resolved": false
         },
         {
           "position": "macrotask",
           "injectedMilliseconds": 4,
           "band": {
-            "low": 0.927,
-            "middle": 1.058,
-            "high": 1.114
+            "low": 0.93,
+            "middle": 1.059,
+            "high": 1.149
           },
-          "observedMicroseconds": 16.5,
+          "observedMicroseconds": 19,
           "resolved": false
         }
       ],
@@ -384,97 +392,109 @@
             "subjectId": "hand-written-per-field-state",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.874,
-              "middle": 0.972,
-              "high": 1.143
+              "low": 0.892,
+              "middle": 1.015,
+              "high": 1.121
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 37.7
+            "spreadPercent": 35.1
           },
           {
             "subjectId": "form-contract-use-field",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.877,
-              "middle": 1.006,
-              "high": 1.076
+              "low": 0.911,
+              "middle": 0.99,
+              "high": 1.161
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 32.3
+            "spreadPercent": 38.8
+          },
+          {
+            "subjectId": "form-contract-uncontrolled",
+            "shapeId": "leaves-31",
+            "band": {
+              "low": 0.861,
+              "middle": 0.988,
+              "high": 1.173
+            },
+            "pairs": 21,
+            "skipped": 0,
+            "spreadPercent": 44.4
           },
           {
             "subjectId": "react-hook-form-scoped",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.884,
-              "middle": 0.984,
-              "high": 1.164
+              "low": 0.909,
+              "middle": 1.016,
+              "high": 1.105
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 60.2
+            "spreadPercent": 29.4
           },
           {
             "subjectId": "react-hook-form-deps",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.903,
-              "middle": 0.992,
-              "high": 1.078
+              "low": 0.898,
+              "middle": 1.015,
+              "high": 1.109
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 53.5
+            "spreadPercent": 30.3
           },
           {
             "subjectId": "react-hook-form-on-submit",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.782,
-              "middle": 0.96,
-              "high": 1.145
+              "low": 0.819,
+              "middle": 0.991,
+              "high": 1.155
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 88.4
+            "spreadPercent": 40.3
           },
           {
             "subjectId": "formik-use-field",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.914,
-              "middle": 1.013,
-              "high": 1.087
+              "low": 0.926,
+              "middle": 0.99,
+              "high": 1.055
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 82.5
+            "spreadPercent": 20.7
           },
           {
             "subjectId": "formik-fast-field",
             "shapeId": "leaves-31",
             "band": {
-              "low": 0.895,
-              "middle": 0.969,
-              "high": 1.066
+              "low": 0.945,
+              "middle": 1.011,
+              "high": 1.075
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 54.8
+            "spreadPercent": 20.8
           },
           {
             "subjectId": "tanstack-form-level",
             "shapeId": "leaves-31",
             "band": {
               "low": 0.931,
-              "middle": 0.978,
-              "high": 1.065
+              "middle": 1.028,
+              "high": 1.159
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 23.6
+            "spreadPercent": 37.9
           }
         ],
         "comparisons": [
@@ -482,259 +502,311 @@
             "shapeId": "leaves-31",
             "one": {
               "label": "form-contract-use-field",
-              "inputHandlerMicroseconds": 176.5,
-              "validatorMicroseconds": 20,
+              "inputHandlerMicroseconds": 185.5,
+              "validatorMicroseconds": 25.4,
               "validatorPasses": 1,
               "insideDispatchShare": 0,
-              "runtimeMicroseconds": 156.5,
-              "layoutMicroseconds": 194.7,
+              "runtimeMicroseconds": 160.1,
+              "layoutMicroseconds": 166,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.3,
+              "updateLayoutTreeMicroseconds": 14.3,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 488.2,
+              "paintMicroseconds": 364.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 176.5
+                "input": 185.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 179,
-              "validatorMicroseconds": 22.9,
+              "inputHandlerMicroseconds": 181,
+              "validatorMicroseconds": 28.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 156.1,
-              "layoutMicroseconds": 192.7,
+              "runtimeMicroseconds": 152.7,
+              "layoutMicroseconds": 164,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 12.7,
+              "updateLayoutTreeMicroseconds": 14.1,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 468.3,
+              "paintMicroseconds": 367.6,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 179
+                "input": 181
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.882,
-              "middle": 0.984,
-              "high": 1.073
+              "low": 0.904,
+              "middle": 1.006,
+              "high": 1.158
             },
-            "ratioLow": 0.815,
-            "ratioHigh": 1.121,
-            "relativeSpreadPercent": 31.1,
+            "ratioLow": 0.819,
+            "ratioHigh": 1.232,
+            "relativeSpreadPercent": 41.1,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -2.5,
+            "differenceMicroseconds": 4.5,
             "verdict": "indistinguishable",
-            "why": "the band 0.882–1.073 overlaps the null band 0.874–1.143"
+            "why": "the band 0.904–1.158 overlaps the null band 0.892–1.161"
+          },
+          {
+            "shapeId": "leaves-31",
+            "one": {
+              "label": "form-contract-uncontrolled",
+              "inputHandlerMicroseconds": 105.5,
+              "validatorMicroseconds": 28.3,
+              "validatorPasses": 1,
+              "insideDispatchShare": 0,
+              "runtimeMicroseconds": 77.2,
+              "layoutMicroseconds": 168.3,
+              "layoutCount": 1,
+              "updateLayoutTreeMicroseconds": 14.7,
+              "recalcStyleCount": 1,
+              "paintMicroseconds": 369,
+              "gcMicroseconds": 0,
+              "dispatchTypes": {
+                "input": 105.5
+              },
+              "inputDispatchCount": 12
+            },
+            "other": {
+              "label": "hand-written-per-field-state",
+              "inputHandlerMicroseconds": 197,
+              "validatorMicroseconds": 30.8,
+              "validatorPasses": 1,
+              "insideDispatchShare": 1,
+              "runtimeMicroseconds": 166.2,
+              "layoutMicroseconds": 167.3,
+              "layoutCount": 1,
+              "updateLayoutTreeMicroseconds": 14.7,
+              "recalcStyleCount": 1,
+              "paintMicroseconds": 374.7,
+              "gcMicroseconds": 0,
+              "dispatchTypes": {
+                "input": 197
+              },
+              "inputDispatchCount": 12
+            },
+            "band": {
+              "low": 0.476,
+              "middle": 0.529,
+              "high": 0.596
+            },
+            "ratioLow": 0.458,
+            "ratioHigh": 0.643,
+            "relativeSpreadPercent": 34.9,
+            "pairs": 21,
+            "skipped": 0,
+            "differenceMicroseconds": -91.5,
+            "verdict": "indistinguishable",
+            "why": "only 0% of its 28.3 µs of validator work per keystroke ran inside the dispatch this metric measures, and the ladder resolves nothing at all at the microtask position; a smaller handler figure here is partly about where the work was scheduled"
           },
           {
             "shapeId": "leaves-31",
             "one": {
               "label": "react-hook-form-scoped",
-              "inputHandlerMicroseconds": 203,
+              "inputHandlerMicroseconds": 186,
               "validatorMicroseconds": 39.6,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 163.4,
-              "layoutMicroseconds": 200.3,
+              "runtimeMicroseconds": 146.4,
+              "layoutMicroseconds": 165.5,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 15.5,
+              "updateLayoutTreeMicroseconds": 14.1,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 484.2,
+              "paintMicroseconds": 371,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 203
+                "input": 186
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 212,
+              "inputHandlerMicroseconds": 206.5,
               "validatorMicroseconds": 31.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 180.8,
-              "layoutMicroseconds": 205.1,
+              "runtimeMicroseconds": 175.3,
+              "layoutMicroseconds": 166.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 14.8,
+              "updateLayoutTreeMicroseconds": 14,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 498.5,
+              "paintMicroseconds": 372.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 212
+                "input": 206.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.866,
-              "middle": 0.973,
-              "high": 1.092
+              "low": 0.806,
+              "middle": 0.922,
+              "high": 1.024
             },
-            "ratioLow": 0.754,
-            "ratioHigh": 1.292,
-            "relativeSpreadPercent": 55.3,
+            "ratioLow": 0.786,
+            "ratioHigh": 1.075,
+            "relativeSpreadPercent": 31.4,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -9,
+            "differenceMicroseconds": -20.5,
             "verdict": "indistinguishable",
-            "why": "the band 0.866–1.092 overlaps the null band 0.874–1.164"
+            "why": "the band 0.806–1.024 overlaps the null band 0.892–1.121"
           },
           {
             "shapeId": "leaves-31",
             "one": {
               "label": "react-hook-form-deps",
-              "inputHandlerMicroseconds": 192.5,
-              "validatorMicroseconds": 38.3,
+              "inputHandlerMicroseconds": 186.5,
+              "validatorMicroseconds": 39.2,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 154.2,
-              "layoutMicroseconds": 190.1,
+              "runtimeMicroseconds": 147.3,
+              "layoutMicroseconds": 168.5,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.5,
+              "updateLayoutTreeMicroseconds": 14.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 477.7,
+              "paintMicroseconds": 381.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 192.5
+                "input": 186.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 192.5,
-              "validatorMicroseconds": 25.4,
+              "inputHandlerMicroseconds": 202.5,
+              "validatorMicroseconds": 32.5,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 167.1,
-              "layoutMicroseconds": 191.8,
+              "runtimeMicroseconds": 170,
+              "layoutMicroseconds": 169.5,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.3,
+              "updateLayoutTreeMicroseconds": 14.6,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 471.3,
+              "paintMicroseconds": 372.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 192.5
+                "input": 202.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.959,
-              "middle": 1.003,
-              "high": 1.133
+              "low": 0.81,
+              "middle": 0.907,
+              "high": 0.989
             },
-            "ratioLow": 0.882,
-            "ratioHigh": 1.151,
-            "relativeSpreadPercent": 26.8,
+            "ratioLow": 0.806,
+            "ratioHigh": 1.077,
+            "relativeSpreadPercent": 29.9,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 0,
+            "differenceMicroseconds": -16,
             "verdict": "indistinguishable",
-            "why": "the band 0.959–1.133 overlaps the null band 0.874–1.143"
+            "why": "the band 0.81–0.989 overlaps the null band 0.892–1.121"
           },
           {
             "shapeId": "leaves-31",
             "one": {
               "label": "react-hook-form-on-submit",
-              "inputHandlerMicroseconds": 125,
+              "inputHandlerMicroseconds": 104,
               "validatorMicroseconds": 0,
               "validatorPasses": 0,
               "insideDispatchShare": 0,
-              "runtimeMicroseconds": 125,
-              "layoutMicroseconds": 211.6,
+              "runtimeMicroseconds": 104,
+              "layoutMicroseconds": 167.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 18,
+              "updateLayoutTreeMicroseconds": 14.9,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 502.1,
+              "paintMicroseconds": 374.4,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 125
+                "input": 104
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 229.5,
-              "validatorMicroseconds": 36.7,
+              "inputHandlerMicroseconds": 207,
+              "validatorMicroseconds": 32.9,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 192.8,
-              "layoutMicroseconds": 215.9,
+              "runtimeMicroseconds": 174.1,
+              "layoutMicroseconds": 172.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 18.5,
+              "updateLayoutTreeMicroseconds": 14.3,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 507.8,
+              "paintMicroseconds": 383.4,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 229.5
+                "input": 207
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.499,
-              "middle": 0.54,
-              "high": 0.615
+              "low": 0.457,
+              "middle": 0.516,
+              "high": 0.603
             },
-            "ratioLow": 0.461,
-            "ratioHigh": 0.695,
-            "relativeSpreadPercent": 43.2,
+            "ratioLow": 0.44,
+            "ratioHigh": 0.616,
+            "relativeSpreadPercent": 34,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -104.5,
+            "differenceMicroseconds": -103,
             "verdict": "indistinguishable",
-            "why": "104.5 µs is under the smallest cost this harness resolved (250 µs)"
+            "why": "103 µs is under the smallest cost this harness resolved (250 µs)"
           },
           {
             "shapeId": "leaves-31",
             "one": {
               "label": "formik-use-field",
-              "inputHandlerMicroseconds": 612,
-              "validatorMicroseconds": 37.5,
+              "inputHandlerMicroseconds": 505,
+              "validatorMicroseconds": 25.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 574.5,
-              "layoutMicroseconds": 212,
+              "runtimeMicroseconds": 479.2,
+              "layoutMicroseconds": 162.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 19.6,
+              "updateLayoutTreeMicroseconds": 13.9,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 517.2,
-              "gcMicroseconds": 389.9,
+              "paintMicroseconds": 368.1,
+              "gcMicroseconds": 243.4,
               "dispatchTypes": {
-                "input": 612
+                "input": 505
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 223.5,
-              "validatorMicroseconds": 36.7,
+              "inputHandlerMicroseconds": 190,
+              "validatorMicroseconds": 30.4,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 186.8,
-              "layoutMicroseconds": 218.8,
+              "runtimeMicroseconds": 159.6,
+              "layoutMicroseconds": 163.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 18.3,
+              "updateLayoutTreeMicroseconds": 14.2,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 521.3,
+              "paintMicroseconds": 368.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 223.5
+                "input": 190
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 2.234,
-              "middle": 2.6,
-              "high": 3.045
+              "low": 2.392,
+              "middle": 2.65,
+              "high": 3.211
             },
-            "ratioLow": 1.97,
-            "ratioHigh": 3.261,
-            "relativeSpreadPercent": 49.6,
+            "ratioLow": 2.135,
+            "ratioHigh": 3.251,
+            "relativeSpreadPercent": 42.1,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 388.5,
+            "differenceMicroseconds": 315,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           },
@@ -742,105 +814,105 @@
             "shapeId": "leaves-31",
             "one": {
               "label": "formik-fast-field",
-              "inputHandlerMicroseconds": 594,
-              "validatorMicroseconds": 47.1,
+              "inputHandlerMicroseconds": 387,
+              "validatorMicroseconds": 28.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 546.9,
-              "layoutMicroseconds": 261.5,
+              "runtimeMicroseconds": 358.3,
+              "layoutMicroseconds": 172.5,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 27.9,
+              "updateLayoutTreeMicroseconds": 14.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 568,
-              "gcMicroseconds": 0,
+              "paintMicroseconds": 372.6,
+              "gcMicroseconds": 289.8,
               "dispatchTypes": {
-                "input": 594
+                "input": 387,
+                "selectionchange": 29
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 305.5,
-              "validatorMicroseconds": 49.2,
+              "inputHandlerMicroseconds": 196,
+              "validatorMicroseconds": 33.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 256.3,
-              "layoutMicroseconds": 259.1,
+              "runtimeMicroseconds": 162.7,
+              "layoutMicroseconds": 173.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 26.6,
+              "updateLayoutTreeMicroseconds": 14.6,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 569.3,
+              "paintMicroseconds": 372.5,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 305.5
+                "input": 196,
+                "selectionchange": 27
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 1.784,
-              "middle": 1.954,
-              "high": 2.141
+              "low": 1.766,
+              "middle": 1.946,
+              "high": 2.126
             },
-            "ratioLow": 1.762,
-            "ratioHigh": 2.214,
-            "relativeSpreadPercent": 23.1,
+            "ratioLow": 1.588,
+            "ratioHigh": 2.236,
+            "relativeSpreadPercent": 33.3,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 288.5,
-            "verdict": "slower",
-            "why": "the band clears both the null band and the calibration floor"
+            "differenceMicroseconds": 191,
+            "verdict": "indistinguishable",
+            "why": "191 µs is under the smallest cost this harness resolved (250 µs)"
           },
           {
             "shapeId": "leaves-31",
             "one": {
               "label": "tanstack-form-level",
-              "inputHandlerMicroseconds": 888,
-              "validatorMicroseconds": 52.1,
+              "inputHandlerMicroseconds": 544,
+              "validatorMicroseconds": 28.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 835.9,
-              "layoutMicroseconds": 262.9,
+              "runtimeMicroseconds": 515.3,
+              "layoutMicroseconds": 171.7,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 28.3,
+              "updateLayoutTreeMicroseconds": 14.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 569.8,
-              "gcMicroseconds": 216.5,
+              "paintMicroseconds": 377,
+              "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 888,
-                "selectionchange": 43
+                "input": 544
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 309.5,
-              "validatorMicroseconds": 52.9,
+              "inputHandlerMicroseconds": 204.5,
+              "validatorMicroseconds": 32.5,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 256.6,
-              "layoutMicroseconds": 258.3,
+              "runtimeMicroseconds": 172,
+              "layoutMicroseconds": 170.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 26.2,
+              "updateLayoutTreeMicroseconds": 14.9,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 586.8,
+              "paintMicroseconds": 372.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 309.5,
-                "selectionchange": 31
+                "input": 204.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 2.523,
-              "middle": 2.844,
-              "high": 3.243
+              "low": 2.5,
+              "middle": 2.664,
+              "high": 3.064
             },
-            "ratioLow": 2.49,
-            "ratioHigh": 3.592,
-            "relativeSpreadPercent": 38.8,
+            "ratioLow": 2.302,
+            "ratioHigh": 3.196,
+            "relativeSpreadPercent": 33.6,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 578.5,
+            "differenceMicroseconds": 339.5,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           }
@@ -854,97 +926,109 @@
             "subjectId": "hand-written-per-field-state",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.857,
-              "middle": 0.945,
-              "high": 1.09
+              "low": 0.911,
+              "middle": 0.992,
+              "high": 1.094
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 72.3
+            "spreadPercent": 39
           },
           {
             "subjectId": "form-contract-use-field",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.787,
-              "middle": 1.021,
-              "high": 1.227
+              "low": 0.904,
+              "middle": 1.015,
+              "high": 1.101
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 73.7
+            "spreadPercent": 31
+          },
+          {
+            "subjectId": "form-contract-uncontrolled",
+            "shapeId": "leaves-61",
+            "band": {
+              "low": 0.843,
+              "middle": 0.983,
+              "high": 1.13
+            },
+            "pairs": 21,
+            "skipped": 0,
+            "spreadPercent": 44.2
           },
           {
             "subjectId": "react-hook-form-scoped",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.87,
-              "middle": 0.978,
-              "high": 1.047
+              "low": 0.829,
+              "middle": 0.955,
+              "high": 1.101
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 37
+            "spreadPercent": 48.3
           },
           {
             "subjectId": "react-hook-form-deps",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.881,
-              "middle": 1.034,
+              "low": 0.88,
+              "middle": 0.983,
               "high": 1.114
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 46
+            "spreadPercent": 32.9
           },
           {
             "subjectId": "react-hook-form-on-submit",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.798,
-              "middle": 1.07,
-              "high": 1.212
+              "low": 0.841,
+              "middle": 1.005,
+              "high": 1.185
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 94.6
+            "spreadPercent": 48.2
           },
           {
             "subjectId": "formik-use-field",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.888,
-              "middle": 1.037,
-              "high": 1.151
+              "low": 0.922,
+              "middle": 0.998,
+              "high": 1.077
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 58.7
+            "spreadPercent": 20.8
           },
           {
             "subjectId": "formik-fast-field",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.951,
-              "middle": 1.058,
-              "high": 1.19
+              "low": 0.937,
+              "middle": 1.025,
+              "high": 1.108
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 43.3
+            "spreadPercent": 25.8
           },
           {
             "subjectId": "tanstack-form-level",
             "shapeId": "leaves-61",
             "band": {
-              "low": 0.943,
-              "middle": 0.994,
-              "high": 1.071
+              "low": 0.948,
+              "middle": 1.038,
+              "high": 1.11
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 21.6
+            "spreadPercent": 26.1
           }
         ],
         "comparisons": [
@@ -952,259 +1036,311 @@
             "shapeId": "leaves-61",
             "one": {
               "label": "form-contract-use-field",
-              "inputHandlerMicroseconds": 175,
-              "validatorMicroseconds": 35.4,
+              "inputHandlerMicroseconds": 208.5,
+              "validatorMicroseconds": 40,
               "validatorPasses": 1,
               "insideDispatchShare": 0,
-              "runtimeMicroseconds": 139.6,
-              "layoutMicroseconds": 293.3,
+              "runtimeMicroseconds": 168.5,
+              "layoutMicroseconds": 243.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 14.4,
+              "updateLayoutTreeMicroseconds": 14.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 792.3,
+              "paintMicroseconds": 617.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 175
+                "input": 208.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 206,
-              "validatorMicroseconds": 35.4,
+              "inputHandlerMicroseconds": 244,
+              "validatorMicroseconds": 46.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 170.6,
-              "layoutMicroseconds": 298.2,
+              "runtimeMicroseconds": 197.8,
+              "layoutMicroseconds": 250.5,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.7,
+              "updateLayoutTreeMicroseconds": 14.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 808.1,
+              "paintMicroseconds": 612.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 206
+                "input": 244
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.619,
-              "middle": 0.857,
-              "high": 0.983
+              "low": 0.771,
+              "middle": 0.893,
+              "high": 0.962
             },
-            "ratioLow": 0.612,
-            "ratioHigh": 1.197,
-            "relativeSpreadPercent": 68.2,
+            "ratioLow": 0.748,
+            "ratioHigh": 1.071,
+            "relativeSpreadPercent": 36.2,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -31,
+            "differenceMicroseconds": -35.5,
             "verdict": "indistinguishable",
-            "why": "the band 0.619–0.983 overlaps the null band 0.787–1.227"
+            "why": "the band 0.771–0.962 overlaps the null band 0.904–1.101"
+          },
+          {
+            "shapeId": "leaves-61",
+            "one": {
+              "label": "form-contract-uncontrolled",
+              "inputHandlerMicroseconds": 113.5,
+              "validatorMicroseconds": 46.7,
+              "validatorPasses": 1,
+              "insideDispatchShare": 0,
+              "runtimeMicroseconds": 66.8,
+              "layoutMicroseconds": 249.3,
+              "layoutCount": 1,
+              "updateLayoutTreeMicroseconds": 14.5,
+              "recalcStyleCount": 1,
+              "paintMicroseconds": 621.4,
+              "gcMicroseconds": 0,
+              "dispatchTypes": {
+                "input": 113.5
+              },
+              "inputDispatchCount": 12
+            },
+            "other": {
+              "label": "hand-written-per-field-state",
+              "inputHandlerMicroseconds": 233.5,
+              "validatorMicroseconds": 40.4,
+              "validatorPasses": 1,
+              "insideDispatchShare": 1,
+              "runtimeMicroseconds": 193.1,
+              "layoutMicroseconds": 245.2,
+              "layoutCount": 1,
+              "updateLayoutTreeMicroseconds": 14,
+              "recalcStyleCount": 1,
+              "paintMicroseconds": 621.3,
+              "gcMicroseconds": 0,
+              "dispatchTypes": {
+                "input": 233.5
+              },
+              "inputDispatchCount": 12
+            },
+            "band": {
+              "low": 0.404,
+              "middle": 0.488,
+              "high": 0.57
+            },
+            "ratioLow": 0.367,
+            "ratioHigh": 0.579,
+            "relativeSpreadPercent": 43.5,
+            "pairs": 21,
+            "skipped": 0,
+            "differenceMicroseconds": -120,
+            "verdict": "indistinguishable",
+            "why": "only 0% of its 46.7 µs of validator work per keystroke ran inside the dispatch this metric measures, and the ladder resolves nothing at all at the microtask position; a smaller handler figure here is partly about where the work was scheduled"
           },
           {
             "shapeId": "leaves-61",
             "one": {
               "label": "react-hook-form-scoped",
-              "inputHandlerMicroseconds": 369.5,
-              "validatorMicroseconds": 83.3,
+              "inputHandlerMicroseconds": 239.5,
+              "validatorMicroseconds": 67.5,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 286.2,
-              "layoutMicroseconds": 351.2,
+              "runtimeMicroseconds": 172,
+              "layoutMicroseconds": 243.4,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 26,
+              "updateLayoutTreeMicroseconds": 14.8,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 924.1,
+              "paintMicroseconds": 614.9,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 369.5
+                "input": 239.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 390.5,
-              "validatorMicroseconds": 71.3,
+              "inputHandlerMicroseconds": 241.5,
+              "validatorMicroseconds": 43.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 319.3,
-              "layoutMicroseconds": 360.1,
+              "runtimeMicroseconds": 198.2,
+              "layoutMicroseconds": 251.7,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 26.1,
+              "updateLayoutTreeMicroseconds": 14.4,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 902.7,
+              "paintMicroseconds": 617.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 390.5
+                "input": 241.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.842,
-              "middle": 0.923,
-              "high": 1.115
+              "low": 0.896,
+              "middle": 0.992,
+              "high": 1.095
             },
-            "ratioLow": 0.818,
-            "ratioHigh": 1.223,
-            "relativeSpreadPercent": 43.9,
+            "ratioLow": 0.87,
+            "ratioHigh": 1.151,
+            "relativeSpreadPercent": 28.3,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -21,
+            "differenceMicroseconds": -2,
             "verdict": "indistinguishable",
-            "why": "the band 0.842–1.115 overlaps the null band 0.857–1.09"
+            "why": "the band 0.896–1.095 overlaps the null band 0.829–1.101"
           },
           {
             "shapeId": "leaves-61",
             "one": {
               "label": "react-hook-form-deps",
-              "inputHandlerMicroseconds": 360.5,
-              "validatorMicroseconds": 91.3,
+              "inputHandlerMicroseconds": 228.5,
+              "validatorMicroseconds": 65,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 269.3,
-              "layoutMicroseconds": 377.5,
+              "runtimeMicroseconds": 163.5,
+              "layoutMicroseconds": 243,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 30.4,
+              "updateLayoutTreeMicroseconds": 14.6,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 944.5,
+              "paintMicroseconds": 603.8,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 360.5
+                "input": 228.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 392.5,
-              "validatorMicroseconds": 72.1,
+              "inputHandlerMicroseconds": 229,
+              "validatorMicroseconds": 42.1,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 320.4,
-              "layoutMicroseconds": 385.2,
+              "runtimeMicroseconds": 186.9,
+              "layoutMicroseconds": 246.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 28.5,
+              "updateLayoutTreeMicroseconds": 13.9,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 943.9,
+              "paintMicroseconds": 610.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 392.5
+                "input": 229
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.821,
-              "middle": 0.918,
-              "high": 1.064
+              "low": 0.841,
+              "middle": 0.958,
+              "high": 1.107
             },
-            "ratioLow": 0.535,
-            "ratioHigh": 1.083,
-            "relativeSpreadPercent": 59.7,
+            "ratioLow": 0.79,
+            "ratioHigh": 1.203,
+            "relativeSpreadPercent": 43.2,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -32,
+            "differenceMicroseconds": -0.5,
             "verdict": "indistinguishable",
-            "why": "the band 0.821–1.064 overlaps the null band 0.857–1.114"
+            "why": "the band 0.841–1.107 overlaps the null band 0.88–1.114"
           },
           {
             "shapeId": "leaves-61",
             "one": {
               "label": "react-hook-form-on-submit",
-              "inputHandlerMicroseconds": 210,
+              "inputHandlerMicroseconds": 109.5,
               "validatorMicroseconds": 0,
               "validatorPasses": 0,
               "insideDispatchShare": 0,
-              "runtimeMicroseconds": 210,
-              "layoutMicroseconds": 381.8,
+              "runtimeMicroseconds": 109.5,
+              "layoutMicroseconds": 240.6,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 28.6,
+              "updateLayoutTreeMicroseconds": 14.4,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 973.3,
+              "paintMicroseconds": 614.7,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 210
+                "input": 109.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 394,
-              "validatorMicroseconds": 70.8,
+              "inputHandlerMicroseconds": 235,
+              "validatorMicroseconds": 41.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 323.2,
-              "layoutMicroseconds": 384.6,
+              "runtimeMicroseconds": 193.8,
+              "layoutMicroseconds": 244.6,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 28,
+              "updateLayoutTreeMicroseconds": 14.1,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 957.3,
+              "paintMicroseconds": 618.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 394
+                "input": 235
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.456,
-              "middle": 0.542,
-              "high": 0.596
+              "low": 0.407,
+              "middle": 0.488,
+              "high": 0.531
             },
-            "ratioLow": 0.282,
-            "ratioHigh": 0.658,
-            "relativeSpreadPercent": 69.3,
+            "ratioLow": 0.375,
+            "ratioHigh": 0.562,
+            "relativeSpreadPercent": 38.3,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -184,
+            "differenceMicroseconds": -125.5,
             "verdict": "indistinguishable",
-            "why": "184 µs is under the smallest cost this harness resolved (250 µs)"
+            "why": "125.5 µs is under the smallest cost this harness resolved (250 µs)"
           },
           {
             "shapeId": "leaves-61",
             "one": {
               "label": "formik-use-field",
-              "inputHandlerMicroseconds": 907.5,
-              "validatorMicroseconds": 71.3,
+              "inputHandlerMicroseconds": 770,
+              "validatorMicroseconds": 55,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 836.3,
-              "layoutMicroseconds": 323.8,
+              "runtimeMicroseconds": 715,
+              "layoutMicroseconds": 243.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 16.3,
+              "updateLayoutTreeMicroseconds": 15.3,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 824.2,
-              "gcMicroseconds": 381.1,
+              "paintMicroseconds": 604.9,
+              "gcMicroseconds": 493.2,
               "dispatchTypes": {
-                "input": 907.5
+                "input": 770
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 295,
-              "validatorMicroseconds": 69.6,
+              "inputHandlerMicroseconds": 248,
+              "validatorMicroseconds": 57.5,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 225.4,
-              "layoutMicroseconds": 319.3,
+              "runtimeMicroseconds": 190.5,
+              "layoutMicroseconds": 245.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 18.9,
+              "updateLayoutTreeMicroseconds": 14.8,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 839.9,
+              "paintMicroseconds": 628.5,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 295
+                "input": 248
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 2.547,
-              "middle": 3.414,
-              "high": 4.465
+              "low": 2.841,
+              "middle": 3.145,
+              "high": 3.412
             },
-            "ratioLow": 2.377,
-            "ratioHigh": 4.543,
-            "relativeSpreadPercent": 63.4,
+            "ratioLow": 2.755,
+            "ratioHigh": 3.893,
+            "relativeSpreadPercent": 36.2,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 612.5,
+            "differenceMicroseconds": 522,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           },
@@ -1212,51 +1348,51 @@
             "shapeId": "leaves-61",
             "one": {
               "label": "formik-fast-field",
-              "inputHandlerMicroseconds": 504.5,
-              "validatorMicroseconds": 37.5,
+              "inputHandlerMicroseconds": 505,
+              "validatorMicroseconds": 49.6,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 467,
-              "layoutMicroseconds": 309.7,
+              "runtimeMicroseconds": 455.4,
+              "layoutMicroseconds": 243.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 14.1,
+              "updateLayoutTreeMicroseconds": 15.3,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 802.2,
+              "paintMicroseconds": 613.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 504.5
+                "input": 505
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 201,
-              "validatorMicroseconds": 39.2,
+              "inputHandlerMicroseconds": 234,
+              "validatorMicroseconds": 52.1,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 161.8,
-              "layoutMicroseconds": 307.3,
+              "runtimeMicroseconds": 181.9,
+              "layoutMicroseconds": 239.6,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.3,
+              "updateLayoutTreeMicroseconds": 13.5,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 799.3,
+              "paintMicroseconds": 613.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 201
+                "input": 234
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 2.158,
-              "middle": 2.544,
-              "high": 2.746
+              "low": 1.891,
+              "middle": 2.11,
+              "high": 2.417
             },
-            "ratioLow": 1.307,
-            "ratioHigh": 3.301,
-            "relativeSpreadPercent": 78.4,
+            "ratioLow": 1.537,
+            "ratioHigh": 2.451,
+            "relativeSpreadPercent": 43.4,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 303.5,
+            "differenceMicroseconds": 271,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           },
@@ -1264,51 +1400,51 @@
             "shapeId": "leaves-61",
             "one": {
               "label": "tanstack-form-level",
-              "inputHandlerMicroseconds": 924.5,
-              "validatorMicroseconds": 31.3,
+              "inputHandlerMicroseconds": 848,
+              "validatorMicroseconds": 35.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 893.3,
-              "layoutMicroseconds": 306.9,
+              "runtimeMicroseconds": 812.2,
+              "layoutMicroseconds": 244.7,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.5,
+              "updateLayoutTreeMicroseconds": 14,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 795.8,
+              "paintMicroseconds": 611.2,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 924.5
+                "input": 848
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 195,
-              "validatorMicroseconds": 32.1,
+              "inputHandlerMicroseconds": 230.5,
+              "validatorMicroseconds": 45.4,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 162.9,
-              "layoutMicroseconds": 305.7,
+              "runtimeMicroseconds": 185.1,
+              "layoutMicroseconds": 246.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.8,
+              "updateLayoutTreeMicroseconds": 14.5,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 792.3,
+              "paintMicroseconds": 607.5,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 195
+                "input": 230.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 3.785,
-              "middle": 4.5,
-              "high": 5.024
+              "low": 3.411,
+              "middle": 3.784,
+              "high": 4.15
             },
-            "ratioLow": 3.357,
-            "ratioHigh": 5.75,
-            "relativeSpreadPercent": 53.2,
+            "ratioLow": 2.975,
+            "ratioHigh": 4.196,
+            "relativeSpreadPercent": 32.3,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 729.5,
+            "differenceMicroseconds": 617.5,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           }
@@ -1322,97 +1458,109 @@
             "subjectId": "hand-written-per-field-state",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.87,
-              "middle": 0.949,
-              "high": 1.126
+              "low": 0.912,
+              "middle": 1.021,
+              "high": 1.151
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 46.9
+            "spreadPercent": 46.5
           },
           {
             "subjectId": "form-contract-use-field",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.912,
-              "middle": 1.005,
-              "high": 1.149
+              "low": 0.896,
+              "middle": 1.019,
+              "high": 1.117
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 35.4
+            "spreadPercent": 37.9
+          },
+          {
+            "subjectId": "form-contract-uncontrolled",
+            "shapeId": "leaves-201",
+            "band": {
+              "low": 0.919,
+              "middle": 0.993,
+              "high": 1.124
+            },
+            "pairs": 21,
+            "skipped": 0,
+            "spreadPercent": 39.9
           },
           {
             "subjectId": "react-hook-form-scoped",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.948,
-              "middle": 0.996,
-              "high": 1.046
+              "low": 0.924,
+              "middle": 1.032,
+              "high": 1.133
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 18.3
+            "spreadPercent": 29.2
           },
           {
             "subjectId": "react-hook-form-deps",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.844,
-              "middle": 0.996,
-              "high": 1.14
+              "low": 0.859,
+              "middle": 0.956,
+              "high": 1.12
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 43.4
+            "spreadPercent": 48.1
           },
           {
             "subjectId": "react-hook-form-on-submit",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.785,
-              "middle": 0.943,
-              "high": 1.101
+              "low": 0.907,
+              "middle": 1.017,
+              "high": 1.144
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 46.7
+            "spreadPercent": 29.6
           },
           {
             "subjectId": "formik-use-field",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.964,
-              "middle": 0.999,
-              "high": 1.024
+              "low": 0.944,
+              "middle": 1.009,
+              "high": 1.043
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 15.6
+            "spreadPercent": 16.1
           },
           {
             "subjectId": "formik-fast-field",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.961,
-              "middle": 1.001,
-              "high": 1.03
+              "low": 0.923,
+              "middle": 0.995,
+              "high": 1.028
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 17.7
+            "spreadPercent": 19.3
           },
           {
             "subjectId": "tanstack-form-level",
             "shapeId": "leaves-201",
             "band": {
-              "low": 0.991,
-              "middle": 1.046,
-              "high": 1.186
+              "low": 0.96,
+              "middle": 0.99,
+              "high": 1.086
             },
             "pairs": 21,
             "skipped": 0,
-            "spreadPercent": 28.7
+            "spreadPercent": 25.4
           }
         ],
         "comparisons": [
@@ -1420,207 +1568,259 @@
             "shapeId": "leaves-201",
             "one": {
               "label": "form-contract-use-field",
-              "inputHandlerMicroseconds": 223,
-              "validatorMicroseconds": 132.1,
+              "inputHandlerMicroseconds": 245.5,
+              "validatorMicroseconds": 132.9,
               "validatorPasses": 1,
               "insideDispatchShare": 0,
-              "runtimeMicroseconds": 90.9,
-              "layoutMicroseconds": 901.4,
+              "runtimeMicroseconds": 112.6,
+              "layoutMicroseconds": 647.7,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.8,
+              "updateLayoutTreeMicroseconds": 14.1,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2140.2,
+              "paintMicroseconds": 1751,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 223
+                "input": 245.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 410.5,
-              "validatorMicroseconds": 116.3,
+              "inputHandlerMicroseconds": 424.5,
+              "validatorMicroseconds": 117.5,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 294.3,
-              "layoutMicroseconds": 855.3,
+              "runtimeMicroseconds": 307,
+              "layoutMicroseconds": 644.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.6,
+              "updateLayoutTreeMicroseconds": 13.8,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2147.3,
+              "paintMicroseconds": 1761.2,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 410.5
+                "input": 424.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.508,
-              "middle": 0.546,
-              "high": 0.592
+              "low": 0.477,
+              "middle": 0.57,
+              "high": 0.616
             },
-            "ratioLow": 0.448,
-            "ratioHigh": 0.611,
-            "relativeSpreadPercent": 30,
+            "ratioLow": 0.467,
+            "ratioHigh": 0.67,
+            "relativeSpreadPercent": 35.5,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -187.5,
+            "differenceMicroseconds": -179,
             "verdict": "indistinguishable",
-            "why": "only 0% of its 132.1 µs of validator work per keystroke ran inside the dispatch this metric measures, and the ladder resolves nothing at all at the microtask position; a smaller handler figure here is partly about where the work was scheduled"
+            "why": "only 0% of its 132.9 µs of validator work per keystroke ran inside the dispatch this metric measures, and the ladder resolves nothing at all at the microtask position; a smaller handler figure here is partly about where the work was scheduled"
+          },
+          {
+            "shapeId": "leaves-201",
+            "one": {
+              "label": "form-contract-uncontrolled",
+              "inputHandlerMicroseconds": 130.5,
+              "validatorMicroseconds": 130.4,
+              "validatorPasses": 1,
+              "insideDispatchShare": 0,
+              "runtimeMicroseconds": 0.1,
+              "layoutMicroseconds": 646.3,
+              "layoutCount": 1,
+              "updateLayoutTreeMicroseconds": 13.1,
+              "recalcStyleCount": 1,
+              "paintMicroseconds": 1782.6,
+              "gcMicroseconds": 0,
+              "dispatchTypes": {
+                "input": 130.5
+              },
+              "inputDispatchCount": 12
+            },
+            "other": {
+              "label": "hand-written-per-field-state",
+              "inputHandlerMicroseconds": 447,
+              "validatorMicroseconds": 116.3,
+              "validatorPasses": 1,
+              "insideDispatchShare": 1,
+              "runtimeMicroseconds": 330.8,
+              "layoutMicroseconds": 645.8,
+              "layoutCount": 1,
+              "updateLayoutTreeMicroseconds": 13.4,
+              "recalcStyleCount": 1,
+              "paintMicroseconds": 1750.2,
+              "gcMicroseconds": 0,
+              "dispatchTypes": {
+                "input": 447
+              },
+              "inputDispatchCount": 12
+            },
+            "band": {
+              "low": 0.277,
+              "middle": 0.296,
+              "high": 0.351
+            },
+            "ratioLow": 0.248,
+            "ratioHigh": 0.363,
+            "relativeSpreadPercent": 39,
+            "pairs": 21,
+            "skipped": 0,
+            "differenceMicroseconds": -316.5,
+            "verdict": "indistinguishable",
+            "why": "only 0% of its 130.4 µs of validator work per keystroke ran inside the dispatch this metric measures, and the ladder resolves nothing at all at the microtask position; a smaller handler figure here is partly about where the work was scheduled"
           },
           {
             "shapeId": "leaves-201",
             "one": {
               "label": "react-hook-form-scoped",
-              "inputHandlerMicroseconds": 463.5,
-              "validatorMicroseconds": 189.2,
+              "inputHandlerMicroseconds": 451,
+              "validatorMicroseconds": 169.2,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 274.3,
-              "layoutMicroseconds": 856.1,
+              "runtimeMicroseconds": 281.8,
+              "layoutMicroseconds": 650.3,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 15.8,
+              "updateLayoutTreeMicroseconds": 14.6,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2213.1,
+              "paintMicroseconds": 1763.4,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 463.5
+                "input": 451
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 443.5,
-              "validatorMicroseconds": 135,
+              "inputHandlerMicroseconds": 446.5,
+              "validatorMicroseconds": 117.5,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 308.5,
-              "layoutMicroseconds": 858.3,
+              "runtimeMicroseconds": 329,
+              "layoutMicroseconds": 650.5,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 15.1,
+              "updateLayoutTreeMicroseconds": 13.8,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2234,
+              "paintMicroseconds": 1738.5,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 443.5
+                "input": 446.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.889,
-              "middle": 1.058,
-              "high": 1.115
+              "low": 0.9,
+              "middle": 0.994,
+              "high": 1.208
             },
-            "ratioLow": 0.816,
-            "ratioHigh": 1.397,
-            "relativeSpreadPercent": 54.9,
+            "ratioLow": 0.836,
+            "ratioHigh": 1.365,
+            "relativeSpreadPercent": 53.3,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 20,
+            "differenceMicroseconds": 4.5,
             "verdict": "indistinguishable",
-            "why": "the band 0.889–1.115 overlaps the null band 0.87–1.126"
+            "why": "the band 0.9–1.208 overlaps the null band 0.912–1.151"
           },
           {
             "shapeId": "leaves-201",
             "one": {
               "label": "react-hook-form-deps",
-              "inputHandlerMicroseconds": 541.5,
-              "validatorMicroseconds": 227.9,
+              "inputHandlerMicroseconds": 442,
+              "validatorMicroseconds": 164.2,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 313.6,
-              "layoutMicroseconds": 866.2,
+              "runtimeMicroseconds": 277.8,
+              "layoutMicroseconds": 648.7,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 18.3,
+              "updateLayoutTreeMicroseconds": 13.9,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2346.3,
+              "paintMicroseconds": 1785.9,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 541.5
+                "input": 442
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 524.5,
-              "validatorMicroseconds": 166.7,
+              "inputHandlerMicroseconds": 424.5,
+              "validatorMicroseconds": 121.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 357.8,
-              "layoutMicroseconds": 878.1,
+              "runtimeMicroseconds": 303.3,
+              "layoutMicroseconds": 647.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 16.5,
+              "updateLayoutTreeMicroseconds": 13.4,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2269.8,
+              "paintMicroseconds": 1748.7,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 524.5
+                "input": 424.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.889,
-              "middle": 0.995,
-              "high": 1.202
+              "low": 0.92,
+              "middle": 1.01,
+              "high": 1.081
             },
-            "ratioLow": 0.794,
-            "ratioHigh": 1.323,
-            "relativeSpreadPercent": 53.1,
+            "ratioLow": 0.825,
+            "ratioHigh": 1.185,
+            "relativeSpreadPercent": 35.6,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 17,
+            "differenceMicroseconds": 17.5,
             "verdict": "indistinguishable",
-            "why": "the band 0.889–1.202 overlaps the null band 0.844–1.14"
+            "why": "the band 0.92–1.081 overlaps the null band 0.859–1.151"
           },
           {
             "shapeId": "leaves-201",
             "one": {
               "label": "react-hook-form-on-submit",
-              "inputHandlerMicroseconds": 129.5,
+              "inputHandlerMicroseconds": 132.5,
               "validatorMicroseconds": 0,
               "validatorPasses": 0,
               "insideDispatchShare": 0,
-              "runtimeMicroseconds": 129.5,
-              "layoutMicroseconds": 834.7,
+              "runtimeMicroseconds": 132.5,
+              "layoutMicroseconds": 639.7,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 14.5,
+              "updateLayoutTreeMicroseconds": 13.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2213.7,
+              "paintMicroseconds": 1764.1,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 129.5
+                "input": 132.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 490.5,
-              "validatorMicroseconds": 145.4,
+              "inputHandlerMicroseconds": 425,
+              "validatorMicroseconds": 116.7,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 345.1,
-              "layoutMicroseconds": 847.6,
+              "runtimeMicroseconds": 308.3,
+              "layoutMicroseconds": 619.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 14.4,
+              "updateLayoutTreeMicroseconds": 13.3,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2165.3,
+              "paintMicroseconds": 1724.9,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 490.5
+                "input": 425
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 0.231,
-              "middle": 0.28,
-              "high": 0.294
+              "low": 0.273,
+              "middle": 0.323,
+              "high": 0.352
             },
-            "ratioLow": 0.229,
-            "ratioHigh": 0.309,
-            "relativeSpreadPercent": 28.5,
+            "ratioLow": 0.243,
+            "ratioHigh": 0.38,
+            "relativeSpreadPercent": 42.5,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": -361,
+            "differenceMicroseconds": -292.5,
             "verdict": "faster",
             "why": "the band clears both the null band and the calibration floor"
           },
@@ -1628,51 +1828,51 @@
             "shapeId": "leaves-201",
             "one": {
               "label": "formik-use-field",
-              "inputHandlerMicroseconds": 2375.5,
-              "validatorMicroseconds": 132.9,
+              "inputHandlerMicroseconds": 2010,
+              "validatorMicroseconds": 122.1,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 2242.6,
-              "layoutMicroseconds": 1067.3,
+              "runtimeMicroseconds": 1887.9,
+              "layoutMicroseconds": 639.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 17.7,
+              "updateLayoutTreeMicroseconds": 15,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2602.6,
-              "gcMicroseconds": 427.8,
+              "paintMicroseconds": 1767.2,
+              "gcMicroseconds": 406,
               "dispatchTypes": {
-                "input": 2375.5
+                "input": 2010
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 417,
-              "validatorMicroseconds": 117.9,
+              "inputHandlerMicroseconds": 434,
+              "validatorMicroseconds": 125.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 299.1,
-              "layoutMicroseconds": 841.3,
+              "runtimeMicroseconds": 308.2,
+              "layoutMicroseconds": 648.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.4,
+              "updateLayoutTreeMicroseconds": 13.7,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2172.1,
+              "paintMicroseconds": 1764.3,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 417
+                "input": 434
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 5.311,
-              "middle": 5.688,
-              "high": 6.083
+              "low": 4.2,
+              "middle": 4.546,
+              "high": 4.906
             },
-            "ratioLow": 4.681,
-            "ratioHigh": 6.519,
-            "relativeSpreadPercent": 32.3,
+            "ratioLow": 3.738,
+            "ratioHigh": 5.038,
+            "relativeSpreadPercent": 28.6,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 1958.5,
+            "differenceMicroseconds": 1576,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           },
@@ -1680,51 +1880,51 @@
             "shapeId": "leaves-201",
             "one": {
               "label": "formik-fast-field",
-              "inputHandlerMicroseconds": 1318.5,
-              "validatorMicroseconds": 127.9,
+              "inputHandlerMicroseconds": 1185,
+              "validatorMicroseconds": 119.6,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 1190.6,
-              "layoutMicroseconds": 859,
+              "runtimeMicroseconds": 1065.4,
+              "layoutMicroseconds": 663.8,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 15.1,
+              "updateLayoutTreeMicroseconds": 15,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2138.1,
+              "paintMicroseconds": 1761.7,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 1318.5
+                "input": 1185
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 413.5,
-              "validatorMicroseconds": 120.4,
+              "inputHandlerMicroseconds": 436.5,
+              "validatorMicroseconds": 128.3,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 293.1,
-              "layoutMicroseconds": 869.6,
+              "runtimeMicroseconds": 308.2,
+              "layoutMicroseconds": 657.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 13.7,
+              "updateLayoutTreeMicroseconds": 14.1,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2150.4,
+              "paintMicroseconds": 1759.5,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 413.5
+                "input": 436.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 2.908,
-              "middle": 3.131,
-              "high": 3.332
+              "low": 2.552,
+              "middle": 2.72,
+              "high": 2.838
             },
-            "ratioLow": 2.813,
-            "ratioHigh": 3.584,
-            "relativeSpreadPercent": 24.6,
+            "ratioLow": 2.309,
+            "ratioHigh": 3.02,
+            "relativeSpreadPercent": 26.2,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 905,
+            "differenceMicroseconds": 748.5,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           },
@@ -1732,51 +1932,51 @@
             "shapeId": "leaves-201",
             "one": {
               "label": "tanstack-form-level",
-              "inputHandlerMicroseconds": 2520,
-              "validatorMicroseconds": 140.4,
+              "inputHandlerMicroseconds": 2240.5,
+              "validatorMicroseconds": 125.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 2379.6,
-              "layoutMicroseconds": 974.1,
+              "runtimeMicroseconds": 2114.7,
+              "layoutMicroseconds": 642.1,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 16.3,
+              "updateLayoutTreeMicroseconds": 13.8,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2643.5,
+              "paintMicroseconds": 1739.1,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 2520
+                "input": 2240.5
               },
               "inputDispatchCount": 12
             },
             "other": {
               "label": "hand-written-per-field-state",
-              "inputHandlerMicroseconds": 420,
+              "inputHandlerMicroseconds": 416.5,
               "validatorMicroseconds": 123.8,
               "validatorPasses": 1,
               "insideDispatchShare": 1,
-              "runtimeMicroseconds": 296.3,
-              "layoutMicroseconds": 856.2,
+              "runtimeMicroseconds": 292.8,
+              "layoutMicroseconds": 651.2,
               "layoutCount": 1,
-              "updateLayoutTreeMicroseconds": 14,
+              "updateLayoutTreeMicroseconds": 13.8,
               "recalcStyleCount": 1,
-              "paintMicroseconds": 2178.5,
+              "paintMicroseconds": 1776.6,
               "gcMicroseconds": 0,
               "dispatchTypes": {
-                "input": 420
+                "input": 416.5
               },
               "inputDispatchCount": 12
             },
             "band": {
-              "low": 5.323,
-              "middle": 5.908,
-              "high": 6.359
+              "low": 4.5,
+              "middle": 5.295,
+              "high": 5.676
             },
-            "ratioLow": 4.753,
-            "ratioHigh": 7.027,
-            "relativeSpreadPercent": 38.5,
+            "ratioLow": 4.321,
+            "ratioHigh": 5.99,
+            "relativeSpreadPercent": 31.5,
             "pairs": 21,
             "skipped": 0,
-            "differenceMicroseconds": 2100,
+            "differenceMicroseconds": 1824,
             "verdict": "slower",
             "why": "the band clears both the null band and the calibration floor"
           }

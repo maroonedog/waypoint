@@ -12,7 +12,7 @@
 // printed and never gated, so publishing a figure from it should be an act
 // somebody performed rather than something that happened on a push.
 // ===========================================================================
-import { DENOMINATOR, PRIMARY, label } from "../subjects.ts";
+import { DENOMINATOR, PRIMARY, UNCONTROLLED, label } from "../subjects.ts";
 
 interface Side {
   readonly label: string;
@@ -68,6 +68,9 @@ const resolvedAt = (position: string): string => {
   const smallest = (ladder.smallestResolved[position] ?? 0) / 1000;
   return any === true ? `${smallest} ms` : "nothing up to 4 ms";
 };
+
+/** Both of ours are highlighted; the point is the difference between them. */
+const ours = (id: string): boolean => id === PRIMARY || id === UNCONTROLLED;
 
 const policy: Readonly<Record<string, string>> = {
   "react-hook-form-on-submit": "on-submit",
@@ -134,13 +137,13 @@ const policy: Readonly<Record<string, string>> = {
               <tr
                 class:list={[
                   "hairline",
-                  row.one.label === PRIMARY && "bg-surface-low",
+                  ours(row.one.label) && "bg-surface-low",
                 ]}
               >
                 <td
                   class:list={[
                     "py-2 pr-4",
-                    row.one.label === PRIMARY && "font-medium",
+                    ours(row.one.label) && "font-medium",
                   ]}
                 >
                   {label(row.one.label)}
@@ -173,18 +176,33 @@ const policy: Readonly<Record<string, string>> = {
         pairs, {summary!.sampling.keystrokes} keystrokes per sample.
       </p>
 
-      {ordered.some((row) => row.one.label === PRIMARY) && (
+      {ordered.some((row) => row.one.label === UNCONTROLLED) && (
         <p class="mt-5 rounded-lg bg-surface-container p-5 leading-relaxed">
-          <strong>The row to read carefully is ours.</strong>{" "}
+          <strong>The rows to read carefully are ours.</strong>{" "}
           {(() => {
-            const mine = ordered.find((row) => row.one.label === PRIMARY)!;
-            return `form-contract reads ${mine.band.middle}x and the verdict says ${mine.verdict} — ${mine.why}.`;
-          })()}{" "}
-          The counts lane above says it does <em>more</em> React work than the
-          reference, so any timing that looks like a win should be read against
-          that before it is believed.
+            const mine = ordered.find((row) => row.one.label === UNCONTROLLED)!;
+            const nothing = ordered.find(
+              (row) => row.one.label === "react-hook-form-on-submit"
+            );
+            const beside =
+              nothing === undefined
+                ? ""
+                : ` That is level with react-hook-form in on-submit mode (${nothing.one.inputHandlerMicroseconds} µs), which the counts lane records as doing nothing whatsoever per keystroke — no commit, no render, no schema pass.`;
+            return (
+              `The uncontrolled row reads ${mine.band.middle}x at ${mine.one.inputHandlerMicroseconds} µs.` +
+              beside
+            );
+          })()}
         </p>
       )}
+
+      <p class="mt-4 leading-relaxed text-on-surface-variant">
+        Neither of our rows is called faster, and the reason is printed with
+        them: the work is real and it is outside the window. Both still run a
+        full whole-root schema pass per keystroke — the counts lane counts it —
+        and this metric cannot see a microtask at all, which the ladder above
+        established before any of these numbers were taken.
+      </p>
     </div>
   )
 }
