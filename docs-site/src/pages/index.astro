@@ -120,6 +120,13 @@ const layers = [
       schema on every settled change. The diff keeps <em>notification</em>{" "}
       proportional to what moved; the pass itself judges the whole root.
     </p>
+    <p class="mt-6 leading-relaxed text-on-surface-variant">
+      Writes coalesce into one pass per settled change, on a microtask — after
+      the event handler, before paint.{" "}
+      <a class="text-primary underline underline-offset-4" href="/runtime/"
+        >What a write touches, and exactly when a verdict happens →</a
+      >
+    </p>
   </section>
 
   <!-- ================================================== measured -->
