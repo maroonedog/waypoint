@@ -108,7 +108,7 @@ const triggers = [
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">A rule that spans two fields</h2>
-  <Code code={crossField} />
+  <Code code={crossField} label="the demo's own schema" />
 
   <p class="caption">
     Nothing in your application lists which field depends on which. The demo on
@@ -129,7 +129,7 @@ const triggers = [
     on its first render when it comes back.
   </p>
 
-  <Code code={unrendered} />
+  <Code code={unrendered} label="no React in this test" />
 
   <p class="caption">
     <code>blockedBy</code> carries the path, so an application can open the
@@ -137,7 +137,7 @@ const triggers = [
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Hiding a section without throwing its data away</h2>
-  <Code code={participation} />
+  <Code code={participation} label="switching a subtree off" />
 
   <div class="mt-5 overflow-x-auto">
     <table class="w-full text-sm">
@@ -163,7 +163,7 @@ const triggers = [
   </div>
 
   <h2 class="mt-16 text-2xl font-bold">What submit says when it refuses</h2>
-  <Code code={submitTypes} />
+  <Code code={submitTypes} label="what submit resolves to" />
 
   <p class="caption">
     The handler runs only when nothing blocks. A handler that throws does not
@@ -172,8 +172,8 @@ const triggers = [
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">A validator that has to ask something</h2>
-  <Code code={asyncOne} />
-  <Code code={numbered} />
+  <Code code={asyncOne} label="an adapter that asks a server" />
+  <Code code={numbered} label="passes are numbered" />
 
   <p class="caption">
     <code>form.validating</code> is true only while a pass is in flight; a pass
@@ -210,7 +210,7 @@ const triggers = [
     </table>
   </div>
 
-  <p class="mt-5 rounded-lg border border-outline-variant p-5 leading-relaxed">
+  <p class="note">
     <strong>A new form has not been judged.</strong> Build one from defaults
     that violate the schema and <code>errorCount</code> is still{" "}
     <code>0</code> — not because the form is clean, but because nothing has

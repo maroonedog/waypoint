@@ -57,8 +57,35 @@ main .code-label {
 main h1 {
   max-width: 22ch;
 }
+
+/* ===========================================================================
+   Section separation.
+
+   A single column with eight headings in it needs the headings to LOOK like
+   eight things. They were the same weight and colour as the body they sat
+   above, with only white space between them — which reads as one document
+   with emphasis in it rather than as a stack of sections.
+
+   A rule, and the heading sitting on it. Not a box and not a number: a box
+   would make a section look like a callout, and numbering claims an order
+   these sections do not have.
+   =========================================================================== */
 main h2 {
-  max-width: 34ch;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--md-outline-variant);
+}
+/* An h2 that opens a bordered card is already separated by the card. */
+main :is(.note, section[class*="border"]) h2 {
+  padding-top: 0;
+  border-top: 0;
+}
+main h2 {
+  max-width: none;
+}
+/* The measure belongs to the words, not to the rule the words sit on. */
+main h2 > span,
+main h2 {
+  text-wrap: balance;
 }
 
 /* ===========================================================================
@@ -140,6 +167,27 @@ main :where(.code-block.is-flush) {
 /* One micro-label: a column header, a code block's strip, the name over a
    returns table. Told apart by case and tracking rather than by weight or a
    filled band — a heavy row at the top of a dense table reads as data. */
+/* ===========================================================================
+   Note.
+
+   A qualification the reader must not skim past — the one a section cannot
+   make in passing. An accent edge rather than a full border: a box outlined on
+   four sides reads as a component, and this is a paragraph with a raised
+   voice.
+   =========================================================================== */
+.note {
+  margin-top: var(--gap-block);
+  border-left: 3px solid var(--md-primary);
+  background: var(--md-surface-container-low);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+.note > :first-child {
+  margin-top: 0;
+}
+
 .label,
 main thead th {
   font-size: 0.6875rem;
@@ -168,4 +216,10 @@ main :is(th, td) {
   padding-block: 0.5rem;
   line-height: 1.5;
   vertical-align: top;
+}
+/* The header is a different kind of row and has to look like one: the rule
+   under it is the page's ink, the rules between rows are the faint one. */
+main thead th {
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--md-on-surface-variant);
 }

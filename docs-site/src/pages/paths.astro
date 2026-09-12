@@ -101,8 +101,8 @@ const viewTypes = [
 
   <h2 class="mt-16 text-2xl font-bold">One declaration, once</h2>
 
-  <Code code={registration} />
-  <Code code={usage} lang="tsx" />
+  <Code code={registration} label="src/form-registry.ts" />
+  <Code code={usage} label="any component, any depth" lang="tsx" />
 
   <p class="caption">
     Skip it and the hooks are not unchecked — they are refused, and the error
@@ -120,11 +120,11 @@ const viewTypes = [
 
   <h2 class="mt-16 text-2xl font-bold">Interpolated paths stay checked</h2>
 
-  <Code code={rows} lang="tsx" />
+  <Code code={rows} label="three levels inside a list" lang="tsx" />
 
   <h2 class="mt-16 text-2xl font-bold">Several forms are several keys</h2>
 
-  <Code code={several} />
+  <Code code={several} label="two forms, two keys" />
 
   <p class="caption">
     The key names a form in the <em>registry</em>; the instance still comes
@@ -170,7 +170,7 @@ const viewTypes = [
 
   <h2 class="mt-16 text-2xl font-bold">A schema nobody wrote down</h2>
 
-  <Code code={dynamic} />
+  <Code code={dynamic} label="a schema with no static shape" />
 
   <p class="caption">
     <code>AddressablePath&lt;string&gt;</code> is <code>string</code>, so that

@@ -8,9 +8,13 @@ arrives after a value exists. Too late to decide whether to draw a number input
 or a select, or what to put in `minlength`. This repository is the other half:
 a contract, and a form runtime built on it.
 
-📖 **[formcontract.dev](https://formcontract.dev)** — the contract, how a value
-changes and when validation fires, how paths get their types, and what the
-benchmark can and cannot see.
+📖 **[formcontract.dev](https://formcontract.dev)** — a form you can type into,
+with a render counter on every row. [Start](https://formcontract.dev/start/) ·
+[Validation](https://formcontract.dev/validation/) ·
+[The runtime](https://formcontract.dev/runtime/) ·
+[Typed paths](https://formcontract.dev/paths/) ·
+[API](https://formcontract.dev/api/) ·
+[Benchmark](https://formcontract.dev/benchmark/)
 
 | Package | What it is |
 |---|---|
@@ -72,7 +76,7 @@ function OrderForm() {
     <FormProvider form={form}>
       <Postcode at="billing.postcode" />
       <Items />
-      <button onClick={() => form.submit(save)}>送信</button>
+      <button onClick={() => form.submit(save)}>Save</button>
     </FormProvider>
   );
 }
@@ -106,7 +110,8 @@ A row hands down an **address**, not a value. It does not change when the value
 does, so passing it re-renders nobody and there is nothing above to lift, and a
 component may read anywhere else in the form at the same time.
 
-→ [How a value changes, and when a verdict happens](https://formcontract.dev/runtime/)
+→ [What a write touches, and when a verdict happens](https://formcontract.dev/runtime/)
+→ [Why a rule can report against a field you did not touch](https://formcontract.dev/validation/)
 
 ## Paths are typed by a registry, not by a prop
 
@@ -198,14 +203,18 @@ npm run bench:forms:check   # the same counts, against the recorded baseline
 npm run bench:forms:time    # microseconds, in the installed Chrome
 ```
 
+**form-contract is behind on all three scenarios, at every size.** The report
+says so in those words and prints the rows it loses before its own table. What
+is worth reading is who beats it: on two of the three, the winning row wins by
+**not showing the message** — one reports only at submit, one reports nothing
+at all. The third is form-contract's own uncontrolled binding.
+
 **The counts lane is gated** — commits, changed fibers, DOM mutations and
 validator passes are integers that do not depend on the machine, so drift is
-never noise and CI fails on it. **The time lane is printed and never gated,**
-and publishes its own resolution above its results: at 201 fields a keystroke
-measures 0.57× the hand-written reference and the harness **refuses to call
-that a win**, because the difference is under the floor its own calibration
-ladder resolved. The report prints the rows form-contract loses before the
-rest.
+never noise and CI fails on it. **The time lane is printed and never gated:** at
+201 fields a keystroke measures 0.57× the hand-written reference and the harness
+**refuses to call that a win**, because the difference is under the floor its
+own calibration ladder resolved.
 
 → [What the benchmark can and cannot see](https://formcontract.dev/benchmark/)
 
@@ -228,8 +237,9 @@ levels inside a list says which row it belongs to. Both have their own README.
 The runtime is complete against its design and is exercised by 128 tests, six
 compile-time programs that pin the path types — including one whose only job is
 to prove that an application registering nothing is refused rather than quietly
-unchecked — and a screen that uses all of it. **It has not been published, and
-nobody has run it in production.**
+unchecked — and a screen that uses all of it. **No package has ever been
+published — there is no publish script and no publish workflow — and nobody has
+run it in production.**
 
 Two limits, stated rather than papered over. The concrete path grammar has no
 escape, so a field whose key contains a dot cannot be addressed. And validation
@@ -237,6 +247,9 @@ is proportional to the schema on every settled change: the diff keeps
 *notification* proportional to what moved, but the pass itself judges the whole
 root — which is what lets a cross-field rule report against a field that did
 not move.
+
+Every hook and component, with the signature the packages emit, is at
+[formcontract.dev/api](https://formcontract.dev/api/).
 
 `CLAUDE.md` carries the naming rule this codebase is held to.
 `docs/design/form-runtime.md` is the design it was built from; sections 7 and 8

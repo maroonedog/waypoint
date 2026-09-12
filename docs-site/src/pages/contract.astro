@@ -90,7 +90,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">What a descriptor draws</h2>
 
-  <Code code={drawn} />
+  <Code code={drawn} label="schema → descriptor → input" />
 
   <p class="caption">
     Stage 2 is what the resolver returns and stage 3 is what{" "}
@@ -101,7 +101,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">Two members</h2>
 
-  <Code code={resolver} />
+  <Code code={resolver} label="the contract" />
 
   <p class="caption">
     There is no registry, no vendor tag and no dispatch: a resolver is named at
@@ -110,7 +110,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">One descriptor is one field</h2>
 
-  <Code code={descriptor} />
+  <Code code={descriptor} label="one field" />
 
   <p class="caption">
     One entry per leaf, and an array is described once through a wildcard
@@ -120,7 +120,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">The type survives</h2>
 
-  <Code code={types} />
+  <Code code={types} label="the type survives" />
 
   <p class="caption">
     The contract is neutral about direction: a type-first validator passes the
@@ -133,7 +133,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">Bring your own validator, and your own copy of it</h2>
 
-  <Code code={weight} />
+  <Code code={weight} label="packages/resolver-zod" />
 
   <div class="mt-5 overflow-x-auto">
     <table class="w-full text-sm">
