@@ -9,6 +9,12 @@
 // `read` applies the interned default here rather than in the caller, so every
 // reader of a channel agrees on what empty looks like and the reference stays
 // stable across reads.
+//
+// Where the value COMES FROM is the caller's business, which is why `read`
+// asks `readCurrent` for it. The store is the answer for a cell the runtime
+// keeps current; for one it does not, the runtime hands back a source that
+// derives instead. Either way a reader gets the same answer whether or not it
+// has subscribed — the point of separating the two.
 // ===========================================================================
 import type {
   CellKey,
@@ -27,7 +33,8 @@ export interface CellSourceRegistry {
 
 export function createCellSourceRegistry(
   store: FormCellStore,
-  onSubscribe?: (key: string) => CellUnsubscribe
+  onSubscribe?: (key: string) => CellUnsubscribe,
+  readCurrent?: (key: string) => unknown
 ): CellSourceRegistry {
   const sources = new Map<string, CellSource<never>>();
 
@@ -47,8 +54,9 @@ export function createCellSourceRegistry(
           };
         },
         read() {
-          const held = store.read(key);
-          return held === undefined ? whenAbsent : held;
+          const held =
+            readCurrent === undefined ? store.read(key) : readCurrent(key);
+          return held === undefined ? whenAbsent : (held as T);
         },
       };
       sources.set(key, created as unknown as CellSource<never>);
