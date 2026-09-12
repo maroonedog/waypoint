@@ -1,4 +1,4 @@
-# waypoint
+# <img src="docs-site/public/favicon.svg" width="26" height="26" alt="" align="top"> waypoint
 
 **A field's address exists before the component that draws it — as a type the
 compiler has already checked, and as runtime state that is already written.**

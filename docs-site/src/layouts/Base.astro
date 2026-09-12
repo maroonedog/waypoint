@@ -99,8 +99,13 @@ const flat = SECTIONS.flatMap((section) => section.items);
       <div
         class="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-3 sm:px-6"
       >
-        <a href="/" class="text-sm font-medium tracking-wide text-primary"
-          >waypoint</a
+        <!-- The mark carries `alt=""` on purpose: the link already says
+             "waypoint", and a second accessible name on one link is one more
+             thing a screen reader reads out for no gain. -->
+        <a
+          href="/"
+          class="flex shrink-0 items-center gap-2 text-sm font-medium tracking-wide text-primary"
+          ><img src="/favicon.svg" alt="" width="20" height="20" />waypoint</a
         >
         <!-- Below lg the index is not on the page, so the sections live here
              and wrap rather than scroll: a link you have to scroll to is a

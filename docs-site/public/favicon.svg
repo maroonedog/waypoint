@@ -1,5 +1,41 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="waypoint">
-  <rect width="32" height="32" rx="7" fill="#00695c"/>
-  <rect x="8" y="10" width="16" height="3.5" rx="1.75" fill="#a9f2e2"/>
-  <rect x="8" y="18.5" width="9" height="3.5" rx="1.75" fill="#a9f2e2"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" role="img" aria-label="waypoint">
+  <!--
+    favicon.svg — the mark, and the one file that carries it.
+
+    A navigational fix: the place drawn as an OUTLINE, because it is there
+    before anything fills it, and the value arriving into it as the dot. That
+    ordering is the library's whole claim, which is why the mark is a place
+    rather than a letter or a clipboard. The two bars it replaces drew a form,
+    which was true of the old name and says nothing about this one.
+
+    Three shapes, because it has to hold at 16px in a browser tab. The stroke
+    is 3 on a 32 viewBox, so 1.5 device pixels at tab size, and the dot is
+    solid rather than hollow for the same reason.
+
+    The colours are the site's own md-primary and md-primary-container tokens
+    rather than a palette invented here. styles.css already makes this argument
+    about the token file: the page documenting the library and the screen built
+    with it must not drift into different ramps, and a favicon is part of the
+    page. Their CSS custom-property spelling is deliberately not written here,
+    because a doubled hyphen ends an XML comment and the file then fails to
+    decode as an image — which is how this file first shipped, and the symptom
+    was a broken-image glyph in the site header rather than any error.
+
+    Two more things learned by looking rather than by reasoning: the comment
+    belongs INSIDE the root element, and width and height belong on the root
+    beside the viewBox. Without the size, naturalWidth reads 0 and every later
+    "did it load" check answers the wrong question.
+
+    The README points at THIS file rather than keeping a copy of the mark. Two
+    icons drift, and the one nobody looks at drifts first.
+  -->
+  <rect width="32" height="32" rx="7" fill="#00695c" />
+  <path
+    d="M16 6 26 16 16 26 6 16Z"
+    fill="none"
+    stroke="#a9f2e2"
+    stroke-width="3"
+    stroke-linejoin="round"
+  />
+  <circle cx="16" cy="16" r="3" fill="#a9f2e2" />
 </svg>
