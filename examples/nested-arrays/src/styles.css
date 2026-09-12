@@ -1,0 +1,143 @@
+/* Deliberately plain. The comparison is about the code that addresses the
+   fields, and a design would be one more thing differing between the panels. */
+:root {
+  color-scheme: light dark;
+  --ink: #1a1b21;
+  --dim: #5a5c66;
+  --line: #c9c9d2;
+  --bg: #fbf9ff;
+  --card: #f2f0f8;
+  --inner: #e8e6f1;
+  --bad: #b3261e;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #e4e2ea;
+    --dim: #a9a8b3;
+    --line: #44454f;
+    --bg: #131319;
+    --card: #1d1e25;
+    --inner: #26272f;
+    --bad: #ffb4ab;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 14px/1.55 ui-sans-serif, system-ui, sans-serif;
+}
+header {
+  padding: 2rem 1.5rem 0.5rem;
+  max-width: 90rem;
+  margin: 0 auto;
+}
+header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.4rem;
+}
+header p {
+  margin: 0;
+  color: var(--dim);
+}
+main {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr));
+  padding: 1.5rem;
+  max-width: 90rem;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 1rem;
+  background: var(--bg);
+}
+.panel h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+.panel h2 small {
+  color: var(--dim);
+  font-weight: 400;
+}
+
+.lbl {
+  display: grid;
+  gap: 2px;
+  margin-bottom: 0.5rem;
+  flex: 1;
+}
+.lbl > span {
+  font-size: 0.75rem;
+  color: var(--dim);
+}
+.lbl input {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.4rem 0.5rem;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  min-width: 0;
+}
+.lbl em {
+  font-size: 0.7rem;
+  color: var(--bad);
+  font-style: normal;
+  min-height: 1em;
+}
+
+.card {
+  background: var(--card);
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.inner {
+  background: var(--inner);
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+.inner-head {
+  margin: 0 0 0.4rem;
+  font-size: 0.75rem;
+  color: var(--dim);
+}
+.inner-head em {
+  color: var(--bad);
+  font-style: normal;
+}
+.line {
+  display: flex;
+  gap: 0.5rem;
+  align-items: start;
+}
+.line button {
+  margin-top: 1.1rem;
+}
+
+button {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+}
+button:hover {
+  background: var(--inner);
+}

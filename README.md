@@ -403,6 +403,21 @@ node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts exa
 
 ---
 
+## The examples
+
+`examples/showcase` — a real application form: 23 inputs across six sections,
+drawn with Tailwind and Material Design 3.
+
+`examples/nested-arrays` — the same `shipments[] → address{} → lines[]` shape
+written four times, in form-contract, react-hook-form, Formik and TanStack
+Form, side by side on one page. Same schema, same markup, same behaviour; the
+only difference is how a field two levels inside a list says which row it
+belongs to. Its README has the measured comparison.
+
+```bash
+node node_modules/vite/bin/vite.js --config examples/nested-arrays/vite.config.ts examples/nested-arrays
+```
+
 ## The comparison
 
 `bench/` measures this runtime against react-hook-form, Formik and TanStack
