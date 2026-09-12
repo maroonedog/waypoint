@@ -110,8 +110,8 @@ export function zodDefinitionToConstraints(
     constraints.format = definition.format;
   }
   for (const check of definition.checks ?? []) {
-    const checkDefinition = readCheckDefinition(check);
-    if (checkDefinition !== undefined) applyCheck(constraints, checkDefinition);
+    const zodCheck = readCheckDefinition(check);
+    if (zodCheck !== undefined) applyCheck(constraints, zodCheck);
   }
   return constraints;
 }
