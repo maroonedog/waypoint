@@ -8,7 +8,7 @@
   "scripts": {
     "build": "npm run build -w form-contract && npm run build -w form-contract-resolver-zod && npm run build -w form-core && npm run build -w form-react && npm run build -w form-store-zustand",
     "test": "node --test test/*.test.mjs",
-    "test:types": "tsc -p test/types/tsconfig.json && tsc -p test/types-unregistered/tsconfig.json && tsc -p bench/tsconfig.json && tsc -p examples/nested-arrays/tsconfig.check.json && tsc -p examples/playground/tsconfig.check.json && tsc -p examples/showcase/tsconfig.check.json",
+    "test:types": "tsc -p test/types/tsconfig.json && tsc -p test/types-unregistered/tsconfig.json && tsc -p test/types-source/tsconfig.json && tsc -p bench/tsconfig.json && tsc -p examples/nested-arrays/tsconfig.check.json && tsc -p examples/playground/tsconfig.check.json && tsc -p examples/showcase/tsconfig.check.json",
     "verify": "npm run build && npm run test && npm run test:types",
     "bench:forms": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts",
     "bench:forms:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts --check",

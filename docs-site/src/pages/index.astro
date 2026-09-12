@@ -86,6 +86,85 @@ items.insert(items.rows.length, { sku: "" });`,
   },
 ];
 
+// What a reader is actually shopping for. Every row is something the
+// repository does or plainly does not — the two it does not are in the table
+// because a capability list without them is an advertisement.
+const CAN: readonly (readonly [string, string, string, boolean])[] = [
+  ["Validate a field", "Your schema already says it. One resolver call.", "/contract/", false],
+  [
+    "A rule across two fields",
+    "One pass judges the whole root, so the message lands on the other field with no deps array.",
+    "/validation/",
+    false,
+  ],
+  [
+    "Field arrays, nested",
+    "useRows takes a concrete path and a row hands down its own address. There is no nested-array API.",
+    "/api/#useRows-",
+    false,
+  ],
+  [
+    "Fields behind a tab or an if",
+    "Mounting is a subscription: a hidden field keeps its value, still validates and still blocks submit.",
+    "/validation/",
+    false,
+  ],
+  [
+    "A multi-step form",
+    "useParticipation takes a step out of what blocks submit and keeps its values; submit reports the paths that blocked it, including ones with no component.",
+    "/validation/",
+    false,
+  ],
+  [
+    "Ask a server whether a handle is taken",
+    "validate may return a promise. Passes are numbered, so an overtaken answer is dropped.",
+    "/validation/",
+    false,
+  ],
+  [
+    "Messages in another language",
+    "They come from your validator, so they are already yours. This library writes none.",
+    "",
+    false,
+  ],
+  [
+    "Auto-save a draft",
+    "Subscribe to the root cell: one notification per settled change, outside React.",
+    "/api/",
+    false,
+  ],
+  [
+    "Two hundred fields that stay fast",
+    "useUncontrolledField writes the DOM node instead of re-rendering: a keystroke is 0 commits.",
+    "/runtime/",
+    false,
+  ],
+  [
+    "Your own inputs and design system",
+    "No input and no class name of ours ships at all; a path type says which fields a widget accepts.",
+    "/paths/",
+    false,
+  ],
+  [
+    "Swap the state container",
+    "Five members over an opaque key, with a conformance kit that checks the four normative rules.",
+    "/contract/",
+    false,
+  ],
+  [
+    "Server errors after a submit",
+    "No setError. Writing the issue cell by hand shows the message and it survives the next pass — but errorCount does not count it, so it does not block a submit.",
+    "",
+    true,
+  ],
+  [
+    "React Native",
+    "form-core has no DOM, but the React bindings do: inputProps are DOM attributes and the uncontrolled ref is an HTMLInputElement.",
+    "",
+    true,
+  ],
+];
+
 const TRY = [
   ["Change billing", "the message appears on shipping"],
   ["Type in name", "only that row's counter moves"],
@@ -140,6 +219,58 @@ const TRY = [
     <p class="caption">
       The real library, built from source.
     </p>
+  </section>
+
+  <!-- ================================================== what you can build -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold">What you can build with it</h2>
+    <p class="caption">
+      The last two rows are things it does not do. They are in the table
+      because leaving them out is how a table like this becomes useless.
+    </p>
+
+    <div class="mt-6 overflow-x-auto">
+      <table class="w-full">
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">What you need</th>
+            <th class="pr-4">How</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            CAN.map(([need, how, where, no]) => (
+              <tr class="hairline">
+                <td
+                  class:list={[
+                    "py-2.5 pr-4 align-top",
+                    no ? "text-on-surface-variant line-through decoration-error/60" : "font-medium",
+                  ]}
+                >
+                  {need}
+                </td>
+                <td class="py-2.5 pr-4 align-top text-on-surface-variant">
+                  {how}
+                </td>
+                <td class="py-2.5 align-top whitespace-nowrap">
+                  {where === "" ? (
+                    ""
+                  ) : (
+                    <a
+                      class="text-primary underline underline-offset-4"
+                      href={where}
+                    >
+                      →
+                    </a>
+                  )}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <!-- ================================================== in code -->

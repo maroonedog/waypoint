@@ -44,6 +44,13 @@ export function useForm(): FormHandle<AnyValues, AnyPath>;
 export function useForm<TKey extends FormKey>(
   key: TKey
 ): FormHandle<ValuesFor<TKey>, PathsFor<TKey>>;
-export function useForm(key?: string): FormHandle<never, string> {
-  return useFormHandle(key) as unknown as FormHandle<never, string>;
+/**
+ * The implementation returns `never` so that BOTH overloads are satisfied by
+ * it. `FormHandle<never, string>` was not: a handle is invariant in its value
+ * type, so once an application registers a form, `AnyValues` stops being
+ * `never` and the first overload no longer matches — which made this file fail
+ * to compile in every compilation that had a registry, and only in those.
+ */
+export function useForm(key?: string): never {
+  return useFormHandle(key) as never;
 }

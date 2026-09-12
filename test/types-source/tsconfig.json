@@ -1,0 +1,24 @@
+{
+  "//": "The packages' SOURCE, compiled with a form registered. test/types compiles the emitted .d.ts, which carries no implementation signatures — so an overload that does not match its own implementation is invisible there. It is visible here, and it shipped once: useForm's implementation returned FormHandle<never, string>, which stops satisfying the keyless overload the moment AnyValues is no longer never, i.e. in every application that registers a form and in none that does not.",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react-jsx",
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "paths": {
+      "form-contract": ["../../packages/spec/src/index.ts"],
+      "form-contract-resolver-zod": ["../../packages/resolver-zod/src/index.ts"],
+      "form-core": ["../../packages/form-core/src/index.ts"],
+      "form-react": ["../../packages/form-react/src/index.ts"]
+    }
+  },
+  "include": ["."]
+}
