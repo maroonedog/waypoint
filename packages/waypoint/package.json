@@ -1,7 +1,7 @@
 {
-  "name": "@maroonedog/form-contract",
+  "name": "@maroonedog/waypoint",
   "version": "0.1.0",
-  "description": "A contract that lets any validator describe itself as a form, with a runtime, React bindings and resolvers behind one install",
+  "description": "A field's address exists before the component that draws it: typed paths the compiler has already checked and runtime state already written, with a contract any validator can describe itself through, resolvers and React bindings behind one install",
   "license": "MIT",
   "publishConfig": {
     "access": "public"

@@ -20,7 +20,7 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
-const PACKAGE = "@maroonedog/form-contract";
+const PACKAGE = "@maroonedog/waypoint";
 
 /**
  * One entry point of the package, as the source file behind it.
@@ -29,7 +29,7 @@ const PACKAGE = "@maroonedog/form-contract";
  */
 const entrySource = (entry) =>
   fileURLToPath(
-    new URL(`../packages/form-contract/src/${entry}/index.ts`, import.meta.url)
+    new URL(`../packages/waypoint/src/${entry}/index.ts`, import.meta.url)
   );
 
 // The package sources resolve `zod` and `react` from the repository root when
@@ -45,8 +45,8 @@ const here = (name) =>
   fileURLToPath(new URL(`./node_modules/${name}`, import.meta.url));
 
 // Anchored regular expressions rather than bare strings: Vite matches a STRING
-// alias as a prefix, so a `@maroonedog/form-contract` key would also swallow
-// `@maroonedog/form-contract/react` and rewrite it to a path that is not
+// alias as a prefix, so a `@maroonedog/waypoint` key would also swallow
+// `@maroonedog/waypoint/react` and rewrite it to a path that is not
 // there. zod keeps prefix matching on purpose — a subpath of it has to land in
 // the same copy as the package itself.
 const entryAliases = [
@@ -65,7 +65,16 @@ const entryAliases = [
 ];
 
 export default defineConfig({
-  site: "https://formcontract.dev",
+  // A PLACEHOLDER, and it has to be one: `@astrojs/sitemap` refuses to run
+  // without `site`, and NO DOMAIN HAS BEEN CHOSEN. `formcontract.dev` was
+  // never registered — it answered NXDOMAIN — and picking its replacement is
+  // the author's call rather than this file's. So this names the address
+  // GitHub Pages would serve from for the repository as it is actually named,
+  // which is at least under the author's control. Whoever picks a domain
+  // changes this line and puts `docs-site/public/CNAME` back; until then every
+  // `og:url` and the sitemap name a page nobody is serving, and the README
+  // says so rather than leaving a reader to find out.
+  site: "https://maroonedog.github.io/form-contract",
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],

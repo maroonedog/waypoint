@@ -8,7 +8,7 @@
 // render counts beside them — the whole point of the demo — would measure the
 // instrument instead of the thing.
 // ===========================================================================
-import type { FormAdapter, FormIssue, MaybeAsync } from "@maroonedog/form-contract";
+import type { FormAdapter, FormIssue, MaybeAsync } from "@maroonedog/waypoint";
 
 export interface PassCounter {
   /** The adapter to hand to `createForm`: the real one, counted. */

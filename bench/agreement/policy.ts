@@ -3,7 +3,7 @@
 //
 // The oracle judges the whole root after every settled change. That is not
 // neutral ground truth: it is a sentence-for-sentence description of
-// form-contract own policy, and three of the four libraries worth comparing
+// waypoint own policy, and three of the four libraries worth comparing
 // ship a different default. Scoring them against this moment would report a
 // documented design choice as a defect.
 //

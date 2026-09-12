@@ -1,10 +1,10 @@
-# @maroonedog/form-contract
+# @maroonedog/waypoint
 
 **A field's address exists before the component that draws it — as a type the
 compiler has already checked, and as runtime state that is already written.**
 
 ```bash
-npm install @maroonedog/form-contract
+npm install @maroonedog/waypoint
 ```
 
 ESM only. Node 20+. `react` and `zod` are optional peers: install React if you
@@ -19,12 +19,12 @@ components that import nothing from it.
 
 ```ts
 // src/form-registry.ts
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { orderSchema } from "./order-schema.js";
 
 export const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
   }
@@ -43,13 +43,13 @@ at all, and `./react` is the only entry whose built output names React.
 
 | Entry | What you import from it |
 |---|---|
-| `@maroonedog/form-contract` | The contract and the path types: `FormAdapter`, `FormIssue`, `FieldPath`, `ConcretePath`, `PartlyBoundPath`, `InhabitedPath`. One runtime export, `isPending`. |
-| `@maroonedog/form-contract/core` | The runtime: `createForm`, `createCellStore`, `assertFormStoreContract`. No React, no validator, no DOM. |
-| `@maroonedog/form-contract/react` | `useField`, `useRows`, `useFormStatus`, `FormProvider`, `<Field>`, `<AutoForm>`. |
-| `@maroonedog/form-contract/resolver-standard` | `standardFormResolver` — any validator that implements Standard Schema and its JSON Schema companion. Names no vendor. |
-| `@maroonedog/form-contract/resolver-zod` | `zodFormResolver`: the above, plus the three facts zod's JSON Schema does not carry about zod. zod is a type-only import, erased at build time. |
-| `@maroonedog/form-contract/resolver-luq` | `luqFormResolver`: the above, plus luq's issue codes and severities, which the spec has no member for. |
-| `@maroonedog/form-contract/store-zustand` | `createZustandCellStore` — a shipped instance of the store contract `./core` exports. |
+| `@maroonedog/waypoint` | The contract and the path types: `FormAdapter`, `FormIssue`, `FieldPath`, `ConcretePath`, `PartlyBoundPath`, `InhabitedPath`. One runtime export, `isPending`. |
+| `@maroonedog/waypoint/core` | The runtime: `createForm`, `createCellStore`, `assertFormStoreContract`. No React, no validator, no DOM. |
+| `@maroonedog/waypoint/react` | `useField`, `useRows`, `useFormStatus`, `FormProvider`, `<Field>`, `<AutoForm>`. |
+| `@maroonedog/waypoint/resolver-standard` | `standardFormResolver` — any validator that implements Standard Schema and its JSON Schema companion. Names no vendor. |
+| `@maroonedog/waypoint/resolver-zod` | `zodFormResolver`: the above, plus the three facts zod's JSON Schema does not carry about zod. zod is a type-only import, erased at build time. |
+| `@maroonedog/waypoint/resolver-luq` | `luqFormResolver`: the above, plus luq's issue codes and severities, which the spec has no member for. |
+| `@maroonedog/waypoint/store-zustand` | `createZustandCellStore` — a shipped instance of the store contract `./core` exports. |
 
 Source ships in the tarball alongside declaration maps, so Go-to-Definition
 lands on the file that explains why the code is the way it is rather than on a

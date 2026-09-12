@@ -7,8 +7,8 @@
 // store that happens to fit and never asks whether the types agreed.
 // ===========================================================================
 import { createStore } from "zustand/vanilla";
-import { createZustandCellStore } from "@maroonedog/form-contract/store-zustand";
-import type { FormCellStore } from "@maroonedog/form-contract/core";
+import { createZustandCellStore } from "@maroonedog/waypoint/store-zustand";
+import type { FormCellStore } from "@maroonedog/waypoint/core";
 
 // The empty-state form, which is what a form-only store looks like.
 const bare: FormCellStore = createZustandCellStore(createStore(() => ({})));

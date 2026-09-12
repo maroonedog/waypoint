@@ -14,17 +14,17 @@
     "noEmit": true,
     "skipLibCheck": true,
     "paths": {
-      "@maroonedog/form-contract": [
-        "../../packages/form-contract/src/contract/index.ts"
+      "@maroonedog/waypoint": [
+        "../../packages/waypoint/src/contract/index.ts"
       ],
-      "@maroonedog/form-contract/resolver-zod": [
-        "../../packages/form-contract/src/resolver-zod/index.ts"
+      "@maroonedog/waypoint/resolver-zod": [
+        "../../packages/waypoint/src/resolver-zod/index.ts"
       ],
-      "@maroonedog/form-contract/core": [
-        "../../packages/form-contract/src/core/index.ts"
+      "@maroonedog/waypoint/core": [
+        "../../packages/waypoint/src/core/index.ts"
       ],
-      "@maroonedog/form-contract/react": [
-        "../../packages/form-contract/src/react/index.ts"
+      "@maroonedog/waypoint/react": [
+        "../../packages/waypoint/src/react/index.ts"
       ]
     }
   },

@@ -6,11 +6,11 @@
 //
 // THIS IS NOT NEUTRAL GROUND TRUTH, and the report says so. "The whole root,
 // judged on every settled change, every issue on its own path" is a
-// description of form-contract policy. That is why a subject is scored WITHIN
+// description of waypoint policy. That is why a subject is scored WITHIN
 // its own declared policy and why a library shipping a different default gets
 // `by design` rather than `disagrees`.
 // ===========================================================================
-import { readValueAt, writeValueAt } from "@maroonedog/form-contract/core";
+import { readValueAt, writeValueAt } from "@maroonedog/waypoint/core";
 import type { Shape } from "../shape/build-shape.ts";
 import { issuePathToConcretePath } from "../shape/issue-path-to-concrete-path.ts";
 import type { ObservableState } from "./verdict.types.ts";

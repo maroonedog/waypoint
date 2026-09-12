@@ -27,7 +27,7 @@ import {
   valueCell,
   ROOT_CELL,
   type FormHandle,
-} from "@maroonedog/form-contract/core";
+} from "@maroonedog/waypoint/core";
 import type { CountingCellStore } from "./counting-cell-store.ts";
 
 /** Open value paths, as the runtime's own read branch answers for them. */

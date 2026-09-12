@@ -13,8 +13,8 @@
 // nothing, and failed in every one that registered a form.
 // ===========================================================================
 import { z } from "zod";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
-import { useField, useForm, useRows } from "@maroonedog/form-contract/react";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
+import { useField, useForm, useRows } from "@maroonedog/waypoint/react";
 
 const orderAdapter = zodFormResolver(
   z.object({
@@ -23,7 +23,7 @@ const orderAdapter = zodFormResolver(
   })
 );
 
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
   }

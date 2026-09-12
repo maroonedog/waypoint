@@ -15,11 +15,11 @@ gated**. §6 is the measurement behind that decision.
 temporary directory and compiles it with `tsc --extendedDiagnostics --noEmit`.
 Each program holds a root type of the stated shape, a
 `FormAdapter<Root, FieldPath<Root>>`, the
-`declare module "@maroonedog/form-contract/react"`
+`declare module "@maroonedog/waypoint/react"`
 augmentation that registers it, and one addressing call per leaf — `useField`
 for a place and `useFieldValues` for a rule, which is how the library itself
 divides them. The
-imports resolve to `packages/form-contract/src`, so what is measured is the type this
+imports resolve to `packages/waypoint/src`, so what is measured is the type this
 repository maintains rather than a `.d.ts` that may predate the last edit.
 
 Leaf counts are **counted** off the generated program, never computed as
@@ -148,7 +148,7 @@ both figures carry is `InhabitedPath`, which every call in this sweep pays —
 ### Where the budget truncates
 
 `PathDepthBudget` is a type alias in
-`packages/form-contract/src/contract/path-depth.types.ts`.
+`packages/waypoint/src/contract/path-depth.types.ts`.
 Its value is not restated here: a number copied out of a file is the kind of
 claim this lane exists to stop making. This is where the compiler actually
 stops, MEASURED by handing `useField` one path

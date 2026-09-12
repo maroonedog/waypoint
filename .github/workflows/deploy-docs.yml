@@ -1,10 +1,14 @@
 # ===========================================================================
-# deploy-docs.yml — formcontract.dev, when somebody asks for it.
+# deploy-docs.yml — the documentation site, when somebody asks for it.
 #
-# NOT on push, deliberately. The domain is registered but nothing is being
-# served from it yet, and GitHub Pages is not available for this repository
-# while it is private on the current plan — so a push trigger would paint every
-# commit with a red X for a deployment nobody asked for.
+# NOT on push, deliberately, and there is no `public/CNAME`: NO DOMAIN HAS BEEN
+# CHOSEN. `formcontract.dev` was never registered — it answered NXDOMAIN, which
+# is why the rename cost nothing — and picking its replacement is the author's
+# call rather than this file's. A CNAME naming a domain nobody owns does not
+# fail loudly; it makes Pages serve nothing at an address that does not exist.
+# GitHub Pages is also unavailable for this repository while it is private on
+# the current plan, so a push trigger would paint every commit with a red X for
+# a deployment nobody asked for.
 #
 # It builds on every pull request instead, which is the half that is worth
 # having now: a docs page that stops compiling should fail review, not fail

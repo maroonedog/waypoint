@@ -12,8 +12,8 @@
 // react-dom that loaded after it.
 // ===========================================================================
 import type { Subject } from "./subject.types.ts";
-import { formContractUseFieldSubject } from "./form-contract-use-field-subject.ts";
-import { formContractUncontrolledSubject } from "./form-contract-uncontrolled-subject.ts";
+import { waypointUseFieldSubject } from "./waypoint-use-field-subject.ts";
+import { waypointUncontrolledSubject } from "./waypoint-uncontrolled-subject.ts";
 import { handWrittenPerFieldStateSubject } from "./hand-written-per-field-state-subject.ts";
 import {
   reactHookFormScopedSubject,
@@ -27,8 +27,8 @@ import {
 import { tanstackFormSubject } from "./tanstack-form-subject.ts";
 
 export const SUBJECTS: readonly Subject[] = [
-  formContractUseFieldSubject,
-  formContractUncontrolledSubject,
+  waypointUseFieldSubject,
+  waypointUncontrolledSubject,
   handWrittenPerFieldStateSubject,
   reactHookFormScopedSubject,
   reactHookFormDepsSubject,

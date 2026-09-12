@@ -1,9 +1,9 @@
 // ===========================================================================
-// order-losses-first.ts — where form-contract is behind, at the top.
+// order-losses-first.ts — where waypoint is behind, at the top.
 //
 // A benchmark whose author sorts their own row to the top is asking to be
 // disbelieved. Rows are grouped by scenario, and within a scenario the rows
-// where form-contract is behind another subject on the headline count are
+// where waypoint is behind another subject on the headline count are
 // printed first.
 //
 // A loss is identified by ROW IDENTITY, not by how many there are. A loss that

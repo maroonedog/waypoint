@@ -1,55 +1,51 @@
 // ===========================================================================
-// form-contract-uncontrolled-subject.ts — the same runtime, not driving React.
+// waypoint-use-field-subject.ts — the primary row.
 //
-// `useUncontrolledField` instead of `useField`. The value cell is subscribed
-// imperatively and the listener writes the DOM node, so a keystroke that moves
-// no verdict reaches React not at all — the same thing react-hook-form's
-// `register` does, and the reason that row reads zero.
+// `useField` with the shipped store, which is how the README tells somebody to
+// write a form. `field.inputProps` is deliberately NOT used: it emits
+// descriptor-derived required/min/max/pattern attributes, which would change
+// the DOM and therefore what the comparison is measuring. The configuration
+// that does use them ships separately as an own-tree subject.
 //
-// It renders the shared leaf with no boundary of its own, so it stays
-// `equal-tree` and is fiber-comparable with every other subject here. The only
-// difference from the primary row is `defaultValue` + `ref` in place of
-// `value`, which is exactly the difference being measured.
+// There is no validation-mode knob to set, because this library has none — a
+// gap recorded in words in the report rather than folded into a number.
 // ===========================================================================
 import { createElement as h, type ReactElement } from "react";
-import { createForm, readValueAt, type FormHandle } from "@maroonedog/form-contract/core";
-import { FormProvider, useUncontrolledField } from "@maroonedog/form-contract/react";
-import type { FormAdapter } from "@maroonedog/form-contract";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { createForm, readValueAt, type FormHandle } from "@maroonedog/waypoint/core";
+import { FormProvider, useField } from "@maroonedog/waypoint/react";
+import type { FormAdapter } from "@maroonedog/waypoint";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { createRoot, type Root } from "react-dom/client";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
 import type { MountedSubject, Subject } from "./subject.types.ts";
 
 function Leaf({ path, label }: LeafProps): ReactElement {
-  const field = useUncontrolledField(path);
+  const field = useField(path);
   return h(SharedLeaf, {
     label,
     name: path,
-    defaultValue: field.defaultValue,
-    inputRef: field.ref,
-    onInput: (event) => field.onChange(event),
-    onBlur: field.onBlur,
+    value: field.value === undefined ? "" : String(field.value),
+    onInput: (event) => field.setValue(event.currentTarget.value),
+    onBlur: () => field.markTouched(),
     invalid: field.issues.length > 0,
     message: field.issues[0]?.message,
   });
 }
 
-export const formContractUncontrolledSubject: Subject = {
-  id: "form-contract-uncontrolled",
-  library: "@maroonedog/form-contract",
+export const waypointUseFieldSubject: Subject = {
+  id: "form-contract-use-field",
+  library: "@maroonedog/waypoint",
   treeClass: "equal-tree",
   policy: "on-change",
   capabilities: [
     "validates-unmounted-fields",
     "cross-field-error-on-other-path",
     "swappable-store",
-    "uncontrolled-input",
   ],
   notes:
-    "The value cell is subscribed imperatively and written to the DOM node, " +
-    "so a keystroke does not re-render. The stated cost: an uncontrolled " +
-    "input cannot be transformed as it is typed, which is what useField is for.",
+    "No validation-mode knob exists; every settled change is judged. " +
+    "inputProps is not used, so the DOM matches the shared leaf exactly.",
   policyCitation:
     "README: one whole-root validation pass per settled change; FormOptions " +
     "carries no validation mode",

@@ -9,7 +9,7 @@
 // So it is written the way a competent developer would, and not handicapped:
 // one useState per leaf, a mutable root the leaves write into, one whole-root
 // pass per settled change, and per-path notification through a plain listener
-// map. That is deliberately the same POLICY as form-contract, because a
+// map. That is deliberately the same POLICY as waypoint, because a
 // reference that judged less would make the library look expensive for a
 // reason that has nothing to do with the store.
 //
@@ -25,7 +25,7 @@ import {
   type ReactElement,
 } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { readValueAt, writeValueAt } from "@maroonedog/form-contract/core";
+import { readValueAt, writeValueAt } from "@maroonedog/waypoint/core";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
 import { issuePathToConcretePath } from "../shape/issue-path-to-concrete-path.ts";

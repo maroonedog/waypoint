@@ -3,7 +3,7 @@
 //
 // A null twin per subject PER SIZE RUNG, interleaved through the run rather
 // than taken once at the start. Variance scales with work: calibrating every
-// verdict on form-contract's self-pair at 31 fields would declare Formik's
+// verdict on waypoint's self-pair at 31 fields would declare Formik's
 // rows at 201 fields "resolved" comfortably inside their own noise.
 //
 // Null and comparison pair counts are pinned equal, and the band is reported

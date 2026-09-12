@@ -24,8 +24,8 @@ import { stringMaxPlugin } from "@maroonedog/luq/plugins/stringMax";
 import { numberMinPlugin } from "@maroonedog/luq/plugins/numberMin";
 import { numberMaxPlugin } from "@maroonedog/luq/plugins/numberMax";
 import { toStandardJsonSchema } from "@maroonedog/luq/standard-schema";
-import { luqFormResolver } from "@maroonedog/form-contract/resolver-luq";
-import { createForm, errorCountCell } from "@maroonedog/form-contract/core";
+import { luqFormResolver } from "@maroonedog/waypoint/resolver-luq";
+import { createForm, errorCountCell } from "@maroonedog/waypoint/core";
 
 const build = () =>
   Builder()

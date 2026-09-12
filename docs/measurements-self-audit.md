@@ -1,10 +1,10 @@
 # Form runtime self-audit — Tier 2
 
-form-contract only. **No competitor column**, because no competitor exposes an equivalent — this tier gates the author's library against the author's own design document, and it is a self-audit rather than a comparison.
+waypoint only. **No competitor column**, because no competitor exposes an equivalent — this tier gates the author's library against the author's own design document, and it is a self-audit rather than a comparison.
 
 Every integer in §1–§3 is gated by `npm run bench:self-audit:check`. The microseconds in §4 are not gated and are recorded nowhere: they move when the runner does, which is the same reason the counts lane gates and the time lane does not.
 
-Driven through `@maroonedog/form-contract/core` with **no React**. The subscription installed per field is `sources.value.subscribe`, which is the one `useCell` hands to `useSyncExternalStore`, so "every field on screen" here opens exactly the cells a rendered form opens. The sizes are the counts lane's `leaves-31`, `leaves-61` and `leaves-201`, plus a `leaves-401` this lane can afford because it mounts no competitors.
+Driven through `@maroonedog/waypoint/core` with **no React**. The subscription installed per field is `sources.value.subscribe`, which is the one `useCell` hands to `useSyncExternalStore`, so "every field on screen" here opens exactly the cells a rendered form opens. The sizes are the counts lane's `leaves-31`, `leaves-61` and `leaves-201`, plus a `leaves-401` this lane can afford because it mounts no competitors.
 
 ## What was measured on
 

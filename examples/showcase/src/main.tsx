@@ -24,7 +24,7 @@ function Page() {
               お取引口座 開設申込
             </h1>
             <p className="text-sm text-on-surface-variant">
-              form-contract の参考画面 — Material Design 3
+              waypoint の参考画面 — Material Design 3
             </p>
           </div>
         </div>

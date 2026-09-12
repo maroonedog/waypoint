@@ -39,7 +39,7 @@ export function warnUnaddressable(
   const asRule = declaredPathOf(path);
   const similar = addressable.similarTo(path);
   warnOnHostConsole(
-    `[form-contract] "${path}" is not a field this form has` +
+    `[waypoint] "${path}" is not a field this form has` +
       (asRule === path ? "" : ` (as a rule, "${asRule}")`) +
       ", so it will draw nothing and validate nothing." +
       (similar.length === 0 ? "" : ` Did you mean: ${similar.join(", ")}?`)

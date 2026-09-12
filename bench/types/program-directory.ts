@@ -71,14 +71,14 @@ const tsconfigFor = (directory: string): string => {
         types: [],
         baseUrl: ".",
         paths: {
-          "@maroonedog/form-contract": [
-            `${back}/packages/form-contract/src/contract/index.ts`,
+          "@maroonedog/waypoint": [
+            `${back}/packages/waypoint/src/contract/index.ts`,
           ],
-          "@maroonedog/form-contract/core": [
-            `${back}/packages/form-contract/src/core/index.ts`,
+          "@maroonedog/waypoint/core": [
+            `${back}/packages/waypoint/src/core/index.ts`,
           ],
-          "@maroonedog/form-contract/react": [
-            `${back}/packages/form-contract/src/react/index.ts`,
+          "@maroonedog/waypoint/react": [
+            `${back}/packages/waypoint/src/react/index.ts`,
           ],
         },
       },
@@ -90,7 +90,7 @@ const tsconfigFor = (directory: string): string => {
 };
 
 export function openProgramDirectory(): ProgramDirectory {
-  const directory = mkdtempSync(join(tmpdir(), "form-contract-types-"));
+  const directory = mkdtempSync(join(tmpdir(), "waypoint-types-"));
   const linked = join(directory, "node_modules");
   symlinkSync(join(REPOSITORY, "node_modules"), linked, "junction");
   // NodeNext reads the nearest package.json to decide the module system, and
@@ -98,7 +98,7 @@ export function openProgramDirectory(): ProgramDirectory {
   // verbatimModuleSyntax rather than compiled.
   writeFileSync(
     join(directory, "package.json"),
-    `${JSON.stringify({ name: "form-contract-type-program", private: true, type: "module" }, null, 2)}\n`
+    `${JSON.stringify({ name: "waypoint-type-program", private: true, type: "module" }, null, 2)}\n`
   );
   writeFileSync(join(directory, "tsconfig.json"), `${tsconfigFor(directory)}\n`);
 

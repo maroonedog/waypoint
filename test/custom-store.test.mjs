@@ -4,8 +4,8 @@
 // and are caught by separate cases.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { assertFormStoreContract } from "@maroonedog/form-contract/core";
-import { createZustandCellStore, FORM_CELLS_MEMBER } from "@maroonedog/form-contract/store-zustand";
+import { assertFormStoreContract } from "@maroonedog/waypoint/core";
+import { createZustandCellStore, FORM_CELLS_MEMBER } from "@maroonedog/waypoint/store-zustand";
 import { createStore } from "zustand/vanilla";
 
 /**

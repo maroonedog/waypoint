@@ -2,7 +2,7 @@
 // measure-calibration-ladder.ts — a known cost, and whether we could see it.
 //
 // Seven rungs at THREE scheduling positions. The third one is the point:
-// form-contract defers its validation pass to a microtask, and the headline
+// waypoint defers its validation pass to a microtask, and the headline
 // metric is EventDispatch filtered to `input`, which closes before a microtask
 // runs. A synchronous-only ladder would prove resolution for the one cost
 // shape the metric already sees best, and then be quoted as though it proved

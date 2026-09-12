@@ -13,8 +13,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
-import { createForm } from "@maroonedog/form-contract/core";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
+import { createForm } from "@maroonedog/waypoint/core";
 
 const SCHEMA = z.object({
   owner: z.object({ name: z.string().min(3, "3文字以上") }),

@@ -13,20 +13,20 @@
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
-const PACKAGE = "@maroonedog/form-contract";
+const PACKAGE = "@maroonedog/waypoint";
 
 /** One entry point of the package, as the source file behind it. */
 const entrySource = (entry: string): string =>
   fileURLToPath(
     new URL(
-      `../../packages/form-contract/src/${entry}/index.ts`,
+      `../../packages/waypoint/src/${entry}/index.ts`,
       import.meta.url
     )
   );
 
 // Anchored regular expressions, because Vite matches a STRING alias as a
-// prefix: a bare `@maroonedog/form-contract` key would also swallow
-// `@maroonedog/form-contract/react` and rewrite it to a path that is not there.
+// prefix: a bare `@maroonedog/waypoint` key would also swallow
+// `@maroonedog/waypoint/react` and rewrite it to a path that is not there.
 const entryAliases = (
   [
     [PACKAGE, "contract"],

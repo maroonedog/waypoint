@@ -40,12 +40,12 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { z } = await import("zod");
 const React = await import("react");
 const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("@maroonedog/form-contract/resolver-zod");
+const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
 const { buildDescriptorTree, createForm, summarizeIssues } = await import(
-  "@maroonedog/form-contract/core"
+  "@maroonedog/waypoint/core"
 );
 const { FormProvider, useErrorSummary, useField } = await import(
-  "@maroonedog/form-contract/react"
+  "@maroonedog/waypoint/react"
 );
 
 const { act, createElement: h } = React;

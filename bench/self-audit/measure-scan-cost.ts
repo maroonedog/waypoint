@@ -33,7 +33,7 @@ import {
   ROOT_CELL,
   type FormCellStore,
   type OpenValueCells,
-} from "@maroonedog/form-contract/core";
+} from "@maroonedog/waypoint/core";
 import { median, relativeSpreadPercent } from "../browser/statistics.ts";
 import type { Shape } from "../shape/build-shape.ts";
 import { refreshesProducedBy, scanShapeOf } from "./count-open-cell-scan.ts";

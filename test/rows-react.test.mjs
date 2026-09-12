@@ -25,10 +25,10 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { z } = await import("zod");
 const React = await import("react");
 const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("@maroonedog/form-contract/resolver-zod");
-const { createForm } = await import("@maroonedog/form-contract/core");
+const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
+const { createForm } = await import("@maroonedog/waypoint/core");
 const { FormProvider, Field, FieldRows, useParticipation } = await import(
-  "@maroonedog/form-contract/react"
+  "@maroonedog/waypoint/react"
 );
 
 const { act, createElement: h, Fragment } = React;
@@ -222,8 +222,8 @@ test("a rule used where a place is needed fails loudly", async () => {
 // address rather than by whatever scope happened to enclose it.
 test("a row can be switched off without being removed", async () => {
   const { z } = await import("zod");
-  const { createForm, errorCountCell } = await import("@maroonedog/form-contract/core");
-  const { useFormStatus } = await import("@maroonedog/form-contract/react");
+  const { createForm, errorCountCell } = await import("@maroonedog/waypoint/core");
+  const { useFormStatus } = await import("@maroonedog/waypoint/react");
 
   const schema = z.object({
     items: z.array(z.object({ sku: z.string().min(1, "required") })),

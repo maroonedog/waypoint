@@ -72,8 +72,10 @@ field.setValue("Ada");   // pass 2 leaves
 // pass 1 answers -> DROPPED. It describes a root that is no longer there.
 `;
 
-// Read out of config/form-baseline.json: subject form-contract-use-field,
-// scenario K1 — one keystroke whose verdict does not move.
+// Read out of config/form-baseline.json: subject `form-contract-use-field`,
+// scenario K1 — one keystroke whose verdict does not move. That subject id is
+// spelled the way the baseline spells it, which is the name the package had
+// when those rows were recorded; see bench/subjects/subject-ids.ts.
 const cost = [
   ["31", "1", "31"],
   ["61", "1", "61"],
@@ -103,7 +105,7 @@ const moments = [
 ---
 
 <Base
-  title="Validation — form-contract"
+  title="Validation — waypoint"
   description="One pass judges the whole root on every settled change. That is what lets a rule report against a field that did not move, what lets an unrendered field block a submit — and what it costs."
 >
   <h1 class="text-3xl font-bold sm:text-4xl">Validation</h1>
@@ -127,7 +129,7 @@ const moments = [
       >home page</a
     > runs exactly that schema, and the rule goes on reading shipping when its
     component is <em>not mounted</em>. The benchmark asks every subject for it
-    as scenario X1: form-contract pays one whole-root pass, the react-hook-form{" "}
+    as scenario X1: waypoint pays one whole-root pass, the react-hook-form{" "}
     <code>deps</code> configuration pays two passes and 402 paths judged, and{" "}
     <code>react-hook-form-scoped</code> is scored <em>disagrees</em> at all
     three sizes because it showed no message at all.

@@ -7,7 +7,7 @@ import {
   useFieldValue,
   useForm,
   useFormStatus,
-} from "@maroonedog/form-contract/react";
+} from "@maroonedog/waypoint/react";
 import { applicationAdapter } from "./form-registry.js";
 import { EMPTY_APPLICATION } from "./schema.js";
 import { AddressFields } from "./sections/address-fields.js";

@@ -5,7 +5,7 @@ npm run example:nested-arrays  # http://localhost:5181
 ```
 
 `shipments[] → address{} → lines[]`。配列の中にオブジェクトがあり、その中にまた配列がある。
-**同じ zod スキーマ・同じ見た目・同じ操作**を form-contract / react-hook-form / Formik /
+**同じ zod スキーマ・同じ見た目・同じ操作**を waypoint / react-hook-form / Formik /
 TanStack Form の4つで書いています。違うのは**フィールドの指し方だけ**です。
 
 4実装とも実際に動かして確認済みです: 初期表示（各9入力・2カード・3明細行）、
@@ -18,7 +18,7 @@ TanStack Form の4つで書いています。違うのは**フィールドの指
 
 | | コード行 | `shipments` の出現 | 内側配列のために別コンポーネントが要るか |
 |---|---|---|---|
-| form-contract | **91** | **7** | いいえ |
+| waypoint | **91** | **7** | いいえ |
 | react-hook-form | 94 | 10 | **はい（強制）** |
 | Formik | 141 | 13 | いいえ |
 | TanStack Form | 132 | 9 | いいえ |
@@ -30,7 +30,7 @@ TanStack Form の4つで書いています。違うのは**フィールドの指
 
 ## 指し方
 
-### form-contract — 行が自分の住所を配る
+### waypoint — 行が自分の住所を配る
 
 ```tsx
 {shipments.rows.map((shipment) => (
@@ -119,5 +119,5 @@ TanStack も受けるので、アダプタが要りません）。`form.Field` �
 zod ブリッジを手書きしている分で、yup を使えば短くなります。**ただしそれは
 「バリデータを選べる」という前提を捨てた場合の話**で、このリポジトリはまさにそこを問題にしています。
 
-form-contract が有利に見える点は正直に一つに絞れます: **内側の配列が「自分が内側である」ことを
+waypoint が有利に見える点は正直に一つに絞れます: **内側の配列が「自分が内側である」ことを
 知らなくて済む**。他の3つはいずれも、内側のフィールドが外側の添字を知っている必要があります。

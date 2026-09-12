@@ -30,7 +30,7 @@ import {
   useUncontrolledField,
   type FieldErrorProps,
   type FormPathTo,
-} from "@maroonedog/form-contract/react";
+} from "@maroonedog/waypoint/react";
 import { blankLine, orderAdapter, orderDefaults } from "./order-form.js";
 import { createPassCounter, type PassCounter } from "./pass-counter.js";
 import { createRecordingStore, type Entry, type Tape } from "./recording-store.js";

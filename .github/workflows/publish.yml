@@ -1,5 +1,5 @@
 # ===========================================================================
-# publish.yml — publishes @maroonedog/form-contract to npm, BY HAND ONLY.
+# publish.yml — publishes @maroonedog/waypoint to npm, BY HAND ONLY.
 #
 # `workflow_dispatch` is the only trigger, and that is deliberate rather than
 # provisional: nothing here has ever been published, and a workflow that
@@ -65,8 +65,8 @@ jobs:
 
       - name: Refuse a version that is already on the registry
         run: |
-          NAME=$(node -p "require('./packages/form-contract/package.json').name")
-          VERSION=$(node -p "require('./packages/form-contract/package.json').version")
+          NAME=$(node -p "require('./packages/waypoint/package.json').name")
+          VERSION=$(node -p "require('./packages/waypoint/package.json').version")
           echo "About to publish $NAME@$VERSION"
           if npm view "$NAME@$VERSION" version > /dev/null 2>&1; then
             echo "::error::$NAME@$VERSION is already published. Bump the version first."
@@ -74,12 +74,12 @@ jobs:
           fi
 
       - name: Pack, and list what the tarball actually carries
-        run: npm pack --dry-run --workspace @maroonedog/form-contract
+        run: npm pack --dry-run --workspace @maroonedog/waypoint
 
       - name: Publish
         if: ${{ inputs.dryRun == false }}
-        run: npm publish --workspace @maroonedog/form-contract --access public
+        run: npm publish --workspace @maroonedog/waypoint --access public
 
       - name: Say what the registry now serves
         if: ${{ inputs.dryRun == false }}
-        run: npm view @maroonedog/form-contract version dist-tags
+        run: npm view @maroonedog/waypoint version dist-tags

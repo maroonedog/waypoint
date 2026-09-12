@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { FieldBinding } from "@maroonedog/form-contract/react";
+import type { FieldBinding } from "@maroonedog/waypoint/react";
 
 /**
  * The line under a field. It keeps its height whether or not anything is in

@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { Field, FieldRows, useFieldIssues } from "@maroonedog/form-contract/react";
+import { Field, FieldRows, useFieldIssues } from "@maroonedog/waypoint/react";
 import { MdTextField } from "../md/text-field.js";
 import { MdNumberField } from "../md/number-field.js";
 import { MdButton } from "../md/button.js";

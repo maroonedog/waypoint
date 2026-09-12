@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { WithFormContract } from "./with-form-contract.js";
+import { WithWaypoint } from "./with-waypoint.js";
 import { WithReactHookForm } from "./with-react-hook-form.js";
 import { WithFormik } from "./with-formik.js";
 import { WithTanStack } from "./with-tanstack.js";
@@ -16,7 +16,7 @@ createRoot(document.getElementById("root")!).render(
       </p>
     </header>
     <main>
-      <WithFormContract />
+      <WithWaypoint />
       <WithReactHookForm />
       <WithFormik />
       <WithTanStack />

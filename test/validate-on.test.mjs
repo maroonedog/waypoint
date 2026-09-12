@@ -12,7 +12,7 @@
 // about has to see the complaint go.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createForm } from "@maroonedog/form-contract/core";
+import { createForm } from "@maroonedog/waypoint/core";
 
 const FIELDS = [
   { path: "name", kind: "string", isRequired: true, constraints: {} },

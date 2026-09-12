@@ -7,7 +7,7 @@
 // once in its own source, and every hook reads them from here — so a component
 // ten levels down imports nothing, receives nothing, and is still checked.
 //
-//   declare module "@maroonedog/form-contract/react" {
+//   declare module "@maroonedog/waypoint/react" {
 //     interface FormTypeRegistry {
 //       form: typeof orderAdapter;
 //     }
@@ -53,7 +53,7 @@ export interface FormTypeRegistry {}
  * just as firmly and explain nothing.
  */
 type NoRegistration =
-  'No form type is registered. Add: declare module "@maroonedog/form-contract/react" { interface FormTypeRegistry { form: typeof yourAdapter } }';
+  'No form type is registered. Add: declare module "@maroonedog/waypoint/react" { interface FormTypeRegistry { form: typeof yourAdapter } }';
 
 /** Every key the application registered. */
 export type FormKey = [keyof FormTypeRegistry] extends [never]

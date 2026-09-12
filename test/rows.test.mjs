@@ -3,7 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import {
   createForm,
   valueCell,
@@ -13,7 +13,7 @@ import {
   declaredPathOf,
   bindDeclaredPath,
   expandDeclaredPath,
-} from "@maroonedog/form-contract/core";
+} from "@maroonedog/waypoint/core";
 
 const SCHEMA = z.object({
   items: z.array(

@@ -22,13 +22,13 @@ globalThis.File = dom.window.File;
 
 const { z } = await import("zod");
 const { zodFormResolver } = await import(
-  "@maroonedog/form-contract/resolver-zod"
+  "@maroonedog/waypoint/resolver-zod"
 );
 const { standardFormResolver } = await import(
-  "@maroonedog/form-contract/resolver-standard"
+  "@maroonedog/waypoint/resolver-standard"
 );
 const { buildInputProps, inputTypeFor } = await import(
-  "@maroonedog/form-contract/react"
+  "@maroonedog/waypoint/react"
 );
 
 const SCHEMA = z.object({

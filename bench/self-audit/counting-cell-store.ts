@@ -29,7 +29,7 @@ import {
   type CellListener,
   type CellUnsubscribe,
   type FormCellStore,
-} from "@maroonedog/form-contract/core";
+} from "@maroonedog/waypoint/core";
 
 export interface StoreTally {
   reads: number;

@@ -17,9 +17,9 @@
 // machine moved these numbers by 3× between two runs an hour apart, and the
 // spread column is printed so a reader can see that rather than be told it.
 // ===========================================================================
-import { isPending, type FormAdapter } from "@maroonedog/form-contract";
-import { createForm, type FormHandle } from "@maroonedog/form-contract/core";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { isPending, type FormAdapter } from "@maroonedog/waypoint";
+import { createForm, type FormHandle } from "@maroonedog/waypoint/core";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { median, relativeSpreadPercent } from "../browser/statistics.ts";
 import type { Shape } from "../shape/build-shape.ts";
 import { SCANNED_LEAF } from "./measure-scan-cost.ts";

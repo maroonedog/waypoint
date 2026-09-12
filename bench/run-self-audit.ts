@@ -4,8 +4,8 @@
 // Command: `npm run bench:self-audit`. Baseline:
 // `config/self-audit-baseline.json`. Report: `docs/measurements-self-audit.md`.
 //
-// The counts lane compares form-contract to four other libraries and cannot see
-// inside any of them, form-contract included. This lane compares form-contract
+// The counts lane compares waypoint to four other libraries and cannot see
+// inside any of them, waypoint included. This lane compares waypoint
 // to its own design document — no competitor column, because the competitors
 // expose no equivalent, and none is implied.
 //
@@ -138,7 +138,7 @@ const share =
 const report = [
   "# Form runtime self-audit — Tier 2",
   "",
-  "form-contract only. **No competitor column**, because no competitor " +
+  "waypoint only. **No competitor column**, because no competitor " +
     "exposes an equivalent — this tier gates the author's library against the " +
     "author's own design document, and it is a self-audit rather than a " +
     "comparison.",
@@ -148,7 +148,7 @@ const report = [
     "the runner does, which is the same reason the counts lane gates and the " +
     "time lane does not.",
   "",
-  "Driven through `@maroonedog/form-contract/core` with **no React**. The " +
+  "Driven through `@maroonedog/waypoint/core` with **no React**. The " +
     "subscription installed per field is `sources.value.subscribe`, which is " +
     "the one `useCell` hands to `useSyncExternalStore`, so \"every field on " +
     "screen\" here opens exactly the cells a rendered form opens. The sizes " +

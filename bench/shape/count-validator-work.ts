@@ -17,7 +17,7 @@
 // It is a measure of what was submitted for judgement, not of what the schema
 // chose to look at, and the report says so.
 // ===========================================================================
-import { readValueAt } from "@maroonedog/form-contract/core";
+import { readValueAt } from "@maroonedog/waypoint/core";
 
 export interface ValidatorWork {
   passes: number;

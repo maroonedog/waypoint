@@ -1,7 +1,7 @@
 // ===========================================================================
 // self-audit.types.ts — the rows this lane records, and nothing else.
 //
-// The counts lane compares five libraries; this one compares form-contract to
+// The counts lane compares five libraries; this one compares waypoint to
 // its own design document, so there is no competitor column and no agreement
 // cell. What is left is a handful of integers per size, and they are separated
 // into three rows because they answer three different accusations: what a

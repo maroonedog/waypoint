@@ -1,5 +1,5 @@
 {
-  "name": "form-contract-docs",
+  "name": "waypoint-docs",
   "private": true,
   "type": "module",
   "//": "Its own dependency tree, deliberately. Astro is large and it has nothing to do with the library; keeping it out of the root manifest means `npm ci` for the packages never installs a documentation toolchain, and the library's lockfile never moves because a docs plugin did.",

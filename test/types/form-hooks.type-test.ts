@@ -13,7 +13,7 @@
 // from an unregistered `never` falls back to the parameter's constraint.
 // ===========================================================================
 import { z } from "zod";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import {
   useField,
   useFieldIssues,
@@ -26,7 +26,7 @@ import {
   type AnyPath,
   type FormPath,
   type FormTypeRegistry,
-} from "@maroonedog/form-contract/react";
+} from "@maroonedog/waypoint/react";
 
 const orderSchema = z.object({
   name: z.string().min(3),
@@ -42,7 +42,7 @@ const orderAdapter = zodFormResolver(orderSchema);
 const profileAdapter = zodFormResolver(profileSchema);
 
 // The application's one registration, which nothing below imports.
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
     profile: typeof profileAdapter;

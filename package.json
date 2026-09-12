@@ -1,12 +1,12 @@
 {
-  "name": "form-contract-workspace",
+  "name": "waypoint-workspace",
   "private": true,
   "type": "module",
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "build": "tsc -b packages/form-contract/tsconfig.json",
+    "build": "tsc -b packages/waypoint/tsconfig.json",
     "test": "node --test test/*.test.mjs",
     "axe:record": "node --test test/accessibility-axe.test.mjs",
     "test:types": "tsc -p test/types/tsconfig.json && tsc -p test/types-containers/tsconfig.json && tsc -p test/types-unregistered/tsconfig.json && tsc -p test/types-source/tsconfig.json && tsc -p bench/tsconfig.json && tsc -p examples/nested-arrays/tsconfig.check.json && tsc -p examples/playground/tsconfig.check.json && tsc -p examples/showcase/tsconfig.check.json",

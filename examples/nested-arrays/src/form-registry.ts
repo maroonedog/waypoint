@@ -5,12 +5,12 @@
 // not to the import graph, so every component below is checked against these
 // paths without receiving anything or knowing this file exists.
 // ===========================================================================
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { orderSchema } from "./schema.js";
 
 const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
   }

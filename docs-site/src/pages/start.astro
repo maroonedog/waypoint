@@ -27,18 +27,18 @@ npm run verify     # builds the package, runs the tests and the type tests
 `;
 
 const entryPoints = [
-  ["@maroonedog/form-contract/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
-  ["@maroonedog/form-contract", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
-  ["@maroonedog/form-contract/resolver-standard", "standardFormResolver", "Any validator that speaks Standard Schema and its JSON Schema companion. Names no vendor."],
-  ["@maroonedog/form-contract/resolver-zod", "zodFormResolver", "The above, plus the three facts zod's JSON Schema does not carry about zod."],
-  ["@maroonedog/form-contract/resolver-luq", "luqFormResolver", "The above, plus luq's issue codes, which the spec has no member for."],
-  ["@maroonedog/form-contract/core", "createForm · createCellStore · assertFormStoreContract", "The runtime. No React."],
-  ["@maroonedog/form-contract/store-zustand", "createZustandCellStore", "A worked example of substituting the store."],
+  ["@maroonedog/waypoint/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
+  ["@maroonedog/waypoint", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
+  ["@maroonedog/waypoint/resolver-standard", "standardFormResolver", "Any validator that speaks Standard Schema and its JSON Schema companion. Names no vendor."],
+  ["@maroonedog/waypoint/resolver-zod", "zodFormResolver", "The above, plus the three facts zod's JSON Schema does not carry about zod."],
+  ["@maroonedog/waypoint/resolver-luq", "luqFormResolver", "The above, plus luq's issue codes, which the spec has no member for."],
+  ["@maroonedog/waypoint/core", "createForm · createCellStore · assertFormStoreContract", "The runtime. No React."],
+  ["@maroonedog/waypoint/store-zustand", "createZustandCellStore", "A worked example of substituting the store."],
 ];
 ---
 
 <Base
-  title="Start — form-contract"
+  title="Start — waypoint"
   description="Clone it, run one command, and write one file. The two code blocks on this page are raw imports of files this site's own build type-checks, so they cannot drift from code that works."
 >
   <h1 class="text-3xl font-bold sm:text-4xl">Start</h1>
@@ -86,7 +86,7 @@ const entryPoints = [
   <h2 class="mt-16 text-2xl font-bold">Where each symbol comes from</h2>
   <p class="mt-3 leading-relaxed text-on-surface-variant">
     Six entry points, and the only one a screen imports from is{" "}
-    <code>@maroonedog/form-contract/react</code>.
+    <code>@maroonedog/waypoint/react</code>.
   </p>
 
   <div class="mt-5 overflow-x-auto">
@@ -118,7 +118,7 @@ const entryPoints = [
 
   <h2 class="mt-16 text-2xl font-bold">Two you can run</h2>
   <p class="mt-3 leading-relaxed text-on-surface-variant">
-    One of them writes the same nested shape four times — form-contract,
+    One of them writes the same nested shape four times — waypoint,
     react-hook-form, Formik and TanStack Form, against one schema, side by side
     on one page — so the difference is how a field two levels inside a list
     says which row it belongs to, and nothing else.

@@ -1,6 +1,6 @@
 // What the timing lane is allowed to call a win.
 //
-// The rule under test came out of a real CI run: form-contract measured 0.537x
+// The rule under test came out of a real CI run: waypoint measured 0.537x
 // the hand-written reference at 201 fields and the harness printed `faster` —
 // while the same harness had counted that 0% of its validator work ran inside
 // the event being timed, and its own ladder had reported that nothing up to

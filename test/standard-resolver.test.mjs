@@ -18,8 +18,8 @@ import assert from "node:assert/strict";
 import {
   standardFormResolver,
   forgetUndescribedFormWarnings,
-} from "@maroonedog/form-contract/resolver-standard";
-import { createForm, errorCountCell } from "@maroonedog/form-contract/core";
+} from "@maroonedog/waypoint/resolver-standard";
+import { createForm, errorCountCell } from "@maroonedog/waypoint/core";
 
 const DOCUMENT = {
   type: "object",

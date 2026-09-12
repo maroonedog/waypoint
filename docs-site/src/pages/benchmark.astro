@@ -13,13 +13,13 @@ import TimingTable from "../components/TimingTable.astro";
 ---
 
 <Base
-  title="Benchmark — form-contract"
+  title="Benchmark — waypoint"
   description="Two lanes: deterministic counts gated in CI, and microseconds from Chrome's own trace that are printed and never gated. The harness publishes its own resolution above its results."
 >
   <h1 class="text-3xl font-bold sm:text-4xl">Benchmark</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">form-contract is behind on all four
+    <strong class="text-on-surface">waypoint is behind on all four
     scenarios, at every size.</strong> The report says so in those words, and
     prints the rows it loses before its own table.
   </p>
@@ -28,7 +28,7 @@ import TimingTable from "../components/TimingTable.astro";
     <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
       Two of the four losses are won by <strong>not showing the message</strong>:
       one configuration reports only at submit, and one reports nothing at all.
-      The other two are beaten by form-contract's own uncontrolled binding.
+      The other two are beaten by waypoint's own uncontrolled binding.
     </li>
     <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
       On the timing lane a keystroke at 201 fields measures{" "}
@@ -39,7 +39,7 @@ import TimingTable from "../components/TimingTable.astro";
     <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
       <strong>K5 is what coalescing is worth.</strong> Five characters into one
       field with <em>one</em> settle at the end: at 201 fields both
-      form-contract subjects run <strong>1 validator pass, 201 paths judged</strong>,
+      waypoint subjects run <strong>1 validator pass, 201 paths judged</strong>,
       and react-hook-form, Formik, TanStack Form and the hand-written reference
       each run <strong>5 passes and 1005 paths judged</strong>. Draining after
       every keystroke — which is what the other three scenarios do — is the one
@@ -84,7 +84,7 @@ import TimingTable from "../components/TimingTable.astro";
     constant is what differs: at 31, 61 and 201 fields the hand-written
     reference reports 39, 69 and 209 — React cloning the sibling list of the
     form it descended through, which every implementation that commits at all
-    pays. What form-contract adds on top is 3, at every size.
+    pays. What waypoint adds on top is 3, at every size.
   </p>
 
   <ScenarioTable />
@@ -94,7 +94,7 @@ import TimingTable from "../components/TimingTable.astro";
     <code>useField</code> the value lands in one task and the verdict in the
     next, so React cannot batch them and commits twice. The last column is the
     one the whole-root pass was built for — a rule reporting against a field
-    nobody touched costs the uncontrolled form-contract row one commit and one
+    nobody touched costs the uncontrolled waypoint row one commit and one
     schema pass, and costs the react-hook-form <code>deps</code> configuration
     two passes and 402 paths judged.
   </p>

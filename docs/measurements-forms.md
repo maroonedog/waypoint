@@ -29,12 +29,12 @@ No milliseconds are published from this lane. jsdom does no layout and no paint,
 
 ## Policies
 
-Each subject is scored at the moment its OWN policy claims a verdict, and the citation is the library documentation rather than our reading of it. The on-change policy is the only policy form-contract has; the default of three of the libraries beside it is not.
+Each subject is scored at the moment its OWN policy claims a verdict, and the citation is the library documentation rather than our reading of it. The on-change policy is the only policy waypoint has; the default of three of the libraries beside it is not.
 
 | subject | library | policy | documented as | notes |
 |---|---|---|---|---|
-| form-contract-use-field | @maroonedog/form-contract | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | No validation-mode knob exists; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly. |
-| form-contract-uncontrolled | @maroonedog/form-contract | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for. |
+| form-contract-use-field | @maroonedog/waypoint | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | No validation-mode knob exists; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly. |
+| form-contract-uncontrolled | @maroonedog/waypoint | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for. |
 | hand-written-per-field-state | (none) | on-change | written for this benchmark to judge on every change | One useState per leaf, a mutable root, one whole-root pass per change, per-path notification. No store, no library. |
 | react-hook-form-scoped | react-hook-form | on-change | react-hook-form useForm options: mode | register with a per-leaf useFormState({name, exact}). mode onChange, criteriaMode all, shouldUnregister false. The root reads no formState. |
 | react-hook-form-deps | react-hook-form | on-change | react-hook-form register options: deps | The scoped subject plus register(name, { deps }) on the one field the shared schema makes another field depend on. |
@@ -47,7 +47,7 @@ Each subject is scored at the moment its OWN policy claims a verdict, and the ci
 
 Wiring fibers, measured by mounting each subject with no fields at all: form-contract-use-field 6, form-contract-uncontrolled 6, hand-written-per-field-state 3, react-hook-form-scoped 7, react-hook-form-deps 7, react-hook-form-on-submit 7, formik-use-field 5, formik-fast-field 5, tanstack-form-level 4. The trees are compared with these taken out, and the figure is taken rather than declared.
 
-form-contract is behind on 4 scenario(s); those rows are first:
+waypoint is behind on 4 scenario(s); those rows are first:
 
 - **K1**: 42 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **K2**: 84 changed fibers against 0 for `react-hook-form-on-submit`, which was scored **agrees at submit only**
@@ -101,7 +101,7 @@ form-contract is behind on 4 scenario(s); those rows are first:
 
 Wiring fibers, measured by mounting each subject with no fields at all: form-contract-use-field 6, form-contract-uncontrolled 6, hand-written-per-field-state 3, react-hook-form-scoped 7, react-hook-form-deps 7, react-hook-form-on-submit 7, formik-use-field 5, formik-fast-field 5, tanstack-form-level 4. The trees are compared with these taken out, and the figure is taken rather than declared.
 
-form-contract is behind on 4 scenario(s); those rows are first:
+waypoint is behind on 4 scenario(s); those rows are first:
 
 - **K1**: 72 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **K2**: 144 changed fibers against 0 for `react-hook-form-on-submit`, which was scored **agrees at submit only**
@@ -155,7 +155,7 @@ form-contract is behind on 4 scenario(s); those rows are first:
 
 Wiring fibers, measured by mounting each subject with no fields at all: form-contract-use-field 6, form-contract-uncontrolled 6, hand-written-per-field-state 3, react-hook-form-scoped 7, react-hook-form-deps 7, react-hook-form-on-submit 7, formik-use-field 5, formik-fast-field 5, tanstack-form-level 4. The trees are compared with these taken out, and the figure is taken rather than declared.
 
-form-contract is behind on 4 scenario(s); those rows are first:
+waypoint is behind on 4 scenario(s); those rows are first:
 
 - **K1**: 212 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **K2**: 424 changed fibers against 0 for `react-hook-form-on-submit`, which was scored **agrees at submit only**

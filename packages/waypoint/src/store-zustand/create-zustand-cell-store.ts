@@ -40,7 +40,7 @@ import {
  * punctuated so that nothing a host names for its own reasons lands on it:
  * colliding with this is something a caller has to spell out on purpose.
  */
-export const FORM_CELLS_MEMBER = "form-contract:cells";
+export const FORM_CELLS_MEMBER = "waypoint:cells";
 
 /** The part of a zustand store this adapter uses. */
 export interface CellStateApi<TState extends object> {

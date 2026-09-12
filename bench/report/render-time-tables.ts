@@ -58,7 +58,7 @@ export function renderResolution(result: TimeLaneResult): string {
     "",
     "The headline metric is `EventDispatch` filtered to `input`, and that " +
       "event closes before a microtask runs. A runtime that defers its work — " +
-      "form-contract coalesces its validation pass to a microtask — is " +
+      "waypoint coalesces its validation pass to a microtask — is " +
       "therefore cheap on this metric BY CONSTRUCTION, and the microtask and " +
       "macrotask columns above are the measurement that says so rather than an " +
       "argument that it might be true.",
@@ -159,7 +159,7 @@ export function renderComparisons(result: TimeLaneResult): string {
           "schema wrapper — the same wrapper that produces `validatorPasses` " +
           "in the counts lane. `runtime` is `input handler − validator` and is " +
           "a SUBTRACTION, not a measurement. It is only meaningful where the " +
-          "validation pass runs inside the dispatch: form-contract coalesces " +
+          "validation pass runs inside the dispatch: waypoint coalesces " +
           "its pass to a microtask and react-hook-form's resolver is " +
           "promise-based. Which of them is which is MEASURED, not assumed: " +
           "the harness counts how many passes ran while the input event was " +

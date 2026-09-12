@@ -51,7 +51,7 @@ Five members over an opaque key. The store is the swappable half; everything tha
 
 ```ts
 // ===========================================================================
-// packages/form-contract/src/core/store/form-cell-store.types.ts
+// packages/waypoint/src/core/store/form-cell-store.types.ts
 // ===========================================================================
 
 declare const CELL_VALUE: unique symbol;
@@ -144,7 +144,7 @@ export interface FormCellStore {
 Channels and key minting — the one file that decides the spelling, and the one file that casts:
 
 ```ts
-// packages/form-contract/src/core/store/cell-key.ts
+// packages/waypoint/src/core/store/cell-key.ts
 export type CellChannel =
   | "value" | "issues" | "touched" | "dirty" | "participating" | "rows" | "form";
 
@@ -166,7 +166,7 @@ Value and issues are **separate cells on purpose**: a component that displays on
 ### The shipped store
 
 ```ts
-// packages/form-contract/src/core/store/create-cell-store.ts
+// packages/waypoint/src/core/store/create-cell-store.ts
 export function createCellStore(seed?: ReadonlyMap<string, unknown>): FormCellStore {
   const cells = new Map<string, unknown>(seed);
   const listeners = createCellListenerIndex();
@@ -206,15 +206,15 @@ export function createCellStore(seed?: ReadonlyMap<string, unknown>): FormCellSt
 
 An earlier design's Zustand adapter notified its own router from inside `write()` and never called `api.subscribe`. A judge killed it: devtools time-travel, `persist` rehydration and the host app's own `api.setState` change Zustand and notify nobody, leaving every `useSyncExternalStore` snapshot stale and the DOM torn — which falsifies the one reason anyone wants R3. This version subscribes once and diffs.
 
-A second version was killed for the opposite half. Its `forget` spelled removal as `setState({ [key]: undefined })`, because removing a top-level key needs the REPLACING `setState` and that would destroy whatever the host application keeps beside the cells — a real reason, disclosed honestly in a comment, and still a leak: the slot survives, so a data grid that churns rows grows the state map without bound and the fifth member buys exactly nothing. **The cells therefore live under ONE member of the host's state, `FORM_CELLS_MEMBER` = `"form-contract:cells"`.** `forget` rebuilds that member without the key and merge-sets it: nothing the host owns is read, rewritten or removed, and `CellStateApi` still asks for `setState` in its merging form only. The copy is not a new cost — Zustand's merging `setState` already rebuilds the top-level object on every write, and that object used to hold every cell. The member name is punctuated so that colliding with it is something a caller has to spell out on purpose.
+A second version was killed for the opposite half. Its `forget` spelled removal as `setState({ [key]: undefined })`, because removing a top-level key needs the REPLACING `setState` and that would destroy whatever the host application keeps beside the cells — a real reason, disclosed honestly in a comment, and still a leak: the slot survives, so a data grid that churns rows grows the state map without bound and the fifth member buys exactly nothing. **The cells therefore live under ONE member of the host's state, `FORM_CELLS_MEMBER` = `"waypoint:cells"`.** `forget` rebuilds that member without the key and merge-sets it: nothing the host owns is read, rewritten or removed, and `CellStateApi` still asks for `setState` in its merging form only. The copy is not a new cost — Zustand's merging `setState` already rebuilds the top-level object on every write, and that object used to hold every cell. The member name is punctuated so that colliding with it is something a caller has to spell out on purpose.
 
 Owning the member also buys the diff a fact it could not previously have: the adapter knows that slice is exactly the cell set, so it can compare PRESENCE as well as value. "Absent" and "present holding `undefined`" are different cells — only the second is a value a field holds — and a diff on values alone calls a forget-then-revive no change at all.
 
 ```ts
-// packages/form-contract/src/store-zustand/create-zustand-cell-store.ts
+// packages/waypoint/src/store-zustand/create-zustand-cell-store.ts
 
 /** The member of the host's state that holds the cells. */
-export const FORM_CELLS_MEMBER = "form-contract:cells";
+export const FORM_CELLS_MEMBER = "waypoint:cells";
 
 /** Staged stand-in for "remove this key when the batch closes". A staged
  *  `undefined` cannot say it: that is a value a field may legitimately hold. */
@@ -295,7 +295,7 @@ Valtio, `@tanstack/store` and `@preact/signals-core` are the same shape and shor
 ### The contract is executable
 
 ```ts
-// packages/form-contract/src/core/store/assert-form-store-contract.ts
+// packages/waypoint/src/core/store/assert-form-store-contract.ts
 export type StoreContractExpect = (held: boolean, what: string) => void;
 
 /** An adapter author runs this. A store that passes it is substitutable; one
@@ -360,7 +360,9 @@ All three are the same primitive at three heights. Layer 1 is layer 2 with the d
 import {
   AutoForm, Field, FieldRows, FieldScope, FormProvider,
   useCreateForm, useField, useFieldIssues, useFormStatus,
-} from "form-contract-react";
+} from "@maroonedog/waypoint/react"; // the design wrote `form-contract-react`,
+                                     // one package per concern; ae4c192
+                                     // collapsed those into entry points
 import { luqResolver } from "@maroonedog/luq/form";
 
 interface Order {
@@ -464,7 +466,7 @@ function SubmitButton(): ReactElement {
 The binding a children function and a widget both receive:
 
 ```ts
-// packages/form-contract/src/react/field-binding.types.ts
+// packages/waypoint/src/react/field-binding.types.ts
 export interface FieldBinding<TValue> {
   readonly path: string;               // concrete: "items[3].quantity"
   readonly declaredPath: string;       // "items[*].quantity"
@@ -504,7 +506,7 @@ export interface FieldInputProps {
 
 **IME.** The store write is unconditional on every change event — a controlled input that skips a write during composition diverges from the store. What is suppressed while composing is **value coercion**: `build-input-props.ts` tracks composition and the runtime defers any normalize/transform of the value until `compositionend`. Transforming mid-composition is what actually breaks Japanese input, and it is the only part that can be deferred safely.
 
-**Widgets ship behind a separate entry point** (`form-contract-react/widgets`). `auto-form.tsx` imports zero widgets: the component set arrives as a prop or from `FormProvider`, so an app that only uses layer 3 never bundles an `<input>` this library authored. No CSS ships and no class names ship.
+**Widgets were designed to ship behind a separate entry point** (`form-contract-react/widgets`, in the one-package-per-concern layout ae4c192 replaced). No widget entry point exists: `packages/waypoint/package.json` declares seven exports and none of them is `widgets`. What did survive is the reason for the split — `auto-form.tsx` imports zero widgets: the component set arrives as a prop or from `FormProvider`, so an app that only uses layer 3 never bundles an `<input>` this library authored. No CSS ships and no class names ship.
 
 **Layer 1 can draw arrays.** The zod resolver states plainly that "a container contributes no descriptor of its own", so `fields` for `Order` is leaves only, with no `items` entry — which is why an earlier design's flagship `<AutoForm />` example did not run. `build-descriptor-tree.ts` derives the container structure from the `[*]` and `.` prefixes of the leaf paths and hands `AutoForm` a tree whose array nodes render a `<FieldRows>`. Array-level issues (`arrayMinLength`) report at path `items`, which has no descriptor; the tree carries a container node for it and `useFieldIssues("items")` reads them.
 
@@ -521,7 +523,7 @@ export interface FieldInputProps {
 **Validating the field on its own.**
 
 ```ts
-// packages/form-contract/src/core/runtime/create-field-handle.ts (the two methods)
+// packages/waypoint/src/core/runtime/create-field-handle.ts (the two methods)
 validate(): readonly FormIssue[] {
   const produced = port.validateRoot(store.read(ROOT_CELL), external);
   distributeIssues(produced);              // the whole map is written back
@@ -550,7 +552,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 
 ## 6. Module layout
 
-### `packages/form-contract/src/core` — vendor-neutral, no React, no Luq
+### `packages/waypoint/src/core` — vendor-neutral, no React, no Luq
 
 | File | Single responsibility |
 |---|---|
@@ -596,7 +598,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | `runtime/form.types.ts` | `FormHandle`, `FormOptions`, `RowsHandle` |
 | `index.ts` | Re-exports only |
 
-### `packages/form-contract/src/react`
+### `packages/waypoint/src/react`
 
 | File | Single responsibility |
 |---|---|
@@ -624,7 +626,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | `index.ts` | Re-exports only |
 | `widgets/*.tsx` | One file per kind, behind a separate entry point |
 
-### `packages/form-contract/src/store-zustand`
+### `packages/waypoint/src/store-zustand`
 
 `create-zustand-cell-store.ts`, `index.ts`. Its test file is `assertFormStoreContract(() => createZustandCellStore(createStore(() => ({}))), expect)` and nothing else.
 
@@ -642,7 +644,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | `src/form/luq-issues-to-form-issues.ts` | `ValidationIssue` → `FormIssue` |
 | `src/form/index.ts` | The new `@maroonedog/luq/form` subpath |
 
-**Luq ships a `/form` subpath exporting `luqResolver`, and the declaration recorder becomes the default.** Both halves are load-bearing, and each one closes a blocker a judge raised as fatal. The recorder installs only as a module-scope side effect of `to-standard-json-schema.ts`, which `"sideEffects": false` permits a production bundler to drop — so descriptors would be empty in the production build and correct in development, which is the worst failure shape available; that same import also drags the whole JSON Schema emitter into a browser form bundle. And `readDeclaredCalls` reaches no barrel, so nothing outside the package can read what was declared without a deep import that Node's subpath encapsulation refuses. Making the recorder the default costs one array copy per chain step at `build()` time — once per validator, never per `validate()`. `luqResolver` returns a `FormAdapter<T, TDeclared>`; `build()` gains no member and Luq takes **no dependency on form-contract**, because the adapter is built by the subpath rather than carried by the validator. `build(): Validator<T, T, TDeclared>` is the one signature change, and its third parameter defaults to `FieldPath<T> & string`, so every existing `Validator<T>` is unaffected.
+**Luq ships a `/form` subpath exporting `luqResolver`, and the declaration recorder becomes the default.** Both halves are load-bearing, and each one closes a blocker a judge raised as fatal. The recorder installs only as a module-scope side effect of `to-standard-json-schema.ts`, which `"sideEffects": false` permits a production bundler to drop — so descriptors would be empty in the production build and correct in development, which is the worst failure shape available; that same import also drags the whole JSON Schema emitter into a browser form bundle. And `readDeclaredCalls` reaches no barrel, so nothing outside the package can read what was declared without a deep import that Node's subpath encapsulation refuses. Making the recorder the default costs one array copy per chain step at `build()` time — once per validator, never per `validate()`. `luqResolver` returns a `FormAdapter<T, TDeclared>`; `build()` gains no member and Luq takes **no dependency on waypoint**, because the adapter is built by the subpath rather than carried by the validator. `build(): Validator<T, T, TDeclared>` is the one signature change, and its third parameter defaults to `FieldPath<T> & string`, so every existing `Validator<T>` is unaffected.
 
 ---
 

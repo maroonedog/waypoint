@@ -63,10 +63,10 @@ const { z } = await import("zod");
 const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const axe = (await import("axe-core")).default;
-const { zodFormResolver } = await import("@maroonedog/form-contract/resolver-zod");
-const { createForm } = await import("@maroonedog/form-contract/core");
+const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
+const { createForm } = await import("@maroonedog/waypoint/core");
 const { FieldRows, FormProvider, useErrorSummary, useField } = await import(
-  "@maroonedog/form-contract/react"
+  "@maroonedog/waypoint/react"
 );
 
 const { act, createElement: h, Fragment } = React;

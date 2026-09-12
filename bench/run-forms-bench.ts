@@ -77,7 +77,7 @@ const sections: string[] = [
   "",
   "Each subject is scored at the moment its OWN policy claims a verdict, and " +
     "the citation is the library documentation rather than our reading of it. " +
-    "The on-change policy is the only policy form-contract has; the default " +
+    "The on-change policy is the only policy waypoint has; the default " +
     "of three of the libraries beside it is not.",
   "",
   [
@@ -125,8 +125,8 @@ for (const run of runs) {
       "rather than declared.",
     "",
     losses.length === 0
-      ? "form-contract is not behind any subject at this size."
-      : `form-contract is behind on ${losses.length} scenario(s); those rows are first:\n\n` +
+      ? "waypoint is not behind any subject at this size."
+      : `waypoint is behind on ${losses.length} scenario(s); those rows are first:\n\n` +
         losses
           .map(
             (loss) =>

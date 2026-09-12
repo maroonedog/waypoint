@@ -1,6 +1,6 @@
 # WCAG 2.2 A and AA, criterion by criterion
 
-Every Level A and Level AA success criterion in WCAG 2.2, with one verdict each about `@maroonedog/form-contract`. Fifty-five rows. The interesting ones are the refusals.
+Every Level A and Level AA success criterion in WCAG 2.2, with one verdict each about `@maroonedog/waypoint`. Fifty-five rows. The interesting ones are the refusals.
 
 **No row says "discharges", and that is the most important sentence here.** This library renders nothing. It hands back prop bags — `inputProps`, `labelProps`, `descriptionProps`, `errorProps` — and an application spreads them onto markup it wrote itself. A library in that position cannot discharge a success criterion, because the artefact a criterion is evaluated against is the rendered document, and this package is never the last hand on it. The most it can do is make the correct attributes the default and the incorrect ones impossible to derive. So the verdicts are:
 

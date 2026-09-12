@@ -17,15 +17,15 @@
 // nothing to suppress is itself an error.
 // ===========================================================================
 import { z } from "zod";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
-import { createForm, summarizeIssues } from "@maroonedog/form-contract/core";
-import type { FormIssue } from "@maroonedog/form-contract";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
+import { createForm, summarizeIssues } from "@maroonedog/waypoint/core";
+import type { FormIssue } from "@maroonedog/waypoint";
 import type {
   CellSource,
   FieldIssueSummary,
-} from "@maroonedog/form-contract/core";
-import { useErrorSummary } from "@maroonedog/form-contract/react";
-import type { ErrorSummary } from "@maroonedog/form-contract/react";
+} from "@maroonedog/waypoint/core";
+import { useErrorSummary } from "@maroonedog/waypoint/react";
+import type { ErrorSummary } from "@maroonedog/waypoint/react";
 
 const form = createForm({
   adapter: zodFormResolver(

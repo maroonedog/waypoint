@@ -21,12 +21,12 @@ import type {
   FormPaths,
   FormValues,
   FormFieldDescriptor,
-} from "@maroonedog/form-contract";
+} from "@maroonedog/waypoint";
 import {
   standardFormResolver,
   type StandardSchemaV1,
   type StandardSchemaWithJSON,
-} from "@maroonedog/form-contract/resolver-standard";
+} from "@maroonedog/waypoint/resolver-standard";
 
 /** Fails to compile unless both sides are the same type. */
 type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;

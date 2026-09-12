@@ -5,7 +5,7 @@
 //
 // Losses sort first. A benchmark whose author sorts their own row to the top
 // is asking to be disbelieved, and sorting by the figure means the order
-// changes silently when a number does. Rows where form-contract is behind are
+// changes silently when a number does. Rows where waypoint is behind are
 // printed above rows where it is ahead, and the ordering is stated in the
 // heading rather than left for a reader to discover.
 //

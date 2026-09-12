@@ -26,10 +26,10 @@ import { Builder } from "@maroonedog/luq";
 import { requiredPlugin } from "@maroonedog/luq/plugins/required";
 import { toStandardJsonSchema } from "@maroonedog/luq/standard-schema";
 import { z } from "zod";
-import type { FieldPath, FormPaths, FormValues } from "@maroonedog/form-contract";
-import { luqFormResolver } from "@maroonedog/form-contract/resolver-luq";
-import { standardFormResolver } from "@maroonedog/form-contract/resolver-standard";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import type { FieldPath, FormPaths, FormValues } from "@maroonedog/waypoint";
+import { luqFormResolver } from "@maroonedog/waypoint/resolver-luq";
+import { standardFormResolver } from "@maroonedog/waypoint/resolver-standard";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 
 /** Fails to compile unless both sides are the same type. */
 type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;

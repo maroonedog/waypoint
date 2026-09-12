@@ -1,5 +1,5 @@
 // ===========================================================================
-// form-contract-registration.ts — the benchmark's form, registered.
+// waypoint-registration.ts — the benchmark's form, registered.
 //
 // Every hook in the `./react` entry reads its paths from the type registry,
 // and this program's form has none to give: the schema is GENERATED, one leaf
@@ -13,9 +13,9 @@
 // down, and it is a line of the application's own source rather than a second
 // API for everyone else to choose between.
 // ===========================================================================
-import type { FormAdapter } from "@maroonedog/form-contract";
+import type { FormAdapter } from "@maroonedog/waypoint";
 
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: FormAdapter<unknown, string>;
   }

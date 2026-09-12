@@ -70,7 +70,7 @@ async function measure(id: string, contents: string): Promise<SizeRow> {
   };
 }
 
-const PACKAGE = "@maroonedog/form-contract";
+const PACKAGE = "@maroonedog/waypoint";
 
 /**
  * Every barrel, then the handful of names a screen imports, then the two

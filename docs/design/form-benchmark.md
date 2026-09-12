@@ -1,6 +1,6 @@
-# `bench/` — the form-runtime comparison harness for `C:/projects/form-contract`
+# `bench/` — the form-runtime comparison harness
 
-Command: `npm run bench:forms`. Baselines: `C:/projects/form-contract/config/form-baseline.json` (+ `.ci.json`). Report: `C:/projects/form-contract/docs/measurements-forms.md`.
+Command: `npm run bench:forms`. Baseline: `config/form-baseline.json`, which is the only baseline this lane reads or writes. Report: `docs/measurements-forms.md`. Paths here are given from the repository root: these two lines used to hard-code an absolute path on one author's machine, and they used to name a `form-baseline.ci.json` beside it that has never existed in `config/`.
 
 Built from the agreement-first design, with the null experiment and calibration ladder from the browser design, the harness-owned fiber counting from the counts design, and every attack disposition recorded in Appendix A.
 
@@ -8,7 +8,7 @@ Built from the agreement-first design, with the null experiment and calibration 
 
 ## 1. The decision
 
-Five form runtimes plus two hand-written references are driven through one scripted transcript against **one zod schema instance the harness owns and instruments**, rendering **one DOM the harness owns and hashes**, in **two lanes**: a *counts lane* (jsdom, production React, deterministic integers, gated in CI on every push) and a *time lane* (headless Chrome over CDP, microseconds taken from the browser's own trace, printed and never gated). Nothing is timed until every subject has been shown — reading the rendered DOM only — to have reached the same observable state *within its own declared validation policy*, and the policy is an axis of the matrix rather than a defect of the competitor. What makes it trustworthy is five mechanisms a sceptic can check without trusting the author: **(a)** no count is produced by code any adapter author wrote — renders come from fiber alternates, validation work from a harness-owned schema wrapper, DOM changes from a `MutationObserver`, so there is no counter to place favourably; **(b)** the validator wrapper records passes, paths judged **and** nanoseconds, so "fast because it validated less" and "cheap because the store is cheap" are arithmetically separable; **(c)** the harness publishes its own resolution *above* its results — a null experiment (form-contract against a byte-identical twin) and a calibration ladder with known cost injected at three scheduling positions — and any band overlapping the null band prints `indistinguishable`, never a win; **(d)** both ends of every library's dial are published **including form-contract's** (zustand store, `<Field>` render prop, `AutoForm`); **(e)** losses sort first, are gated by row *identity* rather than count, and a disappearing loss row fails CI until a reviewed recalibration diff explains it.
+Five form runtimes plus two hand-written references are driven through one scripted transcript against **one zod schema instance the harness owns and instruments**, rendering **one DOM the harness owns and hashes**, in **two lanes**: a *counts lane* (jsdom, production React, deterministic integers, gated in CI on every push) and a *time lane* (headless Chrome over CDP, microseconds taken from the browser's own trace, printed and never gated). Nothing is timed until every subject has been shown — reading the rendered DOM only — to have reached the same observable state *within its own declared validation policy*, and the policy is an axis of the matrix rather than a defect of the competitor. What makes it trustworthy is five mechanisms a sceptic can check without trusting the author: **(a)** no count is produced by code any adapter author wrote — renders come from fiber alternates, validation work from a harness-owned schema wrapper, DOM changes from a `MutationObserver`, so there is no counter to place favourably; **(b)** the validator wrapper records passes, paths judged **and** nanoseconds, so "fast because it validated less" and "cheap because the store is cheap" are arithmetically separable; **(c)** the harness publishes its own resolution *above* its results — a null experiment (waypoint against a byte-identical twin) and a calibration ladder with known cost injected at three scheduling positions — and any band overlapping the null band prints `indistinguishable`, never a win; **(d)** both ends of every library's dial are published **including waypoint's** (zustand store, `<Field>` render prop, `AutoForm`); **(e)** losses sort first, are gated by row *identity* rather than count, and a disappearing loss row fails CI until a reviewed recalibration diff explains it.
 
 ---
 
@@ -20,14 +20,14 @@ Versions are read at run time from `node_modules/<pkg>/package.json` on disk (ne
 
 **No JSX anywhere.** Verified on the installed Node 23: `--experimental-strip-types` does not strip `.tsx` — it loads it as plain JS and throws. Every subject is a `.ts` file using `React.createElement` (aliased `h`). The browser lane builds the *same* `.ts` files through vite, so the two lanes cannot diverge by a build step.
 
-**Two tree classes.** A subject in class `equal-tree` renders the harness's `shared-leaf.ts` with **no additional component boundary**, and `assert-tree-fibers-match.ts` fails the run if its `treeFibers` differs from any other `equal-tree` subject for the same shape. A subject whose idiom structurally requires a boundary (Formik `FastField`, TanStack `form.Field` render prop, form-contract `<Field>`, `AutoForm`) is class `own-tree`: it publishes `treeFibers` and a `Δfibers` column, and its fiber counts are never printed beside an `equal-tree` subject without that delta on the same row. This closes the 605-vs-405 rig without pretending a render-prop API does not exist.
+**Two tree classes.** A subject in class `equal-tree` renders the harness's `shared-leaf.ts` with **no additional component boundary**, and `assert-tree-fibers-match.ts` fails the run if its `treeFibers` differs from any other `equal-tree` subject for the same shape. A subject whose idiom structurally requires a boundary (Formik `FastField`, TanStack `form.Field` render prop, waypoint `<Field>`, `AutoForm`) is class `own-tree`: it publishes `treeFibers` and a `Δfibers` column, and its fiber counts are never printed beside an `equal-tree` subject without that delta on the same row. This closes the 605-vs-405 rig without pretending a render-prop API does not exist.
 
 `shared-leaf.ts` owns the `<label>`, the `<input>`, the `aria-invalid` attribute and the `<em>` message node. A subject supplies only `{ value, onInput, onBlur, invalid, message }`.
 
-### 2.1 form-contract — `useField`, shipped store (`equal-tree`, the primary row)
+### 2.1 waypoint — `useField`, shipped store (`equal-tree`, the primary row)
 
 ```ts
-// bench/subjects/form-contract-use-field-subject.ts
+// bench/subjects/waypoint-use-field-subject.ts
 const Leaf = ({ path, label }: LeafProps) => {
   const f = useField(path);
   return h(SharedLeaf, {
@@ -41,9 +41,9 @@ const Leaf = ({ path, label }: LeafProps) => {
 };
 ```
 
-Knobs: there are four (`adapter`, `defaultValues`, `store`, `validateOn`). This row said there were three and that none was a validation mode; it has been corrected rather than deleted. `FormOptions` in `packages/form-contract/src/core/runtime/form.types.ts` now carries `validateOn: "change" | "blur" | "submit"`, defaulting to `"change"`, which is the setting every subject in this lane is measured under. It is a FORM-level knob and not a per-field one, because one pass judges the whole root — **that remains a published difference from the four competitors, in words, not folded into a number.** `f.inputProps` is deliberately not used: `build-input-props.ts` emits descriptor-derived `required`/`min`/`max`/`pattern`, which would change the DOM and therefore the layout cost. The `inputProps` path ships as `form-contract-auto-form-subject` in `own-tree`, with its extra DOM-attribute count published.
+Knobs: there are four (`adapter`, `defaultValues`, `store`, `validateOn`). This row said there were three and that none was a validation mode; it has been corrected rather than deleted. `FormOptions` in `packages/waypoint/src/core/runtime/form.types.ts` now carries `validateOn: "change" | "blur" | "submit"`, defaulting to `"change"`, which is the setting every subject in this lane is measured under. It is a FORM-level knob and not a per-field one, because one pass judges the whole root — **that remains a published difference from the four competitors, in words, not folded into a number.** `f.inputProps` is deliberately not used: `build-input-props.ts` emits descriptor-derived `required`/`min`/`max`/`pattern`, which would change the DOM and therefore the layout cost. The `inputProps` path was designed to ship as an `own-tree` subject with its extra DOM-attribute count published; that subject has not been written, and `bench/subjects/` holds no configuration that uses `inputProps`.
 
-### 2.2 form-contract — zustand store (`equal-tree`)
+### 2.2 waypoint — zustand store (`equal-tree`)
 
 Identical leaf, `store: createZustandFormStore()`. Present because design §7 item 6 concedes a broadcast-backed adapter cannot reach O(1) notification, costing one `Object.is` per observed key per write. The author's own slower configuration is a subject, for the same reason the competitors' are.
 
@@ -133,7 +133,7 @@ Charged to TanStack and stated as such: `FormApi.mount()` unconditionally subscr
 | `flat-20` | 20 | 20 | 3 | the default rung |
 | `flat-60` / `flat-200` / `flat-500` | same | same | 3 | the sweep; 500 because RHF's own advertised regime is 1,000 fields and stopping at 200 is how a benchmark gets dismissed |
 | `sectioned-200` | 200 | 200 | 3 | section granularity alone moved fiber visits 207 → 37 at the same render count; both are published |
-| `wizard-200-of-20` | 200 | 20 | 0 | the regime where form-contract seeds every cell up front and RHF's `register` is lazy. The schema is shared, so the zod pass is identical and the only difference is mount and fan-out |
+| `wizard-200-of-20` | 200 | 20 | 0 | the regime where waypoint seeds every cell up front and RHF's `register` is lazy. The schema is shared, so the zod pass is identical and the only difference is mount and fan-out |
 | `array-12` | 20 | 20 | 12 | twelve rows, so a splice at index 0 moves eleven |
 
 The typed field is recorded per interaction and swept over `{first, middle, last}` leaf — in `sectioned-200` its depth changes fiber visits directly.
@@ -153,7 +153,7 @@ The typed field is recorded per interaction and swept over `{first, middle, last
 | `A2` | remove row at index 0 | the README states the cost outright: "splicing at index 0 re-subscribes every following row". At 12 rows this moves eleven |
 | `A3` | remove a row from the middle | the cheaper index, published beside `A2` so the difference is visible |
 | `A4` | insert at index 0 | mints a row id and grows the array; worse than `A2` |
-| `S1` | submit an empty form | the heaviest real interaction there is, and form-contract's per-path scatter worst case: N issue writes, N notifications, one commit. Absent from all three candidate designs |
+| `S1` | submit an empty form | the heaviest real interaction there is, and waypoint's per-path scatter worst case: N issue writes, N notifications, one commit. Absent from all three candidate designs |
 | `U1` | hide a subtree holding a rejected value, then submit | |
 | `U2` | unmount then remount a field holding an error; read its **first** render | design §8 test 4; the one capability TanStack fails |
 | `R1` | `reset()` | |
@@ -167,7 +167,7 @@ The typed field is recorded per interaction and swept over `{first, middle, last
 
 ### 4.1 The oracle is a policy, and the policy is an axis
 
-`oracle-verdict.ts` applies the scenario's edits to a `structuredClone` of the defaults with a plain reducer (no React, no form library) and asks the shared schema what it thinks. That is **not** neutral ground truth: "the whole root, judged on every settled change, every issue on its own path, no touched-gating" is a sentence-for-sentence description of form-contract's own runtime. So the oracle is parameterised by `policy.ts`:
+`oracle-verdict.ts` applies the scenario's edits to a `structuredClone` of the defaults with a plain reducer (no React, no form library) and asks the shared schema what it thinks. That is **not** neutral ground truth: "the whole root, judged on every settled change, every issue on its own path, no touched-gating" is a sentence-for-sentence description of waypoint's own runtime. So the oracle is parameterised by `policy.ts`:
 
 - `on-change` — a verdict is claimed after every settled change
 - `on-blur` — after blur, and after the first submit
@@ -177,7 +177,7 @@ Each subject **declares** its policy. Agreement is scored *within* the declared 
 
 `agrees` · `agrees at submit only` · `by design (documented: <citation>)` · `not applicable (capability: <citation>)` · `disagrees`
 
-RHF's `mode: "onSubmit"` default prints `by design (documented)` with a link to the RHF option table, **not** `disagrees`. Section 1 of the report is labelled a **policy-conformance matrix**, not an oracle of correctness, and the first sentence under its heading says that the on-change policy is form-contract's only policy and that three of the four competitors ship a different default.
+RHF's `mode: "onSubmit"` default prints `by design (documented)` with a link to the RHF option table, **not** `disagrees`. Section 1 of the report is labelled a **policy-conformance matrix**, not an oracle of correctness, and the first sentence under its heading says that the on-change policy is waypoint's only policy and that three of the four competitors ship a different default.
 
 ### 4.2 Channels
 
@@ -191,7 +191,7 @@ Three, read from the rendered DOM only, never through a library API:
 
 Three separate dispositions, and none of them is free:
 
-- **`not applicable`** is decided *before* the scenario runs, from the capability the scenario `requires` and the capabilities the subject declares, with a reason written by the adapter author in code. Every subject must contribute at least one capability to the vocabulary (this is asserted). The example that used to stand here — `validateOn` / `mode` as a capability form-contract lacked — expired when `FormOptions.validateOn` shipped. What form-contract still does not have, and what the vocabulary should draw on instead, is a PER-FIELD mode: one pass judges the whole root, so a field set to `"blur"` would be re-judged the moment any other field changed.
+- **`not applicable`** is decided *before* the scenario runs, from the capability the scenario `requires` and the capabilities the subject declares, with a reason written by the adapter author in code. Every subject must contribute at least one capability to the vocabulary (this is asserted). The example that used to stand here — `validateOn` / `mode` as a capability waypoint lacked — expired when `FormOptions.validateOn` shipped. What waypoint still does not have, and what the vocabulary should draw on instead, is a PER-FIELD mode: one pass judges the whole root, so a field set to `"blur"` would be re-judged the moment any other field changed.
 - **`by design`** carries a citation to the library's own documentation and a **repair row**: where a supported configuration exists (`register(name,{deps})`, `onChangeListenTo`, Formik's `validate` prop), the repaired configuration is measured and its price published in the same table. "It cannot do this" and "it can, and here is what it costs" are different sentences.
 - **`disagrees`** publishes both strings side by side. Its counts stay visible and struck through, and **it stays in the losses list**. Disagreeing rows are excluded only from ratio sentences in the timing section — never from the losses list, because the cheapest competitor configurations are exactly the ones that disagree, and removing them from the loss list by a fairness rule would be the rig.
 
@@ -215,18 +215,18 @@ Only after all six pass is anything written to the baseline.
 | metric | means | does NOT mean |
 |---|---|---|
 | `commits` | times React committed for this interaction, from `onCommitFiberRoot`, **filtered by fiber root** (two subjects are mounted in one document during an interleaved pair; an unfiltered hook puts the idle partner's commits in the active subject's exact-gated column) | not work, not time. A commit that touched one text node and one that rebuilt 200 inputs both read 1 |
-| `fiberVisits` | fibers cloned into the committed tree, **diffed per commit against its immediate predecessor**. The naive first-vs-last diff reads 0 whenever a step produces an even number of commits (React double-buffers alternates): measured 0 against a true 56 on exactly the case form-contract is slowest at | a total. It is a **floor** — a render React discarded leaves no trace, and the architecture that discards renders is form-contract's own (§7 item 5). Exact only under SyncLane, which holds for form-contract and TanStack (`useSyncExternalStore` → hard-coded lane 2) and degrades to a floor for RHF and Formik, which commit from a promise continuation on DefaultLane |
-| `rerendered` | of those, how many ran their function, inferred from `memoizedProps`/`memoizedState` identity against the alternate | also a floor: a component React invoked whose props and state are both referentially unchanged classifies as bailed. And it is not a cost — Formik's `FastField` shows N trivial `connect` wrapper renders at full weight against form-contract's 2 |
+| `fiberVisits` | fibers cloned into the committed tree, **diffed per commit against its immediate predecessor**. The naive first-vs-last diff reads 0 whenever a step produces an even number of commits (React double-buffers alternates): measured 0 against a true 56 on exactly the case waypoint is slowest at | a total. It is a **floor** — a render React discarded leaves no trace, and the architecture that discards renders is waypoint's own (§7 item 5). Exact only under SyncLane, which holds for waypoint and TanStack (`useSyncExternalStore` → hard-coded lane 2) and degrades to a floor for RHF and Formik, which commit from a promise continuation on DefaultLane |
+| `rerendered` | of those, how many ran their function, inferred from `memoizedProps`/`memoizedState` identity against the alternate | also a floor: a component React invoked whose props and state are both referentially unchanged classifies as bailed. And it is not a cost — Formik's `FastField` shows N trivial `connect` wrapper renders at full weight against waypoint's 2 |
 | `bailedClones` | `fiberVisits − rerendered` | — |
 | `domMutations` | `MutationObserver` records on the subject's host subtree | not layout. jsdom charges nothing for the consequence |
 | `treeFibers` | committed tree size, per subject per shape | — |
 | `validatorPasses` | calls into the shared schema per interaction | **not work.** 1 at N=20 and 1 at N=500 |
-| `pathsJudged` | leaf paths the call could reject, summed over calls | the metric that makes granularity a wash: TanStack field-level reads 20 passes × 1 path against form-contract's 1 × 20 |
+| `pathsJudged` | leaf paths the call could reject, summed over calls | the metric that makes granularity a wash: TanStack field-level reads 20 passes × 1 path against waypoint's 1 × 20 |
 | `mountCommits` / `mountFiberVisits` | the same, for `M1`/`M2` | — |
 
 `componentBodyInvocations` is **not published at all**, in either tier. Printing a number beside a note saying it is not comparable is how the number gets compared. The refusal is stated in the report, with the measured demonstration behind it: a counter on the obvious per-field wrapper reported **0 renders for a keystroke that visibly changed the DOM**, because the subscription lives one component below.
 
-### Tier 2 — self-audit. form-contract only, **gated**, no competitor column.
+### Tier 2 — self-audit. waypoint only, **gated**, no competitor column.
 
 **Built.** `npm run bench:self-audit`; baseline `config/self-audit-baseline.json`; report `docs/measurements-self-audit.md`; gated by `npm run bench:self-audit:check`, which runs in `verify.yml`. Obtained from `counting-cell-store.ts`, a `FormCellStore` decorator that satisfies the contract and counts, handed to `createForm` through `FormOptions.store` — nothing in `packages/` is instrumented in order to be measured. Driven through `./core` with **no React**, because the number this tier exists for is the one React cannot see, and the subscription it installs per field is the one `useCell` hands to `useSyncExternalStore`.
 
@@ -247,7 +247,7 @@ Stated in the report: this tier gates the author's library against the author's 
 
 ### Tier 3 — printed, hedged, not counts.
 
-`bytesPerInteraction` (heapUsed delta over 500 drained interactions under `--expose-gc`, three repeats with spread), `retainedHeapAfterMount` per field (the cross-library mount-cost metric), `bundleBytes` (each subject's entry built through one vite config, gzipped, minus a React-only baseline entry — a rough attribution, labelled as one). RHF is the ~9 kB zero-dependency incumbent and form-contract ships one package with seven entry points; a benchmark that counts nine kinds of render work and no bytes leaves a reader assuming bytes were checked.
+`bytesPerInteraction` (heapUsed delta over 500 drained interactions under `--expose-gc`, three repeats with spread), `retainedHeapAfterMount` per field (the cross-library mount-cost metric), `bundleBytes` (each subject's entry built through one vite config, gzipped, minus a React-only baseline entry — a rough attribution, labelled as one). RHF is the ~9 kB zero-dependency incumbent and waypoint ships one package with seven entry points; a benchmark that counts nine kinds of render work and no bytes leaves a reader assuming bytes were checked.
 
 ### Tier 4 — time. Browser lane only. **Printed, never gated.**
 
@@ -267,7 +267,7 @@ Production React, asserted three ways: `NODE_ENV === "production"` set before an
 
 Every count is taken **three times**. `stability-screen.ts` promotes an integer to the gated tier only if all three reads are identical; anything else is demoted to the printed tier automatically, in the recorder, not by hand. (Measured precedent: `RecalcStyleCount` read 2 per 40 keystrokes in one probe and 0 in another.)
 
-`settle.ts` runs `await null; await null; await new Promise(r => setTimeout(r, 0))` between interactions and before every verdict read. In a tight synchronous loop the microtask queue never drains, `schedule-validation.ts` never fires, and form-contract's whole-root pass vanishes entirely — measured elsewhere at **0 adapter calls in 400 keystrokes**, a 1.62× flattery on work not done. `validatorPasses` is the cross-check: 0 for a subject declared `on-change` fails the run.
+`settle.ts` runs `await null; await null; await new Promise(r => setTimeout(r, 0))` between interactions and before every verdict read. In a tight synchronous loop the microtask queue never drains, `schedule-validation.ts` never fires, and waypoint's whole-root pass vanishes entirely — measured elsewhere at **0 adapter calls in 400 keystrokes**, a 1.62× flattery on work not done. `validatorPasses` is the cross-check: 0 for a subject declared `on-change` fails the run.
 
 **How a count earns the right to be called real:** a difference of ≥1 reproduced identically on all three repeats. There is no threshold to justify.
 
@@ -281,9 +281,9 @@ Headless Chrome via `playwright-core` (no browser download; `--browser=chrome` d
 - interactions are dispatched as one batched CDP sequence per interaction, then a macrotask and a presented frame. Awaiting each key press individually makes over 99% of the measurement the driver
 - a `PerformanceObserver` on `entryTypes:["gc"]` attributes GC milliseconds per sample and publishes them as a column. Samples are never dropped; a 4.2 ms pause against a 48 ms sample is 9% and the reader is entitled to see it
 
-**Resolution, published above the results.** `measure-null-band.ts` runs **a null twin per subject per size rung**, interleaved through the run rather than once at the start (variance scales with work, so calibrating every verdict on form-contract's self-pair would declare Formik rows "resolved" inside their own noise). Null and comparison pair counts are pinned equal and reported as quantiles, not min-max, because a min-max band widens with N and would otherwise make the sample count the cheapest knob in the design.
+**Resolution, published above the results.** `measure-null-band.ts` runs **a null twin per subject per size rung**, interleaved through the run rather than once at the start (variance scales with work, so calibrating every verdict on waypoint's self-pair would declare Formik rows "resolved" inside their own noise). Null and comparison pair counts are pinned equal and reported as quantiles, not min-max, because a min-max band widens with N and would otherwise make the sample count the cheapest knob in the design.
 
-`measure-calibration-ladder.ts` injects a known cost of 0 / 0.1 / 0.25 / 0.5 / 1 / 2 / 4 ms at **three scheduling positions** — synchronous in the handler, `Promise.resolve().then`, `setTimeout(0)` — because form-contract defers its pass to a microtask and the headline metric is `EventDispatch` filtered to `input`; a synchronous-only ladder proves resolution for the one cost shape the harness already sees best.
+`measure-calibration-ladder.ts` injects a known cost of 0 / 0.1 / 0.25 / 0.5 / 1 / 2 / 4 ms at **three scheduling positions** — synchronous in the handler, `Promise.resolve().then`, `setTimeout(0)` — because waypoint defers its pass to a microtask and the headline metric is `EventDispatch` filtered to `input`; a synchronous-only ladder proves resolution for the one cost shape the harness already sees best.
 
 **How a time difference earns the right to be called real:** its pair-ratio band must (a) not overlap the null band for that subject pair at that size rung, and (b) exceed the smallest ladder rung resolved at that scheduling position. Otherwise `summarise-samples.ts` returns `indistinguishable`, and the report prints that word. A harness whose resolution is published cannot round 6% up into a win.
 
@@ -296,6 +296,8 @@ Headless Chrome via `playwright-core` (no browser download; `--browser=chrome` d
 ## 7. File layout
 
 Every file kebab-case, one responsibility, under 200 lines, `.ts` only.
+
+**This tree is the layout the design asked for, not a listing of what `bench/` holds.** Several entries below were never written — the three extra subjects are marked where they appear — so read it as the plan and `ls bench/` for the fact.
 
 ```
 bench/
@@ -330,10 +332,11 @@ bench/shape/
 bench/subjects/
   subject.types.ts              FormSubject, Capability, Policy, TreeClass
   subject-registry.ts           SUBJECTS + SUBJECTS_OUTSIDE_THE_GATE (in code, never in JSON)
-  form-contract-use-field-subject.ts
-  form-contract-field-component-subject.ts
-  form-contract-zustand-subject.ts
-  form-contract-auto-form-subject.ts
+  waypoint-use-field-subject.ts
+  waypoint-uncontrolled-subject.ts   written instead of the three below
+  waypoint-field-component-subject.ts   NEVER WRITTEN
+  waypoint-zustand-subject.ts           NEVER WRITTEN
+  waypoint-auto-form-subject.ts         NEVER WRITTEN
   react-hook-form-scoped-subject.ts
   react-hook-form-root-errors-subject.ts
   react-hook-form-root-isvalid-subject.ts
@@ -423,9 +426,9 @@ bench/report/
   render-markdown-tables.ts
   write-form-report.ts
 
-config/form-baseline.json, config/form-baseline.ci.json
+config/form-baseline.json         (the planned form-baseline.ci.json was never written)
 docs/measurements-forms.md
-.github/workflows/forms-counts.yml, forms-time.yml
+.github/workflows/forms-counts.yml, forms-time.yml   (shipped as bench-forms.yml, bench-forms-time.yml)
 ```
 
 ---
@@ -436,17 +439,17 @@ docs/measurements-forms.md
 
 **§0 — What this harness can see.** Before any comparison: the null band per subject per rung, the calibration ladder as injected-ms × scheduling-position × resolved/not, and one generated sentence — *"this harness sees a 0.1 ms per-keystroke difference at the synchronous position, 0.25 ms at the microtask position, and exactly one extra commit."* Generated by `measure-gate-resolution.ts`, inside a fence, so it cannot drift into being wrong while still being quoted.
 
-**§1 — Where form-contract is not first.** Produced by `order-losses-first.ts` by sorting every table by form-contract's rank and emitting every row where it is beaten, **sorted by magnitude within rank** so "beaten by one fiber visit" and "beaten 1000× on bytes" do not sit undifferentiated. Disagreeing rows are in this list, annotated. Each row carries its **mechanism**, not just its number.
+**§1 — Where waypoint is not first.** Produced by `order-losses-first.ts` by sorting every table by waypoint's rank and emitting every row where it is beaten, **sorted by magnitude within rank** so "beaten by one fiber visit" and "beaten 1000× on bytes" do not sit undifferentiated. Disagreeing rows are in this list, annotated. Each row carries its **mechanism**, not just its number.
 
 **§2 — What was run.** Machine, react/react-dom/jsdom/zod, each competitor version read from disk, the three production assertions, and per subject: `policy`, `configuration` literal, `writtenFrom` documentation URL, `treeClass`, and the reviewer line (§9).
 
-**§3 — Policy-conformance matrix.** Scenario × subject, five cell values, with the standing sentence that the on-change policy is form-contract's own and three of four competitors ship a different default. Capabilities are listed per subject, both directions.
+**§3 — Policy-conformance matrix.** Scenario × subject, five cell values, with the standing sentence that the on-change policy is waypoint's own and three of four competitors ship a different default. Capabilities are listed per subject, both directions.
 
 **§4 — Disagreement detail.** Every mismatch in full: scenario, observation point, channel, path, both strings verbatim. Not summarised to a count.
 
 **§5 — Counts.** Tier 1, per interaction per subject, with `validatorPasses` and `pathsJudged` on the same row so a 0-commit row can never be read as free, and `Δfibers` on every `own-tree` row.
 
-**§6 — Self-audit.** Tier 2, form-contract only, with the no-competitor-column note.
+**§6 — Self-audit.** Tier 2, waypoint only, with the no-competitor-column note.
 
 **§7 — Time.** Browser lane only. `inputHandlerMicroseconds` / `validatorMicroseconds` / `runtimeMicroseconds` / layout / paint / EventLatency median + p90 / overrun share, then the pair-ratio band against `hand-written-per-field-state` with a `verdict` column reading faster / slower / **indistinguishable**. Absolute microseconds are published beside the ratios (luq records absolutes; dropping them removes the one number a reader can hold against a 16 ms frame budget). The crossover field count is reported as a **bracket between adjacent sweep points**, never as a point estimate, because it is a sign change in the difference of two large numbers.
 
@@ -470,11 +473,11 @@ Stdout mirrors this, with `MACHINE WAS NOISY` inline per figure that never got u
 
 ## 9. What this benchmark cannot measure — for the report itself
 
-1. **Uncontrolled and controlled are different architectures, not the same architecture at different speeds.** RHF's `register` re-renders zero times for a valid keystroke. That is not cheap re-rendering, it is no re-rendering, and no metric makes it the same job as form-contract's. The table puts them side by side and says so; it cannot make the comparison fair. **This cannot be closed.**
+1. **Uncontrolled and controlled are different architectures, not the same architecture at different speeds.** RHF's `register` re-renders zero times for a valid keystroke. That is not cheap re-rendering, it is no re-rendering, and no metric makes it the same job as waypoint's. The table puts them side by side and says so; it cannot make the comparison fair. **This cannot be closed.**
 2. **The author wrote every adapter.** `writtenFrom` cites the documentation page each idiom came from and both ends of every dial are published, which bounds the choice; it does not remove the asymmetry. Mitigation, not fix: every subject file is offered as a PR to the library's maintainers before publication, and the report names, per subject, which maintainers reviewed it and which declined. **This cannot be closed by any mechanism inside the harness.**
-3. **`fiberVisits` and `rerendered` are floors.** Discarded renders leave no trace in any committed tree; reaching the true count needs `performUnitOfWork`, which is module-private. Exact under SyncLane, which holds for form-contract and TanStack and degrades to a floor for RHF and Formik.
+3. **`fiberVisits` and `rerendered` are floors.** Discarded renders leave no trace in any committed tree; reaching the true count needs `performUnitOfWork`, which is module-private. Exact under SyncLane, which holds for waypoint and TanStack and degrades to a floor for RHF and Formik.
 4. **Determinism is not accuracy.** Three identical hashes prove the harness is reproducible, not that commit attribution across the DefaultLane subjects is right.
-5. **Commit scheduler priority.** The production react-dom build passes `priority` as `undefined` to `onCommitFiberRoot`, so the column that would prove every subject commits on the same lane is only available from a dev-build pass — a 6.6× slower world that taxes subscription-per-cell designs (form-contract 5 `useSyncExternalStore` per field, TanStack 7, RHF 0) relative to ref-and-Subject ones. That pass is run and labelled, and its numbers are never read across to the timing columns.
+5. **Commit scheduler priority.** The production react-dom build passes `priority` as `undefined` to `onCommitFiberRoot`, so the column that would prove every subject commits on the same lane is only available from a dev-build pass — a 6.6× slower world that taxes subscription-per-cell designs (waypoint 5 `useSyncExternalStore` per field, TanStack 7, RHF 0) relative to ref-and-Subject ones. That pass is run and labelled, and its numbers are never read across to the timing columns.
 6. **The validator is held constant by excluding every non-zod configuration.** Formik-with-yup, RHF-with-yup and anything ajv-backed are out of scope by construction. Those are real configurations people ship.
 7. **One browser engine, headless, synthetic input.** Chromium only. A headless run's presentation timings come from a synthetic frame sink; `EventLatency`'s first stage begins at a timestamp the harness caused, so the true beginning of the user's wait is missing and the absolute figure is optimistic for everyone, equally.
 8. **Async validation, SSR/hydration and server-error round trips.** Out of scope in v1. The pass-id machinery, `isValidating` and drop-the-stale-answer are neither credited nor charged.
@@ -487,7 +490,7 @@ Stdout mirrors this, with `MACHINE WAS NOISY` inline per figure that never got u
 
 The smallest thing that produces a trustworthy number for **two** subjects and no more.
 
-**Subjects:** `form-contract-use-field-subject` and `hand-written-per-field-state-subject`. Two, because the design doc's claim — "the store contributes nothing on top of React" — is a claim about exactly this pair, and it is falsifiable with no competitor involved.
+**Subjects:** `waypoint-use-field-subject` and `hand-written-per-field-state-subject`. Two, because the design doc's claim — "the store contributes nothing on top of React" — is a claim about exactly this pair, and it is falsifiable with no competitor involved.
 
 **Shape:** `flat-20` only.
 
@@ -506,7 +509,7 @@ bench/shape/{order-schema, order-defaults, declared-paths,
              issue-path-to-concrete-path, shared-leaf, shared-skeleton,
              count-validator-work}.ts
 bench/subjects/{subject.types, subject-registry,
-                form-contract-use-field-subject,
+                waypoint-use-field-subject,
                 hand-written-per-field-state-subject}.ts
 bench/agreement/{verdict.types, policy, apply-script, oracle-verdict,
                  read-observable-state, normalize-issue-messages, compare-verdicts,
@@ -544,7 +547,7 @@ Everything else is ordered behind it: **slice 2** adds the policy axis and `reac
 
 | # | Attack | Disposition |
 |---|---|---|
-| A1 | The oracle is form-contract's validation policy restated as ground truth | **Closed.** Policy is an explicit axis; five cell values including `by design (documented)`; §3 relabelled a policy-conformance matrix; the standing sentence names the on-change policy as form-contract's own |
+| A1 | The oracle is waypoint's validation policy restated as ground truth | **Closed.** Policy is an explicit axis; five cell values including `by design (documented)`; §3 relabelled a policy-conformance matrix; the standing sentence names the on-change policy as waypoint's own |
 | A2 | RHF's comparable per-field subscription (`useFormState({name,exact})`) omitted | **Closed.** It is now RHF's primary row |
 | A3 | "RHF at onSubmit reads 0 validatorCalls" is an artefact of the verdict reader reading `isValid` | **Closed.** `submitBlocked` is read by attempting a submit at untimed observation points; the isValid-at-root configuration is a separate published row with its extra passes shown |
 | A4 | `criteriaMode` / one-message-per-path is a data-model artefact scored as disagreement | **Closed.** `criteriaMode: "all"`; paths gated, messages normalised to the first per path; `one-message-per-path` is a declared capability |
@@ -555,7 +558,7 @@ Everything else is ordered behind it: **slice 2** adds the policy axis and `reac
 | A9 | Two mounted roots, one devtools hook | **Closed.** `attribute-commit-to-root.ts` |
 | A10 | `assert-same-tree-shape` narrower than sold; `treeFibers` spread only a warning | **Closed.** Normalised outerHTML hash + `treeFibers` equality **asserted** within `equal-tree`; `own-tree` publishes `Δfibers` |
 | A11 | `shouldUnregister:true` is a non-default footgun | **Closed.** Default `false`; RHF **passes** `U1` and the report says so |
-| A12 | The gate covers only the axis form-contract optimises | **Closed by Tier 2 + Tier 3.** `openCellScanLength` is gated; bytes, retained heap and bundle size are published |
+| A12 | The gate covers only the axis waypoint optimises | **Closed by Tier 2 + Tier 3.** `openCellScanLength` is gated; bytes, retained heap and bundle size are published |
 | A13 | Single size; competitors only at 20 | **Closed.** Every subject runs the full sweep to 500 |
 | A14 | Warm-up order and the settle boundary | **Closed.** Oracle warms the schema first, order published; settle is outside the timed region and an empty-settle floor is published per subject |
 | A15 | Prose mechanism claims untested, and one (RHF `startsWith`) already wrong at 7.87 | **Closed.** Every mechanism sentence beside a number carries `file:line` at the pinned version, and the RHF claim is corrected |
@@ -567,8 +570,8 @@ Everything else is ordered behind it: **slice 2** adds the policy axis and `reac
 | A21 | The promised declared≫mounted shape had no file | **Closed.** `wizard-shape.ts` |
 | A22 | The splice scenario picks the cheap index | **Closed.** `A2` (index 0), `A3` (middle) and `A4` (insert at 0), at 12 rows |
 | A23 | No many-fields-invalid-at-once scenario | **Closed.** `S1` |
-| A24 | Capability vocabulary drawn only from form-contract's feature list | **Closed.** Every subject must contribute a capability (asserted). The example given was `validateOn`/`mode`; that expired when `FormOptions.validateOn` shipped, and the standing example is a PER-FIELD mode, which this architecture cannot honestly offer |
-| A25 | Both ends of the dial for everyone except the author | **Closed.** Four form-contract configurations |
+| A24 | Capability vocabulary drawn only from waypoint's feature list | **Closed.** Every subject must contribute a capability (asserted). The example given was `validateOn`/`mode`; that expired when `FormOptions.validateOn` shipped, and the standing example is a PER-FIELD mode, which this architecture cannot honestly offer |
+| A25 | Both ends of the dial for everyone except the author | **Partly open.** The design called for four waypoint configurations; two were written — `useField` and the uncontrolled binding — and `bench/subjects/` has no third |
 | A26 | The hand-written denominator is a strawman | **Closed.** Two hand-written subjects; the store claim is scored only against the memoised per-field one |
 | A27 | `lossRowCount` gates on a count | **Closed.** Gated on row identity |
 | A28 | `componentBodyInvocations` printed with "do not compare this" beside it | **Closed.** Not printed at all, and the refusal is explained with the 0-vs-1 measurement |

@@ -16,9 +16,9 @@
 // where the scan's second loop finds anything at all. Reporting only the first
 // two would be an audit that confirmed the author's fears and stopped.
 // ===========================================================================
-import { isPending, type FormAdapter } from "@maroonedog/form-contract";
-import { createForm, type FormHandle } from "@maroonedog/form-contract/core";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { isPending, type FormAdapter } from "@maroonedog/waypoint";
+import { createForm, type FormHandle } from "@maroonedog/waypoint/core";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import type { Shape } from "../shape/build-shape.ts";
 import { createCountingCellStore } from "./counting-cell-store.ts";
 import {

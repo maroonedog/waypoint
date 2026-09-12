@@ -1,5 +1,5 @@
-import { FormProvider, useCreateForm, useField } from "@maroonedog/form-contract/react";
-import type { FormPathTo } from "@maroonedog/form-contract/react";
+import { FormProvider, useCreateForm, useField } from "@maroonedog/waypoint/react";
+import type { FormPathTo } from "@maroonedog/waypoint/react";
 import { orderAdapter, orderDefaults } from "../order-form.js";
 import { useRenderCount } from "../use-render-count.js";
 

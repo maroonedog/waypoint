@@ -3,7 +3,7 @@
 // turned into something that can fail.
 //
 // This lane exists because the largest attack on the counts lane was that it is
-// structurally blind to form-contract's own per-write work. A blind spot is not
+// structurally blind to waypoint's own per-write work. A blind spot is not
 // closed by printing a new integer: it is closed by printing an integer that
 // somebody could have got wrong and did not. So nothing is reported until three
 // things hold.
@@ -25,7 +25,7 @@
 // O(mounted fields) even where the WRITES are not, and the two numbers sit in
 // the same row of the report so neither can be quoted without the other.
 // ===========================================================================
-import { dirtyCell, valueCell, ROOT_CELL } from "@maroonedog/form-contract/core";
+import { dirtyCell, valueCell, ROOT_CELL } from "@maroonedog/waypoint/core";
 import { refreshesProducedBy, type ScanShape } from "./count-open-cell-scan.ts";
 
 export interface DesignClaimsRequest {

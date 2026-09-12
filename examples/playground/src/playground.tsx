@@ -1,11 +1,11 @@
 import { useState, type ReactElement } from "react";
 import { z } from "zod";
 import { createStore } from "zustand/vanilla";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
-import { createCellStore, type FormCellStore } from "@maroonedog/form-contract/core";
-import { FormProvider, useField, useCreateForm } from "@maroonedog/form-contract/react";
-import type { FormPathTo } from "@maroonedog/form-contract/react";
-import { createZustandCellStore } from "@maroonedog/form-contract/store-zustand";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
+import { createCellStore, type FormCellStore } from "@maroonedog/waypoint/core";
+import { FormProvider, useField, useCreateForm } from "@maroonedog/waypoint/react";
+import type { FormPathTo } from "@maroonedog/waypoint/react";
+import { createZustandCellStore } from "@maroonedog/waypoint/store-zustand";
 import { useRenderCount } from "./render-count.js";
 
 const SCHEMA = z
@@ -31,7 +31,7 @@ const SCHEMA = z
 const ADAPTER = zodFormResolver(SCHEMA);
 
 // The one declaration that types every path below. Nothing imports it.
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: typeof ADAPTER;
   }
@@ -186,7 +186,7 @@ export function Playground(): ReactElement {
   return (
     <main>
       <header>
-        <h1>form-contract</h1>
+        <h1>waypoint</h1>
         <p>
           Type in one field and watch the other counters stay still. Unmount
           shipping and the rule on billing still judges it.

@@ -29,13 +29,13 @@
 // path type costs instantiations proportional to paths times depth.
 // ===========================================================================
 import { z } from "zod";
-import type { FieldPath, FormPaths } from "@maroonedog/form-contract";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import type { FieldPath, FormPaths } from "@maroonedog/waypoint";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import {
   useField,
   useFieldValues,
   type FormTypeRegistry,
-} from "@maroonedog/form-contract/react";
+} from "@maroonedog/waypoint/react";
 
 /** Fails to compile unless both sides are the same type. */
 type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
@@ -50,7 +50,7 @@ const schema = z.object({
 
 const adapter = zodFormResolver(schema);
 
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     containers: typeof adapter;
   }

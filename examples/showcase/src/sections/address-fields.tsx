@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { Field, type FormPathOver } from "@maroonedog/form-contract/react";
+import { Field, type FormPathOver } from "@maroonedog/waypoint/react";
 import { MdTextField } from "../md/text-field.js";
 import { MdSelectField } from "../md/select-field.js";
 

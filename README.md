@@ -1,4 +1,4 @@
-# form-contract
+# waypoint
 
 **A field's address exists before the component that draws it — as a type the
 compiler has already checked, and as runtime state that is already written.**
@@ -11,14 +11,30 @@ written at `createForm` from the descriptor list, before any component exists �
 so mounting is a subscription, and there is no register, no unregister and no
 `shouldUnregister`.
 
+**Why "waypoint", and why not "contract".** A waypoint is a named place that
+exists before the journey, which is the claim above. `surveyor` was considered
+and rejected because it names an ACTOR, and the claim is about the state of the
+world rather than about somebody establishing it; `wayfind` was rejected
+because it names the act of SEARCHING, and the whole point is that there is
+nothing to search for.
+
+This was called `form-contract`, and the contract is still here — `FormAdapter`
+is two members, `./` exports the types, and `assertFormStoreContract` ships.
+What changed is that it stopped being the NAME. Two members over a validator is
+prior art (AutoForm's `SchemaProvider`, uniforms' `Bridge`) and two standards
+have since commoditised it — `~standard.validate` and `~standard.jsonSchema`,
+both of which this package now reads directly rather than replacing. A product
+named after the half somebody else standardised, with the differentiator left
+unnamed, is a positioning mistake rather than a modesty.
+
 📖 The documentation site lives in `docs-site/` and **is not served anywhere
-yet** — `formcontract.dev` does not resolve and GitHub Pages will not publish
-this repository while it is private. `npm run docs:dev` builds it: a form you
+yet**: no domain has been chosen, and GitHub Pages will not publish this
+repository while it is private. `npm run docs:dev` builds it: a form you
 can type into, with a render counter on every row and a tape under it printing
 every cell the runtime writes, plus the contract, the paths, the API and the
 benchmark.
 
-One package, `@maroonedog/form-contract`, with an entry point per concern.
+One package, `@maroonedog/waypoint`, with an entry point per concern.
 They are entry points rather than packages because the six this started as all
 installed together anyway — six names bought a reader nothing and cost six
 versions, six budgets and six security surfaces. What the split does buy is
@@ -28,18 +44,20 @@ seventh is the one that made the other two smaller.
 
 | Entry | What it is |
 |---|---|
-| `@maroonedog/form-contract` | The contract and the path types. One runtime export, `isPending`. |
-| `@maroonedog/form-contract/resolver-standard` | Describes and judges **any** validator that implements Standard Schema and its JSON Schema companion. No vendor named anywhere in it. |
-| `@maroonedog/form-contract/resolver-zod` | The above, plus the three facts zod's own JSON Schema does not carry about zod. zod is a type-only import, erased at build time. |
-| `@maroonedog/form-contract/resolver-luq` | The above, plus [luq](https://luq.dev)'s issue codes and severities, which the spec has no member for. |
-| `@maroonedog/form-contract/core` | The runtime. No React, no validator, no DOM. |
-| `@maroonedog/form-contract/react` | React bindings. |
-| `@maroonedog/form-contract/store-zustand` | A zustand-backed store, as a shipped instance of the store contract `./core` exports. |
+| `@maroonedog/waypoint` | The contract and the path types. One runtime export, `isPending`. |
+| `@maroonedog/waypoint/resolver-standard` | Describes and judges **any** validator that implements Standard Schema and its JSON Schema companion. No vendor named anywhere in it. |
+| `@maroonedog/waypoint/resolver-zod` | The above, plus the three facts zod's own JSON Schema does not carry about zod. zod is a type-only import, erased at build time. |
+| `@maroonedog/waypoint/resolver-luq` | The above, plus [luq](https://luq.dev)'s issue codes and severities, which the spec has no member for. |
+| `@maroonedog/waypoint/core` | The runtime. No React, no validator, no DOM. |
+| `@maroonedog/waypoint/react` | React bindings. |
+| `@maroonedog/waypoint/store-zustand` | A zustand-backed store, as a shipped instance of the store contract `./core` exports. |
 
 Nothing here is published yet. Clone
-[the repository](https://github.com/maroonedog/form-contract), `npm install`,
-then `npm run verify` — it builds the package and runs the tests and the type
-tests.
+[the repository](https://github.com/maroonedog/form-contract) — it still
+answers to `form-contract`, because renaming the package and renaming the
+GitHub repository are separate decisions and only the first has been taken —
+then `npm install` and `npm run verify`, which builds the package and runs the
+tests and the type tests.
 
 **What it does not do is [in one place below](#limits-stated-rather-than-papered-over),
 and it is not an appendix:** no `debounceMs`, no per-field validation mode, no
@@ -56,7 +74,7 @@ capability list without them is an advertisement.
 // src/form-registry.ts — one file, one declaration, one time.
 const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "@maroonedog/form-contract/react" {
+declare module "@maroonedog/waypoint/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
   }
@@ -111,7 +129,7 @@ written. Now one resolver takes **both** of its members from specs this package
 does not own:
 
 ```ts
-import { standardFormResolver } from "@maroonedog/form-contract/resolver-standard";
+import { standardFormResolver } from "@maroonedog/waypoint/resolver-standard";
 
 // fields  ← schema["~standard"].jsonSchema.input({ target })
 // validate ← schema["~standard"].validate(root)
@@ -461,17 +479,17 @@ npm run bench:forms:time    # microseconds, in the installed Chrome
 node rather than re-rendering. The price is the transform: an uncontrolled input
 cannot be masked as it is typed, which is what `useField` is for.
 
-**form-contract is behind on all four scenarios, at every size.** The report
+**waypoint is behind on all four scenarios, at every size.** The report
 says so in those words and prints the rows it loses before its own table. Who
 beats it is the part worth reading: on two of the four the winning row wins by
 **not showing the message** — one reports only at submit, one reports nothing at
-all — and the other two are beaten by form-contract's own uncontrolled binding.
+all — and the other two are beaten by waypoint's own uncontrolled binding.
 
 **`K5` is the scenario that says what coalescing is worth**, and it is new: five
 characters typed into one field with ONE settle at the end, rather than a pass
 drained after every keystroke. The design document had recorded that objection
 as closed against a scenario nobody had written; it is written now, and the
-answer is the same at all three sizes. At 201 fields both form-contract subjects
+answer is the same at all three sizes. At 201 fields both waypoint subjects
 run **1 validator pass, 201 paths judged**, while react-hook-form, Formik,
 TanStack Form and the hand-written reference each run **5 passes and 1005 paths
 judged** — because drain-per-keystroke, which is all the other three scenarios
@@ -494,7 +512,7 @@ npm run docs:dev                # the documentation site, with the live form
 
 `showcase` is a real application form — 23 inputs across six sections, drawn
 with Tailwind and Material Design 3. `nested-arrays` writes the same
-`shipments[] → address{} → lines[]` shape four times — form-contract,
+`shipments[] → address{} → lines[]` shape four times — waypoint,
 react-hook-form, Formik, TanStack Form, one page, one schema, same markup, same
 behaviour — so the only difference left is how a field two levels inside a list
 says which row it belongs to. Both have their own README, and neither needs a

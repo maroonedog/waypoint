@@ -8,8 +8,8 @@
 // favourably.
 //
 // `policy` is declared, not inferred. Three of the four competitors ship a
-// default that claims a verdict at a different moment than form-contract does,
-// and scoring them against form-contract's moment would report a documented
+// default that claims a verdict at a different moment than waypoint does,
+// and scoring them against waypoint's moment would report a documented
 // design choice as a disagreement.
 // ===========================================================================
 import type { ComponentType } from "react";

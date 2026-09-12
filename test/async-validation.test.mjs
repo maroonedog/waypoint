@@ -3,13 +3,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import {
   createForm,
   errorCountCell,
   issuesCell,
   validatingCell,
-} from "@maroonedog/form-contract/core";
+} from "@maroonedog/waypoint/core";
 
 const SCHEMA = z.object({ handle: z.string().min(1, "必須です") });
 

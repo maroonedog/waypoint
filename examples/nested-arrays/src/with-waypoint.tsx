@@ -1,5 +1,5 @@
 // ===========================================================================
-// with-form-contract.tsx
+// with-waypoint.tsx
 //
 // A row hands down its own address. `row.path` is `shipments[0]`, and the
 // component inside builds `${at}.lines` from it — so the inner list needs to
@@ -16,8 +16,8 @@
 // import: `row.path` is typed as a place in its own list, so `${row.path}.sku`
 // comes out as a path the registry recognises and a typo does not compile.
 // ===========================================================================
-import { FormProvider, useCreateForm, useField, useRows } from "@maroonedog/form-contract/react";
-import type { FormPathTo } from "@maroonedog/form-contract/react";
+import { FormProvider, useCreateForm, useField, useRows } from "@maroonedog/waypoint/react";
+import type { FormPathTo } from "@maroonedog/waypoint/react";
 import { orderAdapter } from "./form-registry.js";
 import { defaults, blankLine, blankShipment } from "./schema.js";
 import { Panel, Row } from "./ui.js";
@@ -103,7 +103,7 @@ function Shipments() {
   );
 }
 
-export function WithFormContract() {
+export function WithWaypoint() {
   const form = useCreateForm(() => ({
     adapter: orderAdapter,
     defaultValues: defaults,
@@ -111,7 +111,7 @@ export function WithFormContract() {
 
   return (
     <FormProvider form={form}>
-      <Panel title="@maroonedog/form-contract" note="91 行 / 「shipments」7回">
+      <Panel title="@maroonedog/waypoint" note="91 行 / 「shipments」7回">
         <Text at="customer.name" label="お名前" />
         <Shipments />
       </Panel>

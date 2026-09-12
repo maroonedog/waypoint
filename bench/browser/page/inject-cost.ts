@@ -3,7 +3,7 @@
 //
 // This is how the harness publishes its own resolution. A ladder that only
 // burns time synchronously inside the handler proves resolution for the one
-// cost shape the headline metric already sees best — and form-contract does
+// cost shape the headline metric already sees best — and waypoint does
 // not have that shape: it coalesces its pass to a microtask. So the same
 // ladder is injected at three scheduling positions, and the report prints what
 // was resolved at each, including the positions where the answer is "nothing".
