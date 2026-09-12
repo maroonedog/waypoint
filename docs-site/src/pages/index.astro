@@ -5,6 +5,15 @@
 // A reader deciding whether to use this wants to see what it looks like to
 // write and what it does when they type in it. Both are on the page before
 // any argument is made, and the arguments that remain are one sentence each.
+//
+// The headline is TYPED ADDRESSING, and it is one claim with two halves that
+// have to be told together: the address is a compile-checked type before the
+// leaf exists, AND the cell it names is already written. Either half alone is
+// something somebody else also ships. The page used to lead on "a validator
+// has no way to say what a field accepts", which Standard Schema's JSON Schema
+// member made false, and on validator-neutrality, which Standard Schema
+// commoditised — react-hook-form ships `standardSchemaResolver` and TanStack
+// dropped its per-validator adapters at v1. Both are gone rather than softened.
 // ===========================================================================
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
@@ -240,18 +249,21 @@ const TRY = [
 ---
 
 <Base
-  title="form-contract — one function turns a validator into a form"
-  description="A contract that lets any validator describe itself as a form, and a React runtime that updates only the fields that moved. Type into the live form on the page and watch the render counters."
+  title="form-contract — a field's address exists before the component does"
+  description="A field's address is a compile-checked type before the leaf that draws it exists, and the cell it names is already written. One registry declaration, no props, no generic arguments, and no register or unregister at mount."
   bare
 >
   <!-- No eyebrow. The name is already in the header, two centimetres above. -->
   <h1 class="text-4xl font-bold leading-tight text-balance sm:text-5xl">
-    One function turns a validator into a form.
+    A field's address exists before the component that draws it.
   </h1>
   <p class="lead">
-    A renderer needs to know what a field accepts <em>before</em> anyone types
-    in it. Validation answers after a value exists — too late to choose an
-    input or fill in <code>minlength</code>. This is the other half.
+    One claim, two halves. It is a <strong class="text-on-surface">type the
+    compiler has already checked</strong> — one registry declaration, no prop,
+    no generic argument, nothing imported at the leaf — and it is{" "}
+    <strong class="text-on-surface">state already written</strong>: every cell
+    is seeded at <code>createForm</code>, so mounting is a subscription and
+    there is no register, no unregister and no <code>shouldUnregister</code>.
   </p>
 
   <div class="mt-7 flex flex-wrap gap-3">
@@ -319,8 +331,28 @@ const TRY = [
       delete it and every call site stops compiling, which is the failure
       direction you want. Two limits with it: register a second form and a
       keyless <code>useField</code> is checked against the union of both until
-      you name the form key; and the path union is built to a depth of six, so
-      a correct leaf deeper than that is rejected rather than accepted.
+      you name the form key; and{" "}
+      <strong class="text-on-surface">seven path segments are addressable and
+      eight are not</strong>, so a correct leaf deeper than that is rejected
+      rather than accepted. What the union costs the compiler, where it stops,
+      and the escape hatch for a subtree you do not address are measured in{" "}
+      <a
+        class="text-primary underline underline-offset-4"
+        href="https://github.com/maroonedog/form-contract/blob/main/docs/measurements-types.md"
+        >docs/measurements-types.md</a
+      >.
+    </p>
+
+    <p class="mt-8 leading-relaxed text-on-surface-variant">
+      <strong class="text-on-surface">The other half is that the cell the
+      address names is already written.</strong> Every cell is seeded at{" "}
+      <code>createForm</code> from the descriptor list, before any component
+      mounts, so a leaf appearing is a subscription and nothing else — no
+      register, no unregister, no <code>shouldUnregister</code>, no ref
+      callback, and a field in a portal, in a lazy chunk or behind a condition
+      is not a case. An address checked at compile time that named nothing until
+      a component mounted would only be half an address, which is why these two
+      are one claim rather than two features.
     </p>
   </section>
 
@@ -351,7 +383,15 @@ const TRY = [
 
   <!-- ================================================== live -->
   <section class="mt-20">
-    <h2 class="text-2xl font-bold">The error belongs to the field you did not touch</h2>
+    <h2 class="text-2xl font-bold">The runtime, with its writes printed</h2>
+    <p class="caption">
+      A rule reporting onto a field nobody touched is not scarce — every
+      whole-record validator does it. What differs is the bill. At 201 fields
+      this costs one pass over 201 paths and 2 commits; the react-hook-form{" "}
+      <code>deps</code> configuration costs two passes over 402 paths; and{" "}
+      <code>react-hook-form-scoped</code> costs 0 commits by showing no message
+      at all, which the benchmark scores <em>disagrees</em> rather than a win.
+    </p>
 
     <LiveForm client:load />
 
@@ -522,9 +562,9 @@ const TRY = [
       and no publish workflow — and nobody has run it in production.</strong>
     </p>
     <p class="caption">
-      128 tests, six compile-time programs that pin the path types, and a
-      screen that uses all of it. Two limits: a field whose key contains a dot
-      cannot be addressed, and the validation pass judges the whole root on
+      171 tests, the seven compile-time programs <code>test:types</code> runs,
+      and a screen that uses all of it. Two limits: a field whose key contains a
+      dot cannot be addressed, and the validation pass judges the whole root on
       every settled change.
     </p>
   </section>

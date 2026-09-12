@@ -123,4 +123,24 @@ export const STORE_CONTRACT_CASES: readonly StoreContractCase[] = [
       held(store.read(A) === undefined);
     },
   },
+  {
+    // Reclamation itself is not observable through these five members: none of
+    // them reports how many cells are held, and a store that answered that
+    // would be reporting on its own internals. The strongest thing the surface
+    // CAN see is the difference between ABSENT and PRESENT-HOLDING-UNDEFINED,
+    // and that difference is exactly what a forget that reclaims produces and
+    // a forget that merely blanks the slot does not. A store that parks
+    // `undefined` in the key passes the case above — a later read does answer
+    // undefined — and fails this one, because its equality gate now sees the
+    // revival as a write of the value already there.
+    what: "forget removes the key, so writing undefined into it notifies",
+    run: (store, held) => {
+      store.write(A, 1);
+      store.forget(A);
+      const seen = countCalls();
+      store.subscribe(A, seen.listener);
+      store.write(A, undefined);
+      held(seen.calls === 1);
+    },
+  },
 ];

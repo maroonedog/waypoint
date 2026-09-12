@@ -15,6 +15,12 @@
 // through `[*]` rather than once per element, because the number of elements
 // is not known until there is a value and the description has to be readable
 // before one exists.
+//
+// `title` and `description` are the two annotation keywords read here, and
+// they are read verbatim. draft-07 already has the vocabulary for a field's
+// name and its help text, so a document that carries them is answering the
+// question and a document that omits them is declining to — which the
+// descriptor repeats as an absent member rather than papering over.
 // ===========================================================================
 import type {
   FormFieldChoice,
@@ -25,6 +31,8 @@ import type {
 
 /** Only what this walk reads. A draft-07 document has far more in it. */
 interface JsonSchemaNode {
+  readonly title?: string;
+  readonly description?: string;
   readonly type?: string | readonly string[];
   readonly properties?: Readonly<Record<string, JsonSchemaNode>>;
   readonly required?: readonly string[];
@@ -139,11 +147,22 @@ export function collectJsonSchemaFields(
 
   const constraints = constraintsOf(node);
   const choices = choicesOf(node);
-  collected.push(
-    choices === undefined
-      ? { path, kind, isRequired, constraints }
-      : { path, kind, isRequired, constraints, choices }
-  );
+  collected.push({
+    path,
+    kind,
+    isRequired,
+    // An annotation the document did not write is spread away rather than set
+    // to `undefined`: a descriptor saying `label: undefined` would read as a
+    // name that was considered and came out empty, and a silent document has
+    // not considered it. Nothing here derives a name from `path` — that text
+    // would be this package's wording, not the schema author's.
+    ...(typeof node.title === "string" ? { label: node.title } : {}),
+    ...(typeof node.description === "string"
+      ? { description: node.description }
+      : {}),
+    constraints,
+    ...(choices === undefined ? {} : { choices }),
+  });
 }
 
 export type { JsonSchemaNode };

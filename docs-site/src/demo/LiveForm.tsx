@@ -11,6 +11,12 @@
 // rows, so nothing in this file lifts state over the fields: the toolbar reads
 // the pass counter and the error count through their own subscriptions, and it
 // is a sibling of the rows rather than an ancestor.
+//
+// Both rows used to spell `id={at}`, `htmlFor={at}` and `aria-invalid` by
+// hand, and the id they spelled was the path — which collides the moment a
+// second form appears on the page, as one does the moment a reader opens the
+// dialog on another section. They now spread what the binding emits, which is
+// the point the page is making about the descriptor, applied to itself.
 // ===========================================================================
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
@@ -22,6 +28,7 @@ import {
   useFormStatus,
   useRows,
   useUncontrolledField,
+  type FieldErrorProps,
   type FormPathTo,
 } from "form-react";
 import { blankLine, orderAdapter, orderDefaults } from "./order-form.js";
@@ -53,8 +60,25 @@ function Renders({ count }: { readonly count: number }): React.ReactElement {
   );
 }
 
-function Message({ text }: { readonly text: string }): React.ReactElement | null {
-  return text === "" ? null : <p className={MESSAGE}>{text}</p>;
+/**
+ * The message line. It is dropped rather than left empty, which keeps the rows
+ * tight but is the weaker half of `role="alert"`: a live region inserted along
+ * with its first message is the case several screen readers do not announce.
+ * A form that wanted the announcement would render this always and let it be
+ * blank — see the showcase, which reserves the height for exactly that reason.
+ */
+function Message({
+  text,
+  errorProps,
+}: {
+  readonly text: string;
+  readonly errorProps: FieldErrorProps;
+}): React.ReactElement | null {
+  return text === "" ? null : (
+    <p className={MESSAGE} {...errorProps}>
+      {text}
+    </p>
+  );
 }
 
 function ControlledRow({
@@ -69,20 +93,16 @@ function ControlledRow({
   return (
     <>
       <div className={ROW}>
-        <label className={LABEL} htmlFor={at}>
+        <label className={LABEL} {...field.labelProps}>
           {label}
         </label>
-        <input
-          id={at}
-          className={INPUT}
-          value={field.value ?? ""}
-          onChange={(event) => field.setValue(event.target.value)}
-          onBlur={field.markTouched}
-          aria-invalid={field.issues.length > 0}
-        />
+        <input className={INPUT} {...field.inputProps} />
         <Renders count={renders} />
       </div>
-      <Message text={field.issues[0]?.message ?? ""} />
+      <Message
+        text={field.issues[0]?.message ?? ""}
+        errorProps={field.errorProps}
+      />
     </>
   );
 }
@@ -99,21 +119,16 @@ function UncontrolledRow({
   return (
     <>
       <div className={ROW}>
-        <label className={LABEL} htmlFor={at}>
+        <label className={LABEL} {...field.labelProps}>
           {label}
         </label>
-        <input
-          id={at}
-          className={INPUT}
-          defaultValue={field.defaultValue}
-          ref={field.ref}
-          onChange={field.onChange}
-          onBlur={field.onBlur}
-          aria-invalid={field.issues.length > 0}
-        />
+        <input className={INPUT} {...field.inputProps} />
         <Renders count={renders} />
       </div>
-      <Message text={field.issues[0]?.message ?? ""} />
+      <Message
+        text={field.issues[0]?.message ?? ""}
+        errorProps={field.errorProps}
+      />
     </>
   );
 }

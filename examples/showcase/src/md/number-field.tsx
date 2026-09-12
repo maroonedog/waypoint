@@ -5,11 +5,17 @@ import { SupportingText, isShowingError } from "./supporting-text.js";
 /**
  * A number field.
  *
- * The DOM hands back a string and the schema declares a number, so something
- * has to convert. It happens here rather than in the runtime because what an
- * empty box means is a product decision: this one reads it as "no value", and
- * a form that wanted it read as zero would supply a different widget without
- * anything else changing.
+ * This file used to bypass `inputProps` entirely and re-derive `name`, `min`,
+ * `max` and `step` off the descriptor, because the bag wrote the raw string
+ * into a number path and the validator then rejected every keystroke. That is
+ * the binding's job now: it emits `type="number"`, it writes a number when the
+ * text is that number's own spelling, and it lets a half-typed "1." or "-"
+ * stand until the field is left. So what is left here is the appearance —
+ * the floating label, the right alignment and the suffix — which is the only
+ * part that was ever this file's business.
+ *
+ * `aria-invalid` is overridden for the reason text-field.tsx gives: this form
+ * shows a field as wrong only once it has been touched.
  */
 export function MdNumberField({
   field,
@@ -24,32 +30,22 @@ export function MdNumberField({
 }): ReactElement {
   const wrong = isShowingError(field);
   const required = field.descriptor?.isRequired ?? false;
-  const constraints = field.descriptor?.constraints;
 
   return (
     <div className="w-full">
       <div className="relative rounded-t-xs bg-surface-highest">
         <input
-          type="number"
-          name={field.inputProps.name}
-          value={typeof field.value === "number" ? field.value : ""}
-          min={constraints?.minimum}
-          max={constraints?.maximum}
-          step={constraints?.step}
+          {...field.inputProps}
           placeholder=" "
-          aria-invalid={wrong}
-          onChange={(event) => {
-            const raw = event.target.value;
-            field.setValue(raw === "" ? undefined : Number(raw));
-          }}
-          onBlur={() => field.markTouched()}
+          aria-invalid={wrong ? true : undefined}
           className={
             "peer w-full bg-transparent px-4 pb-2 pt-6 text-right text-base " +
             "text-on-surface outline-none placeholder:text-transparent" +
             (suffix === undefined ? "" : " pr-10")
           }
         />
-        <span
+        <label
+          {...field.labelProps}
           className={
             "pointer-events-none absolute left-4 top-4 origin-left text-base transition-all duration-150 " +
             "peer-focus:top-2 peer-focus:text-xs " +
@@ -61,7 +57,7 @@ export function MdNumberField({
         >
           {label}
           {required ? <span className="text-error"> *</span> : null}
-        </span>
+        </label>
         {suffix === undefined ? null : (
           <span className="pointer-events-none absolute bottom-2 right-4 text-sm text-on-surface-variant">
             {suffix}

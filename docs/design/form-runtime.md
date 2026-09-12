@@ -193,9 +193,19 @@ export function createCellStore(seed?: ReadonlyMap<string, unknown>): FormCellSt
 
 An earlier design's Zustand adapter notified its own router from inside `write()` and never called `api.subscribe`. A judge killed it: devtools time-travel, `persist` rehydration and the host app's own `api.setState` change Zustand and notify nobody, leaving every `useSyncExternalStore` snapshot stale and the DOM torn — which falsifies the one reason anyone wants R3. This version subscribes once and diffs.
 
+A second version was killed for the opposite half. Its `forget` spelled removal as `setState({ [key]: undefined })`, because removing a top-level key needs the REPLACING `setState` and that would destroy whatever the host application keeps beside the cells — a real reason, disclosed honestly in a comment, and still a leak: the slot survives, so a data grid that churns rows grows the state map without bound and the fifth member buys exactly nothing. **The cells therefore live under ONE member of the host's state, `FORM_CELLS_MEMBER` = `"form-contract:cells"`.** `forget` rebuilds that member without the key and merge-sets it: nothing the host owns is read, rewritten or removed, and `CellStateApi` still asks for `setState` in its merging form only. The copy is not a new cost — Zustand's merging `setState` already rebuilds the top-level object on every write, and that object used to hold every cell. The member name is punctuated so that colliding with it is something a caller has to spell out on purpose.
+
+Owning the member also buys the diff a fact it could not previously have: the adapter knows that slice is exactly the cell set, so it can compare PRESENCE as well as value. "Absent" and "present holding `undefined`" are different cells — only the second is a value a field holds — and a diff on values alone calls a forget-then-revive no change at all.
+
 ```ts
 // packages/form-store-zustand/src/create-zustand-cell-store.ts
-import type { StoreApi } from "zustand/vanilla";
+
+/** The member of the host's state that holds the cells. */
+export const FORM_CELLS_MEMBER = "form-contract:cells";
+
+/** Staged stand-in for "remove this key when the batch closes". A staged
+ *  `undefined` cannot say it: that is a value a field may legitimately hold. */
+const FORGOTTEN = Symbol("forgotten cell");
 
 /**
  * Values live in Zustand, so devtools, persist and time travel keep working
@@ -204,46 +214,63 @@ import type { StoreApi } from "zustand/vanilla";
  * every write costs one Object.is per OBSERVED key, not O(1). A store that
  * cannot route per key cannot buy that back, and the contract says so.
  */
-export function createZustandCellStore(
-  api: StoreApi<Record<string, unknown>>
+export function createZustandCellStore<TState extends object>(
+  api: CellStateApi<TState>          // getState, MERGING setState, subscribe
 ): FormCellStore {
   const listeners = createCellListenerIndex();
-  let staged: Record<string, unknown> | null = null;
+  const cellsOf = (state) => state[FORM_CELLS_MEMBER] ?? NO_CELLS;
+  const putCells = (next) => api.setState({ [FORM_CELLS_MEMBER]: next });
+  const holdsCell = (cells, key) =>
+    Object.prototype.hasOwnProperty.call(cells, key);
+  let staged: Map<string, unknown> | null = null;
 
   // ONE subscription. Every change reaches here, including the ones we did not
   // make. Diffing only the observed keys is what keeps a foreign write visible
-  // to React instead of tearing silently.
+  // to React instead of tearing silently. Presence is part of the diff: only
+  // that tells a removed cell from one holding undefined.
   api.subscribe((next, previous) => {
+    const after = cellsOf(next), before = cellsOf(previous);
     listeners.forEachObservedKey((key) => {
-      if (!Object.is(next[key], previous[key])) listeners.notify(key);
+      if (holdsCell(after, key) !== holdsCell(before, key)) {
+        listeners.notify(key);
+        return;
+      }
+      if (!Object.is(after[key], before[key])) listeners.notify(key);
     });
   });
 
   return {
-    read: (key) => api.getState()[key] as never,
+    // Staged first, so a read inside a batch sees that batch's own writes.
+    read: (key) => readStagedOr(cellsOf(api.getState()))[key],
     // No manual notify and no equality gate here: setState notifies
     // synchronously and the diff above is the gate. An equal write reaches
     // nobody, which is exactly what the contract demands.
     write(key, next) {
-      if (staged !== null) { staged[key] = next; return; }
-      api.setState({ [key]: next });
+      if (staged !== null) { staged.set(key, next); return; }
+      putCells({ ...cellsOf(api.getState()), [key]: next });
     },
+    // A merge-set of a REBUILT slice. The key is gone rather than blanked, and
+    // the host's own members were never touched.
     forget(key) {
-      api.setState((state) => {
-        const rest = { ...state };
-        delete rest[key];
-        return rest;
-      }, true);
+      if (staged !== null) { staged.set(key, FORGOTTEN); return; }
+      const cells = cellsOf(api.getState());
+      if (!holdsCell(cells, key)) return;
+      const remaining = { ...cells };
+      delete remaining[key];
+      putCells(remaining);
     },
     subscribe: (key, listener) => listeners.add(key, listener),
     batch(writes) {
       if (staged !== null) { writes(); return; }
-      staged = {};
+      staged = new Map();
       try { writes(); }
       finally {
         const pending = staged;
         staged = null;
-        if (Object.keys(pending).length > 0) api.setState(pending);
+        // Rebuilt against the state as it is NOW: the host's own setState may
+        // have run inside the batch.
+        if (pending.size > 0)
+          putCells(applyStaged(cellsOf(api.getState()), pending));
       }
     },
   };
@@ -268,7 +295,11 @@ export function assertFormStoreContract(
 ): void;
 ```
 
-It asserts: read of an unwritten key is `undefined`; an `Object.is`-equal write notifies nobody; a write to `a` never reaches a listener on `b`; `batch` notifies once per changed key, after the callback and before `batch` returns; nested `batch` collapses; unsubscribing during notification does not skip a sibling listener; resubscribe after unsubscribe still receives the next write; `forget` notifies once and a later read is `undefined`; and notification is synchronous.
+It asserts: read of an unwritten key is `undefined`; an `Object.is`-equal write notifies nobody; a write to `a` never reaches a listener on `b`; `batch` notifies once per changed key, after the callback and before `batch` returns; nested `batch` collapses; unsubscribing during notification does not skip a sibling listener; resubscribe after unsubscribe still receives the next write; `forget` notifies once and a later read is `undefined`; `forget` removes the key, so a write of `undefined` into it afterwards notifies; and notification is synchronous.
+
+**What the kit cannot see, said plainly.** Reclamation itself is not observable through the five members. None of them reports how many cells a store holds, and a member that did would be a store reporting on its own internals — so no case can assert that anything was freed, and the `forget` case above is satisfied by an adapter that merely parks `undefined` in the key and leaks every row a grid drops. That is precisely what the previous Zustand adapter did, and the kit passed it.
+
+So the eleventh case asserts the strongest proxy the surface admits: the difference between ABSENT and PRESENT-HOLDING-`undefined`. A store that removed the key sees a later `write(key, undefined)` as a change and notifies; a store that blanked the slot has its own equality gate report the value already there and notifies nobody. It is a proxy and not the thing — a store could pass it and still hold the cell alive somewhere the contract cannot reach — but it is the one difference that reclamation must produce and that blanking cannot fake. `test/custom-store.test.mjs` runs the kit against a deliberately blanking store and asserts that this case, and only this case, fails.
 
 ---
 

@@ -41,9 +41,17 @@ export type {
   WidgetRegistry,
 } from "./widget-registry.types.js";
 export { buildInputProps } from "./build-input-props.js";
+export { buildUncontrolledInputProps } from "./build-uncontrolled-input-props.js";
+export { inputTypeFor } from "./input-attributes.js";
+export { fieldElementIds, type FieldElementIds } from "./field-element-ids.js";
 export type {
   FieldBinding,
   FieldChangeEvent,
+  FieldDescriptionProps,
+  FieldErrorProps,
   FieldInputProps,
+  FieldLabelProps,
+  UncontrolledChangeEvent,
   UncontrolledFieldBinding,
+  UncontrolledInputProps,
 } from "./field-binding.types.js";

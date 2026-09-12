@@ -5,6 +5,14 @@ import { SupportingText } from "./supporting-text.js";
 /**
  * MD3 filter chips over a closed field. Used where the options are few enough
  * that hiding them behind a menu costs more than it saves.
+ *
+ * The one widget here that spreads none of `inputProps`, on purpose: there is
+ * no control to spread it onto. A chip row is a set of buttons, so the id, the
+ * type and the `aria-describedby` the binding emits have no single element to
+ * land on — a faithful version is a radiogroup with its own roles and arrow-key
+ * handling, which is a widget library and not this file's business. It reads
+ * `descriptor.choices` for what the values ARE, and the application supplies
+ * what they are called.
  */
 export function MdChoiceChips({
   field,

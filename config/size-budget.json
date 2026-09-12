@@ -12,51 +12,51 @@
     {
       "id": "form-core",
       "entry": "export * from \"form-core\";",
-      "minified": 17376,
-      "gzipped": 6262,
-      "budget": 6889
+      "minified": 17594,
+      "gzipped": 6310,
+      "budget": 6941
     },
     {
       "id": "form-react",
       "entry": "export * from \"form-react\";",
-      "minified": 20757,
-      "gzipped": 7417,
-      "budget": 8159
+      "minified": 23373,
+      "gzipped": 8273,
+      "budget": 9101
     },
     {
       "id": "form-contract-resolver-zod",
       "entry": "export * from \"form-contract-resolver-zod\";",
-      "minified": 2583,
-      "gzipped": 1104,
-      "budget": 1215
+      "minified": 3124,
+      "gzipped": 1278,
+      "budget": 1406
     },
     {
       "id": "form-contract-resolver-luq",
       "entry": "export * from \"form-contract-resolver-luq\";",
-      "minified": 1924,
-      "gzipped": 868,
-      "budget": 955
+      "minified": 2001,
+      "gzipped": 901,
+      "budget": 992
     },
     {
       "id": "form-store-zustand",
       "entry": "export * from \"form-store-zustand\";",
-      "minified": 845,
-      "gzipped": 473,
-      "budget": 521
+      "minified": 1201,
+      "gzipped": 648,
+      "budget": 713
     },
     {
       "id": "form-react (a screen: useField, useRows, FormProvider, useCreateForm)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"form-react\";",
-      "minified": 16910,
-      "gzipped": 6178,
-      "budget": 6796
+      "minified": 18689,
+      "gzipped": 6785,
+      "budget": 7464
     },
     {
       "id": "form-core (createForm alone)",
       "entry": "export { createForm } from \"form-core\";",
-      "minified": 14574,
-      "gzipped": 5354,
-      "budget": 5890
+      "minified": 14614,
+      "gzipped": 5371,
+      "budget": 5909
     }
   ]
 }

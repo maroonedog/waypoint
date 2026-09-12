@@ -73,6 +73,64 @@ test("a container contributes no descriptor of its own", () => {
   assert.deepEqual(paths.sort(), ["owner.name", "owner.nickname", "quantity"]);
 });
 
+// A draft-07 document written here rather than asked of luq. This resolver is
+// written against the FORMAT, not against luq's internals, and luq has no
+// keyword today that emits `title` or `description` — so a test that went
+// through the builder could only prove the members are absent. Handing the
+// resolver the document directly tests the mapping that a luq release adding
+// those keywords, or any other producer of draft-07, would exercise.
+const describableDocument = (document) => ({
+  "~standard": { jsonSchema: { input: () => document } },
+});
+
+const ANNOTATED = {
+  type: "object",
+  properties: {
+    owner: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          title: "Full name",
+          description: "as it appears on the card",
+          minLength: 3,
+        },
+        nickname: { type: "string" },
+      },
+      required: ["name"],
+    },
+  },
+  required: ["owner"],
+};
+
+test("a document's own title and description reach the descriptor", () => {
+  const adapter = luqFormResolver(build(), describableDocument(ANNOTATED));
+  assert.deepEqual(descriptorAt(adapter, "owner.name"), {
+    path: "owner.name",
+    kind: "string",
+    isRequired: true,
+    label: "Full name",
+    description: "as it appears on the card",
+    constraints: { minLength: 3 },
+  });
+});
+
+test("an unannotated field carries neither member, rather than undefined ones", () => {
+  // The sibling in the same document says nothing, so the descriptor says
+  // nothing — no name is derived from `owner.nickname`, because choosing the
+  // wording and the language of that text is the application's job.
+  const adapter = luqFormResolver(build(), describableDocument(ANNOTATED));
+  const nickname = descriptorAt(adapter, "owner.nickname");
+  assert.equal("label" in nickname, false);
+  assert.equal("description" in nickname, false);
+  assert.deepEqual(Object.keys(nickname).sort(), [
+    "constraints",
+    "isRequired",
+    "kind",
+    "path",
+  ]);
+});
+
 test("an acceptable root produces no issues", () => {
   assert.deepEqual(adapterOf().validate(GOOD), []);
 });

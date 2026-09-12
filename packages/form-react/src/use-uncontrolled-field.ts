@@ -18,10 +18,28 @@
 // anything that rewrites the value on its way to the DOM — needs the value to
 // come back through React, which is what `useField` is for. That is why this
 // is a second hook rather than a change to the first.
+//
+// It emits the same `inputProps` as `useField`, minus the value. It used to
+// emit none, which meant the binding the benchmark recommends was the one that
+// made every caller re-derive the descriptor by hand.
 // ===========================================================================
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useId, useRef } from "react";
 import type { AddressablePath, DeclaredOf } from "form-contract";
-import type { UncontrolledFieldBinding } from "./field-binding.types.js";
+import type {
+  UncontrolledChangeEvent,
+  UncontrolledFieldBinding,
+} from "./field-binding.types.js";
+import { buildUncontrolledInputProps } from "./build-uncontrolled-input-props.js";
+import {
+  descriptionPropsFor,
+  errorPropsFor,
+  fieldElementIds,
+  labelPropsFor,
+} from "./field-element-ids.js";
+import {
+  numberOrTextWhileTyping,
+  numberWhenTypingStops,
+} from "./number-from-typing.js";
 import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
@@ -63,12 +81,23 @@ export function useUncontrolledField(
   const isParticipating = useCell(handle.sources.participating);
 
   const node = useRef<HTMLInputElement | null>(null);
+  const isCheckbox = handle.descriptor?.kind === "boolean";
+  const isNumber = handle.descriptor?.kind === "number";
 
   useEffect(() => {
     const writeToDom = (): void => {
       const element = node.current;
       if (element === null) return;
-      const next = displayValue(handle.sources.value.read());
+      const held = handle.sources.value.read();
+      // A checkbox holds its answer in `checked`; its `value` is the string
+      // "on" whether or not it is ticked, so writing there would look like it
+      // worked and change nothing.
+      if (isCheckbox) {
+        const next = held === true;
+        if (element.checked !== next) element.checked = next;
+        return;
+      }
+      const next = displayValue(held);
       // Only when it actually differs. After a keystroke the cell holds what
       // the user just typed, so this is a no-op — and assigning `value` on a
       // focused input moves the caret to the end even when the string is
@@ -81,14 +110,38 @@ export function useUncontrolledField(
     // next notification.
     writeToDom();
     return handle.sources.value.subscribe(writeToDom);
-  }, [handle]);
+  }, [handle, isCheckbox]);
 
   const onChange = useCallback(
-    (event: { readonly currentTarget: { readonly value: string } }) =>
-      handle.setValue(event.currentTarget.value as never),
-    [handle]
+    (event: UncontrolledChangeEvent) => {
+      const target = event.currentTarget;
+      if (isCheckbox) {
+        handle.setValue((target.checked === true) as never);
+        return;
+      }
+      handle.setValue(
+        (isNumber ? numberOrTextWhileTyping(target.value) : target.value) as never
+      );
+    },
+    [handle, isCheckbox, isNumber]
   );
-  const onBlur = useCallback(() => handle.markTouched(), [handle]);
+
+  // A number that stood as text while it was being typed becomes a number when
+  // the field is left. See number-from-typing.ts for which strings do not.
+  const onBlur = useCallback(() => {
+    if (isNumber) {
+      const asNumber = numberWhenTypingStops(handle.sources.value.read());
+      if (asNumber !== undefined) handle.setValue(asNumber as never);
+    }
+    handle.markTouched();
+  }, [handle, isNumber]);
+
+  const scope = useId();
+  const ids = fieldElementIds(scope, handle.path);
+  // Read, not subscribed. React ignores a changed default after mount, which
+  // is correct here: from then on the effect above owns the node.
+  const held = handle.sources.value.read();
+  const shown = displayValue(held);
 
   return {
     path: handle.path,
@@ -97,14 +150,26 @@ export function useUncontrolledField(
     isTouched,
     isParticipating,
     ref: node,
-    // Read, not subscribed. React ignores a changed defaultValue after mount,
-    // which is correct here: from then on the effect above owns the node.
-    defaultValue: displayValue(handle.sources.value.read()),
+    defaultValue: shown,
     onChange,
     onBlur,
     setValue: (next) => handle.setValue(next),
     markTouched: () => handle.markTouched(),
     validate: () => handle.validate(),
     issuesFor: (candidate) => handle.issuesFor(candidate),
+    inputProps: buildUncontrolledInputProps({
+      path: handle.path,
+      descriptor: handle.descriptor,
+      issues,
+      ids,
+      ref: node,
+      held,
+      defaultValue: shown,
+      onChange,
+      onBlur,
+    }),
+    labelProps: labelPropsFor(ids),
+    descriptionProps: descriptionPropsFor(ids, handle.descriptor?.description),
+    errorProps: errorPropsFor(ids),
   };
 }

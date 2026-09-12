@@ -168,6 +168,76 @@ const viewTypes = [
     third address arriving in it needs no edit in the section that draws one.
   </p>
 
+  <h2 class="mt-16 text-2xl font-bold">What the union costs, and where it stops</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    <code>npm run bench:types</code> compiles one throwaway program per shape
+    under <code>--extendedDiagnostics</code> and prints the deltas. Like the
+    timing lane, it is <strong class="text-on-surface">printed and never
+    gated</strong>: <code>typescript</code> sits at a caret range, so a patch
+    bump rewrites every figure without anybody touching a type.
+  </p>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <tbody>
+        <tr class="hairline">
+          <td class="w-64 py-3 pr-4 align-top font-medium">Building the union</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            120–306 instantiations per leaf, once, in whatever file declares the
+            adapter. It does not grow with the number of components.
+          </td>
+        </tr>
+        <tr class="hairline">
+          <td class="py-3 pr-4 align-top font-medium">One accepted call</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            5.0 instantiations at width 300, and 5.0 at depth 7. A thousand
+            components addressing one form is not where this goes wrong.
+          </td>
+        </tr>
+        <tr class="hairline">
+          <td class="py-3 pr-4 align-top font-medium">The depth budget</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            <strong class="text-on-surface">Seven path segments are addressable
+            and eight are not.</strong> <code>PathDepthBudget</code> is 6, in{" "}
+            <code>packages/spec/src/path-depth.types.ts</code>. A form nested
+            past seven segments does not compile slowly — its fields stop being
+            addressable at all.
+          </td>
+        </tr>
+        <tr class="hairline">
+          <td class="py-3 pr-4 align-top font-medium">One refused call</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            346,055 instantiations, because the compiler elaborates the whole
+            union into the message. That is a fact about a mistyped path in an
+            editor, not about correct code.
+          </td>
+        </tr>
+        <tr class="hairline">
+          <td class="py-3 pr-4 align-top font-medium">The escape hatch</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            <code>OpaqueObject</code>. A member whose interface extends one of
+            its arms ends the path there and keeps its own type and its own
+            members, so the container stays nameable and nothing below it is.
+            On a 729-leaf shape that took the union from 210,887 instantiations
+            to 72,707 for two of three subtrees — exactly the paths given up,
+            and no discount on the rest.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="caption">
+    Every figure above is a delta over a floor the document also prints, and{" "}
+    <code>TS2589</code> was produced by no shape in the sweep — including a
+    self-referential root — which is what the budget exists for.{" "}
+    <a
+      class="text-primary underline underline-offset-4"
+      href="https://github.com/maroonedog/form-contract/blob/main/docs/measurements-types.md"
+      >The measurement, with what it cannot see →</a
+    >
+  </p>
+
   <h2 class="mt-16 text-2xl font-bold">A schema nobody wrote down</h2>
 
   <Code code={dynamic} label="a schema with no static shape" />

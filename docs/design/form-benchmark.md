@@ -241,7 +241,7 @@ Stated in the report: this tier gates the author's library against the author's 
 
 ### Tier 3 — printed, hedged, not counts.
 
-`bytesPerInteraction` (heapUsed delta over 500 drained interactions under `--expose-gc`, three repeats with spread), `retainedHeapAfterMount` per field (the cross-library mount-cost metric), `bundleBytes` (each subject's entry built through one vite config, gzipped, minus a React-only baseline entry — a rough attribution, labelled as one). RHF is the ~9 kB zero-dependency incumbent and form-contract ships five packages; a benchmark that counts nine kinds of render work and no bytes leaves a reader assuming bytes were checked.
+`bytesPerInteraction` (heapUsed delta over 500 drained interactions under `--expose-gc`, three repeats with spread), `retainedHeapAfterMount` per field (the cross-library mount-cost metric), `bundleBytes` (each subject's entry built through one vite config, gzipped, minus a React-only baseline entry — a rough attribution, labelled as one). RHF is the ~9 kB zero-dependency incumbent and form-contract ships six packages; a benchmark that counts nine kinds of render work and no bytes leaves a reader assuming bytes were checked.
 
 ### Tier 4 — time. Browser lane only. **Printed, never gated.**
 

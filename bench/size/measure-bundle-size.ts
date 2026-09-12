@@ -1,7 +1,7 @@
 // ===========================================================================
 // measure-bundle-size.ts — what each package costs an application, in bytes.
 //
-// The repository claims `sideEffects: false` on all five packages and sells
+// The repository claims `sideEffects: false` on all six packages and sells
 // itself partly on doing less work. It had never measured what it weighs, and
 // an unmeasured size claim is the same kind of sentence this project refuses
 // everywhere else.

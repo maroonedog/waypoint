@@ -111,15 +111,18 @@ const triggers = [
   <Code code={crossField} label="the demo's own schema" />
 
   <p class="caption">
-    Nothing in your application lists which field depends on which. The demo on
-    the <a class="text-primary underline underline-offset-4" href="/"
+    <strong class="text-on-surface">Reporting onto a field nobody touched is
+    not scarce</strong> — every whole-record validator does it, and the ones
+    beside this in the benchmark can all be configured to. What is on the table
+    is the bill. Nothing in your application lists which field depends on which:
+    the demo on the <a class="text-primary underline underline-offset-4" href="/"
       >home page</a
-    > runs exactly that: change billing, and the message appears on shipping —
-    and the rule goes on reading shipping when its component is
-    <em>not mounted</em>. The benchmark asks every subject for it as scenario
-    X1, and at all three sizes one configuration is scored{" "}
-    <em>disagrees</em> there: <code>react-hook-form-scoped</code>, which showed
-    no message at all.
+    > runs exactly that schema, and the rule goes on reading shipping when its
+    component is <em>not mounted</em>. The benchmark asks every subject for it
+    as scenario X1: form-contract pays one whole-root pass, the react-hook-form{" "}
+    <code>deps</code> configuration pays two passes and 402 paths judged, and{" "}
+    <code>react-hook-form-scoped</code> is scored <em>disagrees</em> at all
+    three sizes because it showed no message at all.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">A field nobody has rendered</h2>

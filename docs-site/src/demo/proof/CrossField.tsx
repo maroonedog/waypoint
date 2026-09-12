@@ -10,11 +10,15 @@ function Postcode({ at, label }: { at: FormPathTo<string>; label: string }) {
   const invalid = field.issues.length > 0;
   const edge = invalid ? "border-error" : "border-outline-variant";
   return (
-    <label className={`block rounded-lg border bg-surface p-3 ${edge}`}>
-      <span className="text-xs text-on-surface-variant">{label}</span>
-      <input {...field.inputProps} aria-invalid={invalid} className={INPUT} />
-      <span className="mt-1 block h-4 text-xs text-error">{field.issues[0]?.message}</span>
-    </label>
+    <div className={`block rounded-lg border bg-surface p-3 ${edge}`}>
+      <label className="text-xs text-on-surface-variant" {...field.labelProps}>
+        {label}
+      </label>
+      <input {...field.inputProps} className={INPUT} />
+      <span className="mt-1 block h-4 text-xs text-error" {...field.errorProps}>
+        {field.issues[0]?.message}
+      </span>
+    </div>
   );
 }
 

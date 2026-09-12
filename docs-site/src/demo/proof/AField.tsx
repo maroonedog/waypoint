@@ -11,12 +11,14 @@ function Row({ at, label }: { at: FormPathTo<string>; label: string }) {
   const renders = useRenderCount();
   return (
     <div className="mb-3 flex items-center gap-3 text-xs">
-      <label className="w-24 text-on-surface-variant" htmlFor={at}>
+      <label className="w-24 text-on-surface-variant" {...field.labelProps}>
         {label}
       </label>
-      <input id={at} {...field.inputProps} className={INPUT} />
+      <input {...field.inputProps} className={INPUT} />
       <span className="font-mono tabular-nums">{renders} renders</span>
-      <span className="text-error">{field.issues[0]?.message}</span>
+      <span className="text-error" {...field.errorProps}>
+        {field.issues[0]?.message}
+      </span>
     </div>
   );
 }

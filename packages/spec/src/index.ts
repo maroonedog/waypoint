@@ -8,7 +8,6 @@ export type { FormIssue, FormIssueSeverity } from "./form-issue.types.js";
 export type {
   FormAdapter,
   FormPaths,
-  FormResolver,
   FormValues,
 } from "./form-adapter.types.js";
 export type { FieldPath } from "./field-path.types.js";

@@ -1,8 +1,12 @@
 // What a store written from scratch looks like, and what the conformance kit
-// does to one that is written carelessly.
+// does to one that is written carelessly — carelessly in its notification, and
+// carelessly in its reclamation, which are separate ways to be unsubstitutable
+// and are caught by separate cases.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { assertFormStoreContract } from "form-core";
+import { createZustandCellStore, FORM_CELLS_MEMBER } from "form-store-zustand";
+import { createStore } from "zustand/vanilla";
 
 /**
  * The smallest store that satisfies the contract. No dependencies, no shared
@@ -99,6 +103,24 @@ function createBroadcastCellStore() {
   };
 }
 
+/**
+ * The store that answers `forget` by parking `undefined` in the key instead of
+ * removing it. It notifies correctly, a later read does answer undefined, and
+ * it leaks: every row a data grid drops keeps its slot for the life of the
+ * form. This is the shape the zustand adapter had, and it is here so the kit
+ * is shown catching it rather than asserted to.
+ */
+function createBlankingCellStore() {
+  const store = createMinimalCellStore();
+  return {
+    ...store,
+    forget(key) {
+      if (store.read(key) === undefined) return;
+      store.write(key, undefined);
+    },
+  };
+}
+
 const runKit = (build) => {
   const failures = [];
   assertFormStoreContract(build, (holds, what) => {
@@ -109,6 +131,44 @@ const runKit = (build) => {
 
 test("a store written from scratch satisfies the contract", () => {
   assert.deepEqual(runKit(createMinimalCellStore), []);
+});
+
+test("the kit names exactly what a non-reclaiming forget gets wrong", () => {
+  assert.deepEqual(runKit(createBlankingCellStore), [
+    "forget removes the key, so writing undefined into it notifies",
+  ]);
+});
+
+test("the zustand adapter's forget leaves no slot behind", () => {
+  const host = createStore(() => ({ theme: "dark" }));
+  const store = createZustandCellStore(host);
+  store.write("value:items[5].sku", "A-1");
+  assert.deepEqual(Object.keys(host.getState()[FORM_CELLS_MEMBER]), [
+    "value:items[5].sku",
+  ]);
+  store.forget("value:items[5].sku");
+  assert.deepEqual(
+    Object.keys(host.getState()[FORM_CELLS_MEMBER]),
+    [],
+    "the row is reclaimed, not blanked"
+  );
+  assert.equal(host.getState().theme, "dark", "the host's own member survives");
+});
+
+test("a batch that forgets reclaims once the batch closes", () => {
+  const host = createStore(() => ({ theme: "dark" }));
+  const store = createZustandCellStore(host);
+  store.write("value:items[0].sku", "A-1");
+  store.batch(() => {
+    store.write("value:items[1].sku", "B-2");
+    store.forget("value:items[0].sku");
+    assert.equal(store.read("value:items[0].sku"), undefined, "read-your-writes");
+    assert.equal(store.read("value:items[1].sku"), "B-2");
+  });
+  assert.deepEqual(Object.keys(host.getState()[FORM_CELLS_MEMBER]), [
+    "value:items[1].sku",
+  ]);
+  assert.equal(host.getState().theme, "dark");
 });
 
 test("the kit names exactly what a broadcast store gets wrong", () => {

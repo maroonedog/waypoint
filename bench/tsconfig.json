@@ -41,6 +41,8 @@
   "include": [
     "browser/*.ts",
     "report/*.ts",
-    "run-time-bench.ts"
+    "types/*.ts",
+    "run-time-bench.ts",
+    "run-types-bench.ts"
   ]
 }

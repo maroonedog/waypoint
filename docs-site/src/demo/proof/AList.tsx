@@ -8,8 +8,10 @@ function Line({ row, onRemove }: { row: FieldRow<"items">; onRemove: () => void 
   return (
     <div className="flex items-center gap-2 py-1">
       <code className="w-28 shrink-0 text-xs">{row.key} · {row.path}</code>
-      <input {...sku.inputProps} className={INPUT} aria-invalid={sku.issues.length > 0} />
-      <span className="w-20 shrink-0 text-xs text-error">{sku.issues[0]?.message}</span>
+      <input {...sku.inputProps} className={INPUT} />
+      <span className="w-20 shrink-0 text-xs text-error" {...sku.errorProps}>
+        {sku.issues[0]?.message}
+      </span>
       <button type="button" className="text-xs" onClick={onRemove}>remove</button>
     </div>
   );

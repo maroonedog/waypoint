@@ -13,6 +13,7 @@
     "bench:forms": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts",
     "bench:forms:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts --check",
     "bench:forms:time": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-time-bench.ts",
+    "bench:types": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-types-bench.ts",
     "example:showcase": "vite --config examples/showcase/vite.config.ts examples/showcase",
     "example:nested-arrays": "vite --config examples/nested-arrays/vite.config.ts examples/nested-arrays",
     "example:playground": "vite --config examples/playground/vite.config.ts examples/playground",

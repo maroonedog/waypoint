@@ -116,4 +116,28 @@ import TimingTable from "../components/TimingTable.astro";
     <code>npm run bench:forms:time</code>, and the design that argues for every
     choice above is in <code>docs/design/form-benchmark.md</code>.
   </p>
+
+  <!-- ================================================== a third lane -->
+  <h2 class="mt-16 text-2xl font-bold">A third lane, at the compiler</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    <code>npm run bench:types</code> measures what the path types cost{" "}
+    <code>tsc</code>, in the compiler's own accounting: the union built once per
+    shape at 120–306 instantiations per leaf, an accepted <code>useField</code>{" "}
+    at 5.0, a refused one at 346,055, and the depth where the budget stops —{" "}
+    <strong class="text-on-surface">seven path segments are addressable and
+    eight are not</strong>. It is <strong class="text-on-surface">printed and
+    never gated</strong>, for a reason the time lane does not have:{" "}
+    <code>typescript</code> sits at a caret range, so a patch bump would rewrite
+    every figure and the failure would point at <code>npm update</code> rather
+    than at the change that made a type worse.
+  </p>
+
+  <p class="caption">
+    The escape hatch is measured too, rather than asserted.{" "}
+    <a
+      class="text-primary underline underline-offset-4"
+      href="https://github.com/maroonedog/form-contract/blob/main/docs/measurements-types.md"
+      >docs/measurements-types.md →</a
+    >
+  </p>
 </Base>

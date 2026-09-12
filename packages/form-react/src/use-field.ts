@@ -15,11 +15,22 @@
 // Neither is asserted by the caller any more: `useField<string>(path)` used to
 // mean "trust me", and what it usually meant was a misspelt path rendering an
 // empty input that was never validated and said nothing.
+//
+// `useId` is the fifth hook and the only one that is not a subscription. It
+// scopes this binding's element ids, for the reason field-element-ids.ts
+// gives: a path is unique within one form and this hook is deliberately
+// callable twice on the same path.
 // ===========================================================================
-import { useCallback } from "react";
+import { useCallback, useId } from "react";
 import type { AddressablePath, DeclaredOf } from "form-contract";
 import type { FieldBinding } from "./field-binding.types.js";
 import { buildInputProps } from "./build-input-props.js";
+import {
+  descriptionPropsFor,
+  errorPropsFor,
+  fieldElementIds,
+  labelPropsFor,
+} from "./field-element-ids.js";
 import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
@@ -50,11 +61,14 @@ export function useField(first: string, second?: string): FieldBinding<never> {
   const isDirty = useCell(handle.sources.dirty);
   const isParticipating = useCell(handle.sources.participating);
 
-  const onChangeValue = useCallback(
-    (next: string) => handle.setValue(next),
+  const writeValue = useCallback(
+    (next: unknown) => handle.setValue(next as never),
     [handle]
   );
   const onBlur = useCallback(() => handle.markTouched(), [handle]);
+
+  const scope = useId();
+  const ids = fieldElementIds(scope, handle.path);
 
   return {
     path: handle.path,
@@ -73,8 +87,13 @@ export function useField(first: string, second?: string): FieldBinding<never> {
       path: handle.path,
       descriptor: handle.descriptor,
       value,
-      onChangeValue,
+      issues,
+      ids,
+      writeValue,
       onBlur,
     }),
+    labelProps: labelPropsFor(ids),
+    descriptionProps: descriptionPropsFor(ids, handle.descriptor?.description),
+    errorProps: errorPropsFor(ids),
   };
 }

@@ -17,6 +17,19 @@
 // `fields` and `validate` travel together because a runtime needs both, and
 // splitting them would make every vendor ship two adapters to be wired up in
 // the right pairs.
+//
+// There is no `FormResolver` type here any more, and that is the correction
+// rather than an omission. It said a resolver is `(schema) => FormAdapter`,
+// the README presented it as the contract — and one of the two shipped
+// resolvers is not assignable to it: `luqFormResolver` is binary,
+// `(validator, describable)`, because luq judges with one object and describes
+// with another, and tsc rejects the assignment with "Target signature provides
+// too few arguments. Expected 2 or more, but got 1." Nothing referenced the
+// type: zero call sites, zero type tests, so it was never a constraint on
+// anybody, only a promise to readers that the code already broke. A resolver's
+// honest shape is vendor-specific arity — however many arguments that vendor
+// needs to hand over. What every vendor does agree to is the two members
+// below, and that is the whole contract.
 // ===========================================================================
 import type { FormFieldDescriptor } from "./form-field-descriptor.types.js";
 import type { FormIssue } from "./form-issue.types.js";
@@ -38,14 +51,6 @@ export interface FormAdapter<T, TPath extends string = string> {
    */
   validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
 }
-
-/**
- * Builds an adapter from one vendor's schema. The shape a caller writes is
- * `resolver(schema)`, so a resolver is a plain function and nothing more.
- */
-export type FormResolver<TSchema, T, TPath extends string = string> = (
-  schema: TSchema
-) => FormAdapter<T, TPath>;
 
 /** The value type an adapter carries. */
 export type FormValues<A> =

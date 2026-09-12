@@ -18,7 +18,6 @@ import type {
   FormIssue,
 } from "form-contract";
 import { collectZodFields } from "./collect-zod-fields.js";
-import { readZodDefinition } from "./read-zod-definition.js";
 import {
   zodIssuesToFormIssues,
   type ZodIssueShape,
@@ -28,9 +27,8 @@ import {
 export function zodFormResolver<S extends z.ZodObject>(
   schema: S
 ): FormAdapter<z.infer<S>, FieldPath<z.infer<S>>> {
-  const definition = readZodDefinition(schema);
   const fields: FormFieldDescriptor[] = [];
-  if (definition !== undefined) collectZodFields(definition, "", fields);
+  collectZodFields(schema, "", fields);
   return {
     fields,
     validate(root: unknown): readonly FormIssue[] {

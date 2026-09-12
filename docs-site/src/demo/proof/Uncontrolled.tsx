@@ -14,15 +14,13 @@ function ControlledSku() {
   const field = useField("items[0].sku");
   const renders = useRenderCount();
   return (
-    <label className={BOX}>
-      useField — {renders} renders
-      <input
-        className={INPUT}
-        value={field.value ?? ""}
-        onChange={(event) => field.setValue(event.target.value)}
-      />
-      <em className="text-error">{field.issues[0]?.message}</em>
-    </label>
+    <div className={BOX}>
+      <label {...field.labelProps}>useField — {renders} renders</label>
+      <input className={INPUT} {...field.inputProps} />
+      <em className="text-error" {...field.errorProps}>
+        {field.issues[0]?.message}
+      </em>
+    </div>
   );
 }
 
@@ -30,16 +28,15 @@ function UncontrolledSku() {
   const field = useUncontrolledField("items[1].sku");
   const renders = useRenderCount();
   return (
-    <label className={BOX}>
-      useUncontrolledField — {renders} renders
-      <input
-        className={INPUT}
-        ref={field.ref}
-        defaultValue={field.defaultValue}
-        onChange={field.onChange}
-      />
-      <em className="text-error">{field.issues[0]?.message}</em>
-    </label>
+    <div className={BOX}>
+      <label {...field.labelProps}>
+        useUncontrolledField — {renders} renders
+      </label>
+      <input className={INPUT} {...field.inputProps} />
+      <em className="text-error" {...field.errorProps}>
+        {field.issues[0]?.message}
+      </em>
+    </div>
   );
 }
 
