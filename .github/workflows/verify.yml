@@ -1,0 +1,38 @@
+# ===========================================================================
+# verify.yml — the tests and the type programs, in CI.
+#
+# They were not here. The repository gated its BENCHMARK in CI and ran its 128
+# tests and seven compile-time programs on one laptop, which is the wrong way
+# round: a benchmark drifting is a number to re-record, a test failing is a
+# defect shipping.
+#
+# No path filter, for the same reason the counts lane has none: "I only
+# touched the docs" is a sentence that is designed not to hold, and
+# package-lock.json is where a dependency moves under you.
+# ===========================================================================
+name: verify
+
+on:
+  push:
+    branches: [master, develop]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "23"
+          cache: "npm"
+
+      - run: npm ci
+
+      # build, then the tests, then the seven type programs. `verify` is the
+      # same command a contributor runs locally, so CI cannot pass on a
+      # different set of checks from the one they were told to use.
+      - run: npm run verify
+
+      - name: Bundle size, against the recorded budget
+        run: npm run size:check

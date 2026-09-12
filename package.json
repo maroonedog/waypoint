@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w form-contract && npm run build -w form-contract-resolver-zod && npm run build -w form-core && npm run build -w form-react && npm run build -w form-store-zustand",
+    "build": "npm run build -w form-contract && npm run build -w form-contract-resolver-zod && npm run build -w form-contract-resolver-luq && npm run build -w form-core && npm run build -w form-react && npm run build -w form-store-zustand",
     "test": "node --test test/*.test.mjs",
     "test:types": "tsc -p test/types/tsconfig.json && tsc -p test/types-unregistered/tsconfig.json && tsc -p test/types-source/tsconfig.json && tsc -p bench/tsconfig.json && tsc -p examples/nested-arrays/tsconfig.check.json && tsc -p examples/playground/tsconfig.check.json && tsc -p examples/showcase/tsconfig.check.json",
     "verify": "npm run build && npm run test && npm run test:types",
@@ -14,10 +14,13 @@
     "bench:forms:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts --check",
     "bench:forms:time": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-time-bench.ts",
     "docs:dev": "npm run dev --prefix docs-site",
-    "docs:build": "npm ci --prefix docs-site && npm run build --prefix docs-site"
+    "docs:build": "npm ci --prefix docs-site && npm run build --prefix docs-site",
+    "size": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-size-bench.ts",
+    "size:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-size-bench.ts --check"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",
+    "@maroonedog/luq": "^2.4.4",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-form": "^1.33.5",
     "@types/node": "^22.20.2",

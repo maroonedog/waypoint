@@ -20,6 +20,7 @@ with a render counter on every row. [Start](https://formcontract.dev/start/) ·
 |---|---|
 | `form-contract` | The contract and the path types. No dependencies. |
 | `form-contract-resolver-zod` | Describes and judges a zod schema. zod is a type-only import, erased at build time. |
+| `form-contract-resolver-luq` | The same for [luq](https://luq.dev), through the JSON Schema it can already produce. |
 | `form-core` | The runtime. No React, no validator. |
 | `form-react` | React bindings. |
 | `form-store-zustand` | A zustand-backed store, as a worked example of substituting one. |
