@@ -56,3 +56,25 @@ rule is not mechanically decidable — "does this name say what it does" is a
 judgement — so it is enforced in review. When a bad name is found, rename it and
 add the row to the table above, so the next reader calibrates against real
 examples rather than adjectives.
+
+## Addresses nobody owns
+
+**No domain is registered for this project, and none may be invented.** Do not
+add `docs-site/public/CNAME`, and do not write a domain into Astro's `site`,
+a README link, a workflow title or an `og:url`.
+
+The reason this is a rule and not a preference: `formcontract.dev` was written
+into a CNAME, into `site` and into seven README links, and it answered
+NXDOMAIN the whole time. **A CNAME naming a domain nobody owns does not fail
+loudly** — GitHub Pages accepts it and then serves nothing at an address that
+does not exist, so the failure looks like "the site is not deployed yet" rather
+than like a mistake. The same string in `site` puts a dead `og:url` on every
+page. Both survived a full technology review before anybody checked the DNS.
+
+`site` has to hold something, because `@astrojs/sitemap` refuses to run
+without it. It holds the GitHub Pages address for the repository as actually
+named, with a comment saying it is a placeholder. Whoever registers a domain
+changes that line and puts the CNAME back, in a commit that says so.
+
+Registering a domain is the author's decision. So is the product's name, and so
+is the repository's — an agent may propose one and must not write one in.
