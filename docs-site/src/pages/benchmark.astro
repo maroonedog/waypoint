@@ -4,129 +4,114 @@ import CountsTable from "../components/CountsTable.astro";
 import ScenarioTable from "../components/ScenarioTable.astro";
 import TimingTable from "../components/TimingTable.astro";
 
-// Both tables are rendered FROM the repository's own measurement artefacts,
-// not from figures retyped into this file. The counts come from the baseline
-// CI gates against on every push, so a number here is a number a machine
-// checked. The timing summary is only rendered when a CI run has produced one:
-// a microsecond taken on somebody's laptop is not evidence anybody else can
-// use, and this page would rather show nothing than show that.
+// The component tables are rendered FROM the repository's own measurement
+// artefacts, not from figures retyped into this file. The counts come from the
+// baseline CI gates against on every push, so a number here is a number a
+// machine checked. The timing summary is only rendered when a CI run has
+// produced one: a microsecond taken on somebody's laptop is not evidence
+// anybody else can use, and this page would rather show nothing than show that.
 ---
 
 <Base
   title="Benchmark — form-contract"
   description="Two lanes: deterministic counts gated in CI, and microseconds from Chrome's own trace that are printed and never gated. The harness publishes its own resolution above its results."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">What the benchmark can, and cannot, see</h1>
+  <h1 class="text-3xl font-bold sm:text-4xl">Benchmark</h1>
 
-  <p class="mt-6 leading-relaxed text-on-surface-variant">
-    Five form runtimes plus a hand-written reference are driven through one
-    scripted transcript against{" "}
-    <strong class="text-on-surface">one zod schema the harness owns and
-    instruments</strong>, rendering{" "}
-    <strong class="text-on-surface">one DOM the harness owns and hashes</strong>.
-    No count is produced by code an adapter author wrote: renders come from
-    fiber alternates, validation work from a harness-owned schema wrapper, DOM
-    changes from a <code>MutationObserver</code>. There is no counter to place
-    favourably.
+  <p class="lead">
+    <strong class="text-on-surface">form-contract is behind on all three
+    scenarios, at every size.</strong> The report says so in those words, and
+    prints the rows it loses before its own table.
   </p>
 
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Nothing is printed until six proofs hold — that every subject reached the
-    same schema instance, judged the same root, rendered the same DOM, is
-    actually wired up, and that the oracle would have noticed had it not been.
+  <ol class="mt-6 grid gap-3">
+    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+      Two of the three losses are won by <strong>not showing the message</strong>:
+      one configuration reports only at submit, and one reports nothing at all.
+      The third is form-contract's own uncontrolled binding.
+    </li>
+    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+      On the timing lane a keystroke at 201 fields measures{" "}
+      <strong>0.57× the hand-written reference</strong>, and the harness
+      <strong> refuses to call it a win</strong> — its own calibration ladder
+      resolves nothing that far under the floor.
+    </li>
+    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+      Every integer on the counts lane is gated. CI fails when one moves, in
+      either direction.
+    </li>
+  </ol>
+
+  <p class="caption">
+    What follows is why those numbers can be trusted, which is the longer half.
+    The question the lane asks is not how much a commit costs but whether one
+    happens: <code>useField</code> subscribes to the value cell, so a keystroke
+    is a render; <code>useUncontrolledField</code> subscribes imperatively and
+    writes the DOM node, which is what <code>register</code> does for
+    react-hook-form.
   </p>
 
   <!-- ================================================== counts -->
   <h2 class="mt-16 text-2xl font-bold">The counts lane, which is gated</h2>
   <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Commits, changed fibers, DOM mutations and validator passes are integers
-    that do not depend on the machine, which is the only reason a CI gate can
-    exist at all. A drift is therefore never noise, and CI fails on one.
+    These integers do not depend on the machine, which is the only reason a CI
+    gate can exist at all.
   </p>
 
   <CountsTable />
 
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    <code>validatorPasses</code> and <code>paths judged</code> sit on every row
-    beside the render counts, so a zero-commit row can never be read as free.
-    The two react-hook-form rows above commit nothing and re-render nothing for
-    a keystroke — <code>register</code> leaves the inputs uncontrolled — while
-    still handing the whole 201-path root to the schema to find out whether the
-    verdict moved. The <code>on-submit</code> row does not even do that, by
-    documented design, which is what its agreement cell records.
+  <p class="caption">
+    <code>validatorPasses</code> and <code>paths judged</code> sit beside the
+    render counts, so a zero-commit row can never be read as free: the two
+    react-hook-form rows commit nothing for a keystroke — <code>register</code>
+    leaves the inputs uncontrolled — and still hand the whole 201-path root to
+    the schema. The <code>on-submit</code> row does not even do that, by
+    documented design.
   </p>
 
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    Read the fiber column carefully: it is{" "}
+  <p class="caption">
+    The fiber column is{" "}
     <strong class="text-on-surface">leaves + a constant</strong>, and the
-    constant is what differs. At 31, 61 and 201 fields the hand-written
-    reference reports 39, 69 and 209 — always the field count plus eight. That
-    is React cloning the whole sibling list of the form it had to descend
-    through, and every implementation that commits at all pays it. What
-    form-contract adds on top is 3, at every size.
-  </p>
-
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    So the question worth asking is not how much a commit costs but whether one
-    happens. <code>useField</code> subscribes to the value cell, which makes the
-    input controlled and a keystroke a render.{" "}
-    <code>useUncontrolledField</code> subscribes to the same cell imperatively
-    and writes the DOM node instead, which is what
-    <code>register</code> does for react-hook-form and why both read zero above.
+    constant is what differs: at 31, 61 and 201 fields the hand-written
+    reference reports 39, 69 and 209 — React cloning the sibling list of the
+    form it descended through, which every implementation that commits at all
+    pays. What form-contract adds on top is 3, at every size.
   </p>
 
   <ScenarioTable />
 
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    The middle column is where the deferred pass shows up as a cost rather than
-    a saving. With <code>useField</code> the value lands in one task and the
-    verdict in the next, so React cannot batch them and commits twice.
-    Uncontrolled, the value write stops being React's business and only the
-    verdict commits.
-  </p>
-
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    The last column is the one the whole-root pass was built for. A rule
-    reporting against a field nobody touched costs form-contract one commit and
-    one schema pass. react-hook-form in its scoped configuration does not show
-    it at all; the <code>deps</code> configuration that does costs 1213 changed
-    fibers, two passes and 402 paths judged.
+  <p class="caption">
+    The middle column is where the deferred pass costs rather than saves: with
+    <code>useField</code> the value lands in one task and the verdict in the
+    next, so React cannot batch them and commits twice. The last column is the
+    one the whole-root pass was built for — a rule reporting against a field
+    nobody touched costs the uncontrolled form-contract row one commit and one
+    schema pass, and costs the react-hook-form <code>deps</code> configuration
+    two passes and 402 paths judged.
   </p>
 
   <!-- ================================================== time -->
   <h2 class="mt-16 text-2xl font-bold">The timing lane, which is never gated</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Headless Chrome over CDP, every figure taken from the browser's own trace
-    rather than from page JavaScript. 21 interleaved pairs per comparison, order
-    alternating every pair, both members of a pair inside one tracing session on
-    two origins so that they are two renderer processes.
-  </p>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Before it compares anything it measures itself: a known cost injected at
-    seven sizes and three scheduling positions, and every subject run against a
-    byte-identical twin of itself at every size. A band that overlaps the twin's
-    band prints <code>indistinguishable</code>, never a win.
-  </p>
 
   <TimingTable />
 
-  <!-- ================================================== excluded -->
-  <h2 class="mt-16 text-2xl font-bold">What was measured and then thrown away</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Each excluded metric is published with the measurement that excluded it, so
-    a reader can check whether the discarded ones happen to be the flattering
-    ones. <code>ScriptDuration</code> showed a 245% spread between two
-    byte-identical pages. <code>TaskDuration</code> is dominated by the driver's
-    own CDP round trip. <code>PerformanceEventTiming.duration</code> is quantised
-    to 8 ms, larger than everything the lane publishes.
-    React's <code>Profiler.actualDuration</code> excludes commit and fires zero
-    times in the production build this lane requires. And every millisecond
-    taken in jsdom, because jsdom has no layout, no style resolution and no
-    paint — on a page like this one, layout alone is routinely larger than the
-    script that precedes it.
+  <p class="caption">
+    Headless Chrome over CDP, every figure taken from the browser's own trace
+    rather than from page JavaScript, order alternating every pair, both members
+    of a pair inside one tracing session on two origins so that they are two
+    renderer processes. Before it compares anything it measures itself: a known
+    cost injected at seven sizes, and every subject run against a byte-identical
+    twin of itself at every size. A band that overlaps the twin's band prints{" "}
+    <code>indistinguishable</code>, never a win.
   </p>
 
-  <p class="mt-8 text-sm leading-relaxed text-on-surface-variant">
+  <!-- ================================================== excluded -->
+  <p class="caption">
+    Each is published with the measurement that excluded it, in{" "}
+    <code>docs/measurements-forms-time.md</code> §4.
+  </p>
+
+  <p class="caption">
     Both lanes are run by <code>npm run bench:forms</code> and{" "}
     <code>npm run bench:forms:time</code>, and the design that argues for every
     choice above is in <code>docs/design/form-benchmark.md</code>.

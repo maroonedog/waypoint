@@ -36,7 +36,7 @@ const snippets = [
   },
   {
     title: "A list",
-    note: "A row hands down its own address. There is no nested-array API.",
+    note: "There is no nested-array API.",
     lang: "tsx" as const,
     code: `const items = useRows("items");
 
@@ -47,7 +47,7 @@ items.insert(items.rows.length, { sku: "" });`,
   },
   {
     title: "A cross-field rule",
-    note: "Lands on the other path. No deps array, no dependents list.",
+    note: "No deps array, no dependents list.",
     lang: "ts" as const,
     code: `.superRefine((value, ctx) => {
   if (value.billing.postcode !== value.shipping.postcode) {
@@ -60,7 +60,7 @@ items.insert(items.rows.length, { sku: "" });`,
   },
   {
     title: "Submit",
-    note: "Judges the whole root, so an off-screen field still blocks.",
+    note: "",
     lang: "ts" as const,
     code: `const { submitted, blockedBy } = await form.submit(save);
 
@@ -100,7 +100,7 @@ const TRY = [
   <h1 class="mt-3 text-4xl font-bold leading-tight text-balance sm:text-5xl">
     One function turns a validator into a form.
   </h1>
-  <p class="mt-5 max-w-2xl text-lg leading-relaxed text-on-surface-variant">
+  <p class="lead">
     A renderer needs to know what a field accepts <em>before</em> anyone types
     in it. Validation answers after a value exists — too late to choose an
     input or fill in <code>minlength</code>. This is the other half.
@@ -122,13 +122,6 @@ const TRY = [
   <!-- ================================================== live -->
   <section class="mt-20">
     <h2 class="text-2xl font-bold">The error belongs to the field you did not touch</h2>
-    <p class="mt-3 leading-relaxed text-on-surface-variant">
-      <strong class="text-on-surface">Change billing below and the message
-      appears on shipping</strong> — a field you never touched, with no
-      dependency list anywhere in your application. The real library, built
-      from source; the number on each row is how many times that row has
-      rendered.
-    </p>
 
     <LiveForm client:load />
 
@@ -142,15 +135,15 @@ const TRY = [
         ))
       }
     </ul>
+
+    <p class="caption">
+      The real library, built from source.
+    </p>
   </section>
 
   <!-- ================================================== in code -->
   <section class="mt-20">
     <h2 class="text-2xl font-bold">Six things, in code</h2>
-    <p class="mt-3 text-sm text-on-surface-variant">
-      Every hook and component, with its real signature, is on{" "}
-      <a class="text-primary underline underline-offset-4" href="/api/">API</a>.
-    </p>
     <!-- min-w-0 on the item: a grid item defaults to min-width:auto, so the
          widest code block sizes the track and the page scrolls sideways on a
          phone. Same trap as the API entries. -->
@@ -158,25 +151,31 @@ const TRY = [
       {
         snippets.map((one) => (
           <div class="min-w-0">
-            <p class="text-sm font-semibold">{one.title}</p>
-            <p class="mt-1 mb-2 text-sm text-on-surface-variant">{one.note}</p>
+            <p class="mb-2 text-sm font-semibold">{one.title}</p>
             <Code code={one.code} lang={one.lang} flush />
+            {one.note && (
+              <p class="caption">{one.note}</p>
+            )}
           </div>
         ))
       }
     </div>
+    <p class="caption">
+      Every hook and component, with its real signature, is on{" "}
+      <a class="text-primary underline underline-offset-4" href="/api/">API</a>.
+    </p>
   </section>
 
   <!-- ================================================== measured -->
   <section class="mt-20">
     <h2 class="text-2xl font-bold">Measured, losses first</h2>
-    <p class="mt-3 leading-relaxed text-on-surface-variant">
+    <p class="caption">
       <strong class="text-on-surface">form-contract is behind on all three
-      scenarios, at every size</strong> — and the report says so in those words
-      before it prints a table. What is worth reading is who beats it:
+      scenarios, at every size</strong> — the report says so in those words
+      before it prints a table.
     </p>
 
-    <div class="mt-5 overflow-x-auto">
+    <div class="mt-6 overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="text-left text-on-surface-variant">
           <tr class="hairline">
@@ -217,13 +216,8 @@ const TRY = [
       </table>
     </div>
 
-    <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-      Two of the three are won by not doing the work: one shows the message
-      only at submit, and one shows no message at all. The third is
-      form-contract's own uncontrolled binding, which is also zero —{" "}
-      <a class="text-primary underline underline-offset-4" href="/runtime/"
-        >that table is on the runtime page</a
-      >. Every integer here is gated: CI fails when one of them moves.{" "}
+    <p class="caption">
+      Every integer here is gated: CI fails when one of them moves.{" "}
       <a class="text-primary underline underline-offset-4" href="/benchmark/"
         >What the benchmark can and cannot see →</a
       >
@@ -233,17 +227,15 @@ const TRY = [
   <!-- ================================================== status -->
   <section class="mt-20 rounded-xl border border-outline-variant p-6">
     <h2 class="text-lg font-bold">Where it stands</h2>
-    <p class="mt-3 leading-relaxed text-on-surface-variant">
-      128 tests, six compile-time programs that pin the path types, and a
-      screen that uses all of it. <strong class="text-on-surface"
-        >No package has ever been published — there is no publish script and no
-        publish workflow — and nobody has run it in production.</strong
-      >
+    <p class="mt-3 leading-relaxed">
+      <strong>No package has ever been published — there is no publish script
+      and no publish workflow — and nobody has run it in production.</strong>
     </p>
-    <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-      Two limits: a field whose key contains a dot cannot be addressed, and the
-      validation pass judges the whole root on every settled change — which is
-      what lets a rule report against a field that did not move.
+    <p class="caption">
+      128 tests, six compile-time programs that pin the path types, and a
+      screen that uses all of it. Two limits: a field whose key contains a dot
+      cannot be addressed, and the validation pass judges the whole root on
+      every settled change.
     </p>
   </section>
 </Base>

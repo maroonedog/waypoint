@@ -82,23 +82,17 @@ import type * as z from "zod";
 >
   <h1 class="text-3xl font-bold sm:text-4xl">The contract</h1>
 
-  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+  <p class="lead">
     <strong class="text-on-surface">A validator already knows that this field
     is required, capped at twenty characters and one of three values.</strong>{" "}
-    The contract is how it says so <em>before</em> anyone types — which is the
-    only moment a renderer can use it.
+    The contract is how it says so <em>before</em> anyone types.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What a descriptor draws</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    The required marker, the length bounds, the numeric range and a closed
-    field's options come off the schema, so nobody writes them a second time in
-    the JSX.
-  </p>
 
   <Code code={drawn} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+  <p class="caption">
     Stage 2 is what the resolver returns and stage 3 is what{" "}
     <code>inputProps</code> carries; both were produced by running them, not
     typed out. An attribute is emitted only when the schema declared the bound
@@ -106,68 +100,65 @@ import type * as z from "zod";
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Two members</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    All of that is two members: a list of descriptors, and one function that
-    judges a whole root.
-  </p>
 
   <Code code={resolver} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    A resolver is a plain function, named at the call site. There is no
-    registry, no vendor tag and no dispatch, because whoever writes the call
-    already knows which validator they are using.
+  <p class="caption">
+    There is no registry, no vendor tag and no dispatch: a resolver is named at
+    the call site.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">One descriptor is one field</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    One entry per leaf, and an array is described once through a wildcard
-    rather than once per row — because the number of rows is not known until
-    there is a value, and the description has to be readable before one exists.
-  </p>
 
   <Code code={descriptor} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    Constraint values are carried <em>as declared</em>. A pattern stays a{" "}
-    <code>RegExp</code>, because how a renderer spells one is that renderer's
-    business.
+  <p class="caption">
+    One entry per leaf, and an array is described once through a wildcard
+    rather than once per row. Constraint values are carried{" "}
+    <em>as declared</em>: a pattern stays a <code>RegExp</code>.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">The type survives</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    The resolver hands the value type through, which is why a misspelt path is
-    a compile error rather than an input that renders blank and is never
-    validated.
-  </p>
 
   <Code code={types} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    Carrying the type is also what keeps the contract neutral about direction:
-    a type-first validator passes the type its rules were written against, a
-    schema-first one passes what its schema infers, and both arrive as the same
-    form.{" "}
+  <p class="caption">
+    The contract is neutral about direction: a type-first validator passes the
+    type its rules were written against, a schema-first one passes what its
+    schema infers, and both arrive as the same form.{" "}
     <a class="text-primary underline underline-offset-4" href="/paths/"
       >How a path gets its type →</a
     >
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Bring your own validator, and your own copy of it</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    The resolver never imports zod at run time — one <code>import type</code>,
-    erased at build, and the compiled output does not mention it. So it cannot
-    pin a version or pull in a second copy: zod is declared as a peer, and the
-    one you already installed is the one it describes.
-  </p>
 
   <Code code={weight} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    One resolver ships today and it is zod. The contract is two members, so
-    writing another is a plain function — and{" "}
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <tbody>
+        <tr class="hairline">
+          <td class="w-40 py-3 pr-4 align-top font-medium">At run time</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            Nothing — one <code>import type</code>, erased at build.
+          </td>
+        </tr>
+        <tr class="hairline">
+          <td class="w-40 py-3 pr-4 align-top font-medium">At install time</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            zod is declared as a peer, so the copy you already installed is the
+            one it describes; the resolver cannot pin a version or pull in a
+            second.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="caption">
     <a class="text-primary underline underline-offset-4" href="/start/"
-      >what each package gives you</a
-    > is on the Start page.
+      >What each package gives you →</a
+    >
   </p>
 </Base>

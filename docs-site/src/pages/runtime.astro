@@ -25,11 +25,11 @@ await form.submit(save);      // judges first; hands over only if nothing blocks
 const TRY = [
   [
     "Type in name",
-    "Only that row's counter moves. The other four do not render at all — a component subscribes to the cells it reads and to nothing else.",
+    "Only that row's counter moves. The other four do not render at all.",
   ],
   [
     "Change billing",
-    "The error lands on shipping, a field you did not touch, with no deps array anywhere. One pass judges the whole root and the diff writes wherever the verdict moved.",
+    "The error lands on shipping, a field you did not touch. One pass judges the whole root and the diff writes wherever the verdict moved.",
   ],
   [
     "Switch to useUncontrolledField, then type a valid value",
@@ -63,17 +63,12 @@ const woken = [
 >
   <h1 class="text-3xl font-bold sm:text-4xl">How a value changes</h1>
 
-  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+  <p class="lead">
     <strong class="text-on-surface">A keystroke wakes the row it landed in,
     plus the row an error moved to — no other field row renders.</strong>{" "}
     Nothing is lifted and there is no dependency array: values live in a flat,
     path-keyed cell space outside React, and a component subscribes to the
     cells it reads.
-  </p>
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Below is that runtime, running. The number on each row is how many times
-    that row has rendered.
   </p>
 
   <LiveForm client:load />
@@ -90,14 +85,8 @@ const woken = [
   </div>
 
   <h2 class="mt-16 text-2xl font-bold">Typing that costs React nothing</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    The same cell, subscribed imperatively, writes the DOM node instead of
-    re-rendering — so at 201 fields a keystroke that moves no verdict is zero
-    commits and zero changed fibers. This is parity with react-hook-form's{" "}
-    <code>register</code>, not a win over it.
-  </p>
 
-  <div class="mt-5 overflow-x-auto">
+  <div class="mt-6 overflow-x-auto">
     <table class="w-full text-sm">
       <thead class="text-left text-on-surface-variant">
         <tr class="hairline">
@@ -124,12 +113,12 @@ const woken = [
     </table>
   </div>
 
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    The price, and why it is a second hook rather than the default: an
+  <p class="caption">
+    That zero is parity with react-hook-form's <code>register</code>, not a win
+    over it. The price, and why it is a second hook rather than the default: an
     uncontrolled input cannot be transformed as it is typed. Masking,
     upper-casing and inserting separators all need the value to come back
-    through React, which is what <code>useField</code> is for. Flip the toggle
-    on the demo above to watch the counters stop.
+    through React, which is what <code>useField</code> is for.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What one keystroke does</h2>
@@ -137,30 +126,23 @@ const woken = [
   <WriteFlow />
 
   <h2 class="mt-16 text-2xl font-bold">Writing</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    Every write goes through a handle — a field or a row list addressed by
-    path, or the form itself. No <code>setState</code>, and no form object to
-    spread.
-  </p>
 
   <Code code={writing} />
 
-  <p class="mt-8 rounded-lg border border-outline-variant p-5 leading-relaxed">
-    <strong>What asks for a pass, and what does not</strong> — and what one
-    costs — is on{" "}
+  <p class="caption">
+    No <code>setState</code>, and no form object to spread.
+  </p>
+
+  <p
+    class="mt-8 rounded-lg border border-outline-variant p-4 text-sm leading-relaxed text-on-surface-variant"
+  >
+    What asks for a pass, and what does not — and what one costs — is on{" "}
     <a class="text-primary underline underline-offset-4" href="/validation/"
       >Validation</a
-    >, which owns the whole-root pass so that no two pages describe it in
-    different words.
+    >.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Who gets woken</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    A cell wakes its readers only when what it holds changes identity — write
-    the same value into a field again and the store gates it, so no row
-    renders at all. The pass still runs: <code>setValue</code> always asks for
-    one.
-  </p>
 
   <div class="mt-6 overflow-x-auto">
     <table class="w-full text-sm">
@@ -187,8 +169,12 @@ const woken = [
     </table>
   </div>
 
-  <p class="mt-10 text-sm leading-relaxed text-on-surface-variant">
+  <p class="caption">
+    The pass still runs: <code>setValue</code> always asks for one.
+  </p>
+
+  <p class="caption">
     Every figure here came from running the runtime with a counting adapter
-    around the real zod resolver. The demo is that same runtime.
+    around the real zod resolver.
   </p>
 </Base>

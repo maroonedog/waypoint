@@ -89,15 +89,15 @@ const here = Astro.url.pathname;
       </nav>
     </header>
 
-    <main class="mx-auto max-w-5xl px-6 py-16 sm:py-20">
+    <!-- The space that opens a page has to be larger than the space between
+         two sections, or the first section reads as the second one. -->
+    <main class="mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-24">
       <slot />
     </main>
 
-    <footer
-      class="mx-auto max-w-5xl px-6 pb-16 text-sm leading-relaxed text-on-surface-variant"
-    >
+    <footer class="mx-auto max-w-5xl px-6 pb-16">
       <div class="hairline pt-8">
-        <p>
+        <p class="caption">
           MIT licensed. One resolver ships today and it is{" "}
           <a
             class="text-primary underline underline-offset-4"

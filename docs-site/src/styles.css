@@ -30,9 +30,24 @@ pre {
 /* The column is wide so that code, diagrams and reference tables have room.
    Running text must not use all of it: a line of seventy-odd characters is
    read, and a line of a hundred and twenty is scanned and lost. The cap is on
-   the text itself rather than on the column, so the two can differ. */
+   the text itself rather than on the column, so the two can differ.
+
+   Three measures, because there are now three sizes of running text and a
+   measure counts characters: the lead is set larger and needs fewer of them,
+   a caption is set smaller and has to stay narrower than the block it hangs
+   off or it stops reading as subordinate to it. A label strip is not running
+   text — it is the width of the block it names. */
 main :is(p, li, figcaption) {
   max-width: 72ch;
+}
+main .lead {
+  max-width: 58ch;
+}
+main .caption {
+  max-width: 62ch;
+}
+main .code-label {
+  max-width: none;
 }
 
 /* Headings need a shorter measure than body text, not a longer one: they are
@@ -44,4 +59,113 @@ main h1 {
 }
 main h2 {
   max-width: 34ch;
+}
+
+/* ===========================================================================
+   Rhythm.
+
+   Five gaps, no two the same: a caption against its block, a heading against
+   its evidence, one block from the next, a subsection, a section. The pages
+   spell these as utilities and there are only two values among them — 64px at
+   a heading, 12 to 24px everywhere else — which is why a page reads as one
+   column instead of six sections.
+
+   Unlayered element rules, so they win over the mt-* utilities in Tailwind's
+   utilities layer whatever the specificity. The mt-16 and mt-3 left on the
+   pages are inert and can come off in the page pass.
+   =========================================================================== */
+:root {
+  --gap-caption: 0.5rem;
+  --gap-heading: 0.875rem;
+  --gap-block: 1.5rem;
+  --gap-subsection: 2.5rem;
+  --gap-section: 4rem;
+}
+
+main > :is(h2, section) {
+  margin-top: var(--gap-section);
+}
+main > h3 {
+  margin-top: var(--gap-subsection);
+}
+
+/* A heading owns what is under it. Last, so a subsection heading opening a
+   section binds to it instead of being held off by the subsection gap. */
+main :is(h2, h3) + * {
+  margin-top: var(--gap-heading);
+}
+
+/* Code is most of the page, so its spacing is the page's rather than a
+   utility repeated at every call site. :where() holds it at zero specificity,
+   which is what lets the heading rule above still pull a block up under its
+   own heading. */
+main :where(.code-block) {
+  margin-top: var(--gap-block);
+}
+main :where(.code-block.is-flush) {
+  margin-top: 0;
+}
+
+/* ===========================================================================
+   Caption.
+
+   Small type belonging to the block above it: the qualification, the
+   provenance line, the thing the evidence cannot say about itself. Attached
+   by proximity — the smallest gap on the site above it, an ordinary one
+   below. A caption spaced evenly between two blocks belongs to neither, which
+   is what the site has now.
+   =========================================================================== */
+.caption {
+  margin-top: var(--gap-caption);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--md-on-surface-variant);
+}
+.caption + .caption {
+  margin-top: 0.25rem;
+}
+.caption + :not(.caption, h2, h3, section) {
+  margin-top: var(--gap-block);
+}
+
+/* The one paragraph a page opens with: larger than body, shorter measure, and
+   still the muted role so the <strong> inside it is where the eye lands. */
+.lead {
+  margin-top: var(--gap-block);
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--md-on-surface-variant);
+}
+
+/* One micro-label: a column header, a code block's strip, the name over a
+   returns table. Told apart by case and tracking rather than by weight or a
+   filled band — a heavy row at the top of a dense table reads as data. */
+.label,
+main thead th {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--md-on-surface-variant);
+}
+
+/* ===========================================================================
+   Reference tables.
+
+   The densest thing on the site, set until now at body leading. A table is
+   read across a row and down a column, never in sentences: the type steps
+   down to the caption size, the leading to 1.5, and row padding becomes one
+   number in one place rather than py-2 / py-2.5 / py-3 across seven
+   components. Figures line up because half these columns are integers meant
+   to be compared down the column.
+   =========================================================================== */
+main table {
+  width: 100%;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+main :is(th, td) {
+  padding-block: 0.5rem;
+  line-height: 1.5;
+  vertical-align: top;
 }

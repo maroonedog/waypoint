@@ -100,7 +100,7 @@ const triggers = [
 >
   <h1 class="text-3xl font-bold sm:text-4xl">Validation</h1>
 
-  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+  <p class="lead">
     <strong class="text-on-surface">Every settled change judges the whole
     root.</strong> That is what lets a rule report against a field that did not
     move, and what lets a field nobody rendered still block a submit. It is
@@ -108,19 +108,14 @@ const triggers = [
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">A rule that spans two fields</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    A rule comparing two fields puts its message on the one it chooses — and
-    nothing in your application lists which field depends on which.
-  </p>
-
   <Code code={crossField} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    The demo on the <a class="text-primary underline underline-offset-4" href="/"
+  <p class="caption">
+    Nothing in your application lists which field depends on which. The demo on
+    the <a class="text-primary underline underline-offset-4" href="/"
       >home page</a
-    > runs exactly that: change billing, and the message appears on shipping. Two
-    tests pin the halves of it — an edit to one field moving the verdict on
-    another path, and a rule reading a sibling whose component is
+    > runs exactly that: change billing, and the message appears on shipping —
+    and the rule goes on reading shipping when its component is
     <em>not mounted</em>. The benchmark asks every subject for it as scenario
     X1, and at all three sizes one configuration is scored{" "}
     <em>disagrees</em> there: <code>react-hook-form-scoped</code>, which showed
@@ -136,21 +131,12 @@ const triggers = [
 
   <Code code={unrendered} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+  <p class="caption">
     <code>blockedBy</code> carries the path, so an application can open the
-    right section instead of disabling a button with no explanation. Mounting
-    is a subscription and nothing else: every cell exists from{" "}
-    <code>createForm</code>, and subscribing re-derives the value from the
-    root, so a component that was absent for a write starts from what the form
-    actually holds.
+    right section instead of disabling a button with no explanation.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Hiding a section without throwing its data away</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    A subtree switched off stops blocking a submit and keeps every value it
-    holds, so a rule that compares against it goes on reading it.
-  </p>
-
   <Code code={participation} />
 
   <div class="mt-5 overflow-x-auto">
@@ -177,44 +163,27 @@ const triggers = [
   </div>
 
   <h2 class="mt-16 text-2xl font-bold">What submit says when it refuses</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    Submit judges first and reports what stopped it, rather than returning a
-    boolean and leaving you to find out.
-  </p>
-
   <Code code={submitTypes} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+  <p class="caption">
     The handler runs only when nothing blocks. A handler that throws does not
     resolve — submit rejects — and the attempt still counts, so{" "}
     <code>submitCount</code> goes up either way.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">A validator that has to ask something</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    A uniqueness check against a server is the same member: <code>validate</code>{" "}
-    may return a promise, and nothing downstream pays for the possibility when
-    it does not.
-  </p>
-
   <Code code={asyncOne} />
   <Code code={numbered} />
 
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    <code>form.validating</code> is true only while a pass is in flight. A pass
-    that <em>throws</em> leaves the previous verdict standing: an error reaching
-    the network is not evidence that the form became acceptable. The stated
-    cost — there is no validation mode and no debounce, so a slow validator is
-    asked on every settled change.
+  <p class="caption">
+    <code>form.validating</code> is true only while a pass is in flight; a pass
+    that <em>throws</em> leaves the previous verdict standing. There is no
+    validation mode and no debounce, so a slow validator is asked on every
+    settled change.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What asks for a pass, and what does not</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    Nothing on this list costs more than one pass, and the calls that cost none
-    are the ones with nothing to judge.
-  </p>
-
-  <div class="mt-5 overflow-x-auto">
+  <div class="mt-6 overflow-x-auto">
     <table class="w-full text-sm">
       <thead class="text-left text-on-surface-variant">
         <tr class="hairline">
@@ -250,12 +219,7 @@ const triggers = [
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What it costs</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
-    One pass, and it judges every declared path whatever was edited. These are
-    the gated figures for one keystroke whose verdict does not move:
-  </p>
-
-  <div class="mt-5 overflow-x-auto">
+  <div class="mt-6 overflow-x-auto">
     <table class="w-full text-sm">
       <thead class="text-left text-on-surface-variant">
         <tr class="hairline">
@@ -278,11 +242,11 @@ const triggers = [
     </table>
   </div>
 
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    The pass count does not follow the edit; the paths judged are the schema.
-    Those integers live in <code>config/form-baseline.json</code>, which is not
-    a copy of the results — it is the file <code>npm run bench:forms:check</code>{" "}
-    compares every run against, and CI fails when one of them moves.{" "}
+  <p class="caption">
+    One keystroke whose verdict does not move. Those integers live in{" "}
+    <code>config/form-baseline.json</code> — the file{" "}
+    <code>npm run bench:forms:check</code> compares every run against, and CI
+    fails when one of them moves.{" "}
     <a class="text-primary underline underline-offset-4" href="/benchmark/"
       >What the benchmark can and cannot see →</a
     >

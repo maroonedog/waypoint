@@ -19,19 +19,27 @@ interface Props {
   readonly lang?: "ts" | "tsx";
   /** Drop the top margin, for a block that sits directly under its own label. */
   readonly flush?: boolean;
+  /**
+   * Two or three words, set into a strip on the block itself. It is here so a
+   * section can be a heading and a block of code: the sentence above that
+   * only said what the code was becomes the strip. Anything longer than a few
+   * words was never a label and belongs under the block as a caption.
+   */
+  readonly label?: string;
 }
 
-const { code, lang = "ts", flush = false } = Astro.props;
+const { code, lang = "ts", flush = false, label } = Astro.props;
 ---
 
-<div class:list={["overflow-hidden rounded-lg", flush ? "" : "mt-6"]}>
+<figure class:list={["code-block overflow-hidden rounded-lg", flush && "is-flush"]}>
+  {label !== undefined && <figcaption class="label code-label">{label}</figcaption>}
   <Shiki
     code={code.trim()}
     lang={lang}
     themes={{ light: "github-light", dark: "github-dark-dimmed" }}
     defaultColor={false}
   />
-</div>
+</figure>
 
 <style is:global>
   /* Shiki writes both themes as custom properties; this picks one without a
@@ -53,5 +61,18 @@ const { code, lang = "ts", flush = false } = Astro.props;
     font-size: 0.875rem;
     line-height: 1.7;
     border-radius: 0.5rem;
+  }
+
+  /* The strip is part of the block, not a line above it: one rounded
+     container, a square join, and a surface a step off the page so it reads
+     as attached to the code rather than floating over it. Its type is
+     .label — a column header, a returns label and this are one role. */
+  .code-label {
+    padding: 0.5rem 1.25rem;
+    background: var(--md-surface-container);
+  }
+  .code-block:has(.code-label) .astro-code {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
   }
 </style>

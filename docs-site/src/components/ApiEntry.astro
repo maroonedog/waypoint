@@ -29,12 +29,17 @@ const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
 
 <!-- min-w-0: a grid item defaults to min-width:auto, so the widest code block
-     inside sizes the track and the whole page scrolls sideways on a phone. -->
-<section id={slug} class="hairline min-w-0 pt-10 first:border-t-0 first:pt-0">
+     inside sizes the track and the whole page scrolls sideways on a phone.
+     pt-6 against the grid's own gap-10: the rule sits nearer the entry it
+     opens than the one it closes. Centred between two, it opens neither. -->
+<section id={slug} class="hairline min-w-0 pt-6 first:border-t-0 first:pt-0">
   <h3 class="font-mono text-lg font-semibold">
     <a href={`#${slug}`} class="hover:text-primary">{name}</a>
   </h3>
-  <p class="mt-2 max-w-2xl leading-relaxed text-on-surface-variant">{summary}</p>
+  <!-- Not the muted role: in a reference the one-line summary IS the entry,
+       and on-surface-variant is spoken for now by captions and table notes.
+       The gap under the heading and the measure come from the stylesheet. -->
+  <p class="leading-relaxed">{summary}</p>
 
   <Code code={signature} />
 
@@ -42,24 +47,20 @@ const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
   {
     returns !== undefined && (
-      <div class="mt-5">
-        <p class="text-xs font-semibold tracking-wide text-on-surface-variant uppercase">
-          {returnsTitle ?? "Returns"}
-        </p>
+      <div class="mt-6">
+        <p class="label">{returnsTitle ?? "Returns"}</p>
         <div class="mt-2 overflow-x-auto">
-          <table class="w-full text-sm">
+          <table>
             <tbody>
               {returns.map((member) => (
                 <tr class="hairline">
-                  <td class="py-2.5 pr-4 align-top font-mono text-xs whitespace-nowrap">
+                  <td class="pr-4 font-mono text-xs whitespace-nowrap">
                     {member.name}
                   </td>
-                  <td class="py-2.5 pr-4 align-top font-mono text-xs whitespace-nowrap text-primary">
+                  <td class="pr-4 font-mono text-xs whitespace-nowrap text-primary">
                     {member.type}
                   </td>
-                  <td class="py-2.5 align-top leading-relaxed text-on-surface-variant">
-                    {member.note}
-                  </td>
+                  <td class="text-on-surface-variant">{member.note}</td>
                 </tr>
               ))}
             </tbody>
