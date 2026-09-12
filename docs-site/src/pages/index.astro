@@ -1,186 +1,221 @@
 ---
+// ===========================================================================
+// index.astro — code first, prose second.
+//
+// A reader deciding whether to use this wants to see what it looks like to
+// write and what it does when they type in it. Both are on the page before
+// any argument is made, and the arguments that remain are one sentence each.
+// ===========================================================================
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import LiveForm from "../demo/LiveForm.tsx";
 
-const resolver = `
-type FormResolver<TSchema, T, TPath extends string = string> =
-  (schema: TSchema) => FormAdapter<T, TPath>;
+const whole = `
+// 1. Any validator becomes a form description. One function, named by you.
+const orderAdapter = zodFormResolver(orderSchema);
 
-interface FormAdapter<T, TPath extends string = string> {
-  readonly fields: readonly FormFieldDescriptor[];
-  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
+// 2. Its types, registered once for the whole application.
+declare module "form-react" {
+  interface FormTypeRegistry { form: typeof orderAdapter }
 }
+
+// 3. Any component, any depth. No props, no context type, no assertions.
+const field = useField("billing.postcode");   //  string | undefined
+const typo  = useField("billing.postcod");    //  compile error
 `;
 
-const layers = [
+const snippets = [
   {
-    n: "Layer 1",
-    head: "<AutoForm />",
-    body: "Draws every declared field, in declaration order. Nothing to write.",
+    title: "A field",
+    note: "It subscribes to the cells it reads and to nothing else.",
+    lang: "tsx" as const,
+    code: `const field = useField("owner.name");
+
+<input {...field.inputProps} />
+<em>{field.issues[0]?.message}</em>`,
   },
   {
-    n: "Layer 2",
-    head: '<Field path="…" as="postcode" />',
-    body: "Keeps the layout and names a widget from a registry.",
+    title: "A list",
+    note: "A row hands down its own address. There is no nested-array API.",
+    lang: "tsx" as const,
+    code: `const items = useRows("items");
+
+items.rows.map((row) => (
+  <Sku key={row.key} at={\`\${row.path}.sku\`} />
+))
+items.insert(items.rows.length, { sku: "" });`,
   },
   {
-    n: "Layer 3",
-    head: "<Field>{(field) => …}</Field>",
-    body: "Plain React. No second DSL, and no class name of ours.",
+    title: "A cross-field rule",
+    note: "Lands on the other path. No deps array, no dependents list.",
+    lang: "ts" as const,
+    code: `.superRefine((value, ctx) => {
+  if (value.billing.postcode !== value.shipping.postcode) {
+    ctx.addIssue({
+      path: ["shipping", "postcode"],   // not the field being typed in
+      message: "Does not match billing",
+    });
+  }
+})`,
   },
+  {
+    title: "Submit",
+    note: "Judges the whole root, so an off-screen field still blocks.",
+    lang: "ts" as const,
+    code: `const { submitted, blockedBy } = await form.submit(save);
+
+// blockedBy carries every blocking issue, including
+// paths with no component on screen.`,
+  },
+  {
+    title: "Not waking React",
+    note: "The same cell, subscribed imperatively. A keystroke costs 0 commits.",
+    lang: "tsx" as const,
+    code: `const field = useUncontrolledField("owner.name");
+
+<input defaultValue={field.defaultValue} ref={field.ref}
+       onChange={field.onChange} onBlur={field.onBlur} />`,
+  },
+  {
+    title: "Switching a subtree off",
+    note: "It stops blocking submit and keeps its values.",
+    lang: "ts" as const,
+    code: `useParticipation(form, "shipping", !sameAsBilling);
+
+// A rule comparing against it goes on reading it.`,
+  },
+];
+
+const TRY = [
+  ["Type in name", "only that row's counter moves"],
+  ["Change billing", "the error lands on shipping"],
+  ["Switch to useUncontrolledField", "typing moves no counter at all"],
+  ["Watch validator passes", "one per settled change"],
 ];
 ---
 
 <Base
   title="form-contract — one function turns a validator into a form"
-  description="A contract that lets any validator describe itself as a form, and a React runtime that updates only the fields that moved. The benchmark publishes its own resolution before its results."
+  description="A contract that lets any validator describe itself as a form, and a React runtime that updates only the fields that moved. Type into the live form on the page and watch the render counters."
 >
   <p class="text-sm font-medium tracking-wide text-primary">form-contract</p>
-  <h1 class="mt-3 text-4xl font-bold leading-tight sm:text-5xl">
+  <h1 class="mt-3 text-4xl font-bold leading-tight text-balance sm:text-5xl">
     One function turns a validator into a form.
   </h1>
-
-  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
-    A form renderer needs to know what a field accepts <em>before</em> anyone
-    types in it. A validator knows, and has no way to say so — validation
-    answers whether a value is acceptable, and that answer arrives after the
-    value exists. Too late to decide whether to draw a number input or a
-    select, or what to put in <code>minlength</code>.
+  <p class="mt-5 max-w-2xl text-lg leading-relaxed text-on-surface-variant">
+    A renderer needs to know what a field accepts <em>before</em> anyone types
+    in it. Validation answers after a value exists — too late to choose an
+    input or fill in <code>minlength</code>. This is the other half.
   </p>
 
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    This is the other half: a contract, and a form runtime built on it.
-  </p>
-
-  <Code code={resolver} />
-
-  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-    A resolver is a plain function, named at the call site. No registry, no
-    vendor tag, no dispatch — whoever writes the call already knows which
-    validator they are using. <a
-      class="text-primary underline underline-offset-4"
-      href="/contract/">The contract in full →</a
+  <div class="mt-7 flex flex-wrap gap-3">
+    <a
+      class="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
+      href="/runtime/">See how it behaves →</a
     >
-  </p>
+    <a
+      class="rounded-xl border border-outline-variant px-5 py-2.5 text-sm font-medium"
+      href="https://github.com/maroonedog/form-contract">GitHub</a
+    >
+  </div>
+
+  <Code code={whole} />
 
   <!-- ================================================== live -->
   <section class="mt-20">
-    <h2 class="text-2xl font-bold">And here it is, running</h2>
-    <p class="mt-4 leading-relaxed text-on-surface-variant">
-      Built from the packages' source, not a recording. <strong
-        class="text-on-surface">The number on each row is how many times that
-      row has rendered.</strong> Type in <em>name</em> and only its own counter
-      moves. Change <em>billing</em> and the error appears on <em>shipping</em>,
-      a field you did not touch and did not declare a dependency on.
+    <h2 class="text-2xl font-bold">Type in it</h2>
+    <p class="mt-3 leading-relaxed text-on-surface-variant">
+      The real library, built from source. <strong class="text-on-surface"
+        >The number on each row is how many times that row has rendered.</strong
+      >
     </p>
 
     <LiveForm client:load />
 
-    <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-      <a class="text-primary underline underline-offset-4" href="/runtime/"
-        >What a write touches, and exactly when a verdict happens →</a
-      >
-    </p>
+    <ul class="mt-5 grid gap-2 sm:grid-cols-2">
+      {
+        TRY.map(([what, then]) => (
+          <li class="flex gap-2 text-sm leading-relaxed">
+            <span class="font-medium whitespace-nowrap">{what}</span>
+            <span class="text-on-surface-variant">— {then}</span>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
-  <!-- ================================================== layers -->
+  <!-- ================================================== in code -->
   <section class="mt-20">
-    <h2 class="text-2xl font-bold">Three heights, one primitive</h2>
-    <p class="mt-4 leading-relaxed text-on-surface-variant">
-      Schema-driven form libraries usually buy their convenience by taking the
-      markup away. Here the generated screen is the top layer rather than the
-      only one, and there is no second implementation for the heights to
-      diverge between.
-    </p>
-    <div class="mt-6 grid gap-4 sm:grid-cols-3">
+    <h2 class="text-2xl font-bold">The whole surface</h2>
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
       {
-        layers.map((layer) => (
-          <div class="rounded-lg bg-surface-low p-5">
-            <p class="text-xs font-medium tracking-wide text-primary">{layer.n}</p>
-            <p class="mt-2 font-mono text-sm break-words">{layer.head}</p>
-            <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-              {layer.body}
-            </p>
+        snippets.map((one) => (
+          <div>
+            <p class="text-sm font-semibold">{one.title}</p>
+            <p class="mt-1 mb-2 text-sm text-on-surface-variant">{one.note}</p>
+            <Code code={one.code} lang={one.lang} flush />
           </div>
         ))
       }
     </div>
-    <p class="mt-6 leading-relaxed text-on-surface-variant">
-      <strong class="text-on-surface">Mounting is a subscription and nothing
-      else.</strong> Every cell exists from <code>createForm</code>, so a
-      component never registers a field, seeds a default or resets anything on
-      unmount — and a field in a portal, in a lazily loaded chunk or behind a
-      condition stops being a case. No <code>shouldUnregister</code>, and no
-      inspection of the React tree anywhere in the runtime.
-    </p>
-    <p class="mt-6 leading-relaxed text-on-surface-variant">
-      Paths are checked wherever they are written, including the ones a nested
-      list builds by interpolation — with nothing passed down to make that
-      work.{" "}
-      <a class="text-primary underline underline-offset-4" href="/paths/"
-        >How a path gets a type →</a
-      >
-    </p>
-  </section>
-
-  <!-- ================================================== cross-field -->
-  <section class="mt-20">
-    <h2 class="text-2xl font-bold">A rule can report against a field nobody touched</h2>
-    <p class="mt-4 leading-relaxed text-on-surface-variant">
-      That is the behaviour you just operated: one whole-root pass per settled
-      change, scattered back into per-path issue cells and written only where
-      the content differs, so a cross-field rule lands on the <em>other</em>{" "}
-      path with no <code>deps</code> array and no dependents list. The same
-      computation filtered to one path is what{" "}
-      <code>form.field(path).validate()</code> runs, so a conditionally
-      rendered field cannot get a different verdict from a second engine.
-    </p>
-    <p class="mt-4 leading-relaxed text-on-surface-variant">
-      The cost is stated rather than hidden: the pass judges the whole root
-      every settled change. Only the <em>notification</em> is proportional to
-      what moved.
-    </p>
   </section>
 
   <!-- ================================================== measured -->
   <section class="mt-20">
-    <h2 class="text-2xl font-bold">Measured, with the losses printed first</h2>
-    <p class="mt-4 leading-relaxed text-on-surface-variant">
-      Five runtimes are driven through one scripted transcript against one zod
-      schema the harness owns and instruments, rendering one DOM the harness
-      owns and hashes. Every count is an integer that does not depend on the
-      machine, and CI fails when one of them moves.
+    <h2 class="text-2xl font-bold">Measured, losses first</h2>
+    <p class="mt-3 leading-relaxed text-on-surface-variant">
+      Per keystroke at 201 fields, counted in jsdom and gated in CI:
     </p>
-    <p class="mt-4 leading-relaxed text-on-surface-variant">
+    <div class="mt-5 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="text-left text-on-surface-variant">
+          <tr class="hairline">
+            <th class="py-2 pr-4 font-medium">&nbsp;</th>
+            <th class="py-2 pr-4 font-medium">typing, verdict unchanged</th>
+            <th class="py-2 pr-4 font-medium">the field becomes wrong</th>
+            <th class="py-2 font-medium">a rule reports elsewhere</th>
+          </tr>
+        </thead>
+        <tbody class="tabular-nums">
+          <tr class="hairline">
+            <td class="py-3 pr-4 font-mono text-xs">useField</td>
+            <td class="py-3 pr-4">1 commit, 212 fibers</td>
+            <td class="py-3 pr-4">2 commits, 424</td>
+            <td class="py-3">2 commits, 424</td>
+          </tr>
+          <tr class="hairline">
+            <td class="py-3 pr-4 font-mono text-xs">useUncontrolledField</td>
+            <td class="py-3 pr-4 font-semibold text-primary">0 commits, 0</td>
+            <td class="py-3 pr-4">1 commit, 212</td>
+            <td class="py-3">1 commit, 212</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
       On the deterministic lane form-contract is <em>not</em> first, and the
-      report sorts the rows it loses first. It does marginally more React work
-      per keystroke than the hand-written reference it is measured against. That
-      table is published here as it comes out of the file CI gates against.
-    </p>
-    <p class="mt-6">
-      <a
-        class="inline-block rounded-xl bg-primary px-5 py-3 text-sm font-medium text-on-primary"
-        href="/benchmark/">Read what the benchmark can and cannot see →</a
+      report sorts the rows it loses first. Where its keystroke measures 0.63×
+      the hand-written reference, the harness refuses to call that a win — the
+      difference is under the floor its own calibration ladder resolved.{" "}
+      <a class="text-primary underline underline-offset-4" href="/benchmark/"
+        >What the benchmark can and cannot see →</a
       >
     </p>
   </section>
 
   <!-- ================================================== status -->
-  <section class="mt-20 rounded-lg border border-outline-variant p-6">
+  <section class="mt-20 rounded-xl border border-outline-variant p-6">
     <h2 class="text-lg font-bold">Where it stands</h2>
     <p class="mt-3 leading-relaxed text-on-surface-variant">
-      The runtime is complete against its design and is exercised by 126 tests,
-      six compile-time programs that pin the path types — including one whose
-      only job is to prove that an application registering nothing is refused
-      rather than quietly unchecked — and a screen that uses all of it. <strong class="text-on-surface"
-        >It has not been published to npm, and it has not been run in production
-        by anyone.</strong
+      128 tests, six compile-time programs that pin the path types, and a
+      screen that uses all of it. <strong class="text-on-surface"
+        >Not published, and nobody has run it in production.</strong
       >
     </p>
     <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-      One more limit, stated rather than papered over: the concrete path grammar
-      has no escape, so a field whose key contains a dot cannot be addressed.
+      Two limits: a field whose key contains a dot cannot be addressed, and the
+      validation pass judges the whole root on every settled change — which is
+      what lets a rule report against a field that did not move.
     </p>
   </section>
 </Base>

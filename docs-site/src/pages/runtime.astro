@@ -120,9 +120,9 @@ const woken = [
   <WriteFlow />
 
   <h2 class="mt-16 text-2xl font-bold">Writing</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Every write goes through a handle. There is no <code>setState</code>, no
-    form object to spread, and no path that only the runtime understands.
+  <p class="mt-3 text-sm text-on-surface-variant">
+    Every write goes through a handle. No <code>setState</code>, no form object
+    to spread.
   </p>
 
   <Code code={writing} />
@@ -191,35 +191,23 @@ const woken = [
     </table>
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">Asking, submitting, and asking slowly</h2>
-
-  <Code code={asking} />
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>issuesFor</code> is a question rather than an action: it judges a
-    value that is <em>not</em> in the form and writes nothing at all. A probe
-    that mutated the store would move every other field's answer as a side
-    effect of being asked. <code>submit</code> is the opposite — it judges the
-    whole root first, so a field nobody mounted is judged too, because a form
-    that submits with the offending input off screen is the defect this
-    prevents.
+  <h2 class="mt-16 text-2xl font-bold">Asking, and asking slowly</h2>
+  <p class="mt-3 text-sm text-on-surface-variant">
+    <code>issuesFor</code> is a question, not an action — it writes nothing at
+    all.
   </p>
 
+  <Code code={asking} />
   <Code code={asyncOne} />
 
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>validate</code> may return a promise, so a rule can ask a server
-    whether a handle is taken. While any pass is in flight{" "}
-    <code>form.validating</code> is true, a late answer is dropped rather than
-    written, and a pass that <em>throws</em> leaves the previous verdict
-    standing — an error reaching the network is not evidence that the form
-    became acceptable.
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    While a pass is in flight <code>form.validating</code> is true. A pass that{" "}
+    <em>throws</em> leaves the previous verdict standing: an error reaching the
+    network is not evidence that the form became acceptable.
   </p>
 
   <p class="mt-10 text-sm leading-relaxed text-on-surface-variant">
-    Every figure on this page was produced by running the runtime with a
-    counting adapter wrapped around the real zod resolver, and subscription
-    counters on the cells. The demo is that same runtime, built from the
-    packages' source rather than from a copy of it.
+    Every figure here came from running the runtime with a counting adapter
+    around the real zod resolver. The demo is that same runtime.
   </p>
 </Base>

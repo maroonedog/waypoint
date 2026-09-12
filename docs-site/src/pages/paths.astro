@@ -92,20 +92,11 @@ const viewTypes = [
 >
   <h1 class="text-3xl font-bold sm:text-4xl">Typed paths</h1>
 
-  <p class="mt-6 leading-relaxed text-on-surface-variant">
-    One React context object serves every form in an application. So the
-    context cannot be generic, and a path union cannot travel through it —
-    which is why <code>useField</code> took a bare <code>string</code>, and why{" "}
-    <code>useField&lt;string&gt;(path)</code> meant <em>trust me</em>. What it
-    usually meant was a misspelt path rendering an empty input that was never
-    validated and said nothing: the exact failure this project criticises other
-    libraries for.
-  </p>
-
-  <h2 class="mt-16 text-2xl font-bold">So the types do not travel</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    The application states them once, in its own source, and every hook reads
-    them from there. The instance and the type take different roads:
+  <p class="mt-6 max-w-2xl text-lg leading-relaxed text-on-surface-variant">
+    One React context object serves every form, so the context cannot be
+    generic and a path union cannot travel through it. The types therefore do
+    not travel at all: the application registers them once, and the instance
+    and the type take different roads.
   </p>
 
   <TypeAndInstance />
@@ -114,42 +105,35 @@ const viewTypes = [
   <Code code={usage} lang="tsx" />
 
   <h2 class="mt-16 text-2xl font-bold">Interpolated paths stay checked</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Checking that stops at the first array is not worth much, because a nested
-    form is where paths are actually built by hand. A row carries its own
-    address, typed as a place in its own list, so a path assembled three levels
-    down is still one the registry recognises.
+  <p class="mt-3 text-sm text-on-surface-variant">
+    Checking that stops at the first array is worth little: a nested form is
+    where paths are actually built by hand.
   </p>
 
   <Code code={rows} lang="tsx" />
 
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    A string spliced into an index is rejected while a number is accepted,
-    because a template literal type can tell{" "}
-    <code>items[&#36;&#123;number&#125;].sku</code> from{" "}
-    <code>items[&#36;&#123;string&#125;].sku</code> — and a mis-built path is
-    almost always a string that got concatenated in.
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    A number index is accepted and a string one is not, because a template
+    literal type can tell them apart — and a mis-built path is almost always a
+    string that got concatenated in.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Several forms are several keys</h2>
 
   <Code code={several} />
 
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    A key names a form in the <em>registry</em>; the instance still comes from
-    the nearest provider. Nothing in the type system relates the two, so that
-    one gap is closed at run time: a provider carries its key (<code
-      >&lt;FormProvider form={"{form}"} formKey="order"&gt;</code
-    >) and a keyed hook throws when they disagree. Naming no key accepts
-    whichever provider is there, which is what a component shared by two forms
-    wants.
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    The key names a form in the <em>registry</em>; the instance still comes
+    from the nearest provider, and nothing relates the two. So the provider
+    carries its key —{" "}
+    <code>&lt;FormProvider form={"{form}"} formKey="order"&gt;</code> — and a
+    keyed hook throws when they disagree.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Path types for the view layer</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    A widget that draws whatever field it is handed belongs to the design
-    system, not to a form. It does not <em>know</em> a path, it <em>receives</em>{" "}
-    one — and these are how it says which ones it can take.
+  <p class="mt-3 text-sm text-on-surface-variant">
+    A widget receives a path rather than knowing one. These say which ones it
+    can take.
   </p>
 
   <div class="mt-6 overflow-x-auto">
@@ -179,17 +163,15 @@ const viewTypes = [
     </table>
   </div>
 
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>FormPathOver</code> is computed from the registered schema rather than
-    listed, so a third address arriving in the schema needs no edit in the
-    section that draws one.
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    All three are computed from the registered schema rather than listed, so a
+    third address arriving in it needs no edit in the section that draws one.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">A schema nobody wrote down</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Some forms have no static shape at all — one built from a response, or the
-    generated fields this repository's own benchmark drives. Such a form
-    registers an adapter typed <code>string</code>.
+  <p class="mt-3 text-sm text-on-surface-variant">
+    Built from a response, or generated by a benchmark. It registers{" "}
+    <code>string</code>.
   </p>
 
   <Code code={dynamic} />

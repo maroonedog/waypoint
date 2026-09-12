@@ -17,12 +17,14 @@ interface Props {
    * build error rather than an unhighlighted block nobody notices.
    */
   readonly lang?: "ts" | "tsx";
+  /** Drop the top margin, for a block that sits directly under its own label. */
+  readonly flush?: boolean;
 }
 
-const { code, lang = "ts" } = Astro.props;
+const { code, lang = "ts", flush = false } = Astro.props;
 ---
 
-<div class="mt-6 overflow-hidden rounded-lg">
+<div class:list={["overflow-hidden rounded-lg", flush ? "" : "mt-6"]}>
   <Shiki
     code={code.trim()}
     lang={lang}
