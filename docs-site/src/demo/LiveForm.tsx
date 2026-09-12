@@ -30,8 +30,11 @@ import { useRenderCount } from "./use-render-count.js";
 
 type Mode = "controlled" | "uncontrolled";
 
+// The middle track is capped rather than fluid: in a wide column a fluid one
+// gives a postcode an input three quarters of a metre long, which is not what
+// a form looks like and makes the render badge beside it hard to associate.
 const ROW =
-  "grid grid-cols-[7rem_minmax(0,1fr)_auto] items-center gap-3 py-1.5";
+  "grid grid-cols-[6rem_minmax(0,22rem)_auto] items-center gap-3 py-1.5";
 const INPUT =
   "w-full rounded-md border border-outline-variant bg-surface px-3 py-1.5 text-sm " +
   "outline-none focus:border-primary focus:ring-2 focus:ring-primary/30";

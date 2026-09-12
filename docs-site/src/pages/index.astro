@@ -147,10 +147,13 @@ const TRY = [
   <!-- ================================================== in code -->
   <section class="mt-20">
     <h2 class="text-2xl font-bold">The whole surface</h2>
+    <!-- min-w-0 on the item: a grid item defaults to min-width:auto, so the
+         widest code block sizes the track and the page scrolls sideways on a
+         phone. Same trap as the API entries. -->
     <div class="mt-6 grid gap-6 lg:grid-cols-2">
       {
         snippets.map((one) => (
-          <div>
+          <div class="min-w-0">
             <p class="text-sm font-semibold">{one.title}</p>
             <p class="mt-1 mb-2 text-sm text-on-surface-variant">{one.note}</p>
             <Code code={one.code} lang={one.lang} flush />

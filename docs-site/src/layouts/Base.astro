@@ -5,6 +5,11 @@
 // One header, one footer, one place the description and canonical URL are
 // set. A page supplies a title and a description and nothing else, so a new
 // page cannot arrive without either.
+//
+// The column is 5xl rather than 3xl because most of what is on these pages is
+// not running text: code blocks, two diagrams drawn at 720 units wide, and
+// reference tables of three columns. Running text keeps a measure of its own
+// in styles.css, so widening the column widened the code and not the prose.
 // ===========================================================================
 import "../styles.css";
 
@@ -58,7 +63,7 @@ const here = Astro.url.pathname;
            longer fit on one 375px line, and a link that has to be scrolled to
            is a link nobody finds. -->
       <nav
-        class="mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm sm:gap-x-6 sm:px-6"
+        class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm sm:gap-x-6 sm:px-6"
         aria-label="Primary"
       >
         <a href="/" class="font-medium tracking-wide text-primary">form-contract</a>
@@ -80,12 +85,12 @@ const here = Astro.url.pathname;
       </nav>
     </header>
 
-    <main class="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+    <main class="mx-auto max-w-5xl px-6 py-16 sm:py-20">
       <slot />
     </main>
 
     <footer
-      class="mx-auto max-w-3xl px-6 pb-16 text-sm leading-relaxed text-on-surface-variant"
+      class="mx-auto max-w-5xl px-6 pb-16 text-sm leading-relaxed text-on-surface-variant"
     >
       <div class="hairline pt-8">
         <p>

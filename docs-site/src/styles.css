@@ -26,3 +26,22 @@ pre {
 :target {
   scroll-margin-top: 5rem;
 }
+
+/* The column is wide so that code, diagrams and reference tables have room.
+   Running text must not use all of it: a line of seventy-odd characters is
+   read, and a line of a hundred and twenty is scanned and lost. The cap is on
+   the text itself rather than on the column, so the two can differ. */
+main :is(p, li, figcaption) {
+  max-width: 72ch;
+}
+
+/* Headings need a shorter measure than body text, not a longer one: they are
+   set larger, so the same column holds fewer words and a full-width display
+   line has to be tracked across by the eye. The unit is ch, so each level
+   caps against its own size. */
+main h1 {
+  max-width: 22ch;
+}
+main h2 {
+  max-width: 34ch;
+}
