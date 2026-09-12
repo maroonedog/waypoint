@@ -58,13 +58,44 @@ export const alsoUnused = useField;
 const hookFor = (path: string): string =>
   path.includes("[*]") ? "useFieldValues" : "useField";
 
+/**
+ * The form's own name, written into every path the way a caller writes one.
+ *
+ * The key registered below is `form`, and a path names the form it belongs to.
+ * An unprefixed call would compile in this program too — one form is
+ * registered, so both spellings are legal — but the qualified one is what the
+ * README and the site show, so it is the one worth costing. Measuring the
+ * spelling nobody is told to write would put a figure on a path the library
+ * does not lead with.
+ */
+const asWritten = (path: string): string => `form:${path}`;
+
+/**
+ * The inverse: what the shape catalogue calls the leaf a written path names.
+ *
+ * A diagnostic is matched back to a leaf by the path in the line that produced
+ * it, and the catalogue names its leaves with no form in front of them. Left
+ * qualified, every one of those comparisons fails — and it fails in the
+ * direction that reads as "the compiler accepted it", so a table of what the
+ * depth budget refuses reported every path in the sweep as addressable.
+ *
+ * Split lexically, on a head standing before the first `.` or `[`, which is
+ * the rule the library itself applies on both sides.
+ */
+export const localPathOf = (spelling: string): string => {
+  const colon = spelling.indexOf(":");
+  if (colon === -1) return spelling;
+  const head = spelling.slice(0, colon);
+  return /[.[]/.test(head) ? spelling : spelling.slice(colon + 1);
+};
+
 /** The flagship shape, with one call per path given. */
 export function typeProgramSource(
   shape: ShapeUnderTest,
   calledPaths: readonly string[]
 ): string {
   const calls = calledPaths
-    .map((path) => `  ${hookFor(path)}(${JSON.stringify(path)});`)
+    .map((path) => `  ${hookFor(path)}(${JSON.stringify(asWritten(path))});`)
     .join("\n");
   return `${BANNER}
 import type { FieldPath, FormAdapter } from "@maroonedog/waypoint";

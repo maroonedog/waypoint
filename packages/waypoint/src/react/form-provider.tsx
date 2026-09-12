@@ -22,6 +22,14 @@
 // compares that name with this one and throws when they disagree, which is the
 // single thing the registry cannot check for itself.
 //
+// And it is compared against the FORM'S OWN name before anything else reads it.
+// `createForm({ key })` and this prop are two places to say one thing, both
+// type-checked, and the prop used to win in silence — so a form that called
+// itself `admin`, rendered here as `customer`, answered every `customer:` path
+// beneath it. Nothing was wrong with any individual call; the two declarations
+// simply disagreed and the mismatch a qualified path exists to catch was
+// arranged one level above the paths.
+//
 // Its provider is rendered only when the key actually CHANGES. A provider is a
 // fiber, and one rendered unconditionally showed up as two more changed fibers
 // per keystroke in the benchmark — a cost on every application, for a feature
@@ -38,11 +46,21 @@ import {
   WidgetRegistryContext,
 } from "./widget-registry-context.js";
 import type { WidgetRegistry } from "./widget-registry.types.js";
+import type { FormKey } from "./form-type-registry.js";
 
 export interface FormProviderProps<T, TPath extends string> {
   readonly form: FormHandle<T, TPath>;
-  /** Which registered form this is. Omit it when the application has one. */
-  readonly formKey?: string;
+  /**
+   * Which registered form this is. Omit it and the form's own `key` is used,
+   * so an application that named the form where it was created does not name
+   * it twice — and the two names cannot drift apart. Omit both and the
+   * default key stands, which is what an application with one form wants.
+   *
+   * A registered key rather than a string: the prefix every path now carries
+   * is compared against this, so a typo here would refuse every path in the
+   * subtree rather than one.
+   */
+  readonly formKey?: FormKey;
   /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */
   readonly widgets?: WidgetRegistry;
   readonly children: ReactNode;
@@ -52,7 +70,18 @@ export function FormProvider<T, TPath extends string>(
   props: FormProviderProps<T, TPath>
 ): ReactElement {
   const inherited = useContext(FormKeyContext);
-  const formKey = props.formKey ?? DEFAULT_FORM_KEY;
+  if (
+    props.formKey !== undefined &&
+    props.form.key !== undefined &&
+    props.formKey !== props.form.key
+  ) {
+    throw new Error(
+      `This <FormProvider> was given formKey "${props.formKey}", but the form ` +
+        `it carries names itself "${props.form.key}". Say it once: either drop ` +
+        "the prop, or drop `key` from the createForm options."
+    );
+  }
+  const formKey = props.formKey ?? props.form.key ?? DEFAULT_FORM_KEY;
   const widgets = (
     <WidgetRegistryContext.Provider value={props.widgets ?? EMPTY_REGISTRY}>
       {props.children}

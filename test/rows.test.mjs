@@ -13,6 +13,7 @@ import {
   declaredPathOf,
   bindDeclaredPath,
   expandDeclaredPath,
+  forgetUnaddressableWarnings,
 } from "@maroonedog/waypoint/core";
 
 const SCHEMA = z.object({
@@ -169,4 +170,34 @@ test("validating one row member judges the real root, not a rebuilt one", () => 
     ["items[1].sku"],
     "the real index, not zero"
   );
+});
+
+// A list this form does not have hands back an empty row order, and an edit to
+// it writes a member of the ROOT that no descriptor covers: nothing is drawn,
+// nothing is judged, and the submit gate does not notice. `field` puts the
+// addressability question to every path it is given; `rows` put it to none, so
+// that whole failure happened without a line being printed.
+const warningsFrom = (action) => {
+  forgetUnaddressableWarnings();
+  const said = [];
+  const restore = console.warn;
+  console.warn = (...parts) => said.push(parts.join(" "));
+  try {
+    action();
+  } finally {
+    console.warn = restore;
+  }
+  return said.join("\n");
+};
+
+test("a list the form does not have is warned about, not silently empty", () => {
+  const form = build();
+  const warned = warningsFrom(() => form.rows("itemz"));
+  assert.match(warned, /"itemz" is not a field this form has/);
+  assert.match(warned, /Did you mean: items/);
+});
+
+test("a list the form does have says nothing", () => {
+  const form = build();
+  assert.equal(warningsFrom(() => form.rows("items")), "");
 });

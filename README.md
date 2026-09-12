@@ -5,8 +5,10 @@ compiler has already checked, and as runtime state that is already written.**
 
 One claim, two halves. The type is one `FormTypeRegistry` module augmentation:
 a leaf takes no prop, no generic argument and imports nothing from the registry,
-and an application that registered nothing is **refused** rather than quietly
-unchecked. The state is written at `createForm` from the descriptor list, before
+and an application that registered nothing is **refused**, with the
+declaration it is missing quoted back at it — unless a dependency registered
+one, in which case it inherits that one's paths instead. Registration is global
+to the compilation and nothing namespaces it yet. The state is written at `createForm` from the descriptor list, before
 any component exists — so mounting is a subscription, and there is no register,
 no unregister and no `shouldUnregister`.
 
@@ -44,7 +46,7 @@ function OrderForm() {
   const form = useCreateForm(() => ({ adapter: orderAdapter, defaultValues }));
   return (
     <FormProvider form={form}>
-      <Postcode at="billing.postcode" />
+      <Postcode at="form:billing.postcode" />
       <Items />
       <button onClick={() => form.submit(save)}>Save</button>
     </FormProvider>
@@ -52,7 +54,8 @@ function OrderForm() {
 }
 
 // Any depth. It imports nothing from the registry and receives nothing but an
-// address — and the label, the bounds and the aria wiring come off the schema.
+// address, which names its own form — so one prop is the whole story, and the
+// label, the bounds and the aria wiring come off the schema.
 function Postcode({ at }: { at: FormPathTo<string> }) {
   const field = useField(at);
   return (
@@ -65,23 +68,26 @@ function Postcode({ at }: { at: FormPathTo<string> }) {
 }
 
 function Items() {                        // a row hands down its own address,
-  const items = useRows("items");         // and the address is still checked
+  const items = useRows("form:items");    // qualified, so it is complete
   return items.rows.map((r) => <Postcode key={r.key} at={`${r.path}.sku`} />);
 }
 ```
 
+**A path carries its form.** `form` is the key registered above, the colon ends
+it, and the value is read in THAT form rather than in whichever registered form
+happens to have one there. With a single form registered the prefix is optional.
+
 ```tsx
-useField("billing.postcode");    // string | undefined, inferred
-useField("billing.postcod");     // compile error
-useField(`items[${i}].sku`);     // a computed index is fine
-useField(`items[${s}].sku`);     // compile error: s is a string
+useField("form:billing.postcode");  // string | undefined, inferred
+useField("form:billing.postcod");   // compile error
+useField(`form:items[${i}].sku`);   // a computed index is fine
+useField(`form:items[${s}].sku`);   // compile error: s is a string
 ```
 
 The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 `useFieldIssues`, `useFormStatus`, `useRows`, `useParticipation`,
-`useErrorSummary`, `<Field>`, `<FieldRows>`, `<AutoForm>`, `adoptIssues`,
-`validateOn` — is on the site's **API** page, each with the signature the
-package actually emits.
+`useErrorSummary`, `<Field>`, `<FieldRows>`, `<AutoForm>`, `adoptIssues` and
+`validateOn` — is on the site's **API** page, with the emitted signatures.
 
 ## Seven entry points, one package
 
@@ -98,9 +104,8 @@ package actually emits.
 They are entry points rather than packages because they all install together
 anyway. What the split buys is **resolution**: `./core` loads in a worker with
 no React resolvable at all, and only `./react` names React in its built output.
-`useField` alone is 1.39 kB gzipped against 9.38 kB for the whole `./react`
-barrel, and a screen plus the zod resolver is 9.41 kB. `npm run size:check`
-gates every row.
+`useField` alone is 1.50 kB gzipped against 9.53 kB for the whole `./react` barrel,
+and a screen plus the zod resolver is 9.55 kB. `npm run size:check` gates every row.
 
 ## What it does not do
 
@@ -114,22 +119,20 @@ Each of those is on the site with how far you would get and what to reach for
 instead. **A capability list without them is an advertisement**, which is why
 this paragraph is here and not in an appendix.
 
-Accessibility is the same kind of entry. Both bindings hand back four prop bags
-that carry `id`, `type`, `aria-invalid`, `aria-describedby` and the declared
-bounds off the descriptor, `useErrorSummary()` orders a failed submit the way a
-reader meets the fields, and `axe` runs over four synthetic forms in CI.
-`docs/accessibility-criteria.md` takes all fifty-five WCAG 2.2 A and AA
-criteria one at a time and says, for each, whether this library helps with it,
-leaves it to the caller, or cannot touch it at all — and which rules a machine
-checked rather than an author argued. **Nothing here has met a screen reader or
-an auditor.**
+Accessibility is the same kind of entry. Both bindings hand back four prop bags that
+carry `id`, `type`, `aria-invalid`, `aria-describedby` and the declared bounds off
+the descriptor, `useErrorSummary()` orders a failed submit the way a reader meets
+the fields, and `axe` runs over four synthetic forms in CI.
+`docs/accessibility-criteria.md` takes all fifty-five WCAG 2.2 A and AA criteria one
+at a time and says, for each, whether this library helps with it, leaves it to the
+caller, or cannot touch it at all — and which rules a machine checked rather than an
+author argued. **Nothing here has met a screen reader or an auditor.**
 
 ## Measured against nine subjects
 
 `bench/` drives nine subjects — two of this runtime, a hand-written per-field
-reference, three of react-hook-form, two of Formik, one of TanStack Form —
-through one transcript, one zod schema it owns and instruments, one DOM it
-hashes.
+reference, three of react-hook-form, two of Formik, one of TanStack Form — through
+one transcript, one zod schema it owns and instruments, one DOM it hashes.
 
 **waypoint is behind on all three scenarios, at every size**, and the report
 prints the rows it loses before its own table. Who beats it is the part worth
@@ -159,10 +162,10 @@ needs a build: both resolve the package to its **source**.
 
 ## Where it stands
 
-270 tests and eight compile-time programs, one of which exists only to prove
-that an application registering nothing is refused rather than quietly
-unchecked. **Nothing has ever been published, and nobody has run this in
-production.**
+278 tests and eight compile-time programs, one of which exists only to prove that
+an application registering nothing is refused rather than quietly unchecked —
+so long as nothing it depends on registered a form of its own.
+**Nothing has ever been published, and nobody has run this in production.**
 
 `CLAUDE.md` carries the conventions this codebase is held to.
 `docs/design/form-runtime.md` is the design it was built from, and its section

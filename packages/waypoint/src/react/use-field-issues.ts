@@ -9,34 +9,15 @@
 // this hook: every row's verdict is already on the form, and a summary that
 // wants all of them reads `useFormStatus` rather than a wildcard here.
 // ===========================================================================
-import type {
-  ConcretePath,
-  FormIssue,
-  InhabitedPath,
-} from "../contract/index.js";
-import { splitFormArgs } from "./split-form-args.js";
+import type { FormIssue } from "../contract/index.js";
 import { useCell } from "./use-cell.js";
-import { useFormHandle } from "./use-form.js";
-import type {
-  AnyPath,
-  AnyValues,
-  FormKey,
-  PathsFor,
-  ValuesFor,
-} from "./form-type-registry.js";
+import { useFormForPath } from "./use-form-for-path.js";
+import type { FormPath, InhabitedFormPath } from "./form-type-registry.js";
 
-export function useFieldIssues<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
+export function useFieldIssues<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
 ): readonly FormIssue[];
-export function useFieldIssues<
-  TKey extends FormKey,
-  K extends ConcretePath<PathsFor<TKey>>,
->(key: TKey, path: K & InhabitedPath<ValuesFor<TKey>, K>): readonly FormIssue[];
-export function useFieldIssues(
-  first: string,
-  second?: string
-): readonly FormIssue[] {
-  const [key, path] = splitFormArgs(first, second);
-  const form = useFormHandle(key);
+export function useFieldIssues(spelling: string): readonly FormIssue[] {
+  const { form, path } = useFormForPath(spelling);
   return useCell(form.field(path).sources.issues);
 }

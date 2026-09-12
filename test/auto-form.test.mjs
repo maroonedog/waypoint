@@ -96,7 +96,7 @@ test("layer 2 names a widget with as", async () => {
     h(
       FormProvider,
       { form, widgets: REGISTRY },
-      h(Field, { path: "owner.name", as: "badge" })
+      h(Field, { path: "form:owner.name", as: "badge" })
     )
   );
   assert.equal(

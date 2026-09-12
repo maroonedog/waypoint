@@ -1,10 +1,14 @@
 // ===========================================================================
 // with-waypoint.tsx
 //
-// A row hands down its own address. `row.path` is `shipments[0]`, and the
+// A row hands down its own address. `row.path` is `form:shipments[0]`, and the
 // component inside builds `${at}.lines` from it — so the inner list needs to
 // know nothing about being inner, and the leaf needs to know nothing about
 // either list.
+//
+// The address names its FORM as well as its place, which is what makes it a
+// complete thing to hand down. A prop carrying one string says everything the
+// component it lands in needs to know; nothing has to be threaded beside it.
 //
 // There is no separate hook for a nested array and no second component forced
 // by the library. `useRows` takes a concrete path, so an inner list is reached
@@ -45,7 +49,7 @@ function Text({
   );
 }
 
-function Lines({ at }: { readonly at: `shipments[${number}]` }) {
+function Lines({ at }: { readonly at: `form:shipments[${number}]` }) {
   const lines = useRows(`${at}.lines`);
   const issues = useField(`${at}.lines`).issues;
   return (
@@ -73,7 +77,7 @@ function Lines({ at }: { readonly at: `shipments[${number}]` }) {
 }
 
 function Shipments() {
-  const shipments = useRows("shipments");
+  const shipments = useRows("form:shipments");
   return (
     <>
       {shipments.rows.map((shipment) => (
@@ -112,7 +116,7 @@ export function WithWaypoint() {
   return (
     <FormProvider form={form}>
       <Panel title="@maroonedog/waypoint" note="91 行 / 「shipments」7回">
-        <Text at="customer.name" label="お名前" />
+        <Text at="form:customer.name" label="お名前" />
         <Shipments />
       </Panel>
     </FormProvider>

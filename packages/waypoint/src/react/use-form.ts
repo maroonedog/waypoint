@@ -6,8 +6,15 @@
 // `useForm()` is checked rather than asserted.
 //
 // Naming a key checks that key against the provider's. Naming none accepts
-// whatever provider is there, which is what a component shared by two forms
-// wants — it gets the union of their paths and nothing narrower.
+// whatever provider is there.
+//
+// A KEY IS NOT A PATH, which is why this hook keeps its argument while the
+// path hooks gave theirs up: there is no path in this call for a form's name
+// to travel inside. What changed underneath is who reaches the comparison
+// below. It used to be only a call that passed a key as a separate argument; a
+// call that passed none handed this `undefined` and skipped it. The path hooks
+// now take their key out of the path itself, and compare it in
+// parse-qualified-path.ts, which is where the message they throw lives.
 // ===========================================================================
 import { useContext } from "react";
 import type { FormHandle } from "../core/index.js";

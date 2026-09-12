@@ -7,22 +7,23 @@
 // three edits.
 // ===========================================================================
 import type { ReactElement, ReactNode } from "react";
-import type { ConcretePath } from "../contract/index.js";
 import { useRows, type RowsBinding } from "./use-rows.js";
-import type { AnyPath, ArrayPath } from "./form-type-registry.js";
+import type { FormListPath } from "./form-type-registry.js";
 
-export interface FieldRowsProps<K extends ConcretePath<ArrayPath<AnyPath>>> {
+export interface FieldRowsProps<Q extends FormListPath> {
   /**
-   * The one list this draws, concretely. A list nested in a row is reached
-   * through the outer row's own address — `` `${row.path}.lines` `` — because
-   * `shipments[*].lines` is as many row orders as there are shipments.
+   * The one list this draws, concretely, qualified by the form it belongs to.
+   * A list nested in a row is reached through the outer row's own address —
+   * `` `${row.path}.lines` `` — because `shipments[*].lines` is as many row
+   * orders as there are shipments. That address arrives already qualified, so
+   * the inner list needs nothing threaded alongside it.
    */
-  readonly path: K;
-  readonly children: (binding: RowsBinding<K>) => ReactNode;
+  readonly path: Q;
+  readonly children: (binding: RowsBinding<Q>) => ReactNode;
 }
 
-export function FieldRows<K extends ConcretePath<ArrayPath<AnyPath>>>(
-  props: FieldRowsProps<K>
+export function FieldRows<Q extends FormListPath>(
+  props: FieldRowsProps<Q>
 ): ReactElement {
   const binding = useRows(props.path);
   return <>{props.children(binding)}</>;

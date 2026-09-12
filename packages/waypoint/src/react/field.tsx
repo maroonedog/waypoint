@@ -36,40 +36,41 @@
 //   </select>
 // ===========================================================================
 import { useContext, type ReactElement, type ReactNode } from "react";
-import type {
-  ConcretePath,
-  DeclaredOf,
-  InhabitedPath,
-} from "../contract/index.js";
 import type { FieldBinding } from "./field-binding.types.js";
 import { useField } from "./use-field.js";
 import { WidgetRegistryContext } from "./widget-registry-context.js";
 import { resolveWidget } from "./resolve-widget.js";
-import type { AnyPath, AnyValues, ValueOfPath } from "./form-type-registry.js";
+import type {
+  FormPath,
+  InhabitedFormPath,
+  ValueAtFormPath,
+} from "./form-type-registry.js";
 
-export interface FieldProps<K extends ConcretePath<AnyPath>> {
+export interface FieldProps<Q extends FormPath> {
   /**
-   * The PLACE this field occupies. It goes straight to `useField`, so a rule
-   * has no answer here — a list hands each row `row.path`, and
-   * `` `${row.path}.sku` `` is the spelling that names one of them.
+   * The PLACE this field occupies, qualified by the form it belongs to. It
+   * goes straight to `useField`, so a rule has no answer here — a list hands
+   * each row `row.path`, and `` `${row.path}.sku` `` is the spelling that
+   * names one of them, already carrying its form.
+   *
+   * This prop had no way to name a form before the path carried one. It is one
+   * string, the component is generic over it, and there was nowhere to put a
+   * key beside it — so one screen's path compiled inside another screen's
+   * component, and the mistake showed up as a field that drew nothing.
    */
-  readonly path: K & InhabitedPath<AnyValues, K>;
+  readonly path: Q & InhabitedFormPath<Q>;
   /** Layer 3. When present, nothing else is consulted. */
-  readonly children?: (
-    binding: FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>
-  ) => ReactNode;
+  readonly children?: (binding: FieldBinding<ValueAtFormPath<Q>>) => ReactNode;
   /** Layer 2: the widget to draw this field with, by name. */
   readonly as?: string;
 }
 
-export function Field<K extends ConcretePath<AnyPath>>(
-  props: FieldProps<K>
-): ReactElement {
+export function Field<Q extends FormPath>(props: FieldProps<Q>): ReactElement {
   // The type argument is written rather than inferred. `props.path` is already
-  // `K & InhabitedPath<…, K>`, and inferring from it would make K that
+  // `Q & InhabitedFormPath<Q>`, and inferring from it would make Q that
   // intersection and then narrow it a second time — which the compiler cannot
   // see is the same question asked twice, so it refuses its own output.
-  const binding = useField<K>(props.path);
+  const binding = useField<Q>(props.path);
   const registry = useContext(WidgetRegistryContext);
 
   if (props.children !== undefined) {

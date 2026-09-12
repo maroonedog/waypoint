@@ -4,16 +4,17 @@ Verified against source before writing: `rememberDeclaredCalls` runs uncondition
 
 # Cells — the final architecture
 
-> **Two things below did not survive contact with the implementation.** The
-> architecture did; these two did not, and they are left in place rather than
+> **Some spellings below did not survive contact with the implementation.** The
+> architecture did; these did not, and they are left in place rather than
 > quietly edited so the reasons stay readable.
 >
 > **`<FieldScope>` was removed.** A scope rewrote EVERY path beneath it with no
 > way out: a component inside `prefix="billing"` asking for
 > `shipping.postcode` silently got `billing.shipping.postcode` and rendered
-> nothing. A row now carries its own address (`row.path` is `items[2]`) and a
-> section is told where it is by an ordinary prop, which cannot do that to
-> anybody. `setParticipating` moved onto the field handle and `useParticipation`.
+> nothing. A row now carries its own address (`row.path` is `form:items[2]`)
+> and a section is told where it is by an ordinary prop, which cannot do that
+> to anybody. `setParticipating` moved onto the field handle and
+> `useParticipation`.
 >
 > **`check(candidate)` is now `issuesFor(candidate)`.** The name had to be
 > read with its comment to know that it returns issues and writes nothing,
@@ -36,6 +37,22 @@ Verified against source before writing: `rememberDeclaredCalls` runs uncondition
 > comes from a module-augmentation registry the application declares once, so
 > both the path and the value type are checked rather than asserted. See the
 > README section "The path a hook is allowed to ask for".
+>
+> **A path now names its form, and every `path=` below is written without
+> one.** `useField("admin:quotas.seats")`: the head before the colon is a
+> registered key, and the value type is read in the form it names rather than
+> in whichever registered form happens to declare something there. What forced
+> it was that a key could only ever be passed as a SEPARATE argument, and a
+> surface with no argument list has nowhere to put one — a `<Field path>` is a
+> single prop, `FormPathTo<string>` is a type with no parameter for a form, and
+> `row.path` is one string handed down. Each of those was therefore checked
+> against every registered form's paths at once, so a path belonging to another
+> screen compiled where it stood and arrived as a control that drew nothing.
+> With the form inside the string none of them needs a parameter. An
+> application with exactly one registered form still writes no prefix; register
+> a second and the unprefixed spellings leave the union, which is where the
+> application is told. `useParticipation` follows `row.path` and takes either
+> spelling — it is handed a row's own address, and that address is qualified.
 
 ## 1. The decision
 

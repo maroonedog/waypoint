@@ -30,8 +30,8 @@ export default function CrossFieldRule() {
   return (
     <FormProvider form={form}>
       <div className="grid grid-cols-2 gap-3 rounded-xl bg-surface-low p-4">
-        <Postcode at="billing.postcode" label="Billing postcode" />
-        <Postcode at="shipping.postcode" label="Shipping postcode" />
+        <Postcode at="form:billing.postcode" label="Billing postcode" />
+        <Postcode at="form:shipping.postcode" label="Shipping postcode" />
       </div>
     </FormProvider>
   );

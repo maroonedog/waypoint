@@ -167,6 +167,7 @@ export function createForm<T, TPath extends string = string>(
   const rowsByPath = new Map<string, RowsHandle>();
 
   return {
+    key: options.key,
     descriptors,
     tree,
     store,
@@ -181,7 +182,8 @@ export function createForm<T, TPath extends string = string>(
       // The store is what knows the paths, so this is the one place that has
       // to ask. Every hook, every component and every non-React caller comes
       // through here, and none of them keeps its own idea of what exists.
-      if (!addressable.has(path)) warnUnaddressable(path, addressable);
+      if (!addressable.has(path))
+        warnUnaddressable(path, addressable, options.key);
       return handles.of(path, () =>
         createFieldHandle({
           store,
@@ -202,6 +204,12 @@ export function createForm<T, TPath extends string = string>(
 
     rows(arrayPath) {
       assertConcretePath(arrayPath);
+      // The question `field` asks, asked here too. A list this form does not
+      // have hands back an empty order, and an edit to it writes a member of
+      // the ROOT that no descriptor covers: nothing is drawn, nothing is
+      // judged, and until this line nothing was said about it either.
+      if (!addressable.has(arrayPath))
+        warnUnaddressable(arrayPath, addressable, options.key);
       const existing = rowsByPath.get(arrayPath);
       if (existing !== undefined) return existing;
       const created = createRowsHandle({

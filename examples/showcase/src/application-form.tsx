@@ -22,28 +22,28 @@ import { SectionCard } from "./md/section-card.js";
 function ApplicantSection(): ReactElement {
   return (
     <SectionCard icon="badge" title="ご担当者さま" caption="ご連絡先を入力してください">
-      <Field path="applicant.lastName">
+      <Field path="form:applicant.lastName">
         {(field) => <MdTextField field={field} label="姓" />}
       </Field>
-      <Field path="applicant.firstName">
+      <Field path="form:applicant.firstName">
         {(field) => <MdTextField field={field} label="名" />}
       </Field>
-      <Field path="applicant.lastNameKana">
+      <Field path="form:applicant.lastNameKana">
         {(field) => <MdTextField field={field} label="セイ" hint="全角カタカナ" />}
       </Field>
-      <Field path="applicant.firstNameKana">
+      <Field path="form:applicant.firstNameKana">
         {(field) => <MdTextField field={field} label="メイ" hint="全角カタカナ" />}
       </Field>
-      <Field path="applicant.birthDate">
+      <Field path="form:applicant.birthDate">
         {(field) => <MdTextField field={field} label="生年月日" type="date" />}
       </Field>
-      <Field path="applicant.phone">
+      <Field path="form:applicant.phone">
         {(field) => (
           <MdTextField field={field} label="電話番号" leading="call" hint="例: 03-1234-5678" />
         )}
       </Field>
       <div className="sm:col-span-2">
-        <Field path="applicant.email">
+        <Field path="form:applicant.email">
           {(field) => (
             <MdTextField field={field} label="メールアドレス" type="email" leading="mail" />
           )}
@@ -57,17 +57,17 @@ function CompanySection(): ReactElement {
   return (
     <SectionCard icon="apartment" title="会社情報">
       <div className="sm:col-span-2">
-        <Field path="company.name">
+        <Field path="form:company.name">
           {(field) => <MdTextField field={field} label="会社名" />}
         </Field>
       </div>
-      <Field path="company.department">
+      <Field path="form:company.department">
         {(field) => <MdTextField field={field} label="部署" hint="任意" />}
       </Field>
-      <Field path="company.title">
+      <Field path="form:company.title">
         {(field) => <MdTextField field={field} label="役職" hint="任意" />}
       </Field>
-      <Field path="company.employees">
+      <Field path="form:company.employees">
         {(field) => <MdNumberField field={field} label="従業員数" suffix="名" />}
       </Field>
     </SectionCard>
@@ -76,14 +76,14 @@ function CompanySection(): ReactElement {
 
 function AddressSections(): ReactElement {
   const form = useForm();
-  const sameAsBilling = useFieldValue("sameAsBilling") === true;
+  const sameAsBilling = useFieldValue("form:sameAsBilling") === true;
   // The values stay in the store either way; what stops is the verdict
   // counting toward whether the form can be submitted.
-  useParticipation(form, "shipping", !sameAsBilling);
+  useParticipation(form, "form:shipping", !sameAsBilling);
   return (
     <>
       <SectionCard icon="receipt_long" title="請求先住所">
-        <AddressFields at="billing" />
+        <AddressFields at="form:billing" />
       </SectionCard>
 
       <SectionCard
@@ -96,7 +96,7 @@ function AddressSections(): ReactElement {
         }
         actions={
           <div className="w-40">
-            <Field path="sameAsBilling">
+            <Field path="form:sameAsBilling">
               {(field) => (
                 <MdCheckboxField field={field} label="請求先と同じ" />
               )}
@@ -106,7 +106,7 @@ function AddressSections(): ReactElement {
       >
         {/* The values stay in the store either way; what stops is the verdict
             counting toward whether the form can be submitted. */}
-        {sameAsBilling ? null : <AddressFields at="shipping" />}
+        {sameAsBilling ? null : <AddressFields at="form:shipping" />}
       </SectionCard>
     </>
   );
@@ -116,7 +116,7 @@ function TermsSection(): ReactElement {
   return (
     <SectionCard icon="gavel" title="お支払いと確認事項">
       <div className="sm:col-span-2">
-        <Field path="payment">
+        <Field path="form:payment">
           {(field) => (
             <MdChoiceChips
               field={field}
@@ -131,14 +131,14 @@ function TermsSection(): ReactElement {
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field path="note">
+        <Field path="form:note">
           {(field) => (
             <MdTextField field={field} label="備考" multiline hint="任意 / 500 文字まで" />
           )}
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field path="agreed">
+        <Field path="form:agreed">
           {(field) => (
             <MdCheckboxField
               field={field}

@@ -16,6 +16,12 @@
 // mean "trust me", and what it usually meant was a misspelt path rendering an
 // empty input that was never validated and said nothing.
 //
+// ONE ARGUMENT, because the path says which form it belongs to:
+// `useField("admin:quotas.seats")`. There is no second spelling that takes the
+// form beside the path — one call shape, so the value type is read out of the
+// form the path itself names rather than out of every registered form at once.
+// An application with a single registered form writes no prefix.
+//
 // It is a PLACE, not a rule. One field is one value, so `items[*].sku` has no
 // answer here — it names every sku in the list, and that question is
 // `useFieldValues`. The type used to accept it anyway and the runtime threw on
@@ -29,11 +35,6 @@
 // callable twice on the same path.
 // ===========================================================================
 import { useCallback, useId } from "react";
-import type {
-  ConcretePath,
-  DeclaredOf,
-  InhabitedPath,
-} from "../contract/index.js";
 import type { FieldBinding } from "./field-binding.types.js";
 import { buildInputProps } from "./build-input-props.js";
 import {
@@ -42,31 +43,19 @@ import {
   fieldElementIds,
   labelPropsFor,
 } from "./field-element-ids.js";
-import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useFormHandle } from "./use-form.js";
+import { useFormForPath } from "./use-form-for-path.js";
 import type {
-  AnyPath,
-  AnyValues,
-  FormKey,
-  PathsFor,
-  ValueOfPath,
-  ValuesFor,
+  FormPath,
+  InhabitedFormPath,
+  ValueAtFormPath,
 } from "./form-type-registry.js";
 
-export function useField<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>;
-export function useField<
-  TKey extends FormKey,
-  K extends ConcretePath<PathsFor<TKey>>,
->(
-  key: TKey,
-  path: K & InhabitedPath<ValuesFor<TKey>, K>
-): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
-export function useField(first: string, second?: string): FieldBinding<never> {
-  const [key, path] = splitFormArgs(first, second);
-  const form = useFormHandle(key);
+export function useField<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
+): FieldBinding<ValueAtFormPath<Q>>;
+export function useField(spelling: string): FieldBinding<never> {
+  const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
 
   const value = useCell(handle.sources.value);

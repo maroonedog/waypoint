@@ -22,6 +22,6 @@ export function nothingIsAddressable(): void {
   useFieldValue("name");
   // @ts-expect-error no form type is registered
   useRows("items");
-  // @ts-expect-error a key names nothing when nothing is registered
-  useField("order", "owner.email");
+  // @ts-expect-error a prefix names nothing when nothing is registered
+  useField("order:owner.email");
 }

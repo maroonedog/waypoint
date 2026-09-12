@@ -51,7 +51,7 @@ const makeColumn = (path, id, renders) =>
 
 test("an unbound wildcard reads the whole column", async () => {
   const { at, root } = await mount(
-    h(FormProvider, { form: newForm() }, h(makeColumn("items[*].sku", "v")))
+    h(FormProvider, { form: newForm() }, h(makeColumn("form:items[*].sku", "v")))
   );
   assert.equal(at("v").textContent, '["a","b","c"]');
   root.unmount();
@@ -60,7 +60,7 @@ test("an unbound wildcard reads the whole column", async () => {
 test("editing one row moves the column", async () => {
   const form = newForm();
   const { at, root } = await mount(
-    h(FormProvider, { form }, h(makeColumn("items[*].sku", "v")))
+    h(FormProvider, { form }, h(makeColumn("form:items[*].sku", "v")))
   );
 
   await act(async () => form.field("items[1].sku").setValue("B!"));
@@ -76,9 +76,9 @@ test("a splice changes the column, and the new row is subscribed too", async () 
     h(
       FormProvider,
       { form },
-      h(FieldRows, { path: "items" }, (rows) => {
+      h(FieldRows, { path: "form:items" }, (rows) => {
         insert = () => rows.insert(rows.rows.length, { sku: "new" });
-        return h(makeColumn("items[*].sku", "v"));
+        return h(makeColumn("form:items[*].sku", "v"));
       })
     )
   );
@@ -100,9 +100,9 @@ test("a removal shortens it", async () => {
     h(
       FormProvider,
       { form },
-      h(FieldRows, { path: "items" }, (rows) => {
+      h(FieldRows, { path: "form:items" }, (rows) => {
         remove = () => rows.remove(0);
-        return h(makeColumn("items[*].sku", "v"));
+        return h(makeColumn("form:items[*].sku", "v"));
       })
     )
   );
@@ -143,7 +143,7 @@ test("a column is not woken by a write outside it", async () => {
     h(
       FormProvider,
       { form },
-      h(makeColumn("items[*].sku", "v", renders))
+      h(makeColumn("form:items[*].sku", "v", renders))
     )
   );
   const before = renders.count;
@@ -159,7 +159,7 @@ test("the snapshot is reference-stable when nothing changed", async () => {
   const form = newForm();
   const renders = { count: 0 };
   const { root } = await mount(
-    h(FormProvider, { form }, h(makeColumn("items[*].sku", "v", renders)))
+    h(FormProvider, { form }, h(makeColumn("form:items[*].sku", "v", renders)))
   );
   const before = renders.count;
 

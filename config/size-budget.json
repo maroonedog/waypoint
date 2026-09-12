@@ -12,72 +12,72 @@
     {
       "id": "@maroonedog/waypoint/core",
       "entry": "export * from \"@maroonedog/waypoint/core\";",
-      "minified": 20122,
-      "gzipped": 7229,
-      "budget": 7952
+      "minified": 20222,
+      "gzipped": 7266,
+      "budget": 7993
     },
     {
       "id": "@maroonedog/waypoint/react",
       "entry": "export * from \"@maroonedog/waypoint/react\";",
-      "minified": 27105,
-      "gzipped": 9609,
-      "budget": 10570
+      "minified": 27672,
+      "gzipped": 9759,
+      "budget": 10735
     },
     {
       "id": "@maroonedog/waypoint/resolver-standard",
       "entry": "export * from \"@maroonedog/waypoint/resolver-standard\";",
-      "minified": 5040,
-      "gzipped": 2125,
-      "budget": 2338
+      "minified": 5025,
+      "gzipped": 2122,
+      "budget": 2335
     },
     {
       "id": "@maroonedog/waypoint/resolver-zod",
       "entry": "export * from \"@maroonedog/waypoint/resolver-zod\";",
-      "minified": 6616,
-      "gzipped": 2599,
-      "budget": 2859
+      "minified": 6601,
+      "gzipped": 2596,
+      "budget": 2856
     },
     {
       "id": "@maroonedog/waypoint/resolver-luq",
       "entry": "export * from \"@maroonedog/waypoint/resolver-luq\";",
-      "minified": 5204,
-      "gzipped": 2141,
-      "budget": 2356
+      "minified": 5189,
+      "gzipped": 2136,
+      "budget": 2350
     },
     {
       "id": "resolver-standard (standardFormResolver alone)",
       "entry": "export { standardFormResolver } from \"@maroonedog/waypoint/resolver-standard\";",
-      "minified": 4774,
-      "gzipped": 2002,
-      "budget": 2203
+      "minified": 4759,
+      "gzipped": 2000,
+      "budget": 2200
     },
     {
       "id": "@maroonedog/waypoint/store-zustand",
       "entry": "export * from \"@maroonedog/waypoint/store-zustand\";",
-      "minified": 1201,
-      "gzipped": 648,
-      "budget": 713
+      "minified": 1196,
+      "gzipped": 645,
+      "budget": 710
     },
     {
       "id": "react (a screen: useField, useRows, FormProvider, useCreateForm)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";",
-      "minified": 20289,
-      "gzipped": 7385,
-      "budget": 8124
+      "minified": 20759,
+      "gzipped": 7527,
+      "budget": 8280
     },
     {
       "id": "react (useField alone)",
       "entry": "export { useField } from \"@maroonedog/waypoint/react\";",
-      "minified": 3505,
-      "gzipped": 1419,
-      "budget": 1561
+      "minified": 3849,
+      "gzipped": 1537,
+      "budget": 1691
     },
     {
       "id": "core (createForm alone)",
       "entry": "export { createForm } from \"@maroonedog/waypoint/core\";",
-      "minified": 16067,
-      "gzipped": 5922,
-      "budget": 6515
+      "minified": 16171,
+      "gzipped": 5963,
+      "budget": 6560
     },
     {
       "id": "core (assertFormStoreContract alone)",
@@ -89,9 +89,9 @@
     {
       "id": "a screen + resolver-zod (what an application installs)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";\nexport { zodFormResolver } from \"@maroonedog/waypoint/resolver-zod\";",
-      "minified": 26921,
-      "gzipped": 9639,
-      "budget": 10603
+      "minified": 27376,
+      "gzipped": 9776,
+      "budget": 10754
     }
   ]
 }

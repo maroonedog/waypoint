@@ -11,7 +11,13 @@ import { MdSelectField } from "../md/select-field.js";
  *
  * The prop's type is the set of places this whole section fits, computed from
  * the registered form — so the paths it builds by interpolation stay checked,
- * and a prefix that is missing one of these five fields will not compile.
+ * and a place that is missing one of these five fields will not compile.
+ *
+ * Each of those places names its form: `form:billing`, `form:shipping`. That
+ * is what makes ONE prop enough. The section belongs to the design system
+ * rather than to a form, and while a path carried no form there was nowhere to
+ * say which one it had been handed — so another screen's path fitted this prop
+ * exactly as well, and the mistake arrived as blank inputs.
  */
 export function AddressFields({
   at,

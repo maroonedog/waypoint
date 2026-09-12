@@ -23,17 +23,36 @@
 // two casts below say so. This is the one layer where that is not a loss —
 // layer 1 exists to draw a form nobody wrote component code for, and checking
 // a path against a registry only means anything where somebody typed it.
+//
+// SO THIS IS WHERE A QUALIFIED PATH IS MINTED RATHER THAN CHECKED. `<Field>`
+// and `<FieldRows>` take a path that names its form, and the tree's paths name
+// none — they are one form's own vocabulary. The name comes from the enclosing
+// provider, which is the same place the hooks compare against, so the paths
+// this mints are the paths those would accept. The alternative was to leave
+// `<Field>` a door that still takes an unqualified path, which would reopen
+// for every caller what it was closed for here.
 // ===========================================================================
-import { Fragment, type ReactElement, type ReactNode } from "react";
+import { useContext, Fragment, type ReactElement, type ReactNode } from "react";
 import { bindDeclaredPath, type DescriptorNode } from "../core/index.js";
 import { Field } from "./field.js";
 import { FieldRows } from "./field-rows.js";
+import { FormKeyContext } from "./form-key-context.js";
+import { formPathWithin } from "./parse-qualified-path.js";
 import { useFormHandle } from "./use-form.js";
 import type { RowsBinding } from "./use-rows.js";
+import type { FormDeclaredPath } from "./form-type-registry.js";
 
 export interface AutoFormProps {
-  /** Draw only these top-level paths; omit for all of them. */
-  readonly only?: readonly string[];
+  /**
+   * Draw only these top-level declarations; omit for all of them.
+   *
+   * DECLARED paths — the rule — because that is what the tree is keyed by: a
+   * whole list is `form:items[*]`, and the place union has no spelling that
+   * means the list itself. They are qualified like every other path a caller
+   * writes, and the form is taken off again before they are matched against
+   * the tree, which knows only its own.
+   */
+  readonly only?: readonly FormDeclaredPath[];
   /**
    * Wraps one list. It receives the rows binding and the already-rendered
    * rows, so an application decides the chrome and this component decides
@@ -55,26 +74,32 @@ const boundToRows = (
 function renderNode(
   node: DescriptorNode,
   renderList: AutoFormProps["renderList"],
-  indices: readonly number[]
+  indices: readonly number[],
+  formKey: string
 ): ReactElement {
+  // `here` is this form's own vocabulary — what the tree holds, and what the
+  // DOM carries. `qualified` is what a caller would have typed.
   const here = boundToRows(node.path, indices);
+  const qualified = `${formKey}:${here}`;
   if (node.kind === "field") {
-    return <Field key={here} path={here as never} />;
+    return <Field key={here} path={qualified as never} />;
   }
   if (node.kind === "group") {
     return (
       <div key={here} data-field-group={here}>
-        {node.children.map((child) => renderNode(child, renderList, indices))}
+        {node.children.map((child) =>
+          renderNode(child, renderList, indices, formKey)
+        )}
       </div>
     );
   }
   return (
-    <FieldRows key={here} path={here as never}>
+    <FieldRows key={here} path={qualified as never}>
       {(binding) => {
         const rows = binding.rows.map((row) => (
           <Fragment key={row.key}>
             {node.children.map((child) =>
-              renderNode(child, renderList, [...indices, row.index])
+              renderNode(child, renderList, [...indices, row.index], formKey)
             )}
           </Fragment>
         ));
@@ -86,10 +111,15 @@ function renderNode(
 
 export function AutoForm(props: AutoFormProps): ReactElement {
   const form = useFormHandle();
+  const formKey = useContext(FormKeyContext);
   const { only, renderList } = props;
   const drawn =
     only === undefined
       ? form.tree
-      : form.tree.filter((node) => only.includes(node.path));
-  return <>{drawn.map((node) => renderNode(node, renderList, []))}</>;
+      : form.tree.filter((node) =>
+          only.some(
+            (wanted) => formPathWithin(wanted as string, formKey) === node.path
+          )
+        );
+  return <>{drawn.map((node) => renderNode(node, renderList, [], formKey))}</>;
 }

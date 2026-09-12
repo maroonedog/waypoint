@@ -30,8 +30,10 @@ const DEFAULTS = {
   items: [{ sku: "a" }, { sku: "b" }],
 };
 
-export const orderForm = () =>
+/** @param key the name the form gives itself, for the tests that need one. */
+export const orderForm = (key) =>
   createForm({
     adapter: zodFormResolver(ORDER),
     defaultValues: structuredClone(DEFAULTS),
+    key,
   });

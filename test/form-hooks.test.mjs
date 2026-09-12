@@ -10,15 +10,21 @@
 // submit gate stay correct, and what actually broke is one field's display.
 // Throwing would take the whole form down for that.
 //
-// Eleven of the thirteen tests below therefore put one question to a string: is
-// this a path this form has? Warn, stay silent, or — for `items[*]`, the single
-// case where guessing would address a row nobody asked for — throw. The two
-// that ask something else say so in their names: "two forms on one screen stay
-// independent" and "a component needs nothing wrapped around it".
+// The question this file puts to a string is therefore: is this a path this
+// form has? Warn, stay silent, or — for `items[*]`, where guessing would
+// address a row nobody asked for — throw.
 //
-// No hook in this file names a form. That is the line between it and
-// hook-form-key.test.mjs, where every hook does: here the enclosing provider
-// answers, there the call site does.
+// THE PATHS HERE CARRY NO FORM IN FRONT OF THEM, and that is the arm under
+// test. An application with one registered form writes its paths bare, so bare
+// is a spelling that has to keep working, and this is where it is held. The
+// qualified arm is `hook-form-key.test.mjs`: there the call site names the
+// form, here the enclosing provider answers.
+//
+// The last section is about the DIAGNOSTIC rather than about addressing, and
+// it is where both spellings appear. A warning is read by somebody searching
+// their own source for what they typed, so what it quotes has to be the
+// spelling they wrote — which means a qualified call has to produce a
+// qualified message, suggestions included.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import "./support/dom.mjs";
@@ -263,5 +269,79 @@ test("a row that does not exist yet is addressable", async () => {
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
   assert.equal(warned, "");
+  root.unmount();
+});
+
+// ---------------------------------------------------------------------------
+// The warning is written in the caller's vocabulary, whichever one that is.
+//
+// A form NAMED where it is created is the shape the provider is built around:
+// it derives its key from the form rather than being told the same string a
+// second time, so there is one name and nothing to drift. That name is also
+// the only thing here that knows what a path in this form looks like written
+// out, which is why it is what the message is qualified with.
+// ---------------------------------------------------------------------------
+
+/** The order form again, named — so the provider and the message agree. */
+const namedOrderForm = () =>
+  createForm({
+    key: "order",
+    adapter: zodFormResolver(
+      z.object({
+        billing: z.object({ postcode: z.string(), city: z.string() }),
+      })
+    ),
+    defaultValues: { billing: { postcode: "100-0001", city: "Chiyoda" } },
+  });
+
+test("a qualified typo is quoted the way it was written", async () => {
+  // Searched on the bare path, because a form's own vocabulary has no prefix
+  // in it; quoted with the prefix back on, because that is the string the
+  // reader will search their own source for.
+  function Screen() {
+    useField("order:billing.postcod");
+    return null;
+  }
+  const { root, escaped, warned } = await mountCatching(
+    h(FormProvider, { form: namedOrderForm() }, h(Screen))
+  );
+  assert.equal(escaped, null);
+  assert.match(warned, /"order:billing\.postcod"/);
+  root.unmount();
+});
+
+test("the suggestions are qualified too, so they can be pasted back", async () => {
+  // The half that is easy to leave out and the worse half to leave out. A
+  // qualified spelling handed to a search over unqualified paths resembles
+  // none of them, so the suggestions vanish exactly where one is wanted; and a
+  // suggestion returned with the prefix still off cannot be pasted into a
+  // source file where more than one form is registered.
+  function Screen() {
+    useField("order:billing.ctiy");
+    return null;
+  }
+  const { root, warned } = await mountCatching(
+    h(FormProvider, { form: namedOrderForm() }, h(Screen))
+  );
+  assert.match(warned, /Did you mean/);
+  assert.match(warned, /order:billing\.city/);
+  root.unmount();
+});
+
+test("an unnamed form leaves the prefix off, which is the spelling it accepts", async () => {
+  // A form nobody named is a form nobody had to tell apart, so an unprefixed
+  // path is legal against it and an unprefixed suggestion is one the reader
+  // can paste. The message has no name to use because the application never
+  // wrote one down.
+  function Screen() {
+    useField("billing.citty");
+    return null;
+  }
+  const { root, warned } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.match(warned, /"billing\.citty"/);
+  assert.match(warned, /Did you mean: [^?]*\bbilling\.city\b/);
+  assert.doesNotMatch(warned, /form:/);
   root.unmount();
 });

@@ -13,9 +13,11 @@
 // Nothing here treats that as a case — a bound index is just a path.
 //
 // SO THE PATH TYPE IS THE WIDE ONE, and this is the hook that wants it. Every
-// other path surface in the package narrowed to `ConcretePath`, because every
-// other one addresses a single value. This one addresses a set, and it reaches
+// other path surface in the package narrowed to a PLACE, because every other
+// one addresses a single value. This one addresses a set, and it reaches
 // `expandDeclaredPath`, which handles any number of wildcards still standing.
+// `FormColumnPath` is that set, qualified: the form is named in front of the
+// wildcards, which sit where they always did.
 // The rule-or-place union was therefore too NARROW here, not too wide: it
 // offers all wildcards or none, and the partly bound spelling the paragraph
 // above promises is in neither half, so the sentence was true of the runtime
@@ -30,20 +32,11 @@
 // ===========================================================================
 import { useMemo, useSyncExternalStore } from "react";
 import { expandDeclaredPath } from "../core/index.js";
+import { useFormForPath } from "./use-form-for-path.js";
 import type {
-  DeclaredOf,
-  InhabitedPath,
-  PartlyBoundPath,
-} from "../contract/index.js";
-import { splitFormArgs } from "./split-form-args.js";
-import { useFormHandle } from "./use-form.js";
-import type {
-  AnyPath,
-  AnyValues,
-  FormKey,
-  PathsFor,
-  ValueOfPath,
-  ValuesFor,
+  FormColumnPath,
+  InhabitedFormPath,
+  ValueAtFormPath,
 } from "./form-type-registry.js";
 
 const WILDCARD = "[*]";
@@ -59,22 +52,11 @@ const arraysCrossed = (declared: string): readonly string[] => {
   return crossed;
 };
 
-export function useFieldValues<K extends PartlyBoundPath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): readonly ValueOfPath<AnyValues, DeclaredOf<K>>[];
-export function useFieldValues<
-  TKey extends FormKey,
-  K extends PartlyBoundPath<PathsFor<TKey>>,
->(
-  key: TKey,
-  path: K & InhabitedPath<ValuesFor<TKey>, K>
-): readonly ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>[];
-export function useFieldValues(
-  first: string,
-  second?: string
-): readonly never[] {
-  const [formKey, open] = splitFormArgs(first, second);
-  const form = useFormHandle(formKey);
+export function useFieldValues<Q extends FormColumnPath>(
+  path: Q & InhabitedFormPath<Q>
+): readonly ValueAtFormPath<Q>[];
+export function useFieldValues(spelling: string): readonly never[] {
+  const { form, path: open } = useFormForPath(spelling);
 
   // Which places the wildcard covers right now. Read during render rather than
   // subscribed to, because it is only used to decide WHAT to subscribe to —

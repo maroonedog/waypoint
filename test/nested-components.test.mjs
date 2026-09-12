@@ -50,6 +50,12 @@ const DEFAULTS = {
  * THE POINT OF THE FILE. One prop, and it is a location: never a value, never
  * a setter, never a change handler. It does not move when the value does, so
  * passing it costs nothing and re-renders nobody.
+ *
+ * ONE prop, not two. The address names its own form — `form:billing` — so a
+ * component shared between forms takes a single self-describing string rather
+ * than an address plus a key to read it in. `postcode.path` below is the
+ * unqualified half: it is written into the DOM, where it has to match what a
+ * lookup by `name` will ask for.
  */
 function AddressFields({ at }) {
   const postcode = useField(`${at}.postcode`);
@@ -83,7 +89,7 @@ function UncontrolledAddress({ at }) {
 
 /** Somewhere else entirely: not a parent of the field, not a child of it. */
 function ElsewhereOnTheScreen() {
-  const billing = useFieldValue("billing.postcode");
+  const billing = useFieldValue("form:billing.postcode");
   return h("span", { "data-testid": "readout" }, String(billing ?? ""));
 }
 
@@ -117,8 +123,8 @@ test("one component is correct at two different addresses", async () => {
     h(
       FormProvider,
       { form },
-      h(AddressFields, { at: "billing" }),
-      h(AddressFields, { at: "shipping" })
+      h(AddressFields, { at: "form:billing" }),
+      h(AddressFields, { at: "form:shipping" })
     )
   );
 
@@ -135,8 +141,8 @@ test("typing in one copy does not reach the other", async () => {
     h(
       FormProvider,
       { form },
-      h(AddressFields, { at: "billing" }),
-      h(AddressFields, { at: "shipping" })
+      h(AddressFields, { at: "form:billing" }),
+      h(AddressFields, { at: "form:shipping" })
     )
   );
 
@@ -153,7 +159,7 @@ test("a value is read from elsewhere with no props and nothing lifted", async ()
     h(
       FormProvider,
       { form },
-      h(AddressFields, { at: "billing" }),
+      h(AddressFields, { at: "form:billing" }),
       h(ElsewhereOnTheScreen)
     )
   );
@@ -167,7 +173,7 @@ test("a value is read from elsewhere with no props and nothing lifted", async ()
 test("an address composes, so a subtree can be placed inside another one", async () => {
   const form = newForm();
   const { shown, root } = await mount(
-    h(FormProvider, { form }, h(AddressFields, { at: "company.office" }))
+    h(FormProvider, { form }, h(AddressFields, { at: "form:company.office" }))
   );
   assert.equal(shown("pc-company.office.postcode").value, "060-0001");
   root.unmount();
@@ -179,8 +185,8 @@ test("an issue lands on the right copy, not on both", async () => {
     h(
       FormProvider,
       { form },
-      h(AddressFields, { at: "billing" }),
-      h(AddressFields, { at: "shipping" })
+      h(AddressFields, { at: "form:billing" }),
+      h(AddressFields, { at: "form:shipping" })
     )
   );
 
@@ -197,12 +203,12 @@ test("a nested component can read ANYWHERE, not only under its own address", asy
   // want and used to resolve silently to billing.shipping.postcode.
   function CrossReader({ at }) {
     const here = useFieldValue(`${at}.postcode`);
-    const elsewhere = useFieldValue("shipping.postcode");
+    const elsewhere = useFieldValue("form:shipping.postcode");
     return h("span", { "data-testid": "cross" }, `${here}|${elsewhere}`);
   }
   const form = newForm();
   const { shown, root } = await mount(
-    h(FormProvider, { form }, h(CrossReader, { at: "billing" }))
+    h(FormProvider, { form }, h(CrossReader, { at: "form:billing" }))
   );
   assert.equal(shown("cross").textContent, "100-0001|150-0001");
   root.unmount();
@@ -214,8 +220,8 @@ test("the uncontrolled binding takes an address too", async () => {
     h(
       FormProvider,
       { form },
-      h(UncontrolledAddress, { at: "billing" }),
-      h(UncontrolledAddress, { at: "shipping" })
+      h(UncontrolledAddress, { at: "form:billing" }),
+      h(UncontrolledAddress, { at: "form:shipping" })
     )
   );
 
@@ -244,7 +250,7 @@ const listOf = (form, capture) =>
   h(
     FormProvider,
     { form },
-    h(FieldRows, { path: "items" }, (binding) => {
+    h(FieldRows, { path: "form:items" }, (binding) => {
       capture(binding);
       return binding.rows.map((row) =>
         h(RowSku, { key: row.key, at: row.path })

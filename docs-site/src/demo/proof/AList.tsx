@@ -3,7 +3,7 @@ import { blankLine, orderAdapter, orderDefaults } from "../order-form.js";
 
 const INPUT = "min-w-0 flex-1 rounded border border-outline-variant bg-surface px-2 py-1 text-sm";
 
-function Line({ row, onRemove }: { row: FieldRow<"items">; onRemove: () => void }) {
+function Line({ row, onRemove }: { row: FieldRow<"form:items">; onRemove: () => void }) {
   const sku = useField(`${row.path}.sku`);
   return (
     <div className="flex items-center gap-2 py-1">
@@ -18,7 +18,7 @@ function Line({ row, onRemove }: { row: FieldRow<"items">; onRemove: () => void 
 }
 
 function Lines() {
-  const items = useRows("items");
+  const items = useRows("form:items");
   const addLine = () => items.insert(items.rows.length, blankLine());
   return (
     <div className="rounded-lg bg-surface-low p-3">

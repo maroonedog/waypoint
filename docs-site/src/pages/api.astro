@@ -30,15 +30,10 @@ const hooks = [
     name: "useField()",
     summary:
       "One field: its value, its issues, its flags, and the writers for them. Subscribes to five cells, so a keystroke re-renders this component and nothing else. The path is a PLACE — one field is one value, so items[*].sku has no answer here and does not compile; that question is useFieldValues.",
-    signature: `function useField<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>
-
-// naming one registered form
-function useField<TKey extends FormKey, K extends ConcretePath<PathsFor<TKey>>>(
-  key: TKey, path: K & InhabitedPath<ValuesFor<TKey>, K>
-): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>`,
-    example: `const field = useField("owner.name");
+    signature: `function useField<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
+): FieldBinding<ValueAtFormPath<Q>>`,
+    example: `const field = useField("form:owner.name");
 
 <label {...field.labelProps}>Name</label>
 <input {...field.inputProps} />
@@ -67,10 +62,10 @@ function useField<TKey extends FormKey, K extends ConcretePath<PathsFor<TKey>>>(
     name: "useUncontrolledField()",
     summary:
       "The same field, subscribed imperatively: the listener writes the DOM node instead of re-rendering, so typing reaches React not at all. It cannot transform a value as it is typed — masking and formatting need useField.",
-    signature: `function useUncontrolledField<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): UncontrolledFieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>`,
-    example: `const field = useUncontrolledField("owner.name");
+    signature: `function useUncontrolledField<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
+): UncontrolledFieldBinding<ValueAtFormPath<Q>>`,
+    example: `const field = useUncontrolledField("form:owner.name");
 
 <input defaultValue={field.defaultValue} ref={field.ref}
        onChange={field.onChange} onBlur={field.onBlur} />`,
@@ -89,59 +84,57 @@ function useField<TKey extends FormKey, K extends ConcretePath<PathsFor<TKey>>>(
     name: "useFieldValue()",
     summary:
       "One field's value and nothing else. A summary that only mirrors a value has no reason to be woken when the error on it moves.",
-    signature: `function useFieldValue<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): ValueOfPath<AnyValues, DeclaredOf<K>> | undefined`,
-    example: `const sameAsBilling = useFieldValue("sameAsBilling") === true;`,
+    signature: `function useFieldValue<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
+): ValueAtFormPath<Q> | undefined`,
+    example: `const sameAsBilling = useFieldValue("form:sameAsBilling") === true;`,
   },
   {
     name: "useFieldValues()",
     summary:
       "Every place a wildcard covers, read as a column. The one hook here that is not O(1): it subscribes to one cell per place, plus the row order of every array the path crosses. Its path type is the WIDE one — each [*] independently kept or bound — because this is the one hook that addresses a set rather than a value.",
-    signature: `function useFieldValues<K extends PartlyBoundPath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): readonly ValueOfPath<AnyValues, DeclaredOf<K>>[]`,
-    example: `const skus  = useFieldValues("items[*].sku");        // readonly string[]
-const inRow = useFieldValues("shipments[0].lines[*].sku");  // one row's column`,
+    signature: `function useFieldValues<Q extends FormColumnPath>(
+  path: Q & InhabitedFormPath<Q>
+): readonly ValueAtFormPath<Q>[]`,
+    example: `const skus  = useFieldValues("form:items[*].sku");        // readonly string[]
+const inRow = useFieldValues("form:shipments[0].lines[*].sku");  // one row's column`,
   },
   {
     name: "useFieldIssues()",
     summary:
       "One field's issues and nothing else, so typing in an input never re-renders the summary beside it.",
-    signature: `function useFieldIssues<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
+    signature: `function useFieldIssues<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
 ): readonly FormIssue[]`,
-    example: `const listIssues = useFieldIssues("items");   // the array-level rule`,
+    example: `const listIssues = useFieldIssues("form:items");   // the array-level rule`,
   },
   {
     name: "useRows()",
     summary:
       "The row ORDER of one array, and the three edits that change it. Editing a member of a row leaves the order untouched, so a list does not re-render because somebody typed in it. Concrete, because one list has one order: an inner list is reached through the outer row's own address, `${row.path}.lines`.",
-    signature: `function useRows<K extends ConcretePath<ArrayPath<AnyPath>>>(
-  path: K
-): RowsBinding<K>`,
-    example: `const items = useRows("items");
+    signature: `function useRows<Q extends FormListPath>(path: Q): RowsBinding<Q>`,
+    example: `const items = useRows("form:items");
 
 items.rows.map((row) => <Sku key={row.key} at={\`\${row.path}.sku\`} />)
 items.insert(items.rows.length, { sku: "" });
 items.remove(0);
 items.move(0, 2);`,
     returns: [
-      { name: "path", type: "K", note: "The concrete path this list lives at." },
+      { name: "path", type: "Q", note: "The concrete path this list lives at, qualified." },
       { name: "rows", type: "readonly FieldRow[]", note: "In order. See below." },
       { name: "insert", type: "(at, value?) => void", note: "" },
       { name: "remove", type: "(at) => void", note: "" },
       { name: "move", type: "(from, to) => void", note: "" },
       { name: "row.key", type: "string", note: "Opaque, stable for the row's life. The React key, never an address." },
       { name: "row.index", type: "number", note: "" },
-      { name: "row.path", type: "`${K}[${number}]`", note: "Where the row lives. Build a field's path from it." },
+      { name: "row.path", type: "`${Q}[${number}]`", note: "Where the row lives, qualified by its form — so a path built from it is complete and nothing has to be threaded beside it." },
     ],
-    returnsTitle: "RowsBinding<K>",
+    returnsTitle: "RowsBinding<Q>",
   },
   {
     name: "useFormStatus()",
     summary: "The four form-level aggregates, each its own cell.",
-    signature: `function useFormStatus(): FormStatus`,
+    signature: `function useFormStatus(formKey?: FormKey): FormStatus`,
     returns: [
       { name: "errorCount", type: "number", note: "Issues that currently block a submit; a dormant subtree is excluded." },
       { name: "isSubmitting", type: "boolean", note: "" },
@@ -153,13 +146,13 @@ items.move(0, 2);`,
   {
     name: "useParticipation()",
     summary:
-      "Switches a subtree out of what blocks a submit, and back on unmount. The values stay in the store, so a rule comparing against them goes on reading them. A place, not a rule: a dormant root is matched with a segment-anchored prefix test, so a wildcard root matches nothing and would silence nothing.",
+      "Switches a subtree out of what blocks a submit, and back on unmount. The values stay in the store, so a rule comparing against them goes on reading them. A place, not a rule: a dormant root is matched with a segment-anchored prefix test, so a wildcard root matches nothing and would silence nothing. It is the one path-taking hook given its handle rather than reading one from context, and it takes either spelling of a path — a row is silenced by row.path, which arrives qualified.",
     signature: `function useParticipation<T, TPath extends string>(
   form: FormHandle<T, TPath>,
-  path: ConcretePath<TPath>,
+  path: ConcretePath<TPath> | \`\${FormKey}:\${ConcretePath<TPath>}\`,
   participating: boolean | undefined
 ): void`,
-    example: `useParticipation(form, "shipping", !sameAsBilling);`,
+    example: `useParticipation(form, "form:shipping", !sameAsBilling);`,
   },
   {
     name: "useForm()",
@@ -196,27 +189,27 @@ const components = [
   {
     name: "<FormProvider>",
     summary:
-      "Puts one handle in reach of a subtree. formKey matters only to an application that registered more than one form.",
+      "Puts one handle in reach of a subtree. formKey says which registered form this is, and the prefix on every path below is compared against it; omit it and the key the form was created with is used, so the name is written once. It is a registered key rather than a string, because a typo in it would refuse the whole subtree.",
     signature: `<FormProvider form={form} formKey?="order" widgets?={registry}>`,
   },
   {
     name: "<Field>",
     summary:
       "Layers 2 and 3 in one component: a children function gets the binding, and without one a widget is looked up by name from the registry.",
-    signature: `<Field path="owner.name">{(field) => …}</Field>
-<Field path="owner.name" as="postcode" />`,
+    signature: `<Field path="form:owner.name">{(field) => …}</Field>
+<Field path="form:owner.name" as="postcode" />`,
   },
   {
     name: "<FieldRows>",
     summary:
       "useRows as a component. It renders no wrapper and no button — what a row looks like is not this library's business.",
-    signature: `<FieldRows path="items">{({ rows, insert, remove }) => …}</FieldRows>`,
+    signature: `<FieldRows path="form:items">{({ rows, insert, remove }) => …}</FieldRows>`,
   },
   {
     name: "<AutoForm>",
     summary:
       "Layer 1: every declared field, in declaration order, drawn through the widget registry. It ships no input of its own.",
-    signature: `<AutoForm only?={["billing"]} renderList?={(binding, rows) => …} />`,
+    signature: `<AutoForm only?={["form:billing"]} renderList?={(binding, rows) => …} />`,
   },
 ];
 
@@ -241,6 +234,12 @@ type AddressablePath<P>  // P | ConcretePath<P> — the rule or a place
 type DeclaredOf<P>       // the reverse: every [0] back to [*]
 type InhabitedPath<T, K> // K, unless T has no value at K
 
+// These are UNQUALIFIED — one form's own vocabulary, which is all the contract
+// layer and the runtime ever see. The prefix rides to their LEFT: FormPath is
+// ConcretePath with a registered key in front of it, FormColumnPath is
+// PartlyBoundPath, FormListPath the arrays, FormDeclaredPath the rules. The
+// colon comes off in one place in ./react, and nothing below it sees one.
+//
 // A surface addressing ONE value takes ConcretePath: useField, useFieldValue,
 // useFieldIssues, useUncontrolledField, useParticipation, <Field>, and
 // useRows / <FieldRows> over one list's order. Each of them reaches a runtime
@@ -263,10 +262,17 @@ const types = `
 // The registry. One declaration, anywhere in the compilation.
 interface FormTypeRegistry {}
 
+// Every path union below is QUALIFIED: "form:billing.postcode". Name a form as
+// the second argument to take that form's paths and no other's.
 FormPath                       // every registered PLACE, containers included
+FormColumnPath                 // wildcards kept or bound: what useFieldValues takes
+FormListPath                   // the lists: what useRows and <FieldRows> take
+FormDeclaredPath               // the rules, [*] still standing: what AutoForm.only takes
 FormPathTo<string>             // only the paths whose value is a string
+FormPathTo<string, "profile">  // and only that form's
 FormPathOver<"postcode">       // only the prefixes that have those underneath
 
+FormKey                        // every key the application registered
 FormValues<typeof adapter>     // the form's value type
 FormPaths<typeof adapter>      // the paths it declares
 `;
@@ -285,9 +291,9 @@ const slugOf = (name: string): string =>
 >
   <h1 class="text-3xl font-bold sm:text-4xl">API</h1>
   <p class="mt-4 max-w-2xl leading-relaxed text-on-surface-variant">
-    Signatures are the ones the package emits. Each hook also takes a leading
-    form key — <code>useField("order", path)</code> — when an application
-    registered more than one form.
+    Signatures are the ones the package emits. Every path names its form —{" "}
+    <code>useField("order:billing.postcode")</code> — and with a single form
+    registered the prefix is optional.
   </p>
 
   <nav class="mt-6 flex flex-wrap gap-x-4 gap-y-1.5 text-sm" aria-label="On this page">

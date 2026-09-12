@@ -23,21 +23,21 @@ declare module "@maroonedog/waypoint/react" {
 
 const usage = `
 // Any component, at any depth. It imports nothing from the file above.
-const postcode = useField("billing.postcode");  // string | undefined, inferred
-const typo     = useField("billing.postcod");   // compile error
-const sku      = useField("items[0].sku");      // a place, checked as its rule
-const computed = useField(\`items[\${i}].sku\`);   // a computed index is fine
-const spliced  = useField(\`items[\${s}].sku\`);   // compile error: s is a string
+const postcode = useField("form:billing.postcode");  // string | undefined
+const typo     = useField("form:billing.postcod");   // compile error
+const sku      = useField("form:items[0].sku");      // a place, checked as its rule
+const computed = useField(\`form:items[\${i}].sku\`);   // a computed index is fine
+const spliced  = useField(\`form:items[\${s}].sku\`);   // compile error: s is a string
 `;
 
 const rows = `
 // A row hands down its own address, and the address carries a type:
-// \`row.path\` is \`shipments[\${number}]\`, not \`string\`.
+// \`row.path\` is \`form:shipments[\${number}]\`, not \`string\`.
 {shipments.rows.map((shipment) => (
   <Lines key={shipment.key} at={shipment.path} />
 ))}
 
-function Lines({ at }: { at: \`shipments[\${number}]\` }) {
+function Lines({ at }: { at: \`form:shipments[\${number}]\` }) {
   const lines = useRows(\`\${at}.lines\`);          // checked
   return lines.rows.map((line) => (
     <Text key={line.key} at={\`\${line.path}.sku\`} />   // checked, three levels down
@@ -53,9 +53,9 @@ declare module "@maroonedog/waypoint/react" {
   }
 }
 
-useField("order", "items[0].sku");
-useField("profile", "items[0].sku");  // compile error: profile has no items
-useField("items[0].sku");             // no key: checked against every form
+useField("order:items[0].sku");
+useField("profile:items[0].sku");  // compile error: profile has no items
+useField("items[0].sku");          // compile error: two forms, so say which
 `;
 
 const dynamic = `
@@ -105,8 +105,11 @@ const viewTypes = [
   <Code code={usage} label="any component, any depth" lang="tsx" />
 
   <p class="caption">
-    Skip it and the hooks are not unchecked — they are refused, and the error
-    quotes the declaration you are missing.
+    <strong class="text-on-surface">A path carries its form.</strong>{" "}
+    <code>form</code> is the key declared above, the colon ends it, and the
+    value type is read in <em>that</em> form. Register one and the prefix is
+    optional; skip the declaration entirely and the hooks are not unchecked —
+    they are refused, and the error quotes the declaration you are missing.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Why a registry and not a prop</h2>
@@ -127,11 +130,30 @@ const viewTypes = [
   <Code code={several} label="two forms, two keys" />
 
   <p class="caption">
+    With two registered, the unprefixed spellings leave the union — so an
+    application that grows a second form is told at every call site rather than
+    at one. Every path-taking surface gets this for free, including the ones
+    with no room for a key beside the path: a{" "}
+    <code>&lt;Field path&gt;</code>, a <code>FormPathTo&lt;string&gt;</code>{" "}
+    prop, and a row's own <code>row.path</code>.
+  </p>
+
+  <p class="caption">
     The key names a form in the <em>registry</em>; the instance still comes
     from the nearest provider, and nothing relates the two. So the provider
-    carries its key —{" "}
-    <code>&lt;FormProvider form={"{form}"} formKey="order"&gt;</code> — and a
-    keyed hook throws when they disagree.
+    carries its key — name the form at <code>createForm({"{ key: \"order\" }"})</code>{" "}
+    and the provider takes it from there — and a path whose head names a
+    different form throws, saying which two are being confused.
+  </p>
+
+  <p class="caption">
+    Where the prefix ends is <em>lexical</em>: a head qualifies a path only
+    when it stands before the first <code>.</code> or <code>[</code>. A{" "}
+    <code>Record&lt;string, T&gt;</code> key may contain a colon, so{" "}
+    <code>byId.a:b.amount</code> stays an ordinary path — the first{" "}
+    <code>.</code> comes first. It is a lexical rule rather than "is this head
+    registered?" because the run time has to apply the same rule and has no
+    registry to consult, only the one key its provider carries.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Path types for the view layer</h2>
@@ -183,14 +205,14 @@ const viewTypes = [
         <tr class="hairline">
           <td class="w-64 py-3 pr-4 align-top font-medium">Building the union</td>
           <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            120–306 instantiations per leaf, once, in whatever file declares the
+            77–137 instantiations per leaf, once, in whatever file declares the
             adapter. It does not grow with the number of components.
           </td>
         </tr>
         <tr class="hairline">
           <td class="py-3 pr-4 align-top font-medium">One accepted call</td>
           <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            5.0 instantiations at width 300, and 5.0 at depth 7. A thousand
+            129.0 instantiations at width 300, and 275.0 at depth 7. A thousand
             components addressing one form is not where this goes wrong.
           </td>
         </tr>
@@ -207,7 +229,7 @@ const viewTypes = [
         <tr class="hairline">
           <td class="py-3 pr-4 align-top font-medium">One refused call</td>
           <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            346,055 instantiations, because the compiler elaborates the whole
+            475,034 instantiations, because the compiler elaborates the whole
             union into the message. That is a fact about a mistyped path in an
             editor, not about correct code.
           </td>
@@ -218,8 +240,8 @@ const viewTypes = [
             <code>OpaqueObject</code>. A member whose interface extends one of
             its arms ends the path there and keeps its own type and its own
             members, so the container stays nameable and nothing below it is.
-            On a 729-leaf shape that took the union from 210,887 instantiations
-            to 72,707 for two of three subtrees — exactly the paths given up,
+            On a 729-leaf shape that took the union from 99,592 instantiations
+            to 35,508 for two of three subtrees — exactly the paths given up,
             and no discount on the rest.
           </td>
         </tr>
@@ -257,9 +279,9 @@ const viewTypes = [
 
   <div class="mt-6 overflow-hidden rounded-lg bg-surface-low p-5">
     <p class="font-mono text-xs leading-relaxed break-words">
-      [waypoint] "billing.postcod" is not a field this form has, so it will
-      draw nothing and validate nothing. Did you mean: billing.postcode,
-      billing, billing.city?
+      [waypoint] "order:billing.postcod" is not a field this form has, so it
+      will draw nothing and validate nothing. Did you mean: order:billing.postcode,
+      order:billing, order:billing.city?
     </p>
   </div>
 
@@ -267,6 +289,8 @@ const viewTypes = [
     It <strong class="text-on-surface">warns, once per path; it does not
     throw</strong>. A mis-addressed field is inert, but it cannot let bad data
     through: the pass judges the whole root, so the verdict and the submit gate
-    stay correct.
+    stay correct. The resemblance is searched for with the prefix off, because
+    a form's own vocabulary has none in it, and put back on afterwards — so
+    every path in the line can be pasted straight back into the source.
   </p>
 </Base>

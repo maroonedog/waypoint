@@ -57,8 +57,8 @@ export function StarterForm() {
           setBlocked(outcome.blockedBy.map((issue) => issue.path));
         }}
       >
-        <Text at="owner.name" label="Name" />
-        <Text at="billing.postcode" label="Billing postcode" />
+        <Text at="form:owner.name" label="Name" />
+        <Text at="form:billing.postcode" label="Billing postcode" />
         <SubmitButton />
         {blocked.length > 0 && <p>Blocked by: {blocked.join(", ")}</p>}
       </form>

@@ -20,20 +20,13 @@
 // accept the wildcard and throw on it, which put the working spelling and the
 // checking spelling on opposite sides.
 // ===========================================================================
-import type { ConcretePath } from "../contract/index.js";
-import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useFormHandle } from "./use-form.js";
+import { useFormForPath } from "./use-form-for-path.js";
 import type { FieldRow } from "./field-row.types.js";
-import type {
-  AnyPath,
-  ArrayPath,
-  FormKey,
-  PathsFor,
-} from "./form-type-registry.js";
+import type { FormListPath } from "./form-type-registry.js";
 
 export interface RowsBinding<TPath extends string = string> {
-  /** The concrete path this list lives at. */
+  /** Where this list lives, qualified by the form it belongs to. */
   readonly path: TPath;
   readonly rows: readonly FieldRow<TPath>[];
   insert(at: number, value?: unknown): void;
@@ -41,25 +34,22 @@ export interface RowsBinding<TPath extends string = string> {
   move(from: number, to: number): void;
 }
 
-export function useRows<K extends ConcretePath<ArrayPath<AnyPath>>>(
-  path: K
-): RowsBinding<K>;
-export function useRows<
-  TKey extends FormKey,
-  K extends ConcretePath<ArrayPath<PathsFor<TKey>>>,
->(key: TKey, path: K): RowsBinding<K>;
-export function useRows(first: string, second?: string): RowsBinding<string> {
-  const [formKey, path] = splitFormArgs(first, second);
-  const form = useFormHandle(formKey);
+export function useRows<Q extends FormListPath>(path: Q): RowsBinding<Q>;
+export function useRows(spelling: string): RowsBinding<string> {
+  const { form, path } = useFormForPath(spelling);
   const handle = form.rows(path);
   const ids = useCell(handle.ids);
 
   return {
-    path,
+    // The QUALIFIED spelling, not the one the store was addressed with. A row
+    // hands its address back to a path-taking surface — `` `${row.path}.sku` ``
+    // — so it has to carry its form the way every other path does, or the
+    // caller is threading a key beside it again.
+    path: spelling,
     rows: ids.map((key, index) => ({
       key,
       index,
-      path: `${path}[${index}]` as `${string}[${number}]`,
+      path: `${spelling}[${index}]` as `${string}[${number}]`,
     })),
     insert: (at, value) => handle.insert(at, value),
     remove: (at) => handle.remove(at),

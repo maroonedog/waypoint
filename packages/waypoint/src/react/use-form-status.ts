@@ -6,9 +6,17 @@
 // which React reports as "The result of getSnapshot should be cached" and then
 // loops on. Composing here happens after the snapshot comparison, not during
 // it, so a fresh object is harmless.
+//
+// A KEY AND NOT A PATH, which is why qualifying paths did nothing for this
+// hook. A status is an aggregate over the whole form — there is no path in the
+// call to carry a form's name — so it took no argument at all and a named
+// form's status was unreachable from a component that wanted to say which form
+// it meant. The key it now takes is checked against the enclosing provider's
+// the way every other named call is.
 // ===========================================================================
 import { useCell } from "./use-cell.js";
-import { useForm } from "./use-form.js";
+import { useFormHandle } from "./use-form.js";
+import type { FormKey } from "./form-type-registry.js";
 
 export interface FormStatus {
   /** Issues that currently block a submit; a dormant subtree is excluded. */
@@ -18,8 +26,8 @@ export interface FormStatus {
   readonly isValidating: boolean;
 }
 
-export function useFormStatus(): FormStatus {
-  const form = useForm();
+export function useFormStatus(formKey?: FormKey): FormStatus {
+  const form = useFormHandle(formKey);
   return {
     errorCount: useCell(form.errorCount),
     isSubmitting: useCell(form.submitting),

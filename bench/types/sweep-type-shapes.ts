@@ -33,6 +33,7 @@ import {
 import {
   EMPTY_PROGRAM_SOURCE,
   PACKAGES_ONLY_PROGRAM_SOURCE,
+  localPathOf,
   typeProgramSource,
 } from "./type-program-source.ts";
 import { openProgramDirectory } from "./program-directory.ts";
@@ -116,12 +117,16 @@ export function shapeCatalogue(): readonly ShapeUnderTest[] {
  * `useField` and a rule to `useFieldValues`. Matching only the first would
  * leave every array row's refusals unattributed and the `addressable` column
  * silently wrong.
+ *
+ * The form is taken back off, because a call is written qualified and the
+ * catalogue names its leaves without one. Every consumer of this map compares
+ * against the catalogue's spelling.
  */
 const pathByLine = (source: string): Map<number, string> => {
   const found = new Map<number, string>();
   source.split("\n").forEach((text, index) => {
     const call = /use(?:Field|FieldValues)\("(.*)"\)/.exec(text);
-    if (call !== null) found.set(index + 1, String(call[1]));
+    if (call !== null) found.set(index + 1, localPathOf(String(call[1])));
   });
   return found;
 };

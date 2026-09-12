@@ -138,16 +138,16 @@ function Sheet({ store }: { store: FormCellStore }): ReactElement {
           <Counter renders={renders} />
         </h2>
 
-        <TextField path="owner.name" label="Name" />
-        <TextField path="billing.postcode" label="Billing postcode" />
+        <TextField path="form:owner.name" label="Name" />
+        <TextField path="form:billing.postcode" label="Billing postcode" />
         {showShipping ? (
-          <TextField path="shipping.postcode" label="Shipping postcode" />
+          <TextField path="form:shipping.postcode" label="Shipping postcode" />
         ) : (
           <p className="absent">
             Shipping postcode is unmounted. The rule on billing still reads it.
           </p>
         )}
-        <Stepper path="quantity" label="Quantity" />
+        <Stepper path="form:quantity" label="Quantity" />
 
         <div className="controls">
           <button type="button" onClick={() => setShowShipping((on) => !on)}>

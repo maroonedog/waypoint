@@ -9,35 +9,18 @@
 // does, and that handle refuses a rule. The column reading of a wildcard is
 // `useFieldValues`.
 // ===========================================================================
-import type {
-  ConcretePath,
-  DeclaredOf,
-  InhabitedPath,
-} from "../contract/index.js";
-import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useFormHandle } from "./use-form.js";
+import { useFormForPath } from "./use-form-for-path.js";
 import type {
-  AnyPath,
-  AnyValues,
-  FormKey,
-  PathsFor,
-  ValueOfPath,
-  ValuesFor,
+  FormPath,
+  InhabitedFormPath,
+  ValueAtFormPath,
 } from "./form-type-registry.js";
 
-export function useFieldValue<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): ValueOfPath<AnyValues, DeclaredOf<K>> | undefined;
-export function useFieldValue<
-  TKey extends FormKey,
-  K extends ConcretePath<PathsFor<TKey>>,
->(
-  key: TKey,
-  path: K & InhabitedPath<ValuesFor<TKey>, K>
-): ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>> | undefined;
-export function useFieldValue(first: string, second?: string): never {
-  const [key, path] = splitFormArgs(first, second);
-  const form = useFormHandle(key);
+export function useFieldValue<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
+): ValueAtFormPath<Q> | undefined;
+export function useFieldValue(spelling: string): never {
+  const { form, path } = useFormForPath(spelling);
   return useCell(form.field(path).sources.value) as never;
 }

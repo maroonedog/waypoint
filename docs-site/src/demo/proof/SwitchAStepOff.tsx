@@ -11,7 +11,7 @@ const INPUT = "rounded-md border border-outline-variant bg-surface px-2 py-1";
 const BUTTON = "rounded-md bg-primary px-3 py-1 text-sm text-on-primary";
 
 function ShippingPostcode() {
-  const field = useField("shipping.postcode");
+  const field = useField("form:shipping.postcode");
   return (
     <label className="flex items-center gap-3 text-sm">
       shipping postcode
@@ -31,7 +31,7 @@ export default function ShippingStep() {
   }));
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const [sent, setSent] = useState("");
-  useParticipation(form, "shipping", !sameAsBilling);
+  useParticipation(form, "form:shipping", !sameAsBilling);
 
   const send = async () => {
     const outcome = await form.submit((root) => setSent(JSON.stringify(root)));

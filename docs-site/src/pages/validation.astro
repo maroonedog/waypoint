@@ -39,7 +39,7 @@ outcome.blockedBy.map((issue) => issue.path).sort();
 const participation = `
 const form = useForm();
 
-useParticipation(form, "shipping", !sameAsBilling);
+useParticipation(form, "form:shipping", !sameAsBilling);
 `;
 
 const submitTypes = `

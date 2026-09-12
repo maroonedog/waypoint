@@ -41,8 +41,8 @@ declare module "@maroonedog/waypoint/react" {
 }
 
 // 3. Any component, any depth. No props, no context type, no assertions.
-const field = useField("billing.postcode");   //  string | undefined
-const typo  = useField("billing.postcod");    //  compile error
+const field = useField("form:billing.postcode");   //  string | undefined
+const typo  = useField("form:billing.postcod");    //  compile error
 `;
 
 const snippets = [
@@ -50,7 +50,7 @@ const snippets = [
     title: "A field",
     note: "It subscribes to the cells it reads and to nothing else.",
     lang: "tsx" as const,
-    code: `const field = useField("owner.name");
+    code: `const field = useField("form:owner.name");
 
 <input {...field.inputProps} />
 <em>{field.issues[0]?.message}</em>`,
@@ -59,7 +59,7 @@ const snippets = [
     title: "A list",
     note: "There is no nested-array API.",
     lang: "tsx" as const,
-    code: `const items = useRows("items");
+    code: `const items = useRows("form:items");
 
 items.rows.map((row) => (
   <Sku key={row.key} at={\`\${row.path}.sku\`} />
@@ -92,7 +92,7 @@ items.insert(items.rows.length, { sku: "" });`,
     title: "Not waking React",
     note: "The same cell, subscribed imperatively. A keystroke costs 0 commits.",
     lang: "tsx" as const,
-    code: `const field = useUncontrolledField("owner.name");
+    code: `const field = useUncontrolledField("form:owner.name");
 
 <input defaultValue={field.defaultValue} ref={field.ref}
        onChange={field.onChange} onBlur={field.onBlur} />`,
@@ -101,7 +101,7 @@ items.insert(items.rows.length, { sku: "" });`,
     title: "Switching a subtree off",
     note: "It stops blocking submit and keeps its values.",
     lang: "ts" as const,
-    code: `useParticipation(form, "shipping", !sameAsBilling);
+    code: `useParticipation(form, "form:shipping", !sameAsBilling);
 
 // A rule comparing against it goes on reading it.`,
   },
@@ -607,7 +607,7 @@ const TRY = [
       production.</strong>
     </p>
     <p class="caption">
-      270 tests, the eight compile-time programs <code>test:types</code> runs,
+      277 tests, the eight compile-time programs <code>test:types</code> runs,
       and a screen that uses all of it. Two limits: a field whose key contains a
       dot cannot be addressed, and the validation pass judges the whole root on
       every settled change.

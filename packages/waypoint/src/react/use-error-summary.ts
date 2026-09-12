@@ -53,6 +53,7 @@ import { summarizeIssues } from "../core/index.js";
 import { fieldControlAt, focusFieldControl } from "./find-field-control.js";
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
+import type { FormKey } from "./form-type-registry.js";
 
 /** One row of a summary: what to say, and how to get there. */
 export interface ErrorSummaryEntry extends FieldIssueSummary {
@@ -107,7 +108,19 @@ export interface ErrorSummary {
   focusSummary(): boolean;
 }
 
-export function useErrorSummary(formKey?: string): ErrorSummary {
+/**
+ * A KEY AND NOT A PATH, which is why qualifying paths does nothing for this
+ * hook. A summary is an aggregate over one whole form, so there is no path in
+ * the call for a form's name to ride in on. What it took was an unchecked
+ * string; what it takes now is a registered key, checked against the enclosing
+ * provider's like every other named call.
+ *
+ * The entries' own paths stay UNQUALIFIED. They come from the descriptor tree
+ * and they are handed to `fieldControlAt`, which matches them against the DOM
+ * `name` attribute — so they belong to the same vocabulary the inputs carry,
+ * and qualifying them here would only stop them matching.
+ */
+export function useErrorSummary(formKey?: FormKey): ErrorSummary {
   const form = useFormHandle(formKey);
   const blocking = useCell(form.blockedBy);
 

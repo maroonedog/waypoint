@@ -67,6 +67,17 @@ export type FormValidationMoment = "change" | "blur" | "submit";
 
 export interface FormOptions<T, TPath extends string> {
   readonly adapter: FormAdapter<T, TPath>;
+  /**
+   * Which registered form this is — the name a path qualifies itself with.
+   *
+   * It reaches the runtime for ONE purpose: a diagnostic quotes the path the
+   * caller wrote, and after qualification that spelling includes this. Nothing
+   * here addresses a value with it and nothing here compares it; `./core`
+   * neither has a registry nor wants one.
+   *
+   * Omitting it costs the prefix in those messages and nothing else.
+   */
+  readonly key?: string;
   readonly defaultValues?: unknown;
   /** Omit for the shipped store. Anything passing the contract fits here. */
   readonly store?: FormCellStore;
@@ -83,6 +94,12 @@ export interface FormOptions<T, TPath extends string> {
 }
 
 export interface FormHandle<T, TPath extends string = string> {
+  /**
+   * The name this form was created under, when it was given one — what a
+   * provider publishes so the key a path names has one source rather than two
+   * that can drift.
+   */
+  readonly key: string | undefined;
   readonly descriptors: readonly FormFieldDescriptor[];
   /** The containers the descriptors imply, in declaration order. */
   readonly tree: readonly DescriptorNode[];

@@ -11,7 +11,7 @@ const BOX = "grid gap-1 text-xs font-medium text-on-surface-variant";
 const INPUT = "rounded-md border border-outline-variant bg-surface p-2 text-sm";
 
 function ControlledSku() {
-  const field = useField("items[0].sku");
+  const field = useField("form:items[0].sku");
   const renders = useRenderCount();
   return (
     <div className={BOX}>
@@ -25,7 +25,7 @@ function ControlledSku() {
 }
 
 function UncontrolledSku() {
-  const field = useUncontrolledField("items[1].sku");
+  const field = useUncontrolledField("form:items[1].sku");
   const renders = useRenderCount();
   return (
     <div className={BOX}>

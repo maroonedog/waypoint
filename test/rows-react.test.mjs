@@ -51,7 +51,7 @@ function makeScreen(form, counters) {
     return h(
       FormProvider,
       { form },
-      h(FieldRows, { path: "items" }, ({ rows, insert, remove, move }) => {
+      h(FieldRows, { path: "form:items" }, ({ rows, insert, remove, move }) => {
         counters.list += 1;
         return h(
           Fragment,
@@ -179,7 +179,7 @@ test("a rule used where a place is needed fails loudly", async () => {
     defaultValues: structuredClone(DEFAULTS),
   });
   const Bare = () =>
-    h(FormProvider, { form }, h(Field, { path: "items[*].sku" }, () => null));
+    h(FormProvider, { form }, h(Field, { path: "form:items[*].sku" }, () => null));
   const container = dom.window.document.createElement("div");
   dom.window.document.body.appendChild(container);
   const root = createRoot(container);
@@ -197,6 +197,12 @@ test("a rule used where a place is needed fails loudly", async () => {
 // Participation is addressed like everything else now: a path, not a wrapper.
 // The defect this keeps closed is that a row must be silenceable by its own
 // address rather than by whatever scope happened to enclose it.
+//
+// `row.path` is that address, and it arrives QUALIFIED. Handed to a
+// `setParticipating` that read the whole string as a place, `form:items[1]`
+// recorded a dormant root no descendant sits under, so the row went on
+// blocking the submit and nothing was thrown or printed. That is the same
+// silent shape the wildcard had, which is why this test holds both closed.
 test("a row can be switched off without being removed", async () => {
   const { z } = await import("zod");
   const { createForm, errorCountCell } = await import("@maroonedog/waypoint/core");
@@ -221,7 +227,7 @@ test("a row can be switched off without being removed", async () => {
     h(
       FormProvider,
       { form },
-      h(FieldRows, { path: "items" }, ({ rows }) =>
+      h(FieldRows, { path: "form:items" }, ({ rows }) =>
         rows.map((row) =>
           h(Row, {
             key: row.key,

@@ -104,9 +104,10 @@ const report = `# Typed addressing, measured — compiler lane
 
 Typed addressing is what this library leads with: a \`FormTypeRegistry\`
 augmentation, \`ConcretePath<P>\` for a place and \`PartlyBoundPath<P>\` for a
-column, and a leaf component
-that gets a compile-checked path with nothing passed down to it. This document
-is what that costs the compiler, taken with the compiler's own accounting.
+column, a form's own name written into the path in front of them, and a leaf
+component that gets a compile-checked path with nothing passed down to it. This
+document is what that costs the compiler, taken with the compiler's own
+accounting.
 
 Every figure is a **delta**, and every one of them is **printed rather than
 gated**. §6 is the measurement behind that decision.
@@ -120,7 +121,11 @@ Each program holds a root type of the stated shape, a
 \`declare module "@maroonedog/waypoint/react"\`
 augmentation that registers it, and one addressing call per leaf — \`useField\`
 for a place and \`useFieldValues\` for a rule, which is how the library itself
-divides them. The
+divides them. Every call is written QUALIFIED — \`useField("form:a.b")\` — which
+is the spelling the README and the site show, and therefore the one worth
+costing; an unprefixed call would compile here too, because the program
+registers one form.
+The
 imports resolve to \`packages/waypoint/src\`, so what is measured is the type this
 repository maintains rather than a \`.d.ts\` that may predate the last edit.
 

@@ -30,8 +30,8 @@ export default function AField() {
   }));
   return (
     <FormProvider form={form}>
-      <Row at="owner.name" label="name" />
-      <Row at="billing.postcode" label="billing" />
+      <Row at="form:owner.name" label="name" />
+      <Row at="form:billing.postcode" label="billing" />
     </FormProvider>
   );
 }

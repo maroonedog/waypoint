@@ -37,11 +37,6 @@
 // ===========================================================================
 import { useCallback, useEffect, useId, useRef } from "react";
 import type {
-  ConcretePath,
-  DeclaredOf,
-  InhabitedPath,
-} from "../contract/index.js";
-import type {
   UncontrolledChangeEvent,
   UncontrolledFieldBinding,
 } from "./field-binding.types.js";
@@ -56,38 +51,25 @@ import {
   numberOrTextWhileTyping,
   numberWhenTypingStops,
 } from "./number-from-typing.js";
-import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useFormHandle } from "./use-form.js";
+import { useFormForPath } from "./use-form-for-path.js";
 import type {
-  AnyPath,
-  AnyValues,
-  FormKey,
-  PathsFor,
-  ValueOfPath,
-  ValuesFor,
+  FormPath,
+  InhabitedFormPath,
+  ValueAtFormPath,
 } from "./form-type-registry.js";
 
 /** The same coercion buildInputProps applies, so both hooks agree on empty. */
 const displayValue = (value: unknown): string =>
   value === undefined || value === null ? "" : String(value);
 
-export function useUncontrolledField<K extends ConcretePath<AnyPath>>(
-  path: K & InhabitedPath<AnyValues, K>
-): UncontrolledFieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>;
-export function useUncontrolledField<
-  TKey extends FormKey,
-  K extends ConcretePath<PathsFor<TKey>>,
->(
-  key: TKey,
-  path: K & InhabitedPath<ValuesFor<TKey>, K>
-): UncontrolledFieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
+export function useUncontrolledField<Q extends FormPath>(
+  path: Q & InhabitedFormPath<Q>
+): UncontrolledFieldBinding<ValueAtFormPath<Q>>;
 export function useUncontrolledField(
-  first: string,
-  second?: string
+  spelling: string
 ): UncontrolledFieldBinding<never> {
-  const [formKey, path] = splitFormArgs(first, second);
-  const form = useFormHandle(formKey);
+  const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
 
   // The channels a message is drawn from. NOT the value: subscribing to that
