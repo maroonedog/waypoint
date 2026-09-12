@@ -1,0 +1,71 @@
+---
+// ===========================================================================
+// ApiEntry.astro — one thing you can look up.
+//
+// The same order every time: what it is in a line, the signature, then what
+// comes back. A reference is scanned rather than read, and a shape that varies
+// per entry makes the reader re-learn the layout at every heading.
+// ===========================================================================
+import Code from "./Code.astro";
+
+interface Member {
+  readonly name: string;
+  readonly type: string;
+  readonly note: string;
+}
+
+interface Props {
+  readonly name: string;
+  readonly summary: string;
+  readonly signature: string;
+  readonly example?: string;
+  readonly returns?: readonly Member[];
+  readonly returnsTitle?: string;
+}
+
+const { name, summary, signature, example, returns, returnsTitle } =
+  Astro.props;
+const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+---
+
+<!-- min-w-0: a grid item defaults to min-width:auto, so the widest code block
+     inside sizes the track and the whole page scrolls sideways on a phone. -->
+<section id={slug} class="hairline min-w-0 pt-10 first:border-t-0 first:pt-0">
+  <h3 class="font-mono text-lg font-semibold">
+    <a href={`#${slug}`} class="hover:text-primary">{name}</a>
+  </h3>
+  <p class="mt-2 max-w-2xl leading-relaxed text-on-surface-variant">{summary}</p>
+
+  <Code code={signature} />
+
+  {example !== undefined && <Code code={example} lang="tsx" />}
+
+  {
+    returns !== undefined && (
+      <div class="mt-5">
+        <p class="text-xs font-semibold tracking-wide text-on-surface-variant uppercase">
+          {returnsTitle ?? "Returns"}
+        </p>
+        <div class="mt-2 overflow-x-auto">
+          <table class="w-full text-sm">
+            <tbody>
+              {returns.map((member) => (
+                <tr class="hairline">
+                  <td class="py-2.5 pr-4 align-top font-mono text-xs whitespace-nowrap">
+                    {member.name}
+                  </td>
+                  <td class="py-2.5 pr-4 align-top font-mono text-xs whitespace-nowrap text-primary">
+                    {member.type}
+                  </td>
+                  <td class="py-2.5 align-top leading-relaxed text-on-surface-variant">
+                    {member.note}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+</section>

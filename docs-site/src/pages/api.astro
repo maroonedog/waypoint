@@ -1,0 +1,277 @@
+---
+// ===========================================================================
+// api.astro — everything you can call, with its real signature.
+//
+// The signatures are copied from the packages' emitted .d.ts rather than
+// written from memory, because a reference that is approximately right is
+// worse than none: a reader trusts it and stops reading the types.
+// ===========================================================================
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+import ApiEntry from "../components/ApiEntry.astro";
+
+const hooks = [
+  {
+    name: "useCreateForm()",
+    summary:
+      "Builds the form and keeps it for this component's lifetime. The argument is a function so the options are evaluated once rather than on every render.",
+    signature: `function useCreateForm<T, TPath extends string>(
+  options: () => FormOptions<T, TPath>
+): FormHandle<T, TPath>`,
+    example: `const form = useCreateForm(() => ({
+  adapter: orderAdapter,
+  defaultValues,
+}));
+
+<FormProvider form={form}>…</FormProvider>`,
+  },
+  {
+    name: "useField()",
+    summary:
+      "One field: its value, its issues, its flags, and the writers for them. Subscribes to five cells, so a keystroke re-renders this component and nothing else.",
+    signature: `function useField<K extends AddressablePath<AnyPath>>(
+  path: K
+): FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>
+
+// naming one registered form
+function useField<TKey extends FormKey, K extends AddressablePath<PathsFor<TKey>>>(
+  key: TKey, path: K
+): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>`,
+    example: `const field = useField("owner.name");
+
+<input {...field.inputProps} aria-invalid={field.issues.length > 0} />
+<em>{field.issues[0]?.message}</em>`,
+    returns: [
+      { name: "value", type: "T | undefined", note: "The current value." },
+      { name: "issues", type: "readonly FormIssue[]", note: "Never undefined; the empty list is interned." },
+      { name: "isTouched", type: "boolean", note: "Set by markTouched, usually on blur." },
+      { name: "isDirty", type: "boolean", note: "Differs from the value it was built with." },
+      { name: "isParticipating", type: "boolean", note: "Whether it counts toward blocking a submit." },
+      { name: "setValue", type: "(next) => void", note: "Writes, then asks for one coalesced pass." },
+      { name: "markTouched", type: "() => void", note: "Display state only. Asks for no pass." },
+      { name: "setParticipating", type: "(on) => void", note: "Keeps the value either way." },
+      { name: "validate", type: "() => MaybeAsync<FormIssue[]>", note: "The form's own pass, filtered to this path." },
+      { name: "issuesFor", type: "(candidate) => MaybeAsync<FormIssue[]>", note: "What a value WOULD produce. Writes nothing." },
+      { name: "inputProps", type: "FieldInputProps", note: "name / value / onChange / onBlur plus the declared constraints." },
+      { name: "path", type: "string", note: "The concrete path, as resolved." },
+      { name: "descriptor", type: "FormFieldDescriptor | undefined", note: "What the validator declared here." },
+    ],
+    returnsTitle: "FieldBinding<T>",
+  },
+  {
+    name: "useUncontrolledField()",
+    summary:
+      "The same field, subscribed imperatively: the listener writes the DOM node instead of re-rendering, so typing reaches React not at all. It cannot transform a value as it is typed — masking and formatting need useField.",
+    signature: `function useUncontrolledField<K extends AddressablePath<AnyPath>>(
+  path: K
+): UncontrolledFieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>`,
+    example: `const field = useUncontrolledField("owner.name");
+
+<input defaultValue={field.defaultValue} ref={field.ref}
+       onChange={field.onChange} onBlur={field.onBlur} />`,
+    returns: [
+      { name: "ref", type: "RefObject<HTMLInputElement>", note: "Put it on the input. The runtime writes the node through it." },
+      { name: "defaultValue", type: "string", note: "Read at mount only; React ignores it afterwards, which is intended." },
+      { name: "onChange", type: "(event) => void", note: "Takes currentTarget.value." },
+      { name: "onBlur", type: "() => void", note: "Marks touched." },
+      { name: "issues / isTouched / isParticipating", type: "—", note: "Subscribed. No value and no isDirty: subscribing to those is the cost this hook avoids." },
+      { name: "setValue / markTouched / validate / issuesFor", type: "—", note: "As on FieldBinding." },
+    ],
+    returnsTitle: "UncontrolledFieldBinding<T>",
+  },
+  {
+    name: "useFieldValue()",
+    summary:
+      "One field's value and nothing else. A summary that only mirrors a value has no reason to be woken when the error on it moves.",
+    signature: `function useFieldValue<K extends AddressablePath<AnyPath>>(
+  path: K
+): ValueOfPath<AnyValues, DeclaredOf<K>> | undefined`,
+    example: `const sameAsBilling = useFieldValue("sameAsBilling") === true;`,
+  },
+  {
+    name: "useFieldValues()",
+    summary:
+      "Every place a wildcard covers, read as a column. The one hook here that is not O(1): it subscribes to one cell per place, plus the row order of every array the path crosses.",
+    signature: `function useFieldValues<K extends AddressablePath<AnyPath>>(
+  path: K
+): readonly ValueOfPath<AnyValues, DeclaredOf<K>>[]`,
+    example: `const skus  = useFieldValues("items[*].sku");        // readonly string[]
+const inRow = useFieldValues("shipments[0].lines[*].sku");  // one row's column`,
+  },
+  {
+    name: "useFieldIssues()",
+    summary:
+      "One field's issues and nothing else, so typing in an input never re-renders the summary beside it.",
+    signature: `function useFieldIssues(
+  path: AddressablePath<AnyPath>
+): readonly FormIssue[]`,
+    example: `const listIssues = useFieldIssues("items");   // the array-level rule`,
+  },
+  {
+    name: "useRows()",
+    summary:
+      "The row ORDER of one array, and the three edits that change it. Editing a member of a row leaves the order untouched, so a list does not re-render because somebody typed in it.",
+    signature: `function useRows<K extends AddressablePath<ArrayPath<AnyPath>>>(
+  path: K
+): RowsBinding<K>`,
+    example: `const items = useRows("items");
+
+items.rows.map((row) => <Sku key={row.key} at={\`\${row.path}.sku\`} />)
+items.insert(items.rows.length, { sku: "" });
+items.remove(0);
+items.move(0, 2);`,
+    returns: [
+      { name: "path", type: "K", note: "The concrete path this list lives at." },
+      { name: "rows", type: "readonly FieldRow[]", note: "In order. See below." },
+      { name: "insert", type: "(at, value?) => void", note: "" },
+      { name: "remove", type: "(at) => void", note: "" },
+      { name: "move", type: "(from, to) => void", note: "" },
+      { name: "row.key", type: "string", note: "Opaque, stable for the row's life. The React key, never an address." },
+      { name: "row.index", type: "number", note: "" },
+      { name: "row.path", type: "`${K}[${number}]`", note: "Where the row lives. Build a field's path from it." },
+    ],
+    returnsTitle: "RowsBinding<K>",
+  },
+  {
+    name: "useFormStatus()",
+    summary: "The four form-level aggregates, each its own cell.",
+    signature: `function useFormStatus(): FormStatus`,
+    returns: [
+      { name: "errorCount", type: "number", note: "Issues that currently block a submit; a dormant subtree is excluded." },
+      { name: "isSubmitting", type: "boolean", note: "" },
+      { name: "submitCount", type: "number", note: "" },
+      { name: "isValidating", type: "boolean", note: "True while any pass is in flight." },
+    ],
+    returnsTitle: "FormStatus",
+  },
+  {
+    name: "useParticipation()",
+    summary:
+      "Switches a subtree out of what blocks a submit, and back on unmount. The values stay in the store, so a rule comparing against them goes on reading them.",
+    signature: `function useParticipation<T, TPath extends string>(
+  form: FormHandle<T, TPath>,
+  path: AddressablePath<TPath>,
+  participating: boolean | undefined
+): void`,
+    example: `useParticipation(form, "shipping", !sameAsBilling);`,
+  },
+  {
+    name: "useForm()",
+    summary:
+      "The enclosing handle. Naming a key checks it against the provider's and throws when they disagree; naming none accepts whichever provider is there.",
+    signature: `function useForm(): FormHandle<AnyValues, AnyPath>
+function useForm<TKey extends FormKey>(key: TKey): FormHandle<ValuesFor<TKey>, PathsFor<TKey>>`,
+    example: `const form = useForm();
+await form.submit(save);`,
+    returns: [
+      { name: "field", type: "(path) => FieldHandle", note: "Outside React too: sources, setValue, validate, issuesFor." },
+      { name: "rows", type: "(arrayPath) => RowsHandle", note: "" },
+      { name: "submit", type: "(handler) => Promise<SubmitOutcome>", note: "{ submitted, blockedBy }. Judges the whole root first." },
+      { name: "reset", type: "(defaultValues?) => void", note: "" },
+      { name: "validate", type: "() => MaybeAsync<FormIssue[]>", note: "Judges now, not on the microtask." },
+      { name: "readRoot", type: "() => unknown", note: "A root being edited is a draft, so it is not a T." },
+      { name: "errorCount / submitting / submitCount / validating", type: "CellSource<…>", note: "Subscribe directly, outside React if you like." },
+      { name: "descriptors / tree", type: "—", note: "What the validator declared, flat and as a tree." },
+      { name: "store", type: "FormCellStore", note: "The cell space itself." },
+    ],
+    returnsTitle: "FormHandle<T, TPath>",
+  },
+  {
+    name: "useCell()",
+    summary:
+      "Any CellSource, subscribed. Every hook above is built from this one call, and so is anything you write yourself.",
+    signature: `function useCell<T>(source: CellSource<T>): T`,
+    example: `const errors = useCell(form.errorCount);`,
+  },
+];
+
+const components = [
+  {
+    name: "<FormProvider>",
+    summary:
+      "Puts one handle in reach of a subtree. formKey matters only to an application that registered more than one form.",
+    signature: `<FormProvider form={form} formKey?="order" widgets?={registry}>`,
+  },
+  {
+    name: "<Field>",
+    summary:
+      "Layers 2 and 3 in one component: a children function gets the binding, and without one a widget is looked up by name from the registry.",
+    signature: `<Field path="owner.name">{(field) => …}</Field>
+<Field path="owner.name" as="postcode" />`,
+  },
+  {
+    name: "<FieldRows>",
+    summary:
+      "useRows as a component. It renders no wrapper and no button — what a row looks like is not this library's business.",
+    signature: `<FieldRows path="items">{({ rows, insert, remove }) => …}</FieldRows>`,
+  },
+  {
+    name: "<AutoForm>",
+    summary:
+      "Layer 1: every declared field, in declaration order, drawn through the widget registry. It ships no input of its own.",
+    signature: `<AutoForm only?={["billing"]} renderList?={(binding, rows) => …} />`,
+  },
+];
+
+const types = `
+// The registry. One declaration, anywhere in the compilation.
+interface FormTypeRegistry {}
+
+FormPath                       // every registered path, containers included
+FormPathTo<string>             // only the paths whose value is a string
+FormPathOver<"postcode">       // only the prefixes that have those underneath
+
+FormValues<typeof adapter>     // the form's value type
+FormPaths<typeof adapter>      // the paths it declares
+`;
+
+const INDEX = [
+  ...hooks.map((one) => one.name),
+  ...components.map((one) => one.name),
+];
+const slugOf = (name: string): string =>
+  name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
+---
+
+<Base
+  title="API — form-contract"
+  description="Every hook, component and path type, with the signature emitted by the packages themselves and what each one hands back."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">API</h1>
+  <p class="mt-4 max-w-2xl leading-relaxed text-on-surface-variant">
+    Signatures are the ones the packages emit. Each hook also takes a leading
+    form key — <code>useField("order", path)</code> — when an application
+    registered more than one form.
+  </p>
+
+  <nav class="mt-6 flex flex-wrap gap-x-4 gap-y-1.5 text-sm" aria-label="On this page">
+    {
+      INDEX.map((name) => (
+        <a
+          class="font-mono text-xs text-on-surface-variant underline-offset-4 hover:text-primary hover:underline"
+          href={`#${slugOf(name)}`}
+        >
+          {name}
+        </a>
+      ))
+    }
+  </nav>
+
+  <h2 class="mt-14 text-2xl font-bold">Hooks</h2>
+  <div class="mt-6 grid gap-10">
+    {hooks.map((one) => <ApiEntry {...one} />)}
+  </div>
+
+  <h2 class="mt-16 text-2xl font-bold">Components</h2>
+  <div class="mt-6 grid gap-10">
+    {components.map((one) => <ApiEntry {...one} />)}
+  </div>
+
+  <h2 class="mt-16 text-2xl font-bold">Types</h2>
+  <p class="mt-3 text-sm text-on-surface-variant">
+    <a class="text-primary underline underline-offset-4" href="/paths/"
+      >How the registry works →</a
+    >
+  </p>
+  <Code code={types} />
+</Base>
