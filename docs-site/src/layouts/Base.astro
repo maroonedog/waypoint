@@ -2,39 +2,71 @@
 // ===========================================================================
 // Base.astro — the frame every page is drawn in.
 //
-// One header, one footer, one place the description and canonical URL are
-// set. A page supplies a title and a description and nothing else, so a new
-// page cannot arrive without either.
+// TWO FRAMES, not one. A landing page and a reference page are read
+// differently: one is scrolled once by somebody deciding, the other is
+// returned to by somebody who already decided and needs one fact. So `/` is a
+// single centred column, and every other page is a documentation shell — a
+// section index on the left that is present on every page, the content in the
+// middle, and on a wide screen the page's own headings on the right.
 //
-// The column is 5xl rather than 3xl because most of what is on these pages is
-// not running text: code blocks, two diagrams drawn at 720 units wide, and
-// reference tables of three columns. Running text keeps a measure of its own
-// in styles.css, so widening the column widened the code and not the prose.
+// The index is the change that matters. With eight pages and a wrapping top
+// bar there was no view of the whole from anywhere in it: a reader on
+// /validation/ could not see that /paths/ existed without going back up. That
+// is what react-hook-form and Formik both spend their left margin on.
+//
+// The right rail is built from the DOM rather than passed in as a prop,
+// because a hand-maintained list of a page's own headings is a list that goes
+// stale the first time somebody renames one.
+//
+// It appears at 1400 rather than at xl, and the content column is capped at
+// 54rem. Measured at xl: the third column took 68px off the text, so the
+// window got wider and the reading column got narrower — which is the one
+// thing a responsive layout must never do. By 1400 the cap is already reached,
+// so the column does not move when the rail arrives.
 // ===========================================================================
 import "../styles.css";
 
 interface Props {
   readonly title: string;
   readonly description: string;
+  /** The landing page. Everything else gets the documentation shell. */
+  readonly bare?: boolean;
 }
 
-const { title, description } = Astro.props;
+const { title, description, bare = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
-// The wordmark is the link home, so this list carries the SECTIONS only. It
-// used to begin with an Overview entry that `NAV.slice(1)` then skipped —
-// present in the source, rendered nowhere.
-const NAV = [
-  { href: "/start/", label: "Start" },
-  { href: "/contract/", label: "The contract" },
-  { href: "/validation/", label: "Validation" },
-  { href: "/runtime/", label: "The runtime" },
-  { href: "/paths/", label: "Typed paths" },
-  { href: "/api/", label: "API" },
-  { href: "/benchmark/", label: "Benchmark" },
+// Grouped, because seven flat links is a list and three groups of two or
+// three is a structure. The labels say what a reader wants, not what the
+// pages are about.
+const SECTIONS = [
+  {
+    group: "Getting started",
+    items: [
+      { href: "/", label: "Overview" },
+      { href: "/start/", label: "Start" },
+    ],
+  },
+  {
+    group: "How it behaves",
+    items: [
+      { href: "/validation/", label: "Validation" },
+      { href: "/runtime/", label: "The runtime" },
+      { href: "/paths/", label: "Typed paths" },
+    ],
+  },
+  {
+    group: "Reference",
+    items: [
+      { href: "/contract/", label: "The contract" },
+      { href: "/api/", label: "API" },
+      { href: "/benchmark/", label: "Benchmark" },
+    ],
+  },
 ];
 
 const here = Astro.url.pathname;
+const flat = SECTIONS.flatMap((section) => section.items);
 ---
 
 <!doctype html>
@@ -61,19 +93,23 @@ const here = Astro.url.pathname;
 
   <body class="bg-surface text-on-surface">
     <header
-      class="sticky top-0 z-10 border-b border-outline-variant bg-surface/85 backdrop-blur"
+      class="sticky top-0 z-20 border-b border-outline-variant bg-surface/85 backdrop-blur"
     >
-      <!-- Wrapping, not scrolling: four section links plus the wordmark no
-           longer fit on one 375px line, and a link that has to be scrolled to
-           is a link nobody finds. -->
-      <nav
-        class="mx-auto flex max-w-5xl flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-sm sm:gap-x-6 sm:px-6"
-        aria-label="Primary"
+      <div
+        class="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-3 sm:px-6"
       >
-        <a href="/" class="font-medium tracking-wide text-primary">form-contract</a>
-        <div class="flex flex-wrap gap-x-4 gap-y-1 sm:gap-x-5">
+        <a href="/" class="text-sm font-medium tracking-wide text-primary"
+          >form-contract</a
+        >
+        <!-- Below lg the index is not on the page, so the sections live here
+             and wrap rather than scroll: a link you have to scroll to is a
+             link nobody finds. -->
+        <nav
+          class="flex flex-1 flex-wrap gap-x-4 gap-y-1 text-sm lg:hidden"
+          aria-label="Sections"
+        >
           {
-            NAV.map((item) => (
+            flat.slice(1).map((item) => (
               <a
                 href={item.href}
                 class:list={[
@@ -85,17 +121,71 @@ const here = Astro.url.pathname;
               </a>
             ))
           }
-        </div>
-      </nav>
+        </nav>
+        <a
+          class="ml-auto hidden text-sm text-on-surface-variant underline-offset-4 hover:underline lg:block"
+          href="https://github.com/maroonedog/form-contract">GitHub</a
+        >
+      </div>
     </header>
 
-    <!-- The space that opens a page has to be larger than the space between
-         two sections, or the first section reads as the second one. -->
-    <main class="mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-24">
-      <slot />
-    </main>
+    {
+      bare ? (
+        <main class="mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-24">
+          <slot />
+        </main>
+      ) : (
+        <div class="mx-auto grid max-w-[92rem] gap-x-10 px-4 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] min-[1400px]:grid-cols-[13rem_minmax(0,1fr)_13rem]">
+          <nav
+            class="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:py-10"
+            aria-label="Documentation"
+          >
+            {SECTIONS.map((section) => (
+              <div class="mb-6">
+                <p class="label">{section.group}</p>
+                <ul class="mt-2 grid gap-0.5">
+                  {section.items.map((item) => (
+                    <li>
+                      <a
+                        href={item.href}
+                        aria-current={here === item.href ? "page" : undefined}
+                        class:list={[
+                          "-ml-3 block rounded-md px-3 py-1 text-[0.8125rem]",
+                          here === item.href
+                            ? "bg-secondary-container font-medium text-on-secondary-container"
+                            : "text-on-surface-variant hover:text-on-surface",
+                        ]}
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
 
-    <footer class="mx-auto max-w-5xl px-6 pb-16">
+          <main class="min-w-0 max-w-[54rem] pt-16 pb-20 lg:pt-10">
+            <slot />
+          </main>
+
+          <aside
+            class="hidden min-[1400px]:sticky min-[1400px]:top-14 min-[1400px]:block min-[1400px]:h-[calc(100vh-3.5rem)] min-[1400px]:overflow-y-auto min-[1400px]:py-10"
+            aria-label="On this page"
+          >
+            <p class="label">On this page</p>
+            <ul id="on-this-page" class="mt-2 grid gap-1"></ul>
+          </aside>
+        </div>
+      )
+    }
+
+    <footer
+      class:list={[
+        "px-6 pb-16",
+        bare ? "mx-auto max-w-5xl" : "mx-auto max-w-[92rem] lg:pl-[14.5rem]",
+      ]}
+    >
       <div class="hairline pt-8">
         <p class="caption">
           MIT licensed. One resolver ships today and it is{" "}
@@ -108,5 +198,40 @@ const here = Astro.url.pathname;
         </p>
       </div>
     </footer>
+
+    {
+      !bare && (
+        <script is:inline>
+          // Built from the DOM: a hand-kept list of a page's own headings is a
+          // list that goes stale the first time one is renamed. Ids are minted
+          // here too, so a heading needs nothing at its call site.
+          (function () {
+            var rail = document.getElementById("on-this-page");
+            if (!rail) return;
+            var headings = document.querySelectorAll("main h2");
+            if (headings.length < 2) {
+              rail.parentElement.hidden = true;
+              return;
+            }
+            headings.forEach(function (heading) {
+              if (!heading.id) {
+                heading.id = (heading.textContent || "")
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/^-|-$/g, "");
+              }
+              var item = document.createElement("li");
+              var link = document.createElement("a");
+              link.href = "#" + heading.id;
+              link.textContent = heading.textContent;
+              link.className =
+                "block text-[0.8125rem] leading-snug text-on-surface-variant hover:text-on-surface";
+              item.appendChild(link);
+              rail.appendChild(item);
+            });
+          })();
+        </script>
+      )
+    }
   </body>
 </html>
