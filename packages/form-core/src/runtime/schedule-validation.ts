@@ -40,7 +40,7 @@ export function createValidationScheduler(
   let started = 0;
   let pending = 0;
 
-  const settle = (): void => {
+  const finishPass = (): void => {
     pending -= 1;
     if (pending === 0) store.write(validatingCell, false);
   };
@@ -58,14 +58,14 @@ export function createValidationScheduler(
     return outcome.then(
       (produced) => {
         if (passId === started) commit(produced);
-        settle();
+        finishPass();
         return produced;
       },
       (reason: unknown) => {
         // A pass that threw leaves the last verdict standing rather than
         // clearing it: an error reaching the network is not evidence that the
         // form became acceptable.
-        settle();
+        finishPass();
         throw reason;
       }
     );

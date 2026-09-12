@@ -48,8 +48,8 @@ export interface FieldBinding<TValue> {
   setParticipating(participating: boolean): void;
   /** A promise when the validator answers asynchronously. */
   validate(): MaybeAsync<readonly FormIssue[]>;
-  /** Judges a value that is NOT in the store and writes nothing. */
-  check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
+  /** The issues this field would carry if its value were `candidate`. */
+  issuesFor(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
   readonly inputProps: FieldInputProps;
 }
 
@@ -76,5 +76,5 @@ export interface UncontrolledFieldBinding<TValue> {
   setValue(next: TValue | undefined): void;
   markTouched(): void;
   validate(): MaybeAsync<readonly FormIssue[]>;
-  check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
+  issuesFor(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
 }

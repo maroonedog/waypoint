@@ -68,7 +68,7 @@ export function useField(first: string, second?: string): FieldBinding<never> {
     markTouched: () => handle.markTouched(),
     setParticipating: (participating) => handle.setParticipating(participating),
     validate: () => handle.validate(),
-    check: (candidate) => handle.check(candidate),
+    issuesFor: (candidate) => handle.issuesFor(candidate),
     inputProps: buildInputProps({
       path: handle.path,
       descriptor: handle.descriptor,

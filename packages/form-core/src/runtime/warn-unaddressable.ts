@@ -19,7 +19,7 @@ import type { AddressablePaths } from "../descriptors/addressable-paths.js";
  * is simply skipped where none does. A runtime that refuses to run because it
  * could not print a warning would be worse than the warning being missed.
  */
-const report = (message: string): void => {
+const warnOnHostConsole = (message: string): void => {
   const host = globalThis as { console?: { warn?: (line: string) => void } };
   host.console?.warn?.(message);
 };
@@ -36,11 +36,11 @@ export function warnUnaddressable(
   if (alreadyWarned.has(path)) return;
   alreadyWarned.add(path);
   const asRule = declaredPathOf(path);
-  const near = addressable.near(path);
-  report(
+  const similar = addressable.similarTo(path);
+  warnOnHostConsole(
     `[form-contract] "${path}" is not a field this form has` +
       (asRule === path ? "" : ` (as a rule, "${asRule}")`) +
       ", so it will draw nothing and validate nothing." +
-      (near.length === 0 ? "" : ` Did you mean: ${near.join(", ")}?`)
+      (similar.length === 0 ? "" : ` Did you mean: ${similar.join(", ")}?`)
   );
 }

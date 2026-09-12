@@ -200,7 +200,7 @@ test("a field validates on its own, and check writes nothing", () => {
   assert.deepEqual(fromField, fromForm);
 
   const rootBefore = JSON.stringify(form.readRoot());
-  const probed = form.field("billing.postcode").check("");
+  const probed = form.field("billing.postcode").issuesFor("");
   assert.deepEqual(probed, []);
   assert.equal(
     JSON.stringify(form.readRoot()),

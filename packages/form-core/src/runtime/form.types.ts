@@ -42,8 +42,8 @@ export interface FieldHandle<TValue> {
   setParticipating(participating: boolean): void;
   /** Judges the whole root, writes the verdict back, returns this path's part. */
   validate(): MaybeAsync<readonly FormIssue[]>;
-  /** Judges a value that is NOT in the store, and writes nothing. */
-  check(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
+  /** The issues this path would carry if its value were `candidate`. */
+  issuesFor(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
 }
 
 export interface FormOptions<T, TPath extends string> {

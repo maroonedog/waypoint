@@ -42,9 +42,9 @@ export function findLosses(
 
   const losses: LossRow[] = [];
   for (const [scenarioId, group] of byScenario) {
-    const mine = group.find((one) => one.subjectId === subjectId);
-    if (mine === undefined) continue;
-    let best = mine;
+    const ours = group.find((one) => one.subjectId === subjectId);
+    if (ours === undefined) continue;
+    let best = ours;
     for (const one of group) if (HEADLINE(one) < HEADLINE(best)) best = one;
     if (best.subjectId !== subjectId) {
       losses.push({

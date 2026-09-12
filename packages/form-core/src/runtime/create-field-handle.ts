@@ -1,15 +1,16 @@
 // ===========================================================================
 // create-field-handle.ts — one field's reads, writes and verdicts.
 //
-// `validate` and `check` are the same computation the form runs, filtered to
-// this path. That is a correctness argument rather than a simplification: a
+// `validate` and `issuesFor` are the same computation the form runs, filtered
+// to this path. That is a correctness argument rather than a simplification: a
 // runtime with a separate per-field engine gives a conditionally rendered
 // field a different verdict depending on which engine produced it, and the
 // difference shows up only once a field is unmounted.
 //
-// `check` writes nothing at all. Asking whether a value WOULD be acceptable is
-// not the same as putting it in the form, and a probe that mutated the store
-// would move every cross-field verdict as a side effect of asking.
+// `issuesFor` writes nothing at all. Asking what a value WOULD produce is not
+// the same as putting it in the form, and a probe that mutated the store would
+// move every cross-field verdict as a side effect of asking. The name is a
+// noun phrase for that reason: it answers rather than acts.
 // ===========================================================================
 import {
   isPending,
@@ -63,7 +64,7 @@ export function createFieldHandle<TValue>(
     setParticipating,
   } = request;
 
-  const mine = (produced: readonly FormIssue[]): readonly FormIssue[] => {
+  const atThisPath = (produced: readonly FormIssue[]): readonly FormIssue[] => {
     const found = produced.filter((issue) => issue.path === path);
     return found.length === 0 ? NO_ISSUES : found;
   };
@@ -95,12 +96,12 @@ export function createFieldHandle<TValue>(
     },
     validate() {
       const outcome = runValidation();
-      return isPending(outcome) ? outcome.then(mine) : mine(outcome);
+      return isPending(outcome) ? outcome.then(atThisPath) : atThisPath(outcome);
     },
-    check(candidate) {
+    issuesFor(candidate) {
       const probe = writeValueAt(store.read(ROOT_CELL), path, candidate);
       const outcome = judgeRoot(probe);
-      return isPending(outcome) ? outcome.then(mine) : mine(outcome);
+      return isPending(outcome) ? outcome.then(atThisPath) : atThisPath(outcome);
     },
   };
 }

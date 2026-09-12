@@ -58,7 +58,7 @@ const triggers = [
   ["field.setParticipating(b)", "1", "What blocks a submit changed."],
   ["form.reset(...)", "1", "The new root has not been judged yet."],
   ["form.validate()", "1", "Immediately, not on the microtask."],
-  ["field.check(candidate)", "1", "On a probe root. Writes nothing at all."],
+  ["field.issuesFor(candidate)", "1", "On a probe root. Writes nothing at all."],
   ["form.submit(handler)", "1", "Immediately, before the handler is considered."],
   ["createForm(...)", "0", "Nothing is judged until something asks."],
 ];
@@ -223,8 +223,8 @@ const woken = [
 
   <h2 class="mt-16 text-2xl font-bold">Asking without writing</h2>
   <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>field.check(candidate)</code> judges a value that is <em>not</em> in
-    the form and writes nothing — no value, no issue cell, no cross-field
+    <code>field.issuesFor(candidate)</code> answers for a value that is{" "}
+    <em>not</em> in the form, and writes nothing — no value, no issue cell, no cross-field
     verdict. Asking whether a value would be acceptable is not the same as
     putting it in the form, and a probe that mutated the store would move every
     other field's verdict as a side effect of the question.

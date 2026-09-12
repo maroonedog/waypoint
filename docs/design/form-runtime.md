@@ -15,6 +15,10 @@ Verified against source before writing: `rememberDeclaredCalls` runs uncondition
 > section is told where it is by an ordinary prop, which cannot do that to
 > anybody. `setParticipating` moved onto the field handle and `useParticipation`.
 >
+> **`check(candidate)` is now `issuesFor(candidate)`.** The name had to be
+> read with its comment to know that it returns issues and writes nothing,
+> which the naming rule in CLAUDE.md does not allow.
+>
 > **`useField` is no longer spelled `useField<string>(path)`.** The path type
 > comes from a module-augmentation registry the application declares once, so
 > both the path and the value type are checked rather than asserted. See the

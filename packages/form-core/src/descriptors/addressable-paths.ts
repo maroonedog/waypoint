@@ -18,8 +18,8 @@ import { declaredPathOf } from "../path/declared-path-of.js";
 export interface AddressablePaths {
   /** Whether a concrete path names something this form has. */
   has(concretePath: string): boolean;
-  /** Declared paths near a miss, for the message. */
-  near(concretePath: string): readonly string[];
+  /** Declared paths that look like this one, for a "did you mean". */
+  similarTo(concretePath: string): readonly string[];
 }
 
 /** `items[*].sku` also puts `items` and `items[*]` in reach. */
@@ -47,7 +47,7 @@ export function createAddressablePaths(
 
   return {
     has: (concretePath) => reachable.has(declaredPathOf(concretePath)),
-    near(concretePath) {
+    similarTo(concretePath) {
       const wanted = declaredPathOf(concretePath);
       const head = wanted.slice(0, 4);
       return [...reachable]

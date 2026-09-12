@@ -358,7 +358,7 @@ not evidence that the form became acceptable.
 
 ```ts
 form.field("billing.postcode").validate();     // this path's issues
-form.field("billing.postcode").check("999");   // judges a candidate, writes nothing
+form.field("billing.postcode").issuesFor("999"); // the issues a candidate would carry
 ```
 
 Both run the same computation the form runs, filtered to one path. A runtime

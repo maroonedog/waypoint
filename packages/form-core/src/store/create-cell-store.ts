@@ -22,7 +22,7 @@ export function createCellStore(
   const changed = new Set<string>();
   let depth = 0;
 
-  const settle = (key: string): void => {
+  const notifyOrDefer = (key: string): void => {
     if (depth === 0) {
       listeners.notify(key);
       return;
@@ -38,11 +38,11 @@ export function createCellStore(
     write<T>(key: CellKey<T>, next: T): void {
       if (cells.has(key) && Object.is(cells.get(key), next)) return;
       cells.set(key, next);
-      settle(key);
+      notifyOrDefer(key);
     },
     forget(key) {
       if (!cells.delete(key)) return;
-      settle(key);
+      notifyOrDefer(key);
     },
     subscribe: (key, listener) => listeners.add(key, listener),
     batch(writes) {

@@ -1,45 +1,58 @@
 # Coding conventions
 
-Rules here are enforced by a test, not left as sentences. A convention that
-only exists in a document is one that degrades quietly — which is the same
-argument `form-cell-store.types.ts` makes about its own contract.
-
 ## Naming
 
-### `check` is not a name prefix
+### A name has to say what the thing does
 
-`checkField`, `checkValue`, `checkOwnRules` — none of these. The word names the
-*act* and says nothing about the *answer*: a reader cannot tell whether the
-function throws, returns a boolean, returns a list of problems, or writes
-something on the way. Every name in this codebase is meant to state a fact, and
-`check` states that somebody looked.
+**You must be able to tell what something does from its name at the call site —
+without reading its comment, its signature, or its body.** A name that needs the
+comment to be understood is not acceptable. It does not matter that the comment
+is there and is correct: the comment is read once, the name is read every time.
 
-Name what it answers, or what it hands back. The codebase already does:
+This is the rule. Everything below is an instance of it.
 
-| Instead of | The repository writes |
-|---|---|
-| `checkAncestor` | `isAncestorPath` |
-| `checkIssuesEqual` | `sameIssueList` |
-| `checkBlocking` | `blockingOf` |
-| `checkValueAt` | `readValueAt` |
-| `checkPathExists` | `addressable.has` |
+#### What it rules out
 
-**Exception: a name imposed by a foreign interface.** zod's
-`definition.checks` and the React DevTools hook's required `checkDCE` member are
-other people's vocabulary being mirrored; renaming them would hide what they
-correspond to. The rule governs names *we* choose. The test carries an explicit
-allowlist so each exception has to be written down.
+**Naming the act instead of the answer.** `check`, `handle`, `process`, `do`.
+They say somebody did something and leave the reader to find out what came back
+— a boolean? a list of problems? nothing, but something got written?
 
-**Scope: identifiers** — functions, methods, variables, types, object members.
-npm script names and file names (`bench:forms:check`, `tsconfig.check.json`) are
-not identifiers and are out of scope.
+**Words that are only meaningful next to their definition.** `at`, `mine`,
+`near`, `report`, `settle`. Each of these was in this codebase, and each one
+could only be read by scrolling up.
 
-Enforced by `test/naming-conventions.test.mjs`.
+#### What to do instead
 
-### Known exception, not yet resolved
+Say what it answers, or what it hands back. These are the renames that were
+actually made when this rule was written down, and they are the pattern:
 
-`FieldHandle.check(candidate)` and `FieldBinding.check` predate this rule. They
-are the bare word rather than a prefix, so the test does not fail on them — but
-they have the problem the rule exists for: the name does not say that they
-return issues and write nothing, which is why both carry a doc comment saying
-so. Renaming them is a public API decision that has not been taken.
+| Was | Is | Because |
+|---|---|---|
+| `field.check(candidate)` | `field.issuesFor(candidate)` | Says it returns issues. A noun phrase, so it reads as a question and not an action — which is also the fact that it writes nothing. It pairs with `field.issues`: now, versus if it were this. |
+| `mine(produced)` | `atThisPath(produced)` | Says which issues come back. |
+| `at(declaredPath, indices)` | `boundToRows(declaredPath, indices)` | Says what happens to the path. |
+| `addressable.near(path)` | `addressable.similarTo(path)` | Says the result is a resemblance, not a distance. |
+| `report(message)` | `warnOnHostConsole(message)` | Says where it goes, and that there may not be one. |
+| `settle()` (scheduler) | `finishPass()` | Says which thing finished. |
+| `settle(key)` (store) | `notifyOrDefer(key)` | Says both branches. |
+| `checkDefinition` | `zodCheck` | Says whose it is. |
+
+Names that already pass, for calibration: `isAncestorPath`, `sameIssueList`,
+`blockingOf`, `readValueAt`, `expandDeclaredPath`, `distributeIssues`,
+`refreshOpenAround`, `spliceRowCells`.
+
+#### The exception
+
+**A name imposed by a foreign interface.** zod's `definition.checks` and the
+React DevTools hook's required `checkDCE` are other people's vocabulary being
+mirrored; renaming them would hide what they correspond to. The rule governs
+names *we* choose.
+
+#### How much of this is enforced
+
+`check` as a name prefix is banned by `test/naming-conventions.test.mjs`, which
+also fails when an allowlisted foreign name stops being used. The rest of the
+rule is not mechanically decidable — "does this name say what it does" is a
+judgement — so it is enforced in review. When a bad name is found, rename it and
+add the row to the table above, so the next reader calibrates against real
+examples rather than adjectives.

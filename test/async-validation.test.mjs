@@ -135,7 +135,7 @@ test("one field can be validated on its own, asynchronously", async () => {
 test("check asks without writing anything", async () => {
   const form = build(askingAdapter(uniquenessCheck), { handle: "free" });
   const before = JSON.stringify(form.readRoot());
-  const issues = await form.field("handle").check(TAKEN);
+  const issues = await form.field("handle").issuesFor(TAKEN);
   assert.deepEqual(
     issues.map((issue) => issue.code),
     ["taken"]

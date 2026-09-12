@@ -110,12 +110,12 @@ async function mount(element) {
   dom.window.document.body.appendChild(container);
   const root = createRoot(container);
   await act(async () => root.render(element));
-  const at = (testId) =>
+  const shown = (testId) =>
     container.querySelector(`[data-testid=${JSON.stringify(testId)}]`);
   const msg = (path) =>
     container.querySelector(`[data-msg=${JSON.stringify(path)}]`)?.textContent ??
     "";
-  return { container, root, at, msg };
+  return { container, root, shown, msg };
 }
 
 const newForm = () =>
@@ -135,7 +135,7 @@ const typeInto = (element, value) => {
 
 test("one component is correct at two different addresses", async () => {
   const form = newForm();
-  const { at, root } = await mount(
+  const { shown, root } = await mount(
     h(
       FormProvider,
       { form },
@@ -145,15 +145,15 @@ test("one component is correct at two different addresses", async () => {
   );
 
   // The value arrived without being passed.
-  assert.equal(at("pc-billing.postcode").value, "100-0001");
-  assert.equal(at("pc-shipping.postcode").value, "150-0001");
-  assert.equal(at("city-billing.city").value, "Chiyoda");
+  assert.equal(shown("pc-billing.postcode").value, "100-0001");
+  assert.equal(shown("pc-shipping.postcode").value, "150-0001");
+  assert.equal(shown("city-billing.city").value, "Chiyoda");
   root.unmount();
 });
 
 test("typing in one copy does not reach the other", async () => {
   const form = newForm();
-  const { at, root } = await mount(
+  const { shown, root } = await mount(
     h(
       FormProvider,
       { form },
@@ -162,16 +162,16 @@ test("typing in one copy does not reach the other", async () => {
     )
   );
 
-  await act(async () => typeInto(at("pc-billing.postcode"), "999-9999"));
+  await act(async () => typeInto(shown("pc-billing.postcode"), "999-9999"));
 
-  assert.equal(at("pc-billing.postcode").value, "999-9999");
-  assert.equal(at("pc-shipping.postcode").value, "150-0001");
+  assert.equal(shown("pc-billing.postcode").value, "999-9999");
+  assert.equal(shown("pc-shipping.postcode").value, "150-0001");
   root.unmount();
 });
 
 test("a value is read from elsewhere with no props and nothing lifted", async () => {
   const form = newForm();
-  const { at, root } = await mount(
+  const { shown, root } = await mount(
     h(
       FormProvider,
       { form },
@@ -180,24 +180,24 @@ test("a value is read from elsewhere with no props and nothing lifted", async ()
     )
   );
 
-  assert.equal(at("readout").textContent, "100-0001");
-  await act(async () => typeInto(at("pc-billing.postcode"), "777-7777"));
-  assert.equal(at("readout").textContent, "777-7777");
+  assert.equal(shown("readout").textContent, "100-0001");
+  await act(async () => typeInto(shown("pc-billing.postcode"), "777-7777"));
+  assert.equal(shown("readout").textContent, "777-7777");
   root.unmount();
 });
 
 test("an address composes, so a subtree can be placed inside another one", async () => {
   const form = newForm();
-  const { at, root } = await mount(
+  const { shown, root } = await mount(
     h(FormProvider, { form }, h(AddressFields, { at: "company.office" }))
   );
-  assert.equal(at("pc-company.office.postcode").value, "060-0001");
+  assert.equal(shown("pc-company.office.postcode").value, "060-0001");
   root.unmount();
 });
 
 test("an issue lands on the right copy, not on both", async () => {
   const form = newForm();
-  const { at, msg, root } = await mount(
+  const { shown, msg, root } = await mount(
     h(
       FormProvider,
       { form },
@@ -206,7 +206,7 @@ test("an issue lands on the right copy, not on both", async () => {
     )
   );
 
-  await act(async () => typeInto(at("pc-billing.postcode"), "1"));
+  await act(async () => typeInto(shown("pc-billing.postcode"), "1"));
 
   assert.equal(msg("billing.postcode"), "too short");
   assert.equal(msg("shipping.postcode"), "");
@@ -218,21 +218,21 @@ test("a nested component can read ANYWHERE, not only under its own address", asy
   // `billing` and reads `shipping`, which is an ordinary thing for a form to
   // want and used to resolve silently to billing.shipping.postcode.
   function CrossReader({ at }) {
-    const mine = useFieldValue(`${at}.postcode`);
-    const other = useFieldValue("shipping.postcode");
-    return h("span", { "data-testid": "cross" }, `${mine}|${other}`);
+    const here = useFieldValue(`${at}.postcode`);
+    const elsewhere = useFieldValue("shipping.postcode");
+    return h("span", { "data-testid": "cross" }, `${here}|${elsewhere}`);
   }
   const form = newForm();
-  const { at, root } = await mount(
+  const { shown, root } = await mount(
     h(FormProvider, { form }, h(CrossReader, { at: "billing" }))
   );
-  assert.equal(at("cross").textContent, "100-0001|150-0001");
+  assert.equal(shown("cross").textContent, "100-0001|150-0001");
   root.unmount();
 });
 
 test("the uncontrolled binding takes an address too", async () => {
   const form = newForm();
-  const { at, root } = await mount(
+  const { shown, root } = await mount(
     h(
       FormProvider,
       { form },
@@ -241,13 +241,13 @@ test("the uncontrolled binding takes an address too", async () => {
     )
   );
 
-  assert.equal(at("u-billing.postcode").value, "100-0001");
-  assert.equal(at("u-shipping.postcode").value, "150-0001");
+  assert.equal(shown("u-billing.postcode").value, "100-0001");
+  assert.equal(shown("u-shipping.postcode").value, "150-0001");
 
   await act(async () => form.field("shipping.postcode").setValue("500-0005"));
 
-  assert.equal(at("u-shipping.postcode").value, "500-0005");
-  assert.equal(at("u-billing.postcode").value, "100-0001");
+  assert.equal(shown("u-shipping.postcode").value, "500-0005");
+  assert.equal(shown("u-billing.postcode").value, "100-0001");
   root.unmount();
 });
 
@@ -277,28 +277,28 @@ const listOf = (form, capture) =>
 test("a row hands its own address down, with no wrapper", async () => {
   const form = newForm();
   let binding;
-  const { at, root } = await mount(listOf(form, (b) => (binding = b)));
+  const { shown, root } = await mount(listOf(form, (b) => (binding = b)));
 
-  assert.equal(at("sku-items[0].sku").value, "a");
-  assert.equal(at("sku-items[1].sku").value, "b");
-  assert.equal(at("sku-items[2].sku").value, "c");
+  assert.equal(shown("sku-items[0].sku").value, "a");
+  assert.equal(shown("sku-items[1].sku").value, "b");
+  assert.equal(shown("sku-items[2].sku").value, "c");
 
   await act(async () => binding.remove(0));
 
-  assert.equal(at("sku-items[0].sku").value, "b");
-  assert.equal(at("sku-items[1].sku").value, "c");
-  assert.equal(at("sku-items[2].sku"), null);
+  assert.equal(shown("sku-items[0].sku").value, "b");
+  assert.equal(shown("sku-items[1].sku").value, "c");
+  assert.equal(shown("sku-items[2].sku"), null);
   root.unmount();
 });
 
 test("a row edited before the splice keeps the edit afterwards", async () => {
   const form = newForm();
   let binding;
-  const { at, root } = await mount(listOf(form, (b) => (binding = b)));
+  const { shown, root } = await mount(listOf(form, (b) => (binding = b)));
 
-  await act(async () => typeInto(at("sku-items[2].sku"), "edited"));
+  await act(async () => typeInto(shown("sku-items[2].sku"), "edited"));
   await act(async () => binding.remove(0));
 
-  assert.equal(at("sku-items[1].sku").value, "edited");
+  assert.equal(shown("sku-items[1].sku").value, "edited");
   root.unmount();
 });

@@ -105,6 +105,6 @@ export function useUncontrolledField(
     setValue: (next) => handle.setValue(next),
     markTouched: () => handle.markTouched(),
     validate: () => handle.validate(),
-    check: (candidate) => handle.check(candidate),
+    issuesFor: (candidate) => handle.issuesFor(candidate),
   };
 }

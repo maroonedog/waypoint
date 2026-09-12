@@ -46,7 +46,10 @@ export interface AutoFormProps {
 }
 
 /** The declared path with this walk's row indices already in it. */
-const at = (declaredPath: string, indices: readonly number[]): string =>
+const boundToRows = (
+  declaredPath: string,
+  indices: readonly number[]
+): string =>
   bindDeclaredPath(declaredPath, indices) ?? declaredPath;
 
 function renderNode(
@@ -54,7 +57,7 @@ function renderNode(
   renderList: AutoFormProps["renderList"],
   indices: readonly number[]
 ): ReactElement {
-  const here = at(node.path, indices);
+  const here = boundToRows(node.path, indices);
   if (node.kind === "field") {
     return <Field key={here} path={here as never} />;
   }
