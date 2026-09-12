@@ -1,13 +1,17 @@
 // What the timing lane is allowed to call a win.
 //
-// The rule under test came out of a real CI run: waypoint measured 0.537x
-// the hand-written reference at 201 fields and the harness printed `faster` —
-// while the same harness had counted that 0% of its validator work ran inside
-// the event being timed, and its own ladder had reported that nothing up to
-// 4 ms is resolvable at the microtask position.
+// The rule under test is a REFUSAL, and what it refuses is this library's own
+// best rows. `docs/measurements-forms-time.md` at 201 leaves records
+// `form-contract-use-field` at 0.57 and `form-contract-uncontrolled` at 0.296
+// against the hand-written reference and scores both **indistinguishable**,
+// while the one **faster** in that file belongs to `react-hook-form-on-submit`
+// at 0.323. The deciding column is the one beside the ratio: 0% of the
+// validator work ran inside the event being timed, so a smaller handler figure
+// is partly a statement about where the work was scheduled.
 //
-// Remove the `defersUnseenWork` branch in summarise-samples.ts and the first
-// test here fails.
+// The numbers below are SYNTHETIC — shaped like that row, not taken from it,
+// because what is being pinned is the branch rather than any run. Remove
+// `defersUnseenWork` from summarise-samples.ts and the first test here fails.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { summariseSamples } from "../bench/browser/summarise-samples.ts";

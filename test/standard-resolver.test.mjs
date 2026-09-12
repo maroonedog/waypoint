@@ -7,94 +7,35 @@
 // `validate` from `~standard.validate` — so a vendor that implements them is
 // supported without a file being added.
 //
-// The validators below are HAND-WRITTEN objects rather than a real library,
-// and deliberately so. The point of each is a shape the spec permits, and a
-// real vendor only ever demonstrates the one shape it picked: the three issue
-// path spellings, a converter that throws, a converter that declares nothing,
-// and an async verdict do not all co-occur in any installed package. zod and
-// luq cover the real-vendor side in their own files.
+// This file holds the claim itself and nothing else: give the resolver a vendor
+// with both members and a form contract comes out; give it one and the half
+// that keeps a form honest is still there; give it one and a caller who knows
+// the fields, and the other half is there too. Three inputs, one question —
+// what is the adapter MADE OF — and it is the question the rest of the family
+// presupposes, which is why it kept the name.
+//
+// The other four ask their own. What a developer is TOLD when a form comes back
+// with no fields is standard-schema-warnings.test.mjs: three different causes
+// share one symptom there, so the assertions are on sentences and they break
+// when a message is reworded, which is correct and would be noise here. How a
+// converter this package does not own gets CALLED is
+// standard-converter-options.test.mjs. What an issue is permitted to arrive AS
+// — the spec's one real vendor choice — is standard-issue-shapes.test.mjs. And
+// whether a promise survives every hop to a settled form is
+// standard-async-verdict.test.mjs, the only one that builds a running form.
+//
+// The hand-written validators they all share are in
+// test/support/standard-schema-doubles.mjs, with the argument for why they are
+// hand-written.
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { standardFormResolver } from "@maroonedog/waypoint/resolver-standard";
 import {
-  standardFormResolver,
-  forgetUndescribedFormWarnings,
-} from "@maroonedog/waypoint/resolver-standard";
-import { createForm, errorCountCell } from "@maroonedog/waypoint/core";
-
-const DOCUMENT = {
-  type: "object",
-  properties: {
-    owner: {
-      type: "object",
-      properties: {
-        name: { type: "string", minLength: 3, title: "Full name" },
-        nickname: { type: "string" },
-      },
-      required: ["name"],
-    },
-    items: {
-      type: "array",
-      items: {
-        type: "object",
-        properties: { sku: { type: "string", minLength: 2 } },
-        required: ["sku"],
-      },
-    },
-  },
-  required: ["owner"],
-};
-
-/** A validator carrying both halves, with whatever verdict a test needs. */
-const bothHalves = (issues = [], { target, throws } = {}) => ({
-  "~standard": {
-    version: 1,
-    vendor: "example",
-    validate: () => (issues.length === 0 ? { value: {} } : { issues }),
-    jsonSchema: {
-      input: (options) => {
-        if (throws !== undefined) throw new Error(throws);
-        if (target !== undefined && options.target !== target) {
-          throw new Error(`Unsupported JSON Schema target: ${options.target}`);
-        }
-        return DOCUMENT;
-      },
-    },
-  },
-});
-
-/** A validator that judges and says nothing about JSON Schema. */
-const validateOnly = (issues = []) => ({
-  "~standard": {
-    version: 1,
-    vendor: "judge-only",
-    validate: () => (issues.length === 0 ? { value: {} } : { issues }),
-  },
-});
-
-/** Runs `run` with the host console captured, and returns what it printed. */
-const capturedWarnings = (run) => {
-  forgetUndescribedFormWarnings();
-  const original = console.warn;
-  const lines = [];
-  console.warn = (line) => lines.push(line);
-  try {
-    run();
-  } finally {
-    console.warn = original;
-  }
-  return lines;
-};
-
-/** The same capture, for a test that wants the value rather than the line. */
-const withoutWarnings = (run) => {
-  let produced;
-  capturedWarnings(() => {
-    produced = run();
-  });
-  return produced;
-};
-
-const pathsOf = (adapter) => adapter.fields.map((field) => field.path);
+  bothHalves,
+  validateOnly,
+} from "./support/standard-schema-doubles.mjs";
+import { withoutWarnings } from "./support/console-warnings.mjs";
+import { pathsOf } from "./support/descriptor-lookup.mjs";
 
 test("a validator with both halves gets descriptors and issues from the specs", () => {
   const adapter = standardFormResolver(
@@ -143,229 +84,4 @@ test("a caller may supply the fields a validator could not describe", () => {
   ];
   const adapter = standardFormResolver(validateOnly(), { fields: declared });
   assert.deepEqual(adapter.fields, declared);
-});
-
-// ---------------------------------------------------------------------------
-// The degradation signal. Three states that used to be one empty list.
-// ---------------------------------------------------------------------------
-
-test("declaring no JSON Schema is distinguishable from declaring an empty one", () => {
-  // This is the distinction the change exists to make. Both end with no
-  // fields; they are different bugs with different fixes, so they get
-  // different sentences.
-  const [undeclared] = capturedWarnings(() =>
-    standardFormResolver(validateOnly())
-  );
-  const [empty] = capturedWarnings(() =>
-    standardFormResolver({
-      "~standard": {
-        version: 1,
-        vendor: "empty-vendor",
-        validate: () => ({ value: {} }),
-        jsonSchema: { input: () => ({ type: "object", properties: {} }) },
-      },
-    })
-  );
-
-  assert.match(undeclared, /declares no JSON Schema/);
-  assert.match(empty, /produced a JSON Schema with no fields in it/);
-  assert.notEqual(undeclared, empty);
-  for (const line of [undeclared, empty]) {
-    assert.match(line, /validate correctly and draw nothing/);
-  }
-});
-
-test("a converter that throws is reported with the reason it gave", () => {
-  const [line] = capturedWarnings(() =>
-    standardFormResolver(bothHalves([], { throws: "Date cannot be represented" }))
-  );
-  assert.match(line, /"example"/);
-  assert.match(line, /could not produce one: Date cannot be represented/);
-  // The escape hatch is named, because the option is vendor-specific and a
-  // reader who does not know it exists cannot go looking for it.
-  assert.match(line, /libraryOptions/);
-});
-
-test("identical reasons from both targets are said once", () => {
-  const [line] = capturedWarnings(() =>
-    standardFormResolver(bothHalves([], { throws: "the same problem" }))
-  );
-  assert.equal(line.match(/the same problem/g).length, 1);
-});
-
-test("the signal does not fire when a document was produced", () => {
-  assert.deepEqual(
-    capturedWarnings(() => standardFormResolver(bothHalves())),
-    []
-  );
-});
-
-test("the signal does not fire when the caller supplied the fields", () => {
-  // A caller who states the fields has answered the question the warning asks.
-  assert.deepEqual(
-    capturedWarnings(() =>
-      standardFormResolver(validateOnly(), {
-        fields: [
-          { path: "name", kind: "string", isRequired: true, constraints: {} },
-        ],
-      })
-    ),
-    []
-  );
-});
-
-test("the signal is said once per vendor and state, not once per form", () => {
-  const lines = capturedWarnings(() => {
-    standardFormResolver(validateOnly());
-    standardFormResolver(validateOnly());
-    standardFormResolver(validateOnly());
-  });
-  assert.equal(lines.length, 1);
-});
-
-// ---------------------------------------------------------------------------
-// Target negotiation.
-// ---------------------------------------------------------------------------
-
-test("a vendor that speaks only draft-07 is asked again rather than given up on", () => {
-  const adapter = standardFormResolver(bothHalves([], { target: "draft-07" }));
-  assert.deepEqual(pathsOf(adapter), [
-    "owner.name",
-    "owner.nickname",
-    "items[*].sku",
-  ]);
-});
-
-test("libraryOptions reaches the converter verbatim and is never invented", () => {
-  const seen = [];
-  const schema = {
-    "~standard": {
-      version: 1,
-      vendor: "watchful",
-      validate: () => ({ value: {} }),
-      jsonSchema: {
-        input: (options) => {
-          seen.push(options);
-          return DOCUMENT;
-        },
-      },
-    },
-  };
-
-  standardFormResolver(schema);
-  assert.deepEqual(Object.keys(seen[0]), ["target"], "nothing was invented");
-
-  seen.length = 0;
-  standardFormResolver(schema, { libraryOptions: { unrepresentable: "any" } });
-  assert.deepEqual(seen[0], {
-    target: "draft-2020-12",
-    libraryOptions: { unrepresentable: "any" },
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Issue paths. The one place the spec leaves vendors a real choice.
-// ---------------------------------------------------------------------------
-
-const pathOf = (path) =>
-  standardFormResolver(bothHalves([{ message: "m", path }])).validate({})[0]
-    .path;
-
-test("an issue inside an array names the real index, not the wildcard", () => {
-  assert.equal(pathOf(["items", 2, "sku"]), "items[2].sku");
-});
-
-test("a nested issue is addressed with dots", () => {
-  assert.equal(pathOf(["owner", "name"]), "owner.name");
-});
-
-test("the object spelling of a path segment is unwrapped", () => {
-  // The spec permits `{ key }` objects as well as bare keys, and vendors
-  // differ. One formatter handles both, so no resolver has to know which it
-  // was handed.
-  assert.equal(
-    pathOf([{ key: "items" }, { key: 2 }, { key: "sku" }]),
-    "items[2].sku"
-  );
-  assert.equal(pathOf([{ key: "owner" }, { key: "name" }]), "owner.name");
-});
-
-test("the two spellings may be mixed in one path", () => {
-  assert.equal(pathOf(["items", { key: 0 }, "sku"]), "items[0].sku");
-});
-
-test("an issue with no path lands on the root rather than throwing", () => {
-  // A rule comparing two fields can report against neither.
-  assert.equal(pathOf(undefined), "");
-});
-
-test("a symbol segment is dropped rather than stringified", () => {
-  // It cannot be spelled in a path a form addresses, and `Symbol(x)` in one
-  // would name a field that does not exist.
-  assert.equal(pathOf(["owner", Symbol("hidden"), "name"]), "owner.name");
-});
-
-test("an issue with no message still says something a renderer can draw", () => {
-  const [issue] = standardFormResolver(
-    bothHalves([{ path: ["owner", "name"] }])
-  ).validate({});
-  assert.equal(issue.path, "owner.name");
-  assert.equal(typeof issue.message, "string");
-  assert.notEqual(issue.message, "");
-});
-
-test("no code is invented, because the spec has no member for one", () => {
-  const [issue] = standardFormResolver(
-    bothHalves([{ message: "m", path: ["owner", "name"], code: "too_small" }])
-  ).validate({});
-  assert.equal("code" in issue, false);
-  assert.deepEqual(Object.keys(issue).sort(), ["message", "path"]);
-});
-
-// ---------------------------------------------------------------------------
-// Async. `~standard.validate` is allowed to return a promise.
-// ---------------------------------------------------------------------------
-
-const asyncSchema = (issues) => ({
-  "~standard": {
-    version: 1,
-    vendor: "slow",
-    validate: () =>
-      Promise.resolve(issues.length === 0 ? { value: {} } : { issues }),
-    jsonSchema: { input: () => DOCUMENT },
-  },
-});
-
-test("an async verdict is passed on as a promise rather than awaited here", async () => {
-  const adapter = standardFormResolver(
-    asyncSchema([{ message: "taken", path: ["owner", "name"] }])
-  );
-  const outcome = adapter.validate({});
-  assert.equal(typeof outcome.then, "function");
-  assert.deepEqual(await outcome, [
-    { path: "owner.name", message: "taken" },
-  ]);
-});
-
-test("a synchronous vendor stays synchronous end to end", () => {
-  // `MaybeAsync` is a union and not a promise precisely so that the common
-  // case does not get a microtask between a keystroke and the verdict.
-  const outcome = standardFormResolver(bothHalves()).validate({});
-  assert.equal(Array.isArray(outcome), true);
-});
-
-test("the runtime drives an async standard adapter to a settled verdict", async () => {
-  const form = createForm({
-    adapter: standardFormResolver(
-      asyncSchema([{ message: "taken", path: ["owner", "name"] }])
-    ),
-    defaultValues: { owner: { name: "Ada", nickname: "" }, items: [] },
-  });
-  await form.validate();
-  assert.equal(form.store.read(errorCountCell), 1);
-  assert.equal(
-    form.field("owner.name").sources.issues.read()[0].message,
-    "taken"
-  );
-  assert.equal(form.field("owner.name").descriptor.constraints.minLength, 3);
 });

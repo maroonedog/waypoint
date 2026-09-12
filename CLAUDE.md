@@ -78,3 +78,37 @@ changes that line and puts the CNAME back, in a commit that says so.
 
 Registering a domain is the author's decision. So is the product's name, and so
 is the repository's — an agent may propose one and must not write one in.
+
+## Sentences a comment may not contain
+
+A comment here is an argument about why something is the way it is. That is a
+claim about a DESIGN, and a design holds still. Four kinds of sentence are
+claims about the TREE instead, and the tree moves under them:
+
+- **A count of occurrences.** "appears four times in the sibling", "five cases",
+  "two files build their own document". Every one of these was true when it was
+  written.
+- **A superlative across files.** "the only one here that throws", "the one test
+  that does not import the library", "nothing else needs this yet".
+- **A claim about another file's contents.** "error-summary.test.mjs makes its
+  claim through `document.activeElement`" — written about a file that, after a
+  split, contained no `activeElement` at all.
+- **A measurement without a run behind it.** `test/bench-verdict.test.mjs` said
+  its rule "came out of a real CI run: waypoint measured 0.537x the hand-written
+  reference". `0.537` appears in no recording in any revision of this
+  repository. It was the file's own synthetic fixture value, narrated as
+  history, and it shipped.
+
+Say why instead. "A hand-written issue cell was shown, not counted, and did not
+block" is about a defect and will read the same in a year. "Two of the thirteen
+tests below ask something else" is about a file and is one commit from false.
+
+**If a claim will not verify, delete the sentence.** Do not soften it into
+something vaguer that is technically true: a sentence that survives by being
+vague costs a reader the same attention and returns nothing.
+
+This is a rule rather than advice because it has now failed twice under direct
+instruction. A test refactor shipped twelve false claims of these kinds; the
+round that repaired it, told to run every claim before writing it, shipped nine
+more. Both rounds verified diligently and both produced the same genus, which
+is what says the problem is the sentence shape rather than the care taken.

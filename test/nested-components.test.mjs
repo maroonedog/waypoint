@@ -14,30 +14,12 @@
 // ask for it.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
-
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import { dom } from "./support/dom.mjs";
+import { mountIntoDocument } from "./support/react-root.mjs";
+import { find } from "./support/testid-lookup.mjs";
 
 const { z } = await import("zod");
 const React = await import("react");
-const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
 const { createForm } = await import("@maroonedog/waypoint/core");
 const { FormProvider, FieldRows, useField, useFieldValue, useUncontrolledField } =
@@ -106,12 +88,8 @@ function ElsewhereOnTheScreen() {
 }
 
 async function mount(element) {
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () => root.render(element));
-  const shown = (testId) =>
-    container.querySelector(`[data-testid=${JSON.stringify(testId)}]`);
+  const { container, root } = await mountIntoDocument(element);
+  const shown = (testId) => find(container, testId);
   const msg = (path) =>
     container.querySelector(`[data-msg=${JSON.stringify(path)}]`)?.textContent ??
     "";

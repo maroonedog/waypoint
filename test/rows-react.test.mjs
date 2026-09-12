@@ -1,26 +1,9 @@
 // Rows on screen: what a list re-renders, and what it does not.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
-
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import { dom } from "./support/dom.mjs";
+import { mountIntoDocument } from "./support/react-root.mjs";
+import { find } from "./support/testid-lookup.mjs";
 
 const { z } = await import("zod");
 const React = await import("react");
@@ -94,9 +77,6 @@ function makeScreen(form, counters) {
   };
 }
 
-const find = (container, testId) =>
-  container.querySelector("[data-testid=" + JSON.stringify(testId) + "]");
-
 async function type(container, testId, value) {
   const element = find(container, testId);
   await act(async () => {
@@ -116,10 +96,7 @@ async function render() {
     defaultValues: structuredClone(DEFAULTS),
   });
   const Screen = makeScreen(form, counters);
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () => root.render(h(Screen)));
+  const { container, root } = await mountIntoDocument(h(Screen));
   return { form, counters, container, root };
 }
 
@@ -256,10 +233,7 @@ test("a row can be switched off without being removed", async () => {
       )
     );
 
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () => root.render(h(Screen, { silenceSecond: false })));
+  const { root } = await mountIntoDocument(h(Screen, { silenceSecond: false }));
   await act(async () => {
     form.validate();
   });

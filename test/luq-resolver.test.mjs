@@ -25,6 +25,7 @@ import { numberMinPlugin } from "@maroonedog/luq/plugins/numberMin";
 import { numberMaxPlugin } from "@maroonedog/luq/plugins/numberMax";
 import { toStandardJsonSchema } from "@maroonedog/luq/standard-schema";
 import { luqFormResolver } from "@maroonedog/waypoint/resolver-luq";
+import { byPath, pathsOf } from "./support/descriptor-lookup.mjs";
 import { createForm, errorCountCell } from "@maroonedog/waypoint/core";
 
 const build = () =>
@@ -47,11 +48,10 @@ const adapterOf = () => luqFormResolver(toStandardJsonSchema(build()));
 
 const GOOD = { owner: { name: "Ada Lovelace", nickname: "" }, quantity: 2 };
 
-const descriptorAt = (adapter, path) =>
-  adapter.fields.find((field) => field.path === path);
+
 
 test("a leaf is described before any value exists", () => {
-  const name = descriptorAt(adapterOf(), "owner.name");
+  const name = byPath(adapterOf().fields, "owner.name");
   assert.deepEqual(name, {
     path: "owner.name",
     kind: "string",
@@ -62,27 +62,29 @@ test("a leaf is described before any value exists", () => {
 
 test("presence comes from the schema's required list, not from the value", () => {
   const adapter = adapterOf();
-  assert.equal(descriptorAt(adapter, "owner.name").isRequired, true);
-  assert.equal(descriptorAt(adapter, "owner.nickname").isRequired, false);
+  assert.equal(byPath(adapter.fields, "owner.name").isRequired, true);
+  assert.equal(byPath(adapter.fields, "owner.nickname").isRequired, false);
 });
 
 test("a numeric bound arrives as a bound and not as a string", () => {
-  const quantity = descriptorAt(adapterOf(), "quantity");
+  const quantity = byPath(adapterOf().fields, "quantity");
   assert.equal(quantity.kind, "number");
   assert.deepEqual(quantity.constraints, { minimum: 1, maximum: 99 });
 });
 
 test("a container contributes no descriptor of its own", () => {
-  const paths = adapterOf().fields.map((field) => field.path);
-  assert.deepEqual(paths.sort(), ["owner.name", "owner.nickname", "quantity"]);
+  assert.deepEqual(pathsOf(adapterOf()).sort(), [
+    "owner.name",
+    "owner.nickname",
+    "quantity",
+  ]);
 });
 
 // A draft-07 document written here rather than asked of luq. This resolver is
-// written against the FORMAT, not against luq's internals, and luq has no
-// keyword today that emits `title` or `description` — so a test that went
-// through the builder could only prove the members are absent. Handing the
-// resolver the document directly tests the mapping that a luq release adding
-// those keywords, or any other producer of draft-07, would exercise.
+// written against the FORMAT rather than against luq's internals, so the
+// mapping under test is the one any producer of draft-07 exercises — and
+// handing it a document directly is the only way to reach the branches for
+// keywords the builder in this test file does not happen to emit.
 const describableDocument = (document) => ({
   "~standard": {
     version: 1,
@@ -119,7 +121,7 @@ const ANNOTATED = {
 
 test("a document's own title and description reach the descriptor", () => {
   const adapter = luqFormResolver(describableDocument(ANNOTATED));
-  assert.deepEqual(descriptorAt(adapter, "owner.name"), {
+  assert.deepEqual(byPath(adapter.fields, "owner.name"), {
     path: "owner.name",
     kind: "string",
     isRequired: true,
@@ -134,7 +136,7 @@ test("an unannotated field carries neither member, rather than undefined ones", 
   // nothing — no name is derived from `owner.nickname`, because choosing the
   // wording and the language of that text is the application's job.
   const adapter = luqFormResolver(describableDocument(ANNOTATED));
-  const nickname = descriptorAt(adapter, "owner.nickname");
+  const nickname = byPath(adapter.fields, "owner.nickname");
   assert.equal("label" in nickname, false);
   assert.equal("description" in nickname, false);
   assert.deepEqual(Object.keys(nickname).sort(), [

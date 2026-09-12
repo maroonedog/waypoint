@@ -11,30 +11,11 @@
 // and an issue still does render because that is the part React must draw.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
-
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import { dom } from "./support/dom.mjs";
+import { mountIntoDocument } from "./support/react-root.mjs";
 
 const { z } = await import("zod");
 const React = await import("react");
-const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
 const { createForm } = await import("@maroonedog/waypoint/core");
 const { FormProvider, useUncontrolledField } = await import("@maroonedog/waypoint/react");
@@ -72,18 +53,11 @@ async function mount(paths) {
     defaultValues: structuredClone(GOOD),
   });
   const renders = Object.fromEntries(paths.map((p) => [p, { count: 0 }]));
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () =>
-    root.render(
-      h(
-        FormProvider,
-        { form },
-        paths.map((path) =>
-          h(makeLeaf(path, renders[path]), { key: path })
-        )
-      )
+  const { container, root } = await mountIntoDocument(
+    h(
+      FormProvider,
+      { form },
+      paths.map((path) => h(makeLeaf(path, renders[path]), { key: path }))
     )
   );
   const input = (path) =>

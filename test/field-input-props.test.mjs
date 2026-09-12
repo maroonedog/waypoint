@@ -1,55 +1,33 @@
-// What a renderer is told about a field before anyone types in it.
+// What a descriptor alone decides about an input, settled before any element
+// exists.
 //
-// The library's first claim is that a renderer knows what a field accepts
-// without asking the validator, and `inputProps` is the one place that claim
-// is externally checkable: it either comes out of the binding as attributes on
-// an element, or it does not. So these tests read the bag rather than the
-// source — the id three elements address each other by, the `type` the
-// descriptor implies, what a screen reader is handed, and the two kinds of
-// field a text-input-shaped bag used to get wrong.
+// `inputTypeFor` and `buildInputProps` are pure functions of a descriptor, and
+// that is the library's first claim in its checkable form: a renderer is told
+// what a field accepts without asking the validator and without a page. So
+// this file installs no document, and the absence is the assertion rather than
+// an economy. `@maroonedog/waypoint/react` imports and answers here with
+// `globalThis.document` undefined; the day a prop builder starts reaching for
+// a node, this file fails instead of quietly beginning to test something else.
 //
-// The number transients are pinned by calling the emitted `onChange` directly
-// rather than by typing into a node. jsdom sanitises an `<input type=number>`
-// the way a browser does, so "1." and "-" never reach the handler through it —
-// and it is the handler, not the node, that decides what the cell holds.
+// The cases that most need the bag read directly are the ones no element can
+// be asked about. The number transients are pinned by calling the emitted
+// `onChange` rather than by typing into a node: jsdom sanitises an
+// `<input type=number>` the way a browser does, so "1." and "-" never reach
+// the handler through it — and it is the handler, not the node, that decides
+// what the cell holds. A field with no widget — an array, an object, a
+// descriptor that is `undefined` — has no node to interrogate at all, so
+// `inputTypeFor` answering `undefined` for it is a fact with nowhere else to
+// be observed.
+//
+// The other half is field-input-props-react.test.mjs, which asks the opposite
+// question: whether a bag holding the right keys survives being spread.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
-
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-
-const { z } = await import("zod");
-const React = await import("react");
-const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
-const { createForm } = await import("@maroonedog/waypoint/core");
-const {
+import {
   buildInputProps,
   fieldElementIds,
   inputTypeFor,
-  FormProvider,
-  useField,
-  useUncontrolledField,
-} = await import("@maroonedog/waypoint/react");
-
-const { act, createElement: h, Fragment } = React;
+} from "@maroonedog/waypoint/react";
 
 // ---------------------------------------------------------------------------
 // The type a descriptor implies.
@@ -242,251 +220,4 @@ test("a closed field hands back the value the schema declared, not the string", 
   // The placeholder option no schema declares stays the string it is.
   props.onChange({ target: { value: "" } });
   assert.deepEqual(written, [2, ""]);
-});
-
-// ---------------------------------------------------------------------------
-// The same bag, on the screen.
-// ---------------------------------------------------------------------------
-
-const SCHEMA = z.object({
-  owner: z.object({
-    name: z
-      .string()
-      .min(3, "too short")
-      .meta({ description: "As it appears on the card" }),
-    email: z.email(),
-  }),
-  quantity: z.number().min(1),
-  agreed: z.boolean(),
-  payment: z.enum(["invoice", "card"]),
-});
-
-const DEFAULTS = {
-  owner: { name: "Ada Lovelace", email: "ada@example.com" },
-  quantity: 1,
-  agreed: false,
-  payment: "invoice",
-};
-
-const buildForm = () =>
-  createForm({
-    adapter: zodFormResolver(SCHEMA),
-    defaultValues: structuredClone(DEFAULTS),
-  });
-
-async function render(element) {
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () => root.render(element));
-  return { container, root };
-}
-
-/** A field drawn the way the library now says to draw one: four spreads. */
-const WiredRow = ({ path }) => {
-  const field = useField(path);
-  return h(
-    Fragment,
-    null,
-    h("label", { ...field.labelProps }, path),
-    h("input", { ...field.inputProps }),
-    field.descriptionProps === undefined
-      ? null
-      : h("p", { ...field.descriptionProps }, field.descriptor?.description),
-    h(
-      "p",
-      { ...field.errorProps },
-      field.issues.map((issue) => issue.message).join(" ")
-    )
-  );
-};
-
-test("the label, the description and the error all address the input", async () => {
-  const form = buildForm();
-  const { container, root } = await render(
-    h(FormProvider, { form }, h(WiredRow, { path: "owner.name" }))
-  );
-
-  const input = container.querySelector("input");
-  const label = container.querySelector("label");
-  const paragraphs = container.querySelectorAll("p");
-
-  assert.notEqual(input.id, "");
-  assert.equal(label.htmlFor, input.id);
-  assert.equal(paragraphs[0].id, `${input.id}-description`);
-  assert.equal(paragraphs[1].id, `${input.id}-error`);
-  assert.equal(paragraphs[1].getAttribute("role"), "alert");
-  assert.equal(
-    input.getAttribute("aria-describedby"),
-    paragraphs[0].id,
-    "a clean field points only at its description"
-  );
-  assert.equal(input.getAttribute("aria-invalid"), null);
-  assert.equal(input.getAttribute("type"), "text");
-  assert.equal(input.getAttribute("minlength"), "3");
-  root.unmount();
-});
-
-test("an issue adds the error id to what the input points at", async () => {
-  const form = buildForm();
-  const { container, root } = await render(
-    h(FormProvider, { form }, h(WiredRow, { path: "owner.name" }))
-  );
-  const input = container.querySelector("input");
-
-  await act(async () => form.field("owner.name").setValue("ab"));
-
-  assert.equal(input.getAttribute("aria-invalid"), "true");
-  assert.equal(
-    input.getAttribute("aria-describedby"),
-    `${input.id}-description ${input.id}-error`
-  );
-  root.unmount();
-});
-
-test("two forms on one page do not give two inputs the same id", async () => {
-  const first = buildForm();
-  const second = buildForm();
-  const { container, root } = await render(
-    h(
-      Fragment,
-      null,
-      h(FormProvider, { form: first }, h(WiredRow, { path: "owner.name" })),
-      h(FormProvider, { form: second }, h(WiredRow, { path: "owner.name" }))
-    )
-  );
-
-  const inputs = container.querySelectorAll("input");
-  const labels = container.querySelectorAll("label");
-  assert.notEqual(inputs[0].id, inputs[1].id);
-  assert.equal(labels[0].htmlFor, inputs[0].id);
-  assert.equal(labels[1].htmlFor, inputs[1].id);
-  root.unmount();
-});
-
-test("a declared format reaches the DOM as the type", async () => {
-  const form = buildForm();
-  const { container, root } = await render(
-    h(FormProvider, { form }, h(WiredRow, { path: "owner.email" }))
-  );
-  assert.equal(container.querySelector("input").getAttribute("type"), "email");
-  root.unmount();
-});
-
-test("a checkbox spread from the binding actually toggles the cell", async () => {
-  const form = buildForm();
-  const { container, root } = await render(
-    h(FormProvider, { form }, h(WiredRow, { path: "agreed" }))
-  );
-  const input = container.querySelector("input");
-  assert.equal(input.getAttribute("type"), "checkbox");
-  assert.equal(input.checked, false);
-
-  await act(async () => input.click());
-  assert.equal(form.field("agreed").sources.value.read(), true);
-
-  await act(async () => input.click());
-  assert.equal(form.field("agreed").sources.value.read(), false);
-  root.unmount();
-});
-
-test("a number spread from the binding writes a number, not a string", async () => {
-  const form = buildForm();
-  let bag;
-  const Row = () => {
-    bag = useField("quantity").inputProps;
-    return h("input", { ...bag });
-  };
-  const { container, root } = await render(h(FormProvider, { form }, h(Row)));
-  assert.equal(container.querySelector("input").getAttribute("type"), "number");
-
-  await act(async () => bag.onChange({ target: { value: "12" } }));
-
-  assert.equal(form.field("quantity").sources.value.read(), 12);
-  assert.deepEqual(form.field("quantity").sources.issues.read(), []);
-  root.unmount();
-});
-
-test("a select spread from the binding writes the declared choice", async () => {
-  const form = buildForm();
-  const Row = () => {
-    const field = useField("payment");
-    return h(
-      "select",
-      { ...field.inputProps },
-      (field.descriptor?.choices ?? []).map((choice) =>
-        h(
-          "option",
-          { key: String(choice.value), value: String(choice.value) },
-          choice.label
-        )
-      )
-    );
-  };
-  const { container, root } = await render(h(FormProvider, { form }, h(Row)));
-
-  const select = container.querySelector("select");
-  assert.equal(select.hasAttribute("type"), false);
-  assert.equal(select.options.length, 2);
-
-  await act(async () => {
-    select.value = "card";
-    select.dispatchEvent(new dom.window.Event("change", { bubbles: true }));
-  });
-  assert.equal(form.field("payment").sources.value.read(), "card");
-  root.unmount();
-});
-
-// ---------------------------------------------------------------------------
-// The uncontrolled binding, which used to return no props at all.
-// ---------------------------------------------------------------------------
-
-test("the uncontrolled bag carries the descriptor, and is spreadable", async () => {
-  const form = buildForm();
-  const Row = () => {
-    const field = useUncontrolledField("owner.name");
-    return h(
-      Fragment,
-      null,
-      h("label", { ...field.labelProps }, "name"),
-      h("input", { ...field.inputProps })
-    );
-  };
-  const { container, root } = await render(h(FormProvider, { form }, h(Row)));
-
-  const input = container.querySelector("input");
-  assert.equal(input.value, "Ada Lovelace", "the node still starts from the cell");
-  assert.equal(input.getAttribute("type"), "text");
-  assert.equal(input.getAttribute("minlength"), "3");
-  assert.equal(input.getAttribute("name"), "owner.name");
-  assert.equal(container.querySelector("label").htmlFor, input.id);
-  assert.equal(
-    input.getAttribute("aria-describedby"),
-    `${input.id}-description`
-  );
-
-  await act(async () => form.field("owner.name").setValue("ab"));
-  assert.equal(input.getAttribute("aria-invalid"), "true");
-  root.unmount();
-});
-
-test("an uncontrolled checkbox is checked rather than defaulted to a string", async () => {
-  const form = buildForm();
-  const Row = () => {
-    const field = useUncontrolledField("agreed");
-    return h("input", { ...field.inputProps });
-  };
-  const { container, root } = await render(h(FormProvider, { form }, h(Row)));
-
-  const input = container.querySelector("input");
-  assert.equal(input.getAttribute("type"), "checkbox");
-  assert.equal(input.checked, false);
-
-  await act(async () => input.click());
-  assert.equal(form.field("agreed").sources.value.read(), true);
-
-  // And a write from outside still reaches the node without a render.
-  await act(async () => form.field("agreed").setValue(false));
-  assert.equal(input.checked, false);
-  root.unmount();
 });

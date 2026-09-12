@@ -1,23 +1,26 @@
-// `validateOn`, and the signal that replaced the debounce knob.
+// `validateOn`: how many passes a value edit asks for.
 //
-// Both are counted rather than observed through what is on screen. The whole
-// claim of `validateOn` is about HOW MANY PASSES RUN, so a test that asserted
-// on an issue cell would pass under a runtime that judged on every keystroke
-// and happened to produce the same verdict. So the adapter here counts its own
-// calls, and every assertion is a count.
+// Counted rather than observed through what is on screen. The whole claim of
+// `validateOn` is about HOW MANY PASSES RUN, so a test that asserted on an
+// issue cell would pass under a runtime that judged on every keystroke and
+// happened to produce the same verdict. So the adapter here counts its own
+// calls, and every moment rule below is settled by that count. The last test is
+// the one exception and is not about a moment: it asserts that `validateOn` has
+// no per-field member, which is a shape a count cannot reach.
 //
 // The moment rule these pin, in one line: a VALUE EDIT asks for a pass only at
 // the configured moment — except once `submitCount > 0`, after which a value
 // edit always asks, because a person fixing the field the form just complained
 // about has to see the complaint go.
+//
+// What a running pass is TOLD when a newer one starts is a different question
+// and is next door, in validate-signal.test.mjs. Nothing here would notice an
+// abort: the adapter below answers immediately, so every pass it is asked for
+// is a pass it finishes.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createForm } from "@maroonedog/waypoint/core";
-
-const FIELDS = [
-  { path: "name", kind: "string", isRequired: true, constraints: {} },
-  { path: "email", kind: "string", isRequired: true, constraints: {} },
-];
+import { FIELDS, settle } from "./support/scheduled-pass.mjs";
 
 /** An adapter that counts, and refuses an empty name. */
 const countingAdapter = () => {
@@ -46,8 +49,6 @@ const build = (validateOn) => {
   });
   return { form, counted };
 };
-
-const settle = () => new Promise((done) => setTimeout(done, 0));
 
 test("the default judges on change, which is what it always did", async () => {
   const { form, counted } = build();
@@ -121,95 +122,4 @@ test("`validateOn` is on the form and there is no per-field member", () => {
     false,
     "one pass judges the whole root, so a per-field moment could not be kept"
   );
-});
-
-// ---- the signal that replaced the debounce knob ---------------------------
-
-test("an adapter that declares one parameter is never handed a signal", async () => {
-  const seen = [];
-  const form = createForm({
-    adapter: {
-      fields: FIELDS,
-      validate(root) {
-        assert.equal(arguments.length <= 2, true);
-        seen.push(arguments[1]);
-        return [];
-      },
-    },
-    defaultValues: { name: "Ada", email: "ada@example.com" },
-  });
-  await form.validate();
-  assert.deepEqual(seen, [undefined], "no controller is constructed for it");
-});
-
-test("an adapter that asks for a signal is handed one, and it starts unaborted", async () => {
-  let handed;
-  const form = createForm({
-    adapter: {
-      fields: FIELDS,
-      validate(root, signal) {
-        handed = signal;
-        return [];
-      },
-    },
-    defaultValues: { name: "Ada", email: "ada@example.com" },
-  });
-  await form.validate();
-  assert.notEqual(handed, undefined);
-  assert.equal(handed.aborted, false);
-});
-
-test("a superseded pass is aborted, which is what the delay knob was asked for", async () => {
-  const handed = [];
-  let release;
-  const held = new Promise((resolve) => {
-    release = resolve;
-  });
-  const form = createForm({
-    adapter: {
-      fields: FIELDS,
-      validate(root, signal) {
-        handed.push(signal);
-        // The first pass waits; the second answers at once, exactly as a
-        // network rule overtaken by a keystroke would.
-        return handed.length === 1 ? held.then(() => []) : [];
-      },
-    },
-    defaultValues: { name: "Ada", email: "ada@example.com" },
-  });
-
-  const first = form.validate();
-  assert.equal(handed[0].aborted, false);
-
-  form.field("name").setValue("Ad");
-  await settle();
-
-  assert.equal(handed.length, 2, "the keystroke started a newer pass");
-  assert.equal(
-    handed[0].aborted,
-    true,
-    "the older pass is told its answer is already going to be discarded"
-  );
-  assert.equal(handed[1].aborted, false, "the newest pass is live");
-
-  release();
-  await first;
-});
-
-test("the newest pass is not aborted by its own start", async () => {
-  const handed = [];
-  const form = createForm({
-    adapter: {
-      fields: FIELDS,
-      validate(root, signal) {
-        handed.push(signal);
-        return [];
-      },
-    },
-    defaultValues: { name: "Ada", email: "ada@example.com" },
-  });
-  await form.validate();
-  await form.validate();
-  assert.equal(handed.length, 2);
-  assert.equal(handed[1].aborted, false);
 });

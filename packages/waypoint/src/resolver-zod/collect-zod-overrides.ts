@@ -6,9 +6,12 @@
 // zod's JSON Schema now supplies path, kind, presence, bounds, format, label
 // and description — measured, not assumed: run against zod 4.6.1, the generic
 // walk and the old hand-written one produced byte-identical descriptors for
-// every field of every schema in test/zod-resolver.test.mjs. So the walk here
-// collects only the residue, and a reader who wonders why a zod resolver still
-// exists is looking at the answer.
+// every field of every schema in test/zod-resolver.test.mjs, which when the
+// measurement was taken also held the schemas that now live in
+// test/zod-beyond-json-schema.test.mjs. Read the two together: the first is the
+// corpus the shared path gets right unaided, the second is the residue this
+// walk exists for, and a reader who wonders why a zod resolver still exists is
+// looking at the second one.
 //
 // `date`, because `z.date()` is not representable in JSON Schema at all. zod
 // throws on the whole document rather than the one field, and emits `{}` for

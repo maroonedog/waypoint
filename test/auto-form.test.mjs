@@ -1,49 +1,34 @@
-// Layers 1 and 2 on screen: the tree drawn through a registry, and a scope
-// that stops blocking.
+// Layers 1 and 2: the tree drawn through a widget registry, and the name a
+// caller writes to overrule it.
+//
+// WHY FOUR TESTS AND NOT FOUR FILES. What the registry answers is not "which
+// widget for this field" but an ORDER — exact path, then named format, then
+// closed field, then family — and an order is only observable in the
+// comparison. A test that pinned one entry on its own would pass under a
+// registry that consulted that entry and nothing else, which is the failure
+// this arrangement exists to catch. Layer 2 belongs with them for the same
+// reason: `as` is not a separate mechanism, it is one more rung, and the only
+// claim worth making about it is where it sits relative to the other four.
+//
+// WHAT THIS FILE IS NO LONGER ABOUT. It used to carry the form's status count
+// and the dormant-subtree tests as well, which drew no widget and mounted no
+// AutoForm. Those ask what is IN the number that blocks a submit, which is a
+// question about the runtime rather than about drawing, and they are in
+// form-status.test.mjs. They still read the same schema, from
+// support/owner-form.mjs, which says why.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
+import "./support/dom.mjs";
+import { mountIntoDocument as mount } from "./support/react-root.mjs";
+import { newForm, GOOD } from "./support/owner-form.mjs";
+import { find } from "./support/testid-lookup.mjs";
 
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-
-const { z } = await import("zod");
 const React = await import("react");
-const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
-const { createForm } = await import("@maroonedog/waypoint/core");
-const { FormProvider, AutoForm, Field, useParticipation, useFormStatus } =
-  await import("@maroonedog/waypoint/react");
+const { FormProvider, AutoForm, Field } = await import(
+  "@maroonedog/waypoint/react"
+);
 
-const { act, createElement: h, Fragment } = React;
-
-const SCHEMA = z.object({
-  owner: z.object({ name: z.string().min(3), email: z.email() }),
-  plan: z.enum(["free", "pro"]),
-  items: z.array(z.object({ sku: z.string().min(1) })),
-});
-
-const GOOD = {
-  owner: { name: "Ada Lovelace", email: "ada@example.com" },
-  plan: "free",
-  items: [{ sku: "A-1" }],
-};
+const { act, createElement: h } = React;
 
 const drawn = (label) => ({ field }) =>
   h("i", { "data-testid": "w-" + field.path, "data-widget": label });
@@ -56,23 +41,6 @@ const REGISTRY = {
   byKind: { string: drawn("kind") },
   fallback: drawn("fallback"),
 };
-
-const find = (container, testId) =>
-  container.querySelector("[data-testid=" + JSON.stringify(testId) + "]");
-
-async function mount(element) {
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () => root.render(element));
-  return { container, root };
-}
-
-const newForm = (defaultValues = GOOD) =>
-  createForm({
-    adapter: zodFormResolver(SCHEMA),
-    defaultValues: structuredClone(defaultValues),
-  });
 
 test("layer 1 draws every declared field, rows included", async () => {
   const form = newForm();
@@ -136,73 +104,5 @@ test("layer 2 names a widget with as", async () => {
     "named",
     "the name the caller wrote beats the path entry"
   );
-  await act(async () => root.unmount());
-});
-
-test("the status reflects what blocks and how often it was tried", async () => {
-  const form = newForm({ ...GOOD, owner: { name: "A", email: "nope" } });
-  const Status = () => {
-    const status = useFormStatus();
-    return h(
-      "span",
-      { "data-testid": "status" },
-      status.errorCount + "/" + status.submitCount
-    );
-  };
-  const { container, root } = await mount(
-    h(FormProvider, { form }, h(Status, null))
-  );
-
-  await act(async () => {
-    form.validate();
-  });
-  assert.equal(find(container, "status").textContent, "2/0");
-
-  await act(async () => {
-    await form.submit(() => undefined);
-  });
-  assert.equal(find(container, "status").textContent, "2/1");
-  await act(async () => root.unmount());
-});
-
-// Participation is addressed by a path now. It used to be a prop on a scope
-// wrapper, which meant switching a subtree off also rewrote every path inside
-// it — two unrelated things wearing one component.
-const Dormancy = ({ form, path, participating }) => {
-  useParticipation(form, path, participating);
-  return null;
-};
-
-test("a subtree switched off stops blocking while it is mounted", async () => {
-  const form = newForm({ ...GOOD, owner: { name: "A", email: "nope" } });
-  const Status = () => {
-    const status = useFormStatus();
-    return h("span", { "data-testid": "status" }, String(status.errorCount));
-  };
-  const Screen = ({ dormant }) =>
-    h(
-      FormProvider,
-      { form },
-      h(
-        Fragment,
-        null,
-        h(Status, null),
-        h(Dormancy, { form, path: "owner", participating: !dormant })
-      )
-    );
-
-  const { container, root } = await mount(h(Screen, { dormant: false }));
-  await act(async () => {
-    form.validate();
-  });
-  assert.equal(find(container, "status").textContent, "2");
-
-  await act(async () => root.render(h(Screen, { dormant: true })));
-  await act(async () => undefined);
-  assert.equal(find(container, "status").textContent, "0");
-
-  await act(async () => root.render(h(Screen, { dormant: false })));
-  await act(async () => undefined);
-  assert.equal(find(container, "status").textContent, "2");
   await act(async () => root.unmount());
 });

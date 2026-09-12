@@ -11,6 +11,13 @@
 // The byte bounds are pinned too, because dropping them is the other half of
 // why this is a kind. `z.file().min(100)` emits `minLength: 100` and those are
 // BYTES, where this contract's `minLength` is characters or elements.
+//
+// It does NOT import support/dom.mjs, and the reason is worth a line because
+// the import would work. Nothing here renders: these tests read descriptors
+// and prop bags, and the jsdom below exists to borrow one constructor, `File`,
+// which the assertions need a real instance of. Installing a document, a
+// window and an act environment on top of that would dress a description test
+// up as a DOM test, and the next reader would go looking for the render.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { JSDOM } from "jsdom";

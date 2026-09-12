@@ -1,5 +1,13 @@
-// Defects an adversarial review reproduced in the array support, each pinned
-// by the smallest case that fails without its fix.
+// What a row keeps when the list under it is edited: its nested row order, its
+// member values, its issues, its participation flag, and the containers above
+// it. There is no React in this file and no document: every assertion reads a
+// cell, the root, or a subscriber that woke.
+//
+// One file and not five because a splice rewrites the concrete indices under
+// all of them at once, so each is a separate chance for it to move one thing
+// and leave another behind. Five of the thirteen tests carry a comment
+// naming what went wrong there; the rest are the bounds that keep those five
+// from passing for the wrong reason.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";

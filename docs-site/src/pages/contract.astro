@@ -91,8 +91,9 @@ standardFormResolver(judging, { fields: myFields })
 `;
 
 const roads = `
-// zod 4.6.1, every schema in test/zod-resolver.test.mjs, both paths.
-// Identical on every field but these three:
+// zod 4.6.1, both paths, over every schema in test/zod-resolver.test.mjs
+// and test/zod-beyond-json-schema.test.mjs. Identical on every field
+// but these three, which are what the second file pins:
 
                             vendor            generic, unaided
 z.date()                    kind: "date"      kind: "unknown"

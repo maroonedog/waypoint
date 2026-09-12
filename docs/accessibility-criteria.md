@@ -10,7 +10,9 @@ Every Level A and Level AA success criterion in WCAG 2.2, with one verdict each 
 | **Does not** | a field-level obligation this library leaves entirely to the caller. The reason is given. These are the gaps. |
 | **Cannot touch** | a property of the page, the flow, the prose or the pixels. No field-level library reaches it, and saying otherwise would be a sales sentence. |
 
-**What is checked and what is asserted.** Rows marked *(axe)* are exercised by `test/accessibility-axe.test.mjs`, which runs axe-core 4.13.0 over rendered forms covering every `FormFieldKind`, a field with choices, a field with a description, a field carrying an error, a list of rows, and the error summary, and fails the build on any violation. `config/axe-coverage.json` records which rules reached a verdict and which two were switched off because jsdom cannot run them. Everything else in this table is a reading of the source, not a measurement. **Nothing here has met a screen reader or an auditor.**
+**What is checked and what is asserted.** `test/accessibility-axe.test.mjs` runs axe-core 4.13.0 over four rendered forms — every `FormFieldKind`; a closed field, a described field and a field carrying an error together; a list of rows; the error summary — and fails the build on any violation. `config/axe-coverage.json` records which rules reached a verdict and which two were switched off because jsdom cannot run them.
+
+A row is marked *(axe)* when a rule in that recorded `decided` list carries that criterion in **axe's own WCAG tag** — `axe.getRules()`, tag `wcag131`, `wcag332`, `wcag412`. Exactly three criteria qualify, and that is the whole of what is measured here: 1.3.1 (`list`, `listitem`), 3.3.2 (`form-field-multiple-labels`), and 4.1.2 (the other thirteen, `label` and `select-name` and the `aria-*` family among them). The audit is scoped to the mounted subtree, so no rule about the page itself — `html-has-lang`, `document-title`, `region` — reaches it at all. Everything else in this table is a reading of the source, not a measurement. **Nothing here has met a screen reader or an auditor.**
 
 ## The legal frame, stated once and precisely
 
@@ -36,7 +38,7 @@ This is the criterion most of the prop bags exist for, and the one they cover mo
 
 `descriptionProps` is `undefined` when the schema declared no description, so no `aria-describedby` ever points at an element nobody drew — an attribute naming a missing id is worse than no attribute, because a reader is told there is more and then hears nothing.
 
-### 3.3.1 Error Identification (A) — **Helps** *(axe)*
+### 3.3.1 Error Identification (A) — **Helps**
 
 > "If an input error is automatically detected, the item that is in error is identified and the error is described to the user in text."
 
@@ -44,9 +46,9 @@ Two halves, and the library carries one and a bit. The *identification* is `aria
 
 The *description in text* is the validator's message, passed through unaltered. This library does not write error prose and cannot judge it: zod 4.6.1's default for an empty required string is `Too small: expected string to have >=1 characters`, which is text and does describe the error, and is also not a sentence anybody should show a person. The contract carries `FormIssue.message` and the vendor owns it.
 
-One measured trap worth writing down. `inputProps.required` is a real `required` attribute, so the browser's own constraint validation runs first: a `<form>` without `noValidate` never fires `submit` for an empty required field, and `form.submit()` is never reached. That is fine — the native bubble is itself an error identification — but a caller doing its own messaging must set `noValidate`, or its summary will never appear. Found by writing `test/error-summary.test.mjs`, where the first version of every focus test failed for exactly this reason.
+One measured trap worth writing down. `inputProps.required` is a real `required` attribute, so the browser's own constraint validation runs first: a `<form>` without `noValidate` never fires `submit` for an empty required field, and `form.submit()` is never reached. That is fine — the native bubble is itself an error identification — but a caller doing its own messaging must set `noValidate`, or its summary will never appear. Found by writing the focus tests now in `test/error-summary-react.test.mjs`, where the first version of every one of them failed for exactly this reason.
 
-### 3.3.2 Labels or Instructions (A) — **Helps**
+### 3.3.2 Labels or Instructions (A) — **Helps** *(axe)*
 
 > Labels or instructions are provided when content requires user input.
 
@@ -112,7 +114,7 @@ Nothing in this package knows a suggestion. `FormIssue` is `path`, `message`, an
 
 | SC | Name | Level | Verdict | Why |
 |---|---|---|---|---|
-| 2.1.1 | Keyboard | A | **Helps** *(axe)* | Every control the bags describe is a native `<input>` or the caller's `<select>`, keyboard-operable without any work. No custom widget ships here, so there is none to break it. axe's `nested-interactive` decides on the rendered forms. |
+| 2.1.1 | Keyboard | A | **Helps** | Every control the bags describe is a native `<input>` or the caller's `<select>`, keyboard-operable without any work. No custom widget ships here, so there is none to break it. axe's `nested-interactive` does decide on the rendered forms, but axe tags that rule `wcag412`, so it backs 4.1.2 and not this criterion. |
 | 2.1.2 | No Keyboard Trap | A | Cannot touch | Nothing here holds focus. `focusFirst()` and `focusSummary()` move it once, on demand, and never take it back. |
 | 2.1.4 | Character Key Shortcuts | A | Cannot touch | No keyboard shortcut is registered. |
 | 2.2.1 | Timing Adjustable | A | Cannot touch | No time limit. `validateOn` and the validation scheduler decide *when a pass runs*, never how long a person has. |
@@ -144,8 +146,8 @@ Nothing in this package knows a suggestion. `FormIssue` is `path`, `message`, an
 | 3.2.3 | Consistent Navigation | AA | Cannot touch | A site-level concern. |
 | 3.2.4 | Consistent Identification | AA | Cannot touch | A site-level concern — though a form drawn by `AutoForm` from one registry is consistent by construction, which is a side effect and not a claim. |
 | 3.2.6 | Consistent Help | A | Cannot touch | New in 2.2. A site-level concern: where the help link lives on every page. |
-| 3.3.1 | Error Identification | A | **Helps** *(axe)* | See above. |
-| 3.3.2 | Labels or Instructions | A | **Helps** | See above. |
+| 3.3.1 | Error Identification | A | **Helps** | See above. |
+| 3.3.2 | Labels or Instructions | A | **Helps** *(axe)* | See above. |
 | 3.3.3 | Error Suggestion | AA | Cannot touch | See above. `FormIssue` has no member for a suggestion. |
 | 3.3.4 | Error Prevention (Legal, Financial, Data) | AA | **Does not** | Reversible, checked or confirmed — a review step, an "are you sure", an undo. Every one of those is a property of the flow between screens, and this package has one screen's worth of state and a `submit()`. `adoptIssues` is the nearest thing: a server's verdict comes back as blocking issues that refuse the next submit, which is error *correction* after the fact rather than prevention before it. |
 | 3.3.7 | Redundant Entry | A | **Helps** | New in 2.2. `defaultValues` seeds the root, and `reset(next)` replaces it, so re-showing what a person already gave is a one-line call rather than a feature. Whether the application actually carries an answer forward from the previous step is the application's. |
@@ -162,6 +164,6 @@ Nothing in this package knows a suggestion. `FormIssue` is `path`, `message`, an
 
 ## What this table is not
 
-It is not an audit. An audit is performed by a person against a rendered application, and this is a reading of a library against a standard, with a machine check over four synthetic forms. Four of the fifty-five rows are backed by a running assertion; the rest are argued. Two axe rules are switched off with reasons recorded. The one thing it does have over the alternative is that every row can be disagreed with specifically.
+It is not an audit. An audit is performed by a person against a rendered application, and this is a reading of a library against a standard, with a machine check over four synthetic forms. Three of the fifty-five rows are backed by a running assertion; the rest are argued. Two axe rules are switched off with reasons recorded. The one thing it does have over the alternative is that every row can be disagreed with specifically.
 
 **Still not done, still not scheduled:** an audit by somebody who does this for a living, and a screen reader — any screen reader — in front of any of it. Until then the strongest claim available is the one made at the top: no row says "discharges".

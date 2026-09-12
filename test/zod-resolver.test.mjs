@@ -1,9 +1,31 @@
+// What the two specs make of a zod schema, with nothing zod-shaped left in it.
+//
+// Since the refactor `zodFormResolver` takes its descriptors from
+// `~standard.jsonSchema` and its verdicts from `~standard.validate` — the same
+// two members every vendor is read through. So every expected value below is a
+// statement about that SHARED path, with zod only supplying the input: hand a
+// different vendor a document and a verdict that say the same things and none
+// of these assertions would change. That is what makes this file the baseline,
+// and a baseline is worth only as much as it is clean. The places where zod
+// genuinely needs the shared answer corrected are in
+// zod-beyond-json-schema.test.mjs, and keeping them out of here is how the
+// claim "there are three of them" stays falsifiable instead of decorative.
+//
+// THE CONTAINERS AT THE BOTTOM STAY, and it is worth saying why they are not a
+// third file. They look vendor-specific and are not: a union, a tuple and a
+// record arrive as shapes none of the walk's own `type` branches match, and the
+// fix for all three was in the walk, not in anything that knows about zod. They
+// also cannot move. `test/types-containers/container-shapes.type-test.ts` names
+// THIS file as the runtime half it is written against, shape for shape, and the
+// pairing is the point of both. And the tuple test is an argument with the
+// array test two hundred lines above it — one says an array is described once
+// through a wildcard, the other says a fixed tuple is not one — which is a
+// contradiction a reader has to be able to see resolved in one place.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
 import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
-
-const byPath = (fields, path) => fields.find((f) => f.path === path);
+import { byPath } from "./support/descriptor-lookup.mjs";
 
 test("reads bounds, presence and choices from a flat schema", () => {
   const { fields } = zodFormResolver(
@@ -149,97 +171,6 @@ test("a nested issue is addressed with dots", () => {
     adapter.validate({ owner: { name: "" } }).map((i) => i.path),
     ["owner.name"]
   );
-});
-
-// ---------------------------------------------------------------------------
-// The three facts zod's own JSON Schema does not carry about zod.
-//
-// The descriptors now come from `~standard.jsonSchema`, the same walk every
-// vendor gets. These are the fields where that document is wrong about the
-// schema that produced it, and a caller of `zodFormResolver` must not be able
-// to tell — each one is UI that would otherwise change under a version bump.
-// ---------------------------------------------------------------------------
-
-test("a JS Date keeps its widget, which JSON Schema cannot represent at all", () => {
-  // Run here on zod 4.6.1, `jsonSchema.input()` on a schema containing
-  // `z.date()` throws `Date cannot be represented in JSON Schema` and emits no
-  // property whatsoever — the whole document is lost to the one field. The
-  // resolver passes `{ unrepresentable: "any" }`, which gets the document back
-  // with `{}` in that slot, and this restores what the `{}` used to be.
-  const { fields } = zodFormResolver(
-    z.object({ when: z.date(), whenever: z.date().optional() })
-  );
-  assert.equal(byPath(fields, "when").kind, "date");
-  assert.equal(byPath(fields, "when").isRequired, true);
-  assert.equal(byPath(fields, "whenever").kind, "date");
-  assert.equal(byPath(fields, "whenever").isRequired, false);
-});
-
-test("an ISO date is left alone, because the document already said so", () => {
-  // `z.iso.date()` survives as `format: "date"`, which resolve-widget prefers
-  // over `kind` anyway. Only the JS-Date-typed field needed rescuing.
-  const { fields } = zodFormResolver(z.object({ day: z.iso.date() }));
-  assert.equal(byPath(fields, "day").constraints.format, "date");
-});
-
-test("an enum's choice labels come from the key, not the stored value", () => {
-  // JSON Schema's `enum` is a list of VALUES. zod's enum has two sides, and
-  // the one a person reads is the key — so the document alone would silently
-  // turn "Admin" into "admin" in the rendered option.
-  const { fields } = zodFormResolver(
-    z.object({ role: z.enum({ Admin: "admin", User: "user" }) })
-  );
-  assert.deepEqual(byPath(fields, "role").choices, [
-    { value: "admin", label: "Admin" },
-    { value: "user", label: "User" },
-  ]);
-});
-
-test("an array-form enum still labels each option with its own spelling", () => {
-  const { fields } = zodFormResolver(
-    z.object({ role: z.enum(["admin", "user"]) })
-  );
-  assert.deepEqual(byPath(fields, "role").choices, [
-    { value: "admin", label: "admin" },
-    { value: "user", label: "user" },
-  ]);
-});
-
-test("the bounds `.int()` writes for itself are not shown as bounds", () => {
-  // zod spells `z.number().int()` as `minimum: -9007199254740991, maximum:
-  // 9007199254740991` — the range of a JavaScript safe integer, not a rule the
-  // author wrote. Carried through, an input would say min="-9007199254740991".
-  const { fields } = zodFormResolver(
-    z.object({ count: z.number().int(), floor: z.number().int().min(0) })
-  );
-  assert.deepEqual(byPath(fields, "count").constraints, {});
-  assert.deepEqual(byPath(fields, "floor").constraints, { minimum: 0 });
-});
-
-test("a declared bound that is not synthetic survives", () => {
-  const { fields } = zodFormResolver(
-    z.object({ age: z.number().int().min(18).max(120) })
-  );
-  assert.deepEqual(byPath(fields, "age").constraints, {
-    minimum: 18,
-    maximum: 120,
-  });
-});
-
-test("a field zod could not refine still arrives correctly described", () => {
-  // The refinement is a correction on top of a descriptor that is already
-  // right, which is the whole change: a broken zod internal now costs a date
-  // widget, not every descriptor.
-  const { fields } = zodFormResolver(
-    z.object({ when: z.date(), name: z.string().min(2).describe("who") })
-  );
-  assert.deepEqual(byPath(fields, "name"), {
-    path: "name",
-    kind: "string",
-    isRequired: true,
-    description: "who",
-    constraints: { minLength: 2 },
-  });
 });
 
 test("an async refinement is judged rather than thrown over", () => {

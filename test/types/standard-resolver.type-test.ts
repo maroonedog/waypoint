@@ -10,7 +10,8 @@
 // for the second is to supply the fields the validator could not.
 //
 // The runtime half — a vendor that declares `jsonSchema` and then throws — is
-// what types cannot see, and it is pinned in test/standard-resolver.test.mjs
+// what types cannot see, and it is pinned by "a converter that throws is
+// reported with the reason it gave" in test/standard-schema-warnings.test.mjs
 // instead. Neither half is sufficient alone, which is why there are two files.
 //
 // The validators here are hand-written rather than imported, because the two

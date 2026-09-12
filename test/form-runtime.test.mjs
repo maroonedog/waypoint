@@ -1,141 +1,34 @@
-// The first vertical slice: two fields, a rule between them, one of them
-// behind a toggle that unmounts it. Layer 3 only.
+// What a keystroke costs, counted in components — and what a component paints
+// the moment it comes back.
+//
+// Every test here renders the first vertical slice, and three of the five
+// assert on RENDER COUNTS rather than on the tree. That is deliberate and it is
+// the only place the claim is observable: a form that re-renders the whole
+// screen on every keystroke is correct by every assertion about values and
+// issues that could be written, and is exactly the thing this library exists
+// not to be. So in those three the counters are the assertion, and a number one
+// larger than it should be is the failure — which is why they say "the shell
+// did not re-render" three times between them.
+//
+// The second half is the same mechanism approached from the side where it
+// broke. Cells are written for readers, so a field with no mounted component
+// has no reader and the fan-out passes it by; the two defects pinned below are
+// both "what it paints when it comes back" — the value written while it was
+// away, and the error that appeared while it was away. Both need a document, a
+// toggle and a commit to state at all: they are about the first render after a
+// remount, and there is no such moment without React.
+//
+// What these tests can only see INDIRECTLY — that a pass writes one issue cell
+// and not two — is the subject of runtime-writes.test.mjs, which measures it on
+// the store rather than inferring it from a count.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
+import "./support/dom.mjs";
+import { renderSlice, type } from "./support/postcode-slice.mjs";
+import { find } from "./support/testid-lookup.mjs";
 
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
-
-const { z } = await import("zod");
-const React = await import("react");
-const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
-const {
-  createForm,
-  createCellStore,
-  assertFormStoreContract,
-  issuesCell,
-  readValueAt,
-  ROOT_CELL,
-} = await import("@maroonedog/waypoint/core");
-const { FormProvider, Field } = await import("@maroonedog/waypoint/react");
-const { createZustandCellStore } = await import("@maroonedog/waypoint/store-zustand");
-const { createStore } = await import("zustand/vanilla");
-
-const { act, createElement: h, useState, Fragment } = React;
-
-const SCHEMA = z
-  .object({
-    billing: z.object({ postcode: z.string() }),
-    shipping: z.object({ postcode: z.string() }),
-  })
-  .superRefine((value, ctx) => {
-    if (value.billing.postcode !== value.shipping.postcode) {
-      ctx.addIssue({
-        code: "custom",
-        message: "must match shipping",
-        path: ["billing", "postcode"],
-      });
-    }
-  });
-
-const DEFAULTS = { billing: { postcode: "" }, shipping: { postcode: "" } };
-
-function buildForm(store) {
-  return createForm({
-    adapter: zodFormResolver(SCHEMA),
-    defaultValues: structuredClone(DEFAULTS),
-    ...(store === undefined ? {} : { store }),
-  });
-}
-
-function makeScreen(form, counters) {
-  const Input = ({ path, testId }) =>
-    h(Field, { path }, (field) => {
-      counters[testId] += 1;
-      return h(
-        Fragment,
-        null,
-        h("input", { ...field.inputProps, "data-testid": testId }),
-        h(
-          "span",
-          { "data-testid": testId + "-error" },
-          field.issues.map((issue) => issue.message).join(" ")
-        )
-      );
-    });
-
-  return function Screen() {
-    counters.shell += 1;
-    const [showShipping, setShowShipping] = useState(true);
-    const [showBilling, setShowBilling] = useState(true);
-    return h(
-      FormProvider,
-      { form },
-      h(
-        Fragment,
-        null,
-        showBilling
-          ? h(Input, { path: "billing.postcode", testId: "billing" })
-          : null,
-        showShipping
-          ? h(Input, { path: "shipping.postcode", testId: "shipping" })
-          : null,
-        h("button", {
-          "data-testid": "toggle",
-          onClick: () => setShowShipping((shown) => !shown),
-        }),
-        h("button", {
-          "data-testid": "toggle-billing",
-          onClick: () => setShowBilling((shown) => !shown),
-        })
-      )
-    );
-  };
-}
-
-const find = (container, testId) =>
-  container.querySelector("[data-testid=" + JSON.stringify(testId) + "]");
-
-async function type(container, testId, value) {
-  const element = find(container, testId);
-  await act(async () => {
-    const setter = Object.getOwnPropertyDescriptor(
-      dom.window.HTMLInputElement.prototype,
-      "value"
-    ).set;
-    setter.call(element, value);
-    element.dispatchEvent(new dom.window.Event("input", { bubbles: true }));
-  });
-}
-
-async function renderSlice(store) {
-  const counters = { shell: 0, billing: 0, shipping: 0 };
-  const form = buildForm(store);
-  const Screen = makeScreen(form, counters);
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  await act(async () => root.render(h(Screen)));
-  return { form, counters, container, root };
-}
+const { act } = await import("react");
+const { issuesCell, readValueAt } = await import("@maroonedog/waypoint/core");
 
 // 1 - R4
 test("typing into one field re-renders only that one component", async () => {
@@ -183,31 +76,6 @@ test("a rule reads a sibling whose component is not mounted", async () => {
   });
   assert.deepEqual(issues, []);
   await act(async () => root.unmount());
-});
-
-// 3 - R2, isolation
-// No component is rendered at all. A field addressed by path is reachable
-// whether or not React has ever been involved, which is the point.
-test("a field validates on its own, and check writes nothing", () => {
-  const form = buildForm();
-  const adapter = zodFormResolver(SCHEMA);
-  form.field("billing.postcode").setValue("100");
-
-  const fromField = form.field("billing.postcode").validate();
-  const fromForm = adapter
-    .validate(form.readRoot())
-    .filter((issue) => issue.path === "billing.postcode");
-  assert.deepEqual(fromField, fromForm);
-
-  const rootBefore = JSON.stringify(form.readRoot());
-  const probed = form.field("billing.postcode").issuesFor("");
-  assert.deepEqual(probed, []);
-  assert.equal(
-    JSON.stringify(form.readRoot()),
-    rootBefore,
-    "check wrote nothing"
-  );
-  assert.equal(form.field("billing.postcode").sources.value.read(), "100");
 });
 
 // 4 - the cross-field direction
@@ -281,137 +149,4 @@ test("a field remounted after a write it did not see paints the current value", 
     "the keystroke built on the real value"
   );
   await act(async () => root.unmount());
-});
-
-// The defect this closes: `[*]` has no case in the concrete grammar, so it
-// parsed as a member named "*" and a write replaced the whole array.
-test("addressing a field by a declared path is refused, not guessed", () => {
-  const form = buildForm();
-  assert.throws(
-    () => form.field("items[*].quantity"),
-    (error) =>
-      error instanceof TypeError && /is a rule, not a place/.test(error.message)
-  );
-});
-
-// 5 - R3
-test("the shipped store and a zustand store both satisfy the contract", () => {
-  const failures = [];
-  const expect = (holds, what) => {
-    if (!holds) failures.push(what);
-  };
-  assertFormStoreContract(() => createCellStore(), expect);
-  assertFormStoreContract(
-    () => createZustandCellStore(createStore(() => ({}))),
-    expect
-  );
-  assert.deepEqual(failures, []);
-});
-
-test("the slice behaves identically with the zustand store injected", async () => {
-  const store = createZustandCellStore(createStore(() => ({})));
-  const { form, counters, container, root } = await renderSlice(store);
-  const before = { ...counters };
-  await type(container, "billing", "100");
-  assert.equal(counters.billing, before.billing + 2, "value, then issues");
-  assert.equal(counters.shipping, before.shipping);
-  await act(async () => undefined);
-  assert.deepEqual(
-    form.store.read(issuesCell("billing.postcode")).map((i) => i.message),
-    ["must match shipping"]
-  );
-  await act(async () => root.unmount());
-});
-
-// The defect this closes: the adapter staged writes but answered reads from
-// zustand, so a second read-modify-write of the root inside one batch started
-// from the pre-batch value and dropped the first.
-test("batched writes to the same cell build on each other in every store", () => {
-  for (const build of [
-    () => createCellStore(),
-    () => createZustandCellStore(createStore(() => ({}))),
-  ]) {
-    const form = createForm({
-      adapter: zodFormResolver(SCHEMA),
-      defaultValues: structuredClone(DEFAULTS),
-      store: build(),
-    });
-    form.store.batch(() => {
-      form.field("billing.postcode").setValue("111");
-      form.field("shipping.postcode").setValue("222");
-    });
-    assert.deepEqual(form.store.read(ROOT_CELL), {
-      billing: { postcode: "111" },
-      shipping: { postcode: "222" },
-    });
-  }
-});
-
-// 6 - the diff
-test("a pass writes only the issue cells whose content changed", async () => {
-  const store = createCellStore();
-  const written = [];
-  const spied = {
-    ...store,
-    write: (key, next) => {
-      written.push(key);
-      store.write(key, next);
-    },
-  };
-  const form = createForm({
-    adapter: zodFormResolver(SCHEMA),
-    defaultValues: structuredClone(DEFAULTS),
-    store: spied,
-  });
-
-  form.validate();
-  written.length = 0;
-  form.validate();
-  assert.deepEqual(
-    written.filter((key) => key.startsWith("issues:")),
-    [],
-    "a pass that changes nothing writes no issue cell"
-  );
-
-  form.field("billing.postcode").setValue("100");
-  written.length = 0;
-  form.validate();
-  assert.deepEqual(
-    written.filter((key) => key.startsWith("issues:")),
-    ["issues:billing.postcode"],
-    "a pass that changes one field writes one issue cell"
-  );
-});
-
-// 7 - CSP
-test("nothing in the runtime compiles a string", async () => {
-  const { readFile, readdir } = await import("node:fs/promises");
-  const { join } = await import("node:path");
-
-  const sourceFiles = async (directory) => {
-    const found = [];
-    for (const entry of await readdir(directory, { withFileTypes: true })) {
-      const full = join(directory, entry.name);
-      if (entry.isDirectory()) found.push(...(await sourceFiles(full)));
-      else if (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) {
-        found.push(full);
-      }
-    }
-    return found;
-  };
-
-  const banned = [/new\s+Function\s*\(/, /(^|[^.\w])eval\s*\(/];
-  const offenders = [];
-  // One root, so every entry point is covered by construction. Listing the
-  // directories by hand is how `resolver-luq` went unscanned while the five
-  // that were named looked exhaustive.
-  for (const file of await sourceFiles("packages/waypoint/src")) {
-    const text = await readFile(file, "utf8");
-    if (banned.some((pattern) => pattern.test(text))) offenders.push(file);
-  }
-  assert.ok(offenders.length === 0, `${offenders.join(", ")} compiles a string`);
-  assert.ok(
-    (await sourceFiles("packages/waypoint/src")).length > 50,
-    "the scan found almost no files — it is pointed somewhere wrong"
-  );
 });

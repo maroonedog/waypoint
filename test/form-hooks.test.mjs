@@ -9,37 +9,28 @@
 // data through, because the pass judges the whole ROOT: the verdict and the
 // submit gate stay correct, and what actually broke is one field's display.
 // Throwing would take the whole form down for that.
+//
+// Eleven of the thirteen tests below therefore put one question to a string: is
+// this a path this form has? Warn, stay silent, or — for `items[*]`, the single
+// case where guessing would address a row nobody asked for — throw. The two
+// that ask something else say so in their names: "two forms on one screen stay
+// independent" and "a component needs nothing wrapped around it".
+//
+// No hook in this file names a form. That is the line between it and
+// hook-form-key.test.mjs, where every hook does: here the enclosing provider
+// answers, there the call site does.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { JSDOM } from "jsdom";
-
-const dom = new JSDOM("<!doctype html><html><body></body></html>", {
-  url: "http://localhost",
-  pretendToBeVisual: true,
-});
-globalThis.window = dom.window;
-globalThis.document = dom.window.document;
-globalThis.HTMLElement = dom.window.HTMLElement;
-globalThis.Event = dom.window.Event;
-globalThis.Node = dom.window.Node;
-try {
-  Object.defineProperty(globalThis, "navigator", {
-    value: dom.window.navigator,
-    configurable: true,
-  });
-} catch {
-  // A navigator already provided by the host is fine.
-}
-globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+import "./support/dom.mjs";
+import { mountCatching, text } from "./support/warning-mount.mjs";
+import { orderForm } from "./support/order-form.mjs";
 
 const { z } = await import("zod");
 const React = await import("react");
-const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("@maroonedog/waypoint/resolver-zod");
 const { createForm } = await import("@maroonedog/waypoint/core");
 const {
   FormProvider,
-  forgetUnaddressableWarnings,
   useField,
   useFieldIssues,
   useFieldValue,
@@ -47,55 +38,14 @@ const {
 
 const { act, createElement: h } = React;
 
-const ORDER = z.object({
-  billing: z.object({ postcode: z.string().min(3), city: z.string() }),
-  shipping: z.object({ postcode: z.string().min(3), city: z.string() }),
-  items: z.array(z.object({ sku: z.string() })),
-});
+/** A form that declares none of the order's paths. */
 const OTHER = z.object({ unrelated: z.object({ token: z.string() }) });
-
-const DEFAULTS = {
-  billing: { postcode: "100-0001", city: "Chiyoda" },
-  shipping: { postcode: "150-0001", city: "Shibuya" },
-  items: [{ sku: "a" }, { sku: "b" }],
-};
-
-const orderForm = () =>
-  createForm({
-    adapter: zodFormResolver(ORDER),
-    defaultValues: structuredClone(DEFAULTS),
-  });
 
 const otherForm = () =>
   createForm({
     adapter: zodFormResolver(OTHER),
     defaultValues: { unrelated: { token: "x" } },
   });
-
-/** Renders, and collects what was warned and whatever escaped. */
-async function mountCatching(element) {
-  forgetUnaddressableWarnings();
-  const container = dom.window.document.createElement("div");
-  dom.window.document.body.appendChild(container);
-  const root = createRoot(container);
-  const warnings = [];
-  let escaped = null;
-  const quietWarn = console.warn;
-  const quietError = console.error;
-  console.warn = (...parts) => warnings.push(parts.join(" "));
-  console.error = () => {};
-  try {
-    await act(async () => root.render(element));
-  } catch (error) {
-    escaped = error;
-  } finally {
-    console.warn = quietWarn;
-    console.error = quietError;
-  }
-  return { container, root, escaped, warnings, warned: warnings.join("\n") };
-}
-
-const text = (container, id) => container.querySelector("#" + id).textContent;
 
 test("a declared path works exactly as the untyped hook does", async () => {
   function Screen() {
@@ -313,51 +263,5 @@ test("a row that does not exist yet is addressable", async () => {
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
   assert.equal(warned, "");
-  root.unmount();
-});
-
-// ---------------------------------------------------------------------------
-// The key. A hook typed against one registered form, rendered under another,
-// is the single thing the registry cannot see — so it is checked here.
-// ---------------------------------------------------------------------------
-
-test("naming a form that is not the enclosing one throws and says which", async () => {
-  function Screen() {
-    useFieldValue("order", "billing.postcode");
-    return null;
-  }
-  const { escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm(), formKey: "checkout" }, h(Screen))
-  );
-  assert.ok(escaped !== null, "expected a mismatched key to throw");
-  assert.match(escaped.message, /"order"/);
-  assert.match(escaped.message, /"checkout"/);
-});
-
-test("naming the enclosing form is accepted", async () => {
-  function Screen() {
-    const postcode = useFieldValue("order", "billing.postcode");
-    return h("span", { id: "v" }, String(postcode));
-  }
-  const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm(), formKey: "order" }, h(Screen))
-  );
-  assert.equal(escaped, null);
-  assert.equal(text(container, "v"), "100-0001");
-  root.unmount();
-});
-
-test("naming no form accepts whichever provider is there", async () => {
-  // What a component shared by two forms does. It gives up telling them
-  // apart, and nothing else.
-  function Screen() {
-    const postcode = useFieldValue("billing.postcode");
-    return h("span", { id: "v" }, String(postcode));
-  }
-  const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm(), formKey: "anything" }, h(Screen))
-  );
-  assert.equal(escaped, null);
-  assert.equal(text(container, "v"), "100-0001");
   root.unmount();
 });
