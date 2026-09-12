@@ -33,11 +33,19 @@ const TRY = [
   ],
   [
     "Switch to useUncontrolledField, then type a valid value",
-    "The counter does not move at all. Same cell, subscribed imperatively, writing the DOM node instead of re-rendering.",
+    "The tape keeps printing and the counter does not move at all. Same cell, subscribed imperatively, writing the DOM node instead of re-rendering.",
   ],
   [
     "Watch validator passes",
     "One per settled change, however many fields that change touched.",
+  ],
+  [
+    "Type a second character into billing",
+    "The tape adds a root and a value and nothing else: the verdict did not move, so no issues cell is written and the row showing the error does not render.",
+  ],
+  [
+    "Add a line, then remove the first row",
+    "The tape shows B-2's value moving down a slot and the removed row's cells being forgotten. A value follows its row, because a row is addressed by identity rather than by index.",
   ],
 ];
 
@@ -73,6 +81,14 @@ const woken = [
 
   <LiveForm client:load />
 
+  <p class="caption">
+    The panel under the form is the cell store narrating itself. A recording
+    store is handed to <code>createForm</code> — the same option an application
+    uses to keep a form in zustand — so every write is printed, newest first.
+    A keystroke writes the root and one value; an <code>issues</code> line
+    appears only on the pass where a verdict actually moved.
+  </p>
+
   <div class="mt-6 grid gap-3 sm:grid-cols-2">
     {
       TRY.map(([what, why]) => (
@@ -83,6 +99,25 @@ const woken = [
       ))
     }
   </div>
+
+  <h2 class="mt-16 text-2xl font-bold">The same runtime, on your machine</h2>
+
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    Nothing is published, so there is no sandbox to link to — you clone it. Both
+    examples resolve the packages to their <strong>source</strong>, so an edit
+    inside <code>packages/form-core</code> reloads the page with no build step
+    in between.
+  </p>
+
+  <Code
+    code={`git clone https://github.com/maroonedog/form-contract
+cd form-contract && npm install
+
+npm run example:showcase        # 23 inputs, six sections, one screen
+npm run example:nested-arrays   # the same shape in four libraries, side by side
+npm run docs:dev                # this site, with the form above`}
+    label="shell"
+  />
 
   <h2 class="mt-16 text-2xl font-bold">Typing that costs React nothing</h2>
 

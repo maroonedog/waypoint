@@ -12,7 +12,7 @@
 // the pass counter and the error count through their own subscriptions, and it
 // is a sibling of the rows rather than an ancestor.
 // ===========================================================================
-import { useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import {
   FormProvider,
   useCreateForm,
@@ -26,6 +26,7 @@ import {
 } from "form-react";
 import { blankLine, orderAdapter, orderDefaults } from "./order-form.js";
 import { createPassCounter, type PassCounter } from "./pass-counter.js";
+import { createRecordingStore, type Entry, type Tape } from "./recording-store.js";
 import { useRenderCount } from "./use-render-count.js";
 
 type Mode = "controlled" | "uncontrolled";
@@ -152,6 +153,56 @@ function Lines({ mode }: { readonly mode: Mode }): React.ReactElement {
   );
 }
 
+const KIND_TINT: Readonly<Record<Entry["kind"], string>> = {
+  value: "text-primary",
+  issues: "text-error",
+  rows: "text-tertiary",
+  flag: "text-on-surface-variant",
+  form: "text-on-surface-variant",
+  forget: "text-on-surface-variant",
+};
+
+/**
+ * What the runtime just did, newest first. It reads the recording store rather
+ * than any hook, so it is a sibling of the fields and re-rendering it does not
+ * re-render them — which matters here more than anywhere, because the numbers
+ * beside the fields are the other half of the demo.
+ */
+function Tape({ tape }: { readonly tape: Tape }): React.ReactElement {
+  const entries = useSyncExternalStore(tape.subscribe, tape.read, tape.read);
+  // After mount, so the fourteen cells that building the form wrote are not
+  // the fourteen the reader is looking at.
+  useEffect(() => tape.startRecording(), [tape]);
+  return (
+    <div className="mt-4 overflow-hidden rounded-lg border border-outline-variant">
+      <p className="flex items-center justify-between border-b border-outline-variant bg-surface px-3 py-1.5 text-[0.65rem] font-semibold tracking-wide text-on-surface-variant uppercase">
+        <span>every cell the runtime wrote</span>
+        <button type="button" className="font-normal normal-case" onClick={tape.clear}>
+          clear
+        </button>
+      </p>
+      {entries.length === 0 ? (
+        <p className="px-3 py-3 text-xs text-on-surface-variant">
+          Type in a field above. Nothing is written until something changes.
+        </p>
+      ) : (
+        <ol className="max-h-52 overflow-y-auto">
+          {entries.map((entry) => (
+            <li
+              key={entry.seq}
+              className="grid grid-cols-[6.5rem_11rem_minmax(0,1fr)] items-baseline gap-2 border-b border-outline-variant/60 px-3 py-1 font-mono text-[0.7rem] last:border-b-0"
+            >
+              <span className={KIND_TINT[entry.kind]}>{entry.channel}</span>
+              <span className="truncate">{entry.path}</span>
+              <span className="truncate text-on-surface-variant">{entry.what}</span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
 function Toolbar({ counter }: { readonly counter: PassCounter }): React.ReactElement {
   const passes = useSyncExternalStore(
     counter.subscribe,
@@ -189,13 +240,18 @@ function Toolbar({ counter }: { readonly counter: PassCounter }): React.ReactEle
 function Sheet({
   mode,
   counter,
+  tape,
 }: {
   readonly mode: Mode;
   readonly counter: PassCounter;
+  readonly tape: Tape;
 }): React.ReactElement {
+  // The store is an argument, so instrumenting the runtime needs no hook in
+  // it: this is the same seam form-store-zustand uses.
   const form = useCreateForm(() => ({
     adapter: counter.adapter,
     defaultValues: structuredClone(orderDefaults),
+    store: tape.store,
   }));
   const Row = mode === "controlled" ? ControlledRow : UncontrolledRow;
   return (
@@ -205,6 +261,7 @@ function Sheet({
       <Row at="shipping.postcode" label="shipping" />
       <Lines mode={mode} />
       <Toolbar counter={counter} />
+      <Tape tape={tape} />
     </FormProvider>
   );
 }
@@ -214,6 +271,7 @@ export default function LiveForm(): React.ReactElement {
   // One counter per mounted sheet, so switching modes starts the count over
   // rather than carrying the other mode's passes into it.
   const counter = useMemo(() => createPassCounter(orderAdapter), [mode]);
+  const tape = useMemo(() => createRecordingStore(), [mode]);
 
   return (
     <div className="mt-6 rounded-xl border border-outline-variant bg-surface-low p-4 sm:p-5">
@@ -238,7 +296,7 @@ export default function LiveForm(): React.ReactElement {
           the number on each row is how many times it rendered
         </span>
       </div>
-      <Sheet key={mode} mode={mode} counter={counter} />
+      <Sheet key={mode} mode={mode} counter={counter} tape={tape} />
     </div>
   );
 }

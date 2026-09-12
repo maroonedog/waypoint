@@ -5,7 +5,7 @@ It is a real form: personal details, a company, two addresses, an order table
 and terms — 23 inputs across six sections.
 
 ```bash
-node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts examples/showcase
+npm run example:showcase       # http://localhost:5179
 ```
 
 The packages resolve to their **source**, so editing the runtime reloads the

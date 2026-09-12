@@ -1,7 +1,7 @@
 # 配列とネストが混ざったフォーム — 4実装
 
 ```bash
-node node_modules/vite/bin/vite.js --config examples/nested-arrays/vite.config.ts examples/nested-arrays
+npm run example:nested-arrays  # http://localhost:5181
 ```
 
 `shipments[] → address{} → lines[]`。配列の中にオブジェクトがあり、その中にまた配列がある。

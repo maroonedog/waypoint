@@ -9,7 +9,8 @@ or a select, or what to put in `minlength`. This repository is the other half:
 a contract, and a form runtime built on it.
 
 📖 **[formcontract.dev](https://formcontract.dev)** — a form you can type into,
-with a render counter on every row. [Start](https://formcontract.dev/start/) ·
+with a render counter on every row and a tape under it printing every cell the
+runtime writes. [Start](https://formcontract.dev/start/) ·
 [Validation](https://formcontract.dev/validation/) ·
 [The runtime](https://formcontract.dev/runtime/) ·
 [Typed paths](https://formcontract.dev/paths/) ·
@@ -222,8 +223,9 @@ own calibration ladder resolved.
 ## Examples
 
 ```bash
-node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts examples/showcase
-node node_modules/vite/bin/vite.js --config examples/nested-arrays/vite.config.ts examples/nested-arrays
+npm run example:showcase        # http://localhost:5179
+npm run example:nested-arrays   # http://localhost:5181
+npm run docs:dev                # the documentation site, with the live form
 ```
 
 `showcase` is a real application form — 23 inputs across six sections, drawn
@@ -232,6 +234,9 @@ with Tailwind and Material Design 3. `nested-arrays` writes the same
 react-hook-form, Formik and TanStack Form, side by side on one page: same
 schema, same markup, same behaviour, and the only difference is how a field two
 levels inside a list says which row it belongs to. Both have their own README.
+
+Neither needs a build step: every example resolves the packages to their
+**source**, so an edit inside `packages/form-core` reloads the page.
 
 ## Where it stands
 

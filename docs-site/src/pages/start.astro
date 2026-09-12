@@ -124,13 +124,16 @@ const packages = [
   </p>
 
   <Code
-    code={`node node_modules/vite/bin/vite.js --config examples/nested-arrays/vite.config.ts examples/nested-arrays
-node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts examples/showcase`}
+    code={`npm run example:nested-arrays   # http://localhost:5181
+npm run example:showcase        # http://localhost:5179`}
+    label="shell"
   />
 
   <p class="caption">
     The second is a 23-input application form across six sections, drawn with
-    the application's own components. Both have their own README.
+    the application's own components. Both have their own README. Neither
+    needs a build: the packages resolve to their <strong>source</strong>, so
+    an edit inside <code>packages/form-core</code> reloads the page.
   </p>
 
   <section class="mt-16 rounded-xl border border-outline-variant p-6">
