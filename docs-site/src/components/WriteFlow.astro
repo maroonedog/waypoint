@@ -1,0 +1,115 @@
+---
+// ===========================================================================
+// WriteFlow.astro — one keystroke, drawn.
+//
+// It replaces four paragraphs that said the same thing in order, because the
+// thing being described IS an order: what is written, when the pass happens,
+// and why the pass being big does not make the notification big.
+//
+// Inline SVG with the MD3 tokens as fills, so it themes with the page and
+// carries no request of its own. The viewBox scales it; the text is kept
+// large enough to survive that.
+// ===========================================================================
+---
+
+<figure class="mt-8">
+  <!-- Scrolls rather than shrinks. Scaled to a 375px column the labels come
+       out around five pixels tall, which is a diagram nobody can read; the
+       minimum width keeps them legible and the page still never scrolls. -->
+  <div class="overflow-x-auto">
+  <svg
+    viewBox="0 0 720 392"
+    role="img"
+    aria-labelledby="writeflow-title writeflow-desc"
+    class="w-full min-w-[620px]"
+  >
+    <title id="writeflow-title">What one keystroke does</title>
+    <desc id="writeflow-desc">
+      setValue writes the root, the leaf and its dirty flag, plus any container
+      someone is reading. The validation request is coalesced into one
+      microtask, which judges the whole root once. The verdict is diffed per
+      path, so only the cells whose issues actually changed notify, and React
+      commits only those components.
+    </desc>
+
+    <defs>
+      <marker
+        id="writeflow-arrow"
+        viewBox="0 0 10 10"
+        refX="9"
+        refY="5"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+      >
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--md-outline)" />
+      </marker>
+    </defs>
+
+    <g
+      font-family="var(--md-font-sans, ui-sans-serif, system-ui, sans-serif)"
+      fill="var(--md-on-surface)"
+    >
+      <!-- 1. the write -->
+      <rect x="16" y="8" width="330" height="44" rx="8"
+        fill="var(--md-primary-container)" />
+      <text x="32" y="30" font-size="14" font-weight="600"
+        fill="var(--md-on-primary-container)">setValue("billing.postcode", "999")</text>
+      <text x="32" y="45" font-size="11.5"
+        fill="var(--md-on-primary-container)">synchronous, inside your event handler</text>
+
+      <line x1="60" y1="52" x2="60" y2="76" stroke="var(--md-outline)"
+        stroke-width="1.5" marker-end="url(#writeflow-arrow)" />
+
+      <!-- 2. fan-out -->
+      <rect x="16" y="80" width="330" height="76" rx="8"
+        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
+      <text x="32" y="102" font-size="13" font-weight="600">fan-out — 3 cells</text>
+      <text x="32" y="121" font-size="11.5" fill="var(--md-on-surface-variant)">the root · that leaf · its dirty flag</text>
+      <text x="32" y="139" font-size="11.5" fill="var(--md-on-surface-variant)">containers only if somebody is reading one</text>
+      <text x="368" y="121" font-size="11.5" fill="var(--md-on-surface-variant)">Whatever the depth of the path.</text>
+      <text x="368" y="139" font-size="11.5" fill="var(--md-on-surface-variant)">A leaf edit is not a tree walk.</text>
+
+      <line x1="60" y1="156" x2="60" y2="180" stroke="var(--md-outline)"
+        stroke-width="1.5" marker-end="url(#writeflow-arrow)" />
+
+      <!-- 3. coalesce -->
+      <rect x="16" y="184" width="330" height="60" rx="8"
+        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
+      <text x="32" y="206" font-size="13" font-weight="600">one microtask</text>
+      <text x="32" y="226" font-size="11.5" fill="var(--md-on-surface-variant)">every write of this turn, coalesced into one request</text>
+      <text x="368" y="206" font-size="11.5" fill="var(--md-on-surface-variant)">After the handler returns,</text>
+      <text x="368" y="224" font-size="11.5" fill="var(--md-on-surface-variant)">before the browser paints.</text>
+      <text x="368" y="242" font-size="11.5" fill="var(--md-on-surface-variant)">Three writes → one pass.</text>
+
+      <line x1="60" y1="244" x2="60" y2="268" stroke="var(--md-outline)"
+        stroke-width="1.5" marker-end="url(#writeflow-arrow)" />
+
+      <!-- 4. the pass -->
+      <rect x="16" y="272" width="330" height="44" rx="8"
+        fill="var(--md-secondary-container)" />
+      <text x="32" y="294" font-size="13" font-weight="600"
+        fill="var(--md-on-secondary-container)">validate(root) — the whole root, once</text>
+      <text x="32" y="309" font-size="11.5"
+        fill="var(--md-on-secondary-container)">which is how a rule can report against another field</text>
+
+      <line x1="60" y1="316" x2="60" y2="340" stroke="var(--md-outline)"
+        stroke-width="1.5" marker-end="url(#writeflow-arrow)" />
+
+      <!-- 5. the diff -->
+      <rect x="16" y="344" width="330" height="44" rx="8"
+        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
+      <text x="32" y="366" font-size="13" font-weight="600">issue diff — writes only what moved</text>
+      <text x="32" y="381" font-size="11.5" fill="var(--md-on-surface-variant)">400 fields judged; the one whose error changed wakes</text>
+      <text x="368" y="366" font-size="11.5" fill="var(--md-on-surface-variant)">Compute is the schema's size.</text>
+      <text x="368" y="384" font-size="11.5" fill="var(--md-on-surface-variant)">Notification is what changed.</text>
+    </g>
+  </svg>
+  </div>
+  <figcaption class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    The last box is the one that matters: the pass is proportional to the
+    schema, and the <em>notification</em> is proportional to what actually
+    moved. The demo above is this diagram running — one pass per settled
+    change, and a render count that only moves on the rows whose cells did.
+  </figcaption>
+</figure>

@@ -11,7 +11,12 @@ import { Code as Shiki } from "astro:components";
 
 interface Props {
   readonly code: string;
-  readonly lang?: string;
+  /**
+   * The two this site writes. Narrower than Shiki's own union on purpose:
+   * `string` does not satisfy it, and a typo in a language name should be a
+   * build error rather than an unhighlighted block nobody notices.
+   */
+  readonly lang?: "ts" | "tsx";
 }
 
 const { code, lang = "ts" } = Astro.props;

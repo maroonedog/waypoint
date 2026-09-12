@@ -1,0 +1,31 @@
+{
+  "extends": "astro/tsconfigs/strict",
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "paths": {
+      "form-contract": [
+        "../packages/spec/src/index.ts"
+      ],
+      "form-contract-resolver-zod": [
+        "../packages/resolver-zod/src/index.ts"
+      ],
+      "form-core": [
+        "../packages/form-core/src/index.ts"
+      ],
+      "form-react": [
+        "../packages/form-react/src/index.ts"
+      ],
+      "zod": [
+        "./node_modules/zod"
+      ]
+    }
+  }
+}

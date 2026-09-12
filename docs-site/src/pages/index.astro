@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
+import LiveForm from "../demo/LiveForm.tsx";
 
 const resolver = `
 type FormResolver<TSchema, T, TPath extends string = string> =
@@ -63,6 +64,26 @@ const layers = [
     >
   </p>
 
+  <!-- ================================================== live -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold">And here it is, running</h2>
+    <p class="mt-4 leading-relaxed text-on-surface-variant">
+      Built from the packages' source, not a recording. <strong
+        class="text-on-surface">The number on each row is how many times that
+      row has rendered.</strong> Type in <em>name</em> and only its own counter
+      moves. Change <em>billing</em> and the error appears on <em>shipping</em>,
+      a field you did not touch and did not declare a dependency on.
+    </p>
+
+    <LiveForm client:load />
+
+    <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+      <a class="text-primary underline underline-offset-4" href="/runtime/"
+        >What a write touches, and exactly when a verdict happens →</a
+      >
+    </p>
+  </section>
+
   <!-- ================================================== layers -->
   <section class="mt-20">
     <h2 class="text-2xl font-bold">Three heights, one primitive</h2>
@@ -86,20 +107,20 @@ const layers = [
       }
     </div>
     <p class="mt-6 leading-relaxed text-on-surface-variant">
-      A path is checked wherever it is written, including the ones a nested list
-      builds by interpolation — and nothing is passed down to make that work.{" "}
+      <strong class="text-on-surface">Mounting is a subscription and nothing
+      else.</strong> Every cell exists from <code>createForm</code>, so a
+      component never registers a field, seeds a default or resets anything on
+      unmount — and a field in a portal, in a lazily loaded chunk or behind a
+      condition stops being a case. No <code>shouldUnregister</code>, and no
+      inspection of the React tree anywhere in the runtime.
+    </p>
+    <p class="mt-6 leading-relaxed text-on-surface-variant">
+      Paths are checked wherever they are written, including the ones a nested
+      list builds by interpolation — with nothing passed down to make that
+      work.{" "}
       <a class="text-primary underline underline-offset-4" href="/paths/"
         >How a path gets a type →</a
       >
-    </p>
-    <p class="mt-6 leading-relaxed text-on-surface-variant">
-      <strong class="text-on-surface">Mounting is a subscription and nothing
-      else.</strong> Every cell exists from <code>createForm</code>, seeded from
-      the descriptors, so a component never registers a field, seeds a default
-      or resets anything on unmount. A field in a portal, in a lazily loaded
-      chunk or behind a condition is therefore not a case: there is no{" "}
-      <code>shouldUnregister</code> and no inspection of the React tree anywhere
-      in the runtime.
     </p>
   </section>
 
@@ -107,25 +128,18 @@ const layers = [
   <section class="mt-20">
     <h2 class="text-2xl font-bold">A rule can report against a field nobody touched</h2>
     <p class="mt-4 leading-relaxed text-on-surface-variant">
-      One whole-root pass per settled change, scattered back into per-path issue
-      cells, writing only where the content actually differs. So a cross-field
-      rule lands its error on the <em>other</em> path with no{" "}
-      <code>deps</code> array and no dependents list — and the same computation,
-      filtered to one path, is what <code>form.field(path).validate()</code>{" "}
-      runs, so a conditionally rendered field cannot get a different verdict
-      from a second engine.
+      That is the behaviour you just operated: one whole-root pass per settled
+      change, scattered back into per-path issue cells and written only where
+      the content differs, so a cross-field rule lands on the <em>other</em>{" "}
+      path with no <code>deps</code> array and no dependents list. The same
+      computation filtered to one path is what{" "}
+      <code>form.field(path).validate()</code> runs, so a conditionally
+      rendered field cannot get a different verdict from a second engine.
     </p>
     <p class="mt-4 leading-relaxed text-on-surface-variant">
-      The cost is stated rather than hidden: validation is proportional to the
-      schema on every settled change. The diff keeps <em>notification</em>{" "}
-      proportional to what moved; the pass itself judges the whole root.
-    </p>
-    <p class="mt-6 leading-relaxed text-on-surface-variant">
-      Writes coalesce into one pass per settled change, on a microtask — after
-      the event handler, before paint.{" "}
-      <a class="text-primary underline underline-offset-4" href="/runtime/"
-        >What a write touches, and exactly when a verdict happens →</a
-      >
+      The cost is stated rather than hidden: the pass judges the whole root
+      every settled change. Only the <em>notification</em> is proportional to
+      what moved.
     </p>
   </section>
 

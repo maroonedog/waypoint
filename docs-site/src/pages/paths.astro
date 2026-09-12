@@ -8,6 +8,7 @@
 // ===========================================================================
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
+import TypeAndInstance from "../components/TypeAndInstance.astro";
 
 const registration = `
 // src/form-registry.ts — one file, one declaration, one time.
@@ -104,32 +105,20 @@ const viewTypes = [
   <h2 class="mt-16 text-2xl font-bold">So the types do not travel</h2>
   <p class="mt-4 leading-relaxed text-on-surface-variant">
     The application states them once, in its own source, and every hook reads
-    them from there.
+    them from there. The instance and the type take different roads:
   </p>
+
+  <TypeAndInstance />
 
   <Code code={registration} />
   <Code code={usage} lang="tsx" />
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Nothing is passed down and nothing is asserted. A component ten levels deep
-    imports nothing, receives nothing, and is still checked.
-  </p>
-
-  <p class="mt-6 rounded-lg border border-outline-variant p-5 leading-relaxed">
-    <strong>A module augmentation belongs to the compilation, not to the import
-    graph.</strong> That is what lets a component that never imports the registry
-    be checked by it. It also means a registration file dropping out of{" "}
-    <code>tsconfig</code>'s <code>include</code> fails <em>loudly</em> rather
-    than degrading to <code>string</code> — the compiler quotes the declaration
-    you are missing, verbatim, in the error.
-  </p>
 
   <h2 class="mt-16 text-2xl font-bold">Interpolated paths stay checked</h2>
   <p class="mt-4 leading-relaxed text-on-surface-variant">
     Checking that stops at the first array is not worth much, because a nested
     form is where paths are actually built by hand. A row carries its own
-    address, and that address is typed as a place in its own list — so a path
-    assembled three levels down is still a path the registry recognises.
+    address, typed as a place in its own list, so a path assembled three levels
+    down is still one the registry recognises.
   </p>
 
   <Code code={rows} lang="tsx" />

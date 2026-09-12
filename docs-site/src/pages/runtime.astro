@@ -2,53 +2,62 @@
 // ===========================================================================
 // runtime.astro — what a write touches, and when a verdict happens.
 //
-// Every figure on this page came from running the thing, not from reading it:
-// a counting adapter around the real resolver, and subscription counters on
-// three cells. The tables are what it printed.
+// The demo comes before the prose because it is better evidence than the
+// prose. Every figure here was produced by running the runtime with a counting
+// adapter, and a reader can reproduce two of them by typing.
 // ===========================================================================
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
+import WriteFlow from "../components/WriteFlow.astro";
+import LiveForm from "../demo/LiveForm.tsx";
 
 const writing = `
-// Every write goes through a handle. There is no setState, no form object to
-// spread, and no path string that only the runtime understands.
 form.field("owner.name").setValue("Grace");
-form.field("items[0].sku").setValue("A-1");
 
 form.rows("items").insert(2, { sku: "" });
 form.rows("items").remove(0);
 form.rows("items").move(0, 2);
 
-form.reset();                    // back to the defaults it was built with
-form.reset(otherDefaults);       // or to different ones
+form.reset();                 // back to the defaults it was built with
+await form.submit(save);      // judges first; hands over only if nothing blocks
 `;
 
-const coalesced = `
-// One event handler, three writes.
-function applyPreset() {
-  form.field("owner.name").setValue("Grace");
-  form.field("owner.nick").setValue("grace");
-  form.field("items[0].sku").setValue("A-1");
-}
-// -> 0 validation passes so far.
-// -> 1 pass, one microtask later: after the handler returns, before paint.
+const asking = `
+field.issues                  // what they are now
+await field.issuesFor("999")  // what they would be. Writes nothing at all.
+field.validate()              // the form's own pass, filtered to this path
+
+const { submitted, blockedBy } = await form.submit(save);
+// blockedBy carries every blocking issue, including paths with no component,
+// so an application can open the right section rather than disable a button.
 `;
 
 const asyncOne = `
-// Passes are numbered. Type, wait, type again, and the slow answer to the
-// first one arrives after the second has been committed.
+// Passes are numbered, so a slow answer that has been overtaken is dropped.
 field.setValue("Ad");    // pass 1 leaves, asking the server
 field.setValue("Ada");   // pass 2 leaves
 // pass 2 answers  -> committed
 // pass 1 answers  -> DROPPED. It describes a root that is no longer there.
 `;
 
-const submitting = `
-const outcome = await form.submit((root) => save(root));
-
-outcome.submitted   // false when anything blocked
-outcome.blockedBy   // every blocking issue, including paths with no component
-`;
+const TRY = [
+  [
+    "Type in name",
+    "Only that row's counter moves. The other four do not render at all — a component subscribes to the cells it reads and to nothing else.",
+  ],
+  [
+    "Change billing",
+    "The error lands on shipping, a field you did not touch, with no deps array anywhere. One pass judges the whole root and the diff writes wherever the verdict moved.",
+  ],
+  [
+    "Switch to useUncontrolledField, then type a valid value",
+    "The counter does not move at all. Same cell, subscribed imperatively, writing the DOM node instead of re-rendering.",
+  ],
+  [
+    "Watch validator passes",
+    "One per settled change, however many fields that change touched.",
+  ],
+];
 
 // Measured with a counting adapter wrapped around the real zod resolver.
 const triggers = [
@@ -81,42 +90,42 @@ const woken = [
 
 <Base
   title="The runtime — form-contract"
-  description="How a value is written, what one write touches, and exactly when validation fires. One coalesced whole-root pass per settled change, with the verdict scattered back only onto the paths whose issues actually moved."
+  description="A live form you can type into, with a render counter on every row. One coalesced whole-root pass per settled change, and a verdict scattered back only onto the paths whose issues actually moved."
 >
   <h1 class="text-3xl font-bold sm:text-4xl">How a value changes</h1>
 
   <p class="mt-6 leading-relaxed text-on-surface-variant">
     Values live in a flat, path-keyed cell space outside React. A component
     does not own a value and does not lift one: it subscribes to the cells it
-    reads, and writes through a handle addressed by path.
+    reads, and writes through a handle addressed by path. Below is that
+    runtime, running — <strong class="text-on-surface">the number on each row
+    is how many times that row has rendered.</strong>
+  </p>
+
+  <LiveForm client:load />
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+    {
+      TRY.map(([what, why]) => (
+        <div class="rounded-lg bg-surface-low p-4">
+          <p class="text-sm font-medium">{what}</p>
+          <p class="mt-1.5 text-sm leading-relaxed text-on-surface-variant">{why}</p>
+        </div>
+      ))
+    }
+  </div>
+
+  <h2 class="mt-16 text-2xl font-bold">What one keystroke does</h2>
+
+  <WriteFlow />
+
+  <h2 class="mt-16 text-2xl font-bold">Writing</h2>
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Every write goes through a handle. There is no <code>setState</code>, no
+    form object to spread, and no path that only the runtime understands.
   </p>
 
   <Code code={writing} />
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    One <code>setValue</code> writes the root, the leaf's own cell, its dirty
-    flag — and of its containers, only the ones somebody is currently reading.
-    A leaf edit with no container on screen touches three cells, whatever the
-    depth of the path.
-  </p>
-
-  <h2 class="mt-16 text-2xl font-bold">Validation fires once per settled change</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    A single user action is many writes, and judging on each of them would run
-    the whole schema several times for one keystroke. Requests are coalesced
-    into <strong class="text-on-surface">one microtask</strong>: the pass runs
-    after the event handler has returned and before the browser paints, so
-    nothing renders twice and no verdict is a frame late.
-  </p>
-
-  <Code code={coalesced} />
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    The microtask comes from a resolved promise rather than{" "}
-    <code>queueMicrotask</code>, which is a host global — this runtime depends
-    on the language and not on an environment, because it runs wherever a
-    validator does.
-  </p>
 
   <h2 class="mt-16 text-2xl font-bold">What asks for a pass, and what does not</h2>
 
@@ -156,12 +165,6 @@ const woken = [
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Who gets woken</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Computation is proportional to the schema; notification is proportional to
-    what actually moved. Paths that <em>had</em> issues are revisited as well as
-    paths that have them now, so a fixed error is cleared rather than left on
-    screen.
-  </p>
 
   <div class="mt-6 overflow-x-auto">
     <table class="w-full text-sm">
@@ -188,57 +191,35 @@ const woken = [
     </table>
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">A validator that has to ask something</h2>
+  <h2 class="mt-16 text-2xl font-bold">Asking, submitting, and asking slowly</h2>
+
+  <Code code={asking} />
+
   <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>validate</code> may return a promise, so a rule can ask a server
-    whether a handle is taken. While any pass is in flight{" "}
-    <code>form.validating</code> is <code>true</code>.
+    <code>issuesFor</code> is a question rather than an action: it judges a
+    value that is <em>not</em> in the form and writes nothing at all. A probe
+    that mutated the store would move every other field's answer as a side
+    effect of being asked. <code>submit</code> is the opposite — it judges the
+    whole root first, so a field nobody mounted is judged too, because a form
+    that submits with the offending input off screen is the defect this
+    prevents.
   </p>
 
   <Code code={asyncOne} />
 
   <p class="mt-4 leading-relaxed text-on-surface-variant">
-    A late answer is dropped rather than written — otherwise typing during a
-    slow check would flicker the form back to the verdict for what was typed
-    before. A pass that <em>throws</em> leaves the previous verdict standing: an
-    error reaching the network is not evidence that the form became acceptable.
-  </p>
-
-  <h2 class="mt-16 text-2xl font-bold">Submitting</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    Submit judges the whole root first, so a field nobody has mounted is judged
-    too. A form that submits because the offending input was off screen is the
-    defect this exists to prevent.
-  </p>
-
-  <Code code={submitting} />
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    What blocks is reported rather than counted, and <code>blockedBy</code>{" "}
-    carries the path — so an application can open the right section instead of
-    showing a disabled button with no explanation. The handler runs only when
-    nothing blocks, and a handler that throws leaves the form not submitted
-    rather than half submitted.
-  </p>
-
-  <h2 class="mt-16 text-2xl font-bold">Asking without writing</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>field.issuesFor(candidate)</code> answers for a value that is{" "}
-    <em>not</em> in the form, and writes nothing — no value, no issue cell, no cross-field
-    verdict. Asking whether a value would be acceptable is not the same as
-    putting it in the form, and a probe that mutated the store would move every
-    other field's verdict as a side effect of the question.
-  </p>
-
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
-    <code>field.validate()</code> is the opposite: it is the form's own pass,
-    filtered to that path, so a conditionally rendered field cannot get a
-    different answer from a second engine.
+    <code>validate</code> may return a promise, so a rule can ask a server
+    whether a handle is taken. While any pass is in flight{" "}
+    <code>form.validating</code> is true, a late answer is dropped rather than
+    written, and a pass that <em>throws</em> leaves the previous verdict
+    standing — an error reaching the network is not evidence that the form
+    became acceptable.
   </p>
 
   <p class="mt-10 text-sm leading-relaxed text-on-surface-variant">
-    Every number on this page was produced by running the runtime with a
+    Every figure on this page was produced by running the runtime with a
     counting adapter wrapped around the real zod resolver, and subscription
-    counters on the cells — not by reading the source.
+    counters on the cells. The demo is that same runtime, built from the
+    packages' source rather than from a copy of it.
   </p>
 </Base>
