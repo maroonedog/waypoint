@@ -86,6 +86,32 @@ items.insert(items.rows.length, { sku: "" });`,
   },
 ];
 
+// The answer to "why would I use this", which is a different question from
+// "how do I write it" and was the one the page never answered. Each row is a
+// thing a reader is doing today, beside the thing they would stop doing.
+const GAINS: readonly (readonly [string, string])[] = [
+  [
+    "Writing min(3) in the schema and minLength={3} again in the JSX, and finding out they disagreed from a user.",
+    "The input carries required, minlength, min, max, step and pattern straight off the schema. You write them once.",
+  ],
+  [
+    "Keeping a list of which field depends on which, and renaming a field without remembering to update it.",
+    "A rule comparing two fields puts its message on the other field. There is no dependency list to keep.",
+  ],
+  [
+    "A form that submits because the broken input was behind a collapsed section, or unregistered itself when it unmounted.",
+    "A hidden field keeps its value, still validates, still blocks — and submit hands back the paths that blocked it, component or no component.",
+  ],
+  [
+    "A typo in a field name rendering an empty input that is never validated and says nothing.",
+    "It does not compile. Inside arrays too, and with a computed row index.",
+  ],
+  [
+    "Choosing between a form that re-renders on every keystroke and one that tells you nothing until submit.",
+    "A keystroke is zero commits when you want it, and the verdict still arrives on the same pass.",
+  ],
+];
+
 // What a reader is actually shopping for. Every row is something the
 // repository does or plainly does not — the two it does not are in the table
 // because a capability list without them is an advertisement.
@@ -197,7 +223,36 @@ const TRY = [
     >
   </div>
 
-  <Code code={whole} label="the whole idea" />
+  <!-- ================================================== what you stop doing -->
+  <section class="mt-16">
+    <h2 class="text-2xl font-bold">What you stop doing</h2>
+
+    <div class="mt-6 grid gap-px overflow-hidden rounded-xl bg-outline-variant sm:grid-cols-2">
+      <div class="bg-surface-low px-5 py-3">
+        <p class="label">Today</p>
+      </div>
+      <div class="bg-surface-low px-5 py-3">
+        <p class="label">With this</p>
+      </div>
+      {
+        GAINS.map(([today, here]) => (
+          <>
+            <div class="bg-surface px-5 py-4">
+              <p class="text-sm leading-relaxed text-on-surface-variant">{today}</p>
+            </div>
+            <div class="bg-surface px-5 py-4">
+              <p class="text-sm leading-relaxed">{here}</p>
+            </div>
+          </>
+        ))
+      }
+    </div>
+
+    <p class="caption">
+      Every row is something the repository does, and the pages under
+      each one say which test or measurement holds it up.
+    </p>
+  </section>
 
   <!-- ================================================== live -->
   <section class="mt-20">
@@ -219,6 +274,12 @@ const TRY = [
     <p class="caption">
       The real library, built from source.
     </p>
+  </section>
+
+  <!-- ================================================== the whole idea -->
+  <section class="mt-20">
+    <h2 class="text-2xl font-bold">All of that, in ten lines</h2>
+    <Code code={whole} label="the whole idea" />
   </section>
 
   <!-- ================================================== what you can build -->
