@@ -36,9 +36,8 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, createFormHooks, forgetWarnings } = await import(
-  "form-react"
-);
+const { FormProvider, createFormHooks, forgetUnaddressableWarnings, useField, useFieldIssues } =
+  await import("form-react");
 
 const { act, createElement: h } = React;
 
@@ -71,7 +70,7 @@ const otherForm = () =>
 
 /** Renders, and collects what was warned and whatever escaped. */
 async function mountCatching(element) {
-  forgetWarnings();
+  forgetUnaddressableWarnings();
   const container = dom.window.document.createElement("div");
   dom.window.document.body.appendChild(container);
   const root = createRoot(container);
@@ -160,8 +159,8 @@ test("the same path is warned about once, not once per render", async () => {
 });
 
 test("hooks rendered under a DIFFERENT form's provider warn", async () => {
-  // The one mistake the types cannot see: these hooks carry the order form's
-  // paths, and nothing stops them being rendered somewhere else.
+  // The one mistake the types cannot see. The store the component is actually
+  // inside is what answers, so it needs no separate check in the hooks.
   function Screen() {
     OrderForm.useFieldValue("billing.postcode");
     return null;
@@ -170,7 +169,7 @@ test("hooks rendered under a DIFFERENT form's provider warn", async () => {
     h(FormProvider, { form: otherForm() }, h(Screen))
   );
   assert.equal(escaped, null);
-  assert.match(warned, /not a field this form declares/);
+  assert.match(warned, /not a field this form has/);
   root.unmount();
 });
 
@@ -255,5 +254,59 @@ test("a computed row index is addressable too", async () => {
   assert.equal(escaped, null);
   assert.equal(warned, "");
   assert.equal(text(container, "v"), "b");
+  root.unmount();
+});
+
+// ---------------------------------------------------------------------------
+// The check belongs to the STORE, not to the typed hooks. Two consequences,
+// and the second is a bug this pins closed.
+// ---------------------------------------------------------------------------
+
+test("the plain hooks warn too, not only the typed ones", async () => {
+  // The hole as it actually shipped: the check lived in createFormHooks, so
+  // useField — which the examples and the showcase all use — was silent.
+  function Screen() {
+    const typo = useField("billing.postcod");
+    return h("span", { id: "v" }, String(typo.value));
+  }
+  const { container, root, escaped, warned } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.equal(escaped, null);
+  assert.match(warned, /billing.postcod/);
+  assert.equal(text(container, "v"), "undefined");
+  root.unmount();
+});
+
+test("a container is addressable, and must not warn", async () => {
+  // A resolver emits LEAF descriptors only, so "items" and "billing" have
+  // none — and both are legitimate: an array-level issue lands on the first
+  // and reading a whole object is ordinary. Asking "has a descriptor" warned
+  // about both, which is why the question is "is it a leaf or an ancestor".
+  function Screen() {
+    useFieldIssues("items");   // 配列レベルの issue
+    useField("billing");       // オブジェクトまるごと
+    useFieldIssues("items[0]"); // 行そのもの
+    return null;
+  }
+  const { root, escaped, warned } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.equal(escaped, null);
+  assert.equal(warned, "", "a container is not a mistake");
+  root.unmount();
+});
+
+test("a row that does not exist yet is addressable", async () => {
+  // items[9] is a real field of the form whose row has not been inserted. That
+  // is a question about data, not about addressing.
+  function Screen() {
+    useField("items[9].sku");
+    return null;
+  }
+  const { root, warned } = await mountCatching(
+    h(FormProvider, { form: orderForm() }, h(Screen))
+  );
+  assert.equal(warned, "");
   root.unmount();
 });

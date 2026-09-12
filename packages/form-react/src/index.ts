@@ -3,11 +3,11 @@ export { FormProvider, type FormProviderProps } from "./form-provider.js";
 export { useCreateForm } from "./use-create-form.js";
 export { useForm } from "./use-form.js";
 export { useCell } from "./use-cell.js";
+export { forgetUnaddressableWarnings } from "form-core";
 export { useField } from "./use-field.js";
 export { useUncontrolledField } from "./use-uncontrolled-field.js";
 export {
   createFormHooks,
-  forgetWarnings,
   type FormHooks,
   type PathsOf,
   type ValuesOf,

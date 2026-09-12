@@ -30,6 +30,7 @@ export { seedRootValue } from "./descriptors/seed-root-value.js";
 export { NO_ISSUES } from "./runtime/interned-defaults.js";
 export type { CellSource } from "./runtime/cell-source.js";
 export { createForm } from "./runtime/create-form.js";
+export { forgetUnaddressableWarnings } from "./runtime/warn-unaddressable.js";
 export type {
   FieldHandle,
   FieldSources,
@@ -43,6 +44,10 @@ export { assertConcretePath } from "./path/assert-concrete-path.js";
 export { rowsCell } from "./store/cell-key.js";
 export { NO_ROWS } from "./runtime/interned-defaults.js";
 export type { RowsHandle } from "./runtime/create-rows-handle.js";
+export {
+  createAddressablePaths,
+  type AddressablePaths,
+} from "./descriptors/addressable-paths.js";
 export {
   createDescriptorIndex,
   type DescriptorIndex,

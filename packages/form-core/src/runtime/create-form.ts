@@ -24,6 +24,8 @@ import { assertConcretePath } from "../path/assert-concrete-path.js";
 import { declaredPathOf } from "../path/declared-path-of.js";
 import { buildDescriptorTree } from "../descriptors/build-descriptor-tree.js";
 import { createDescriptorIndex } from "../descriptors/descriptor-index.js";
+import { createAddressablePaths } from "../descriptors/addressable-paths.js";
+import { warnUnaddressable } from "./warn-unaddressable.js";
 import { seedFormCells } from "../descriptors/seed-form-cells.js";
 import { seedRootValue } from "../descriptors/seed-root-value.js";
 import { createRowIdMinter } from "./row-index.js";
@@ -52,6 +54,7 @@ export function createForm<T, TPath extends string = string>(
   const store: FormCellStore = options.store ?? createCellStore();
   const descriptors = adapter.fields;
   const index = createDescriptorIndex(descriptors);
+  const addressable = createAddressablePaths(descriptors);
   const tree = buildDescriptorTree(descriptors);
   const minter = createRowIdMinter();
   const participation = createParticipationIndex();
@@ -116,6 +119,10 @@ export function createForm<T, TPath extends string = string>(
 
     field(path) {
       assertConcretePath(path);
+      // The store is what knows the paths, so this is the one place that has
+      // to ask. Every hook, every component and every non-React caller comes
+      // through here, and none of them keeps its own idea of what exists.
+      if (!addressable.has(path)) warnUnaddressable(path, addressable);
       return handles.of(path, () =>
         createFieldHandle({
           store,

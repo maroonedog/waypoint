@@ -30,7 +30,6 @@
 // a thrown error in JavaScript too, where the types are not there to help.
 // ===========================================================================
 import type { AddressablePath, FormAdapter, FormIssue } from "form-contract";
-import { declaredPathOf, type FormHandle } from "form-core";
 import type {
   FieldBinding,
   UncontrolledFieldBinding,
@@ -40,7 +39,6 @@ import { useFieldValue } from "./use-field-value.js";
 import { useFieldValues } from "./use-field-values.js";
 import { useFieldIssues } from "./use-field-issues.js";
 import { useUncontrolledField } from "./use-uncontrolled-field.js";
-import { useForm } from "./use-form.js";
 
 export interface FormHooks<T, TPath extends string> {
   useField<TValue = unknown>(path: AddressablePath<TPath>): FieldBinding<TValue>;
@@ -60,97 +58,33 @@ export type ValuesOf<H> = H extends FormHooks<infer T, string> ? T : never;
 /** The paths a set of hooks accepts. */
 export type PathsOf<H> = H extends FormHooks<unknown, infer P> ? P : never;
 
-/**
- * WARNED, NOT THROWN. A field addressed at a path the form does not declare is
- * inert: it draws nothing and it validates nothing. It cannot, however, let
- * bad data through — the pass judges the whole ROOT, so the verdict and the
- * submit gate are both still correct, and what has actually broken is one
- * field's display.
- *
- * Throwing takes the entire form down for that. A warning names the mistake
- * loudly in the console, in development and production alike, and leaves the
- * other two hundred fields working. TypeScript callers never reach either:
- * the path is a compile error.
- *
- * Once per distinct path, because a form re-renders and a warning repeated on
- * every keystroke is a warning nobody reads.
- */
-const alreadyWarned = new Set<string>();
-
-const warnUndeclared = (wanted: string, known: ReadonlySet<string>): void => {
-  if (alreadyWarned.has(wanted)) return;
-  alreadyWarned.add(wanted);
-  const asRule = declaredPathOf(wanted);
-  if (asRule !== wanted && known.has(asRule)) {
-    console.warn(
-      `[form-contract] "${wanted}" names one row of "${asRule}", and this form ` +
-        "has no such row right now. The field will draw nothing until it does."
-    );
-    return;
-  }
-  const near = [...known].filter(
-    (one) =>
-      one.startsWith(wanted.slice(0, 4)) || wanted.startsWith(one.slice(0, 4))
-  );
-  console.warn(
-    `[form-contract] "${wanted}" is not a field this form declares, so it will ` +
-      "draw nothing and validate nothing." +
-      (near.length === 0 ? "" : ` Did you mean: ${near.slice(0, 4).join(", ")}?`)
-  );
-};
-
-/** Test seam: the warning is once per path for the life of the module. */
-export const forgetWarnings = (): void => alreadyWarned.clear();
-
-/**
- * Declared paths per handle, computed once. Building the set per render would
- * be O(fields) inside every field, which is O(fields squared) for the form —
- * the exact shape of cost the rest of this runtime exists to avoid.
- */
-const declaredBy = new WeakMap<object, ReadonlySet<string>>();
-
-const declaredPathsOf = (form: FormHandle<unknown, string>): ReadonlySet<string> => {
-  const cached = declaredBy.get(form);
-  if (cached !== undefined) return cached;
-  const built = new Set(form.descriptors.map((field) => field.path));
-  declaredBy.set(form, built);
-  return built;
-};
-
 export function createFormHooks<T, TPath extends string>(
   adapter: FormAdapter<T, TPath>
 ): FormHooks<T, TPath> {
+  // Types only. Whether a path exists is the STORE's question — it holds the
+  // descriptors, every caller funnels through form.field(), and a second
+  // answer kept here was both a duplicate and a wrong one: it was built from
+  // adapter.fields, which carries leaves only, so it warned about "items" and
+  // "owner" — an array-level issue and a container read, both legitimate.
   const fromAdapter = new Set<string>(adapter.fields.map((field) => field.path));
 
   // Checked against the ENCLOSING form, not only against the adapter this
   // closed over: rendering these hooks under a different form's provider is
   // the one mistake the types cannot see, and it is the same lookup that
   // catches a typo, so both cost one set probe.
-  const useCheckedPath = (path: string): string => {
-    const form = useForm();
-    const wanted = path;
-    // A concrete index is a place, not a rule, so it is checked as its rule.
-    const asRule = declaredPathOf(wanted);
-    const here = declaredPathsOf(form);
-    if (!fromAdapter.has(asRule) || !here.has(asRule)) {
-      warnUndeclared(wanted, here);
-    }
-    return path;
-  };
-
   return {
     adapter,
     useField: <TValue,>(path: AddressablePath<TPath>): FieldBinding<TValue> =>
-      useField<TValue>(useCheckedPath(path)),
+      useField<TValue>(path),
     useUncontrolledField: <TValue,>(
       path: AddressablePath<TPath>
     ): UncontrolledFieldBinding<TValue> =>
-      useUncontrolledField<TValue>(useCheckedPath(path)),
+      useUncontrolledField<TValue>(path),
     useFieldValue: <TValue,>(path: AddressablePath<TPath>): TValue | undefined =>
-      useFieldValue<TValue>(useCheckedPath(path)),
+      useFieldValue<TValue>(path),
     useFieldValues: <TValue,>(path: AddressablePath<TPath>): readonly TValue[] =>
-      useFieldValues<TValue>(useCheckedPath(path)),
+      useFieldValues<TValue>(path),
     useFieldIssues: (path: AddressablePath<TPath>): readonly FormIssue[] =>
-      useFieldIssues(useCheckedPath(path)),
+      useFieldIssues(path),
   };
 }

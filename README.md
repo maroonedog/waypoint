@@ -187,15 +187,27 @@ too, since a bare `useField` is a hook name by itself — it just stops naming
 which form. React itself does not care: the runtime only sees call order.
 
 At run time these still read the enclosing `<FormProvider>`, so a nested
-component stays propless. What they add is a check that the path is one the
-enclosing form declares, which makes the same mistake loud in JavaScript and
-catches the one thing the types cannot see — hooks rendered under a different
-form's provider.
+component stays propless. They add **types and nothing else**: whether a path
+exists is the store's question, and the store answers it for every caller.
+
+```
+[form-contract] "billing.postcod" is not a field this form has, so it will draw
+nothing and validate nothing. Did you mean: billing.postcode?
+```
+
+That comes from `form.field()`, which every hook, every `<Field>` and every
+non-React caller funnels through — so plain `useField` is as loud as the typed
+one, and a component rendered under a different form's provider is caught by
+the store it is actually inside.
 
 It **warns**, once per path; it does not throw. A mis-addressed field is inert,
 but it cannot let bad data through: the pass judges the whole root, so the
 verdict and the submit gate stay correct and what broke is one field's display.
-Taking the whole form down for that would be the larger failure.
+
+A path counts as existing when it is a declared leaf **or an ancestor of one**.
+A resolver emits leaves only, so `items` and `billing` have no descriptor while
+both are perfectly ordinary to address — an array-level issue lands on the
+first, and reading a whole object is a normal thing to want.
 
 Plain `useField` remains, unnarrowed, as the escape hatch: a record field
 addressed dynamically has no declared path to check against.
@@ -464,7 +476,7 @@ every attack on the method and what was done about it.
 
 ## Where it stands
 
-The runtime is complete against its design and is exercised by 114 tests, a
+The runtime is complete against its design and is exercised by 117 tests, a
 compile-time test that pins the path union, and a screen that uses all of it.
 It has not been published, and it has not been run in production by anyone.
 
