@@ -7,13 +7,13 @@
     "access": "public"
   },
   "author": "maroonedog",
-  "homepage": "https://github.com/maroonedog/form-contract#readme",
+  "homepage": "https://github.com/maroonedog/waypoint#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maroonedog/form-contract.git"
+    "url": "git+https://github.com/maroonedog/waypoint.git"
   },
   "bugs": {
-    "url": "https://github.com/maroonedog/form-contract/issues"
+    "url": "https://github.com/maroonedog/waypoint/issues"
   },
   "type": "module",
   "engines": {

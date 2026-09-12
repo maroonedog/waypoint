@@ -100,7 +100,7 @@ grammar and of describing a union branch.
 
 Nobody has run this in production yet. The full argument, the measurements and
 the benchmark are in
-[the repository](https://github.com/maroonedog/form-contract); the
+[the repository](https://github.com/maroonedog/waypoint); the
 documentation site is in `docs-site/` and is not served anywhere yet.
 
 MIT.

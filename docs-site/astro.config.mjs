@@ -74,7 +74,7 @@ export default defineConfig({
   // changes this line and puts `docs-site/public/CNAME` back; until then every
   // `og:url` and the sitemap name a page nobody is serving, and the README
   // says so rather than leaving a reader to find out.
-  site: "https://maroonedog.github.io/form-contract",
+  site: "https://maroonedog.github.io/waypoint",
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],

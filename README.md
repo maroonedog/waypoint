@@ -53,7 +53,7 @@ seventh is the one that made the other two smaller.
 | `@maroonedog/waypoint/store-zustand` | A zustand-backed store, as a shipped instance of the store contract `./core` exports. |
 
 Nothing here is published yet. Clone
-[the repository](https://github.com/maroonedog/form-contract) — it still
+[the repository](https://github.com/maroonedog/waypoint) — it still
 answers to `form-contract`, because renaming the package and renaming the
 GitHub repository are separate decisions and only the first has been taken —
 then `npm install` and `npm run verify`, which builds the package and runs the
