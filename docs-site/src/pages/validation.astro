@@ -1,0 +1,290 @@
+---
+// ===========================================================================
+// validation.astro — the claims that were being re-argued on five pages.
+//
+// Each of these was thirty words somewhere else: on the home page, on the
+// runtime page, in an API summary. They are one owner now, and every other
+// page links here rather than making the argument again in its own words —
+// two owners of one claim is how two pages come to disagree.
+//
+// Every claim below was checked against the test that pins it. Where a test
+// pins something narrower than the claim wanted to say, the claim was cut
+// down to the test.
+// ===========================================================================
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+
+const crossField = `
+// The schema the live demo on this site runs on.
+.superRefine((value, ctx) => {
+  if (value.billing.postcode !== value.shipping.postcode) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["shipping", "postcode"],   // NOT the field being typed in
+      message: "Does not match billing",
+    });
+  }
+})
+`;
+
+const unrendered = `
+// No React in this test at all. Two fields, neither of them mounted.
+const outcome = await form.submit(save);
+
+outcome.submitted;   // false — the handler never ran
+outcome.blockedBy.map((issue) => issue.path).sort();
+// ["owner.email", "owner.name"]
+`;
+
+const participation = `
+const form = useForm();
+
+useParticipation(form, "shipping", !sameAsBilling);
+`;
+
+const submitTypes = `
+interface SubmitOutcome {
+  readonly submitted: boolean;
+  /** Empty when the form was handed over. */
+  readonly blockedBy: readonly FormIssue[];
+}
+
+type SubmitHandler = (root: unknown) => void | Promise<void>;
+`;
+
+const asyncOne = `
+const adapter = {
+  fields: base.fields,
+  async validate(root) {
+    const local = base.validate(root);
+    const taken = await isHandleTaken(root.handle);
+    return taken
+      ? [...local, { path: "handle", message: "Already taken" }]
+      : local;
+  },
+};
+`;
+
+const numbered = `
+field.setValue("Ad");    // pass 1 leaves, asking the server
+field.setValue("Ada");   // pass 2 leaves
+// pass 2 answers -> committed
+// pass 1 answers -> DROPPED. It describes a root that is no longer there.
+`;
+
+// Read out of config/form-baseline.json: subject form-contract-use-field,
+// scenario K1 — one keystroke whose verdict does not move.
+const cost = [
+  ["31", "1", "31"],
+  ["61", "1", "61"],
+  ["201", "1", "201"],
+];
+
+// Measured with a counting adapter around the real zod resolver.
+const triggers = [
+  ["field.setValue(next)", "1", "Coalesced: many writes in one turn are one pass."],
+  ["rows.insert / remove / move", "1", "Each edit changes the root — a refused edit does not."],
+  ["field.setParticipating(b)", "1", "What blocks a submit changed."],
+  ["form.reset(...)", "1", "The new root has not been judged yet."],
+  ["form.validate()", "1", "Immediately, not on the microtask."],
+  ["field.issuesFor(candidate)", "1", "On a probe root. Writes nothing at all."],
+  ["form.submit(handler)", "1", "Immediately, before the handler is considered."],
+  ["field.markTouched()", "0", "Touched is display state. Nothing to re-judge."],
+  ["createForm(...)", "0", "Nothing is judged until something asks."],
+];
+---
+
+<Base
+  title="Validation — form-contract"
+  description="One pass judges the whole root on every settled change. That is what lets a rule report against a field that did not move, what lets an unrendered field block a submit — and what it costs."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">Validation</h1>
+
+  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+    <strong class="text-on-surface">Every settled change judges the whole
+    root.</strong> That is what lets a rule report against a field that did not
+    move, and what lets a field nobody rendered still block a submit. It is
+    also what it costs.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">A rule that spans two fields</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    A rule comparing two fields puts its message on the one it chooses — and
+    nothing in your application lists which field depends on which.
+  </p>
+
+  <Code code={crossField} />
+
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    The demo on the <a class="text-primary underline underline-offset-4" href="/"
+      >home page</a
+    > runs exactly that: change billing, and the message appears on shipping. Two
+    tests pin the halves of it — an edit to one field moving the verdict on
+    another path, and a rule reading a sibling whose component is
+    <em>not mounted</em>. The benchmark asks every subject for it as scenario
+    X1, and at all three sizes one configuration is scored{" "}
+    <em>disagrees</em> there: <code>react-hook-form-scoped</code>, which showed
+    no message at all.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">A field nobody has rendered</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    A field behind a tab, a lazy chunk or an <code>if</code> keeps its value,
+    still blocks a submit, and paints the current value and the current error
+    on its first render when it comes back.
+  </p>
+
+  <Code code={unrendered} />
+
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    <code>blockedBy</code> carries the path, so an application can open the
+    right section instead of disabling a button with no explanation. Mounting
+    is a subscription and nothing else: every cell exists from{" "}
+    <code>createForm</code>, and subscribing re-derives the value from the
+    root, so a component that was absent for a write starts from what the form
+    actually holds.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">Hiding a section without throwing its data away</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    A subtree switched off stops blocking a submit and keeps every value it
+    holds, so a rule that compares against it goes on reading it.
+  </p>
+
+  <Code code={participation} />
+
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <tbody>
+        <tr class="hairline">
+          <td class="w-40 py-3 pr-4 align-top font-medium">Changes</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            <code>errorCount</code> drops that subtree's issues; a submit is no
+            longer blocked by them; a dormant field's own issues cell reads
+            empty.
+          </td>
+        </tr>
+        <tr class="hairline">
+          <td class="w-40 py-3 pr-4 align-top font-medium">Does not change</td>
+          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+            The values in <code>readRoot()</code>; that the pass judges the
+            subtree at all; the count once it is switched back on — the hook's
+            teardown puts it back.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="mt-16 text-2xl font-bold">What submit says when it refuses</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    Submit judges first and reports what stopped it, rather than returning a
+    boolean and leaving you to find out.
+  </p>
+
+  <Code code={submitTypes} />
+
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    The handler runs only when nothing blocks. A handler that throws does not
+    resolve — submit rejects — and the attempt still counts, so{" "}
+    <code>submitCount</code> goes up either way.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">A validator that has to ask something</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    A uniqueness check against a server is the same member: <code>validate</code>{" "}
+    may return a promise, and nothing downstream pays for the possibility when
+    it does not.
+  </p>
+
+  <Code code={asyncOne} />
+  <Code code={numbered} />
+
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    <code>form.validating</code> is true only while a pass is in flight. A pass
+    that <em>throws</em> leaves the previous verdict standing: an error reaching
+    the network is not evidence that the form became acceptable. The stated
+    cost — there is no validation mode and no debounce, so a slow validator is
+    asked on every settled change.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">What asks for a pass, and what does not</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    Nothing on this list costs more than one pass, and the calls that cost none
+    are the ones with nothing to judge.
+  </p>
+
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">Call</th>
+          <th class="py-2 pr-4 font-medium">Passes</th>
+          <th class="py-2 font-medium">Why</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          triggers.map(([call, n, why]) => (
+            <tr class="hairline">
+              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
+                {call}
+              </td>
+              <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">{n}</td>
+              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+                {why}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-5 rounded-lg border border-outline-variant p-5 leading-relaxed">
+    <strong>A new form has not been judged.</strong> Build one from defaults
+    that violate the schema and <code>errorCount</code> is still{" "}
+    <code>0</code> — not because the form is clean, but because nothing has
+    asked yet. Call <code>form.validate()</code> if a screen should open
+    showing its errors.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">What it costs</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    One pass, and it judges every declared path whatever was edited. These are
+    the gated figures for one keystroke whose verdict does not move:
+  </p>
+
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">fields rendered</th>
+          <th class="py-2 pr-4 font-medium">validator passes</th>
+          <th class="py-2 font-medium">paths judged</th>
+        </tr>
+      </thead>
+      <tbody class="tabular-nums">
+        {
+          cost.map(([fields, passes, judged]) => (
+            <tr class="hairline">
+              <td class="py-3 pr-4 font-mono text-xs">{fields}</td>
+              <td class="py-3 pr-4 font-mono text-xs">{passes}</td>
+              <td class="py-3 font-mono text-xs">{judged}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    The pass count does not follow the edit; the paths judged are the schema.
+    Those integers live in <code>config/form-baseline.json</code>, which is not
+    a copy of the results — it is the file <code>npm run bench:forms:check</code>{" "}
+    compares every run against, and CI fails when one of them moves.{" "}
+    <a class="text-primary underline underline-offset-4" href="/benchmark/"
+      >What the benchmark can and cannot see →</a
+    >
+  </p>
+</Base>

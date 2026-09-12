@@ -87,10 +87,8 @@ items.insert(items.rows.length, { sku: "" });`,
 ];
 
 const TRY = [
+  ["Change billing", "the message appears on shipping"],
   ["Type in name", "only that row's counter moves"],
-  ["Change billing", "the error lands on shipping"],
-  ["Switch to useUncontrolledField", "typing moves no counter at all"],
-  ["Watch validator passes", "one per settled change"],
 ];
 ---
 
@@ -123,11 +121,13 @@ const TRY = [
 
   <!-- ================================================== live -->
   <section class="mt-20">
-    <h2 class="text-2xl font-bold">Type in it</h2>
+    <h2 class="text-2xl font-bold">The error belongs to the field you did not touch</h2>
     <p class="mt-3 leading-relaxed text-on-surface-variant">
-      The real library, built from source. <strong class="text-on-surface"
-        >The number on each row is how many times that row has rendered.</strong
-      >
+      <strong class="text-on-surface">Change billing below and the message
+      appears on shipping</strong> — a field you never touched, with no
+      dependency list anywhere in your application. The real library, built
+      from source; the number on each row is how many times that row has
+      rendered.
     </p>
 
     <LiveForm client:load />
@@ -146,7 +146,11 @@ const TRY = [
 
   <!-- ================================================== in code -->
   <section class="mt-20">
-    <h2 class="text-2xl font-bold">The whole surface</h2>
+    <h2 class="text-2xl font-bold">Six things, in code</h2>
+    <p class="mt-3 text-sm text-on-surface-variant">
+      Every hook and component, with its real signature, is on{" "}
+      <a class="text-primary underline underline-offset-4" href="/api/">API</a>.
+    </p>
     <!-- min-w-0 on the item: a grid item defaults to min-width:auto, so the
          widest code block sizes the track and the page scrolls sideways on a
          phone. Same trap as the API entries. -->
@@ -167,40 +171,59 @@ const TRY = [
   <section class="mt-20">
     <h2 class="text-2xl font-bold">Measured, losses first</h2>
     <p class="mt-3 leading-relaxed text-on-surface-variant">
-      Per keystroke at 201 fields, counted in jsdom and gated in CI:
+      <strong class="text-on-surface">form-contract is behind on all three
+      scenarios, at every size</strong> — and the report says so in those words
+      before it prints a table. What is worth reading is who beats it:
     </p>
+
     <div class="mt-5 overflow-x-auto">
       <table class="w-full text-sm">
         <thead class="text-left text-on-surface-variant">
           <tr class="hairline">
-            <th class="py-2 pr-4 font-medium">&nbsp;</th>
-            <th class="py-2 pr-4 font-medium">typing, verdict unchanged</th>
-            <th class="py-2 pr-4 font-medium">the field becomes wrong</th>
-            <th class="py-2 font-medium">a rule reports elsewhere</th>
+            <th class="py-2 pr-4 font-medium">at 201 fields</th>
+            <th class="py-2 pr-4 font-medium">form-contract</th>
+            <th class="py-2 pr-4 font-medium">beaten by</th>
+            <th class="py-2 font-medium">which was scored</th>
           </tr>
         </thead>
-        <tbody class="tabular-nums">
+        <tbody>
           <tr class="hairline">
-            <td class="py-3 pr-4 font-mono text-xs">useField</td>
-            <td class="py-3 pr-4">1 commit, 212 fibers</td>
-            <td class="py-3 pr-4">2 commits, 424</td>
-            <td class="py-3">2 commits, 424</td>
+            <td class="py-3 pr-4 align-top">type a character, verdict unchanged</td>
+            <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">212 fibers</td>
+            <td class="py-3 pr-4 align-top font-mono text-xs"
+              >0 — form-contract-uncontrolled</td
+            >
+            <td class="py-3 align-top text-on-surface-variant">agrees</td>
           </tr>
           <tr class="hairline">
-            <td class="py-3 pr-4 font-mono text-xs">useUncontrolledField</td>
-            <td class="py-3 pr-4 font-semibold text-primary">0 commits, 0</td>
-            <td class="py-3 pr-4">1 commit, 212</td>
-            <td class="py-3">1 commit, 212</td>
+            <td class="py-3 pr-4 align-top">the typed field becomes wrong</td>
+            <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">424 fibers</td>
+            <td class="py-3 pr-4 align-top font-mono text-xs"
+              >0 — react-hook-form-on-submit</td
+            >
+            <td class="py-3 align-top text-on-surface-variant"
+              >agrees at submit only</td
+            >
+          </tr>
+          <tr class="hairline">
+            <td class="py-3 pr-4 align-top">a rule reports elsewhere</td>
+            <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">424 fibers</td>
+            <td class="py-3 pr-4 align-top font-mono text-xs"
+              >0 — react-hook-form-scoped</td
+            >
+            <td class="py-3 align-top font-medium text-error">disagrees</td>
           </tr>
         </tbody>
       </table>
     </div>
+
     <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
-      On the deterministic lane form-contract is <em>not</em> first, and the
-      report prints the rows it loses before the rest. At 201 fields its
-      keystroke measures 0.57× the hand-written reference and the harness
-      refuses to call that a win — the difference is under the floor its own
-      calibration ladder resolved.{" "}
+      Two of the three are won by not doing the work: one shows the message
+      only at submit, and one shows no message at all. The third is
+      form-contract's own uncontrolled binding, which is also zero —{" "}
+      <a class="text-primary underline underline-offset-4" href="/runtime/"
+        >that table is on the runtime page</a
+      >. Every integer here is gated: CI fails when one of them moves.{" "}
       <a class="text-primary underline underline-offset-4" href="/benchmark/"
         >What the benchmark can and cannot see →</a
       >
@@ -213,7 +236,8 @@ const TRY = [
     <p class="mt-3 leading-relaxed text-on-surface-variant">
       128 tests, six compile-time programs that pin the path types, and a
       screen that uses all of it. <strong class="text-on-surface"
-        >Not published, and nobody has run it in production.</strong
+        >No package has ever been published — there is no publish script and no
+        publish workflow — and nobody has run it in production.</strong
       >
     </p>
     <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">

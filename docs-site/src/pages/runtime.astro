@@ -22,24 +22,6 @@ form.reset();                 // back to the defaults it was built with
 await form.submit(save);      // judges first; hands over only if nothing blocks
 `;
 
-const asking = `
-field.issues                  // what they are now
-await field.issuesFor("999")  // what they would be. Writes nothing at all.
-field.validate()              // the form's own pass, filtered to this path
-
-const { submitted, blockedBy } = await form.submit(save);
-// blockedBy carries every blocking issue, including paths with no component,
-// so an application can open the right section rather than disable a button.
-`;
-
-const asyncOne = `
-// Passes are numbered, so a slow answer that has been overtaken is dropped.
-field.setValue("Ad");    // pass 1 leaves, asking the server
-field.setValue("Ada");   // pass 2 leaves
-// pass 2 answers  -> committed
-// pass 1 answers  -> DROPPED. It describes a root that is no longer there.
-`;
-
 const TRY = [
   [
     "Type in name",
@@ -57,19 +39,6 @@ const TRY = [
     "Watch validator passes",
     "One per settled change, however many fields that change touched.",
   ],
-];
-
-// Measured with a counting adapter wrapped around the real zod resolver.
-const triggers = [
-  ["field.setValue(next)", "1", "Coalesced: many writes in one turn are one pass."],
-  ["field.markTouched()", "0", "Touched is display state. Nothing to re-judge."],
-  ["rows.insert / remove / move", "1", "Each edit changes the root."],
-  ["field.setParticipating(b)", "1", "What blocks a submit changed."],
-  ["form.reset(...)", "1", "The new root has not been judged yet."],
-  ["form.validate()", "1", "Immediately, not on the microtask."],
-  ["field.issuesFor(candidate)", "1", "On a probe root. Writes nothing at all."],
-  ["form.submit(handler)", "1", "Immediately, before the handler is considered."],
-  ["createForm(...)", "0", "Nothing is judged until something asks."],
 ];
 
 const woken = [
@@ -94,12 +63,17 @@ const woken = [
 >
   <h1 class="text-3xl font-bold sm:text-4xl">How a value changes</h1>
 
-  <p class="mt-6 leading-relaxed text-on-surface-variant">
-    Values live in a flat, path-keyed cell space outside React. A component
-    does not own a value and does not lift one: it subscribes to the cells it
-    reads, and writes through a handle addressed by path. Below is that
-    runtime, running — <strong class="text-on-surface">the number on each row
-    is how many times that row has rendered.</strong>
+  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+    <strong class="text-on-surface">A keystroke wakes the row it landed in,
+    plus the row an error moved to — no other field row renders.</strong>{" "}
+    Nothing is lifted and there is no dependency array: values live in a flat,
+    path-keyed cell space outside React, and a component subscribes to the
+    cells it reads.
+  </p>
+
+  <p class="mt-4 leading-relaxed text-on-surface-variant">
+    Below is that runtime, running. The number on each row is how many times
+    that row has rendered.
   </p>
 
   <LiveForm client:load />
@@ -115,56 +89,78 @@ const woken = [
     }
   </div>
 
+  <h2 class="mt-16 text-2xl font-bold">Typing that costs React nothing</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    The same cell, subscribed imperatively, writes the DOM node instead of
+    re-rendering — so at 201 fields a keystroke that moves no verdict is zero
+    commits and zero changed fibers. This is parity with react-hook-form's{" "}
+    <code>register</code>, not a win over it.
+  </p>
+
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">per keystroke, 201 fields</th>
+          <th class="py-2 pr-4 font-medium">verdict does not move</th>
+          <th class="py-2 pr-4 font-medium">the field becomes wrong</th>
+          <th class="py-2 font-medium">a rule reports elsewhere</th>
+        </tr>
+      </thead>
+      <tbody class="tabular-nums">
+        <tr class="hairline">
+          <td class="py-3 pr-4 font-mono text-xs">useField</td>
+          <td class="py-3 pr-4">1 commit, 212 fibers</td>
+          <td class="py-3 pr-4">2 commits, 424</td>
+          <td class="py-3">2 commits, 424</td>
+        </tr>
+        <tr class="hairline">
+          <td class="py-3 pr-4 font-mono text-xs">useUncontrolledField</td>
+          <td class="py-3 pr-4 font-semibold text-primary">0 commits, 0</td>
+          <td class="py-3 pr-4">1 commit, 212</td>
+          <td class="py-3">1 commit, 212</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="mt-4 text-sm leading-relaxed text-on-surface-variant">
+    The price, and why it is a second hook rather than the default: an
+    uncontrolled input cannot be transformed as it is typed. Masking,
+    upper-casing and inserting separators all need the value to come back
+    through React, which is what <code>useField</code> is for. Flip the toggle
+    on the demo above to watch the counters stop.
+  </p>
+
   <h2 class="mt-16 text-2xl font-bold">What one keystroke does</h2>
 
   <WriteFlow />
 
   <h2 class="mt-16 text-2xl font-bold">Writing</h2>
-  <p class="mt-3 text-sm text-on-surface-variant">
-    Every write goes through a handle. No <code>setState</code>, no form object
-    to spread.
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    Every write goes through a handle — a field or a row list addressed by
+    path, or the form itself. No <code>setState</code>, and no form object to
+    spread.
   </p>
 
   <Code code={writing} />
 
-  <h2 class="mt-16 text-2xl font-bold">What asks for a pass, and what does not</h2>
-
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
-        <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">Call</th>
-          <th class="py-2 pr-4 font-medium">Passes</th>
-          <th class="py-2 font-medium">Why</th>
-        </tr>
-      </thead>
-      <tbody>
-        {
-          triggers.map(([call, n, why]) => (
-            <tr class="hairline">
-              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
-                {call}
-              </td>
-              <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">{n}</td>
-              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-                {why}
-              </td>
-            </tr>
-          ))
-        }
-      </tbody>
-    </table>
-  </div>
-
-  <p class="mt-6 rounded-lg border border-outline-variant p-5 leading-relaxed">
-    <strong>A new form has not been judged.</strong> Build one from defaults
-    that violate the schema and <code>errorCount</code> is still{" "}
-    <code>0</code> — not because the form is clean, but because nothing has
-    asked yet. Call <code>form.validate()</code> if a screen should open
-    showing its errors.
+  <p class="mt-8 rounded-lg border border-outline-variant p-5 leading-relaxed">
+    <strong>What asks for a pass, and what does not</strong> — and what one
+    costs — is on{" "}
+    <a class="text-primary underline underline-offset-4" href="/validation/"
+      >Validation</a
+    >, which owns the whole-root pass so that no two pages describe it in
+    different words.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Who gets woken</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    A cell wakes its readers only when what it holds changes identity — write
+    the same value into a field again and the store gates it, so no row
+    renders at all. The pass still runs: <code>setValue</code> always asks for
+    one.
+  </p>
 
   <div class="mt-6 overflow-x-auto">
     <table class="w-full text-sm">
@@ -190,21 +186,6 @@ const woken = [
       </tbody>
     </table>
   </div>
-
-  <h2 class="mt-16 text-2xl font-bold">Asking, and asking slowly</h2>
-  <p class="mt-3 text-sm text-on-surface-variant">
-    <code>issuesFor</code> is a question, not an action — it writes nothing at
-    all.
-  </p>
-
-  <Code code={asking} />
-  <Code code={asyncOne} />
-
-  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
-    While a pass is in flight <code>form.validating</code> is true. A pass that{" "}
-    <em>throws</em> leaves the previous verdict standing: an error reaching the
-    network is not evidence that the form became acceptable.
-  </p>
 
   <p class="mt-10 text-sm leading-relaxed text-on-surface-variant">
     Every figure here came from running the runtime with a counting adapter
