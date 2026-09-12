@@ -201,10 +201,11 @@ npm run bench:forms:time    # microseconds, in the installed Chrome
 **The counts lane is gated** — commits, changed fibers, DOM mutations and
 validator passes are integers that do not depend on the machine, so drift is
 never noise and CI fails on it. **The time lane is printed and never gated,**
-and publishes its own resolution above its results: where form-contract's
-keystroke measures 0.63× the hand-written reference, the harness **refuses to
-call that a win**, because the difference is under the floor its own
-calibration ladder resolved. Rows where form-contract loses sort first.
+and publishes its own resolution above its results: at 201 fields a keystroke
+measures 0.57× the hand-written reference and the harness **refuses to call
+that a win**, because the difference is under the floor its own calibration
+ladder resolved. The report prints the rows form-contract loses before the
+rest.
 
 → [What the benchmark can and cannot see](https://formcontract.dev/benchmark/)
 

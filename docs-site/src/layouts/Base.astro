@@ -21,8 +21,10 @@ interface Props {
 const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
+// The wordmark is the link home, so this list carries the SECTIONS only. It
+// used to begin with an Overview entry that `NAV.slice(1)` then skipped —
+// present in the source, rendered nowhere.
 const NAV = [
-  { href: "/", label: "Overview" },
   { href: "/contract/", label: "The contract" },
   { href: "/runtime/", label: "The runtime" },
   { href: "/paths/", label: "Typed paths" },
@@ -69,7 +71,7 @@ const here = Astro.url.pathname;
         <a href="/" class="font-medium tracking-wide text-primary">form-contract</a>
         <div class="flex flex-wrap gap-x-4 gap-y-1 sm:gap-x-5">
           {
-            NAV.slice(1).map((item) => (
+            NAV.map((item) => (
               <a
                 href={item.href}
                 class:list={[
@@ -94,10 +96,13 @@ const here = Astro.url.pathname;
     >
       <div class="hairline pt-8">
         <p>
-          MIT licensed. Built alongside{" "}
-          <a class="text-primary underline underline-offset-4" href="https://luq.dev">
-            luq
-          </a>, which is one of the validators it resolves.
+          MIT licensed. One resolver ships today and it is{" "}
+          <a
+            class="text-primary underline underline-offset-4"
+            href="https://github.com/maroonedog/form-contract/tree/master/packages/resolver-zod"
+            >zod</a
+          >; the contract is two members, so writing another is a plain
+          function.
         </p>
       </div>
     </footer>
