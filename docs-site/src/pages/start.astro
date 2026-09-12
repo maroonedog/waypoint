@@ -1,0 +1,144 @@
+---
+// ===========================================================================
+// start.astro — from "this sounds good" to a file that compiles.
+//
+// The two code blocks are not samples. They are `?raw` imports of files that
+// this site's own build type-checks (`astro check && astro build`), so the
+// code on this page cannot drift from code that works — which is the failure
+// a hand-written starter always eventually has.
+// ===========================================================================
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+import registrySource from "../demo/order-form.ts?raw";
+import starterSource from "../demo/StarterForm.tsx?raw";
+
+/** Drops the file's banner comment, which is house documentation, not sample. */
+const withoutBanner = (source: string): string => {
+  const lines = source.split("\n");
+  const last = lines.findLastIndex((line) => line.startsWith("// ====="));
+  return lines.slice(last + 1).join("\n").trim();
+};
+
+const install = `
+git clone https://github.com/maroonedog/form-contract
+cd form-contract
+npm install
+npm run verify     # builds every package, runs the tests and the type tests
+`;
+
+const packages = [
+  ["form-react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
+  ["form-contract", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
+  ["form-contract-resolver-zod", "zodFormResolver", "Describes and judges a zod schema."],
+  ["form-core", "createForm · createCellStore · assertFormStoreContract", "The runtime. No React."],
+  ["form-store-zustand", "createZustandCellStore", "A worked example of substituting the store."],
+];
+---
+
+<Base
+  title="Start — form-contract"
+  description="Clone it, run one command, and write one file. The two code blocks on this page are raw imports of files this site's own build type-checks, so they cannot drift from code that works."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">Start</h1>
+
+  <p class="mt-6 text-lg leading-relaxed text-on-surface-variant">
+    <strong class="text-on-surface">Nothing is published yet</strong>, so you
+    clone it and run one command. The five packages are npm workspaces and
+    resolve to each other with no linking step.
+  </p>
+
+  <Code code={install} lang="ts" />
+
+  <h2 class="mt-16 text-2xl font-bold">Tell the types about your form, once</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    One declaration, in one file, gives every component in the application
+    checked paths — and a component ten levels down imports nothing to get
+    them, because a module augmentation belongs to the compilation rather than
+    to the import graph.
+  </p>
+
+  <Code code={withoutBanner(registrySource)} />
+
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    Skip it and the hooks are not unchecked — they are refused, and the
+    compiler error quotes the declaration you are missing.{" "}
+    <a class="text-primary underline underline-offset-4" href="/paths/"
+      >Why it is a registry and not a prop →</a
+    >
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">Then the form is ordinary React</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    No state to lift, no form object to thread, and no second DSL: a component
+    names the path it wants and gets a binding for it.
+  </p>
+
+  <Code code={withoutBanner(starterSource)} lang="tsx" />
+
+  <p class="mt-3 rounded-lg border border-outline-variant p-5 text-sm leading-relaxed">
+    <strong>Both blocks above are the files themselves.</strong> They live in
+    this site's source and are type-checked by its build, so the code on this
+    page is code that compiles rather than code that was once written down.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">Where each symbol comes from</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    Five packages, and the only one a screen imports from is{" "}
+    <code>form-react</code>.
+  </p>
+
+  <div class="mt-5 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">Package</th>
+          <th class="py-2 pr-4 font-medium">What you import from it</th>
+          <th class="py-2 font-medium">&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          packages.map(([name, symbols, what]) => (
+            <tr class="hairline">
+              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
+                {name}
+              </td>
+              <td class="py-3 pr-4 align-top font-mono text-xs">{symbols}</td>
+              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+                {what}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="mt-16 text-2xl font-bold">Two you can run</h2>
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    One of them writes the same nested shape four times — form-contract,
+    react-hook-form, Formik and TanStack Form, against one schema, side by side
+    on one page — so the difference is how a field two levels inside a list
+    says which row it belongs to, and nothing else.
+  </p>
+
+  <Code
+    code={`node node_modules/vite/bin/vite.js --config examples/nested-arrays/vite.config.ts examples/nested-arrays
+node node_modules/vite/bin/vite.js --config examples/showcase/vite.config.ts examples/showcase`}
+  />
+
+  <p class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+    The second is a 23-input application form across six sections, drawn with
+    the application's own components. Both have their own README.
+  </p>
+
+  <section class="mt-16 rounded-xl border border-outline-variant p-6">
+    <h2 class="text-lg font-bold">Where it stands</h2>
+    <p class="mt-3 leading-relaxed text-on-surface-variant">
+      128 tests, six compile-time programs that pin the path types, and a screen
+      that uses all of it. <strong class="text-on-surface">No package has ever
+      been published — there is no publish script and no publish workflow — and
+      nobody has run it in production.</strong>
+    </p>
+  </section>
+</Base>

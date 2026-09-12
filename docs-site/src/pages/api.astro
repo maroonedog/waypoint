@@ -213,6 +213,29 @@ const components = [
   },
 ];
 
+const submitTypes = `
+interface SubmitOutcome {
+  readonly submitted: boolean;
+  /** Empty when the form was handed over. */
+  readonly blockedBy: readonly FormIssue[];
+}
+
+type SubmitHandler = (root: unknown) => void | Promise<void>;
+`;
+
+const pathTypes = `
+// A declared path names the RULE: "items[*].sku".
+// A value has PLACES:             "items[0].sku", "items[1].sku".
+// Both are things a caller may legitimately write, so both are addressable.
+
+type ConcretePath<P>    // every [*] replaced by an index position
+type AddressablePath<P> // P | ConcretePath<P> — what a hook accepts
+type DeclaredOf<P>      // the reverse: every [0] back to [*]
+
+// AddressablePath<string> is string, which is why a form registered as
+// FormAdapter<unknown, string> is back to unchecked paths.
+`;
+
 const types = `
 // The registry. One declaration, anywhere in the compilation.
 interface FormTypeRegistry {}
@@ -268,7 +291,26 @@ const slugOf = (name: string): string =>
   </div>
 
   <h2 class="mt-16 text-2xl font-bold">Types</h2>
-  <p class="mt-3 text-sm text-on-surface-variant">
+
+  <h3 class="mt-8 font-mono text-lg font-semibold">SubmitOutcome, SubmitHandler</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant">
+    What <code>form.submit()</code> resolves to, and what it hands your handler.
+    <code>blockedBy</code> carries every blocking issue, including paths with no
+    component on screen.
+  </p>
+  <Code code={submitTypes} />
+
+  <h3 class="mt-10 font-mono text-lg font-semibold">
+    AddressablePath, ConcretePath, DeclaredOf
+  </h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant">
+    The types every signature above is written in. A descriptor is keyed by the
+    rule; a value lives at a place; a hook accepts either.
+  </p>
+  <Code code={pathTypes} />
+
+  <h3 class="mt-10 font-mono text-lg font-semibold">The registry, and the view-layer paths</h3>
+  <p class="mt-2 leading-relaxed text-on-surface-variant">
     <a class="text-primary underline underline-offset-4" href="/paths/"
       >How the registry works →</a
     >
