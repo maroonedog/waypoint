@@ -1,0 +1,32 @@
+[
+ {
+  "id": "a-field",
+  "tabLabel": "A single field",
+  "claim": "A component that reads one field re-renders when that field changes and at no other time.",
+  "watch": "Type in name: its counter climbs and billing's stays at 1; delete down past three characters to see the message."
+ },
+ {
+  "id": "cross-field",
+  "tabLabel": "Cross-field rule",
+  "claim": "A rule that spans two fields reports against the path it names, so the message lands on shipping even though billing is the field being typed in.",
+  "watch": "Change a digit in the billing postcode — the error appears under shipping, the field you never touched."
+ },
+ {
+  "id": "a-list",
+  "tabLabel": "Row identity",
+  "claim": "Remove a row and every row below it keeps its own value, its own error and its own React key — only the addresses renumber.",
+  "watch": "Add a line and leave it blank — it reads Required straight away. Give the two rows above it different skus, then remove the top row: every survivor keeps its value, the blank one keeps its Required, and the key printed beside each stays put while the address next to it shifts down."
+ },
+ {
+  "id": "uncontrolled",
+  "tabLabel": "Uncontrolled typing",
+  "claim": "Two inputs on one form: useField keeps the value in React and re-renders on every keystroke, useUncontrolledField leaves it in the DOM node, so typing reaches React not at all.",
+  "watch": "Type in the left box and its counter climbs by one on every keystroke; type in the right box and neither counter moves — then empty the right box, and \"Required\" appears beside it for the cost of a single render, which is the form saying it had every keystroke all along."
+ },
+ {
+  "id": "switch-a-step-off",
+  "tabLabel": "Switch a step off",
+  "claim": "A section switched off stops blocking submit and keeps every value typed into it, so the rules that read it go on reading it.",
+  "watch": "Tick \"same as billing\": the error on the postcode clears and submit prints the payload it handed over — \"shipping\":{\"postcode\":\"530-0002\"} still in it — instead of \"blocked by shipping.postcode\"; untick and the rule judges whatever you typed while it was off."
+ }
+]

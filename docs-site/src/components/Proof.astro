@@ -1,0 +1,46 @@
+---
+// ===========================================================================
+// Proof.astro — the code, and that code running, side by side.
+//
+// The left half is a ?raw import of the file the right half renders, so the
+// two cannot disagree: there is no version of this page where the code shown
+// is not the code running. That is the whole reason it is built this way
+// rather than as a snippet beside a screenshot.
+//
+// One claim line above the pair and one line of what-to-do under it. Nothing
+// else — the screen is the argument, and prose beside a live demo is prose
+// the reader has to take on trust while looking at the thing itself.
+// ===========================================================================
+import Code from "./Code.astro";
+
+interface Props {
+  readonly claim: string;
+  readonly watch: string;
+  readonly source: string;
+  readonly file: string;
+}
+
+const { claim, watch, source, file } = Astro.props;
+---
+
+<div class="mt-8">
+  <p class="text-[0.9375rem] leading-relaxed font-medium">{claim}</p>
+
+  <div class="mt-3 grid items-start gap-4 lg:grid-cols-2">
+    <div class="min-w-0">
+      <Code code={source} lang="tsx" label={file} flush />
+    </div>
+
+    <div class="min-w-0 overflow-hidden rounded-lg border border-outline-variant">
+      <p class="label border-b border-outline-variant bg-surface-low px-4 py-2">
+        running, right here
+      </p>
+      <div class="p-4">
+        <slot />
+      </div>
+      <p class="caption border-t border-outline-variant bg-surface-low px-4 py-2">
+        {watch}
+      </p>
+    </div>
+  </div>
+</div>

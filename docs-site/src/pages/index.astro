@@ -9,6 +9,18 @@
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import LiveForm from "../demo/LiveForm.tsx";
+import Proof from "../components/Proof.astro";
+import proofMeta from "../demo/proof/index.json";
+import AField from "../demo/proof/AField.tsx";
+import CrossField from "../demo/proof/CrossField.tsx";
+import AList from "../demo/proof/AList.tsx";
+import Uncontrolled from "../demo/proof/Uncontrolled.tsx";
+import SwitchAStepOff from "../demo/proof/SwitchAStepOff.tsx";
+import aFieldSource from "../demo/proof/AField.tsx?raw";
+import crossFieldSource from "../demo/proof/CrossField.tsx?raw";
+import aListSource from "../demo/proof/AList.tsx?raw";
+import uncontrolledSource from "../demo/proof/Uncontrolled.tsx?raw";
+import switchAStepOffSource from "../demo/proof/SwitchAStepOff.tsx?raw";
 
 const whole = `
 // 1. Any validator becomes a form description. One function, named by you.
@@ -86,31 +98,11 @@ items.insert(items.rows.length, { sku: "" });`,
   },
 ];
 
-// The answer to "why would I use this", which is a different question from
-// "how do I write it" and was the one the page never answered. Each row is a
-// thing a reader is doing today, beside the thing they would stop doing.
-const GAINS: readonly (readonly [string, string])[] = [
-  [
-    "Writing min(3) in the schema and minLength={3} again in the JSX, and finding out they disagreed from a user.",
-    "The input carries required, minlength, min, max, step and pattern straight off the schema. You write them once.",
-  ],
-  [
-    "Keeping a list of which field depends on which, and renaming a field without remembering to update it.",
-    "A rule comparing two fields puts its message on the other field. There is no dependency list to keep.",
-  ],
-  [
-    "A form that submits because the broken input was behind a collapsed section, or unregistered itself when it unmounted.",
-    "A hidden field keeps its value, still validates, still blocks — and submit hands back the paths that blocked it, component or no component.",
-  ],
-  [
-    "A typo in a field name rendering an empty input that is never validated and says nothing.",
-    "It does not compile. Inside arrays too, and with a computed row index.",
-  ],
-  [
-    "Choosing between a form that re-renders on every keystroke and one that tells you nothing until submit.",
-    "A keystroke is zero commits when you want it, and the verdict still arrives on the same pass.",
-  ],
-];
+// The pair table: each entry is a component, its own source, and the two
+// lines that frame it. The source is a ?raw import of the very file the
+// component is, so the code shown and the code running are one file.
+const byId = Object.fromEntries(proofMeta.map((one) => [one.id, one]));
+const m = (id: string): { claim: string; watch: string } => byId[id];
 
 // What a reader is actually shopping for. Every row is something the
 // repository does or plainly does not — the two it does not are in the table
@@ -223,35 +215,29 @@ const TRY = [
     >
   </div>
 
-  <!-- ================================================== what you stop doing -->
+  <!-- ================================================== proof -->
   <section class="mt-16">
-    <h2 class="text-2xl font-bold">What you stop doing</h2>
+    <h2 class="text-2xl font-bold">Five things, each beside itself running</h2>
 
-    <div class="mt-6 grid gap-px overflow-hidden rounded-xl bg-outline-variant sm:grid-cols-2">
-      <div class="bg-surface-low px-5 py-3">
-        <p class="label">Today</p>
-      </div>
-      <div class="bg-surface-low px-5 py-3">
-        <p class="label">With this</p>
-      </div>
-      {
-        GAINS.map(([today, here]) => (
-          <>
-            <div class="bg-surface px-5 py-4">
-              <p class="text-sm leading-relaxed text-on-surface-variant">{today}</p>
-            </div>
-            <div class="bg-surface px-5 py-4">
-              <p class="text-sm leading-relaxed">{here}</p>
-            </div>
-          </>
-        ))
-      }
-    </div>
+    <Proof claim={m("a-field").claim} watch={m("a-field").watch} source={aFieldSource} file="AField.tsx">
+      <AField client:visible />
+    </Proof>
 
-    <p class="caption">
-      Every row is something the repository does, and the pages under
-      each one say which test or measurement holds it up.
-    </p>
+    <Proof claim={m("cross-field").claim} watch={m("cross-field").watch} source={crossFieldSource} file="CrossField.tsx">
+      <CrossField client:visible />
+    </Proof>
+
+    <Proof claim={m("a-list").claim} watch={m("a-list").watch} source={aListSource} file="AList.tsx">
+      <AList client:visible />
+    </Proof>
+
+    <Proof claim={m("uncontrolled").claim} watch={m("uncontrolled").watch} source={uncontrolledSource} file="Uncontrolled.tsx">
+      <Uncontrolled client:visible />
+    </Proof>
+
+    <Proof claim={m("switch-a-step-off").claim} watch={m("switch-a-step-off").watch} source={switchAStepOffSource} file="SwitchAStepOff.tsx">
+      <SwitchAStepOff client:visible />
+    </Proof>
   </section>
 
   <!-- ================================================== live -->
