@@ -4,7 +4,7 @@ import {
   useCreateForm,
   useField,
   useParticipation,
-} from "form-react";
+} from "@maroonedog/form-contract/react";
 import { orderAdapter, orderDefaults } from "../order-form.js";
 
 const INPUT = "rounded-md border border-outline-variant bg-surface px-2 py-1";

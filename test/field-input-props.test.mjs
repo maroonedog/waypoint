@@ -38,8 +38,8 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { z } = await import("zod");
 const React = await import("react");
 const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("form-contract-resolver-zod");
-const { createForm } = await import("form-core");
+const { zodFormResolver } = await import("@maroonedog/form-contract/resolver-zod");
+const { createForm } = await import("@maroonedog/form-contract/core");
 const {
   buildInputProps,
   fieldElementIds,
@@ -47,7 +47,7 @@ const {
   FormProvider,
   useField,
   useUncontrolledField,
-} = await import("form-react");
+} = await import("@maroonedog/form-contract/react");
 
 const { act, createElement: h, Fragment } = React;
 

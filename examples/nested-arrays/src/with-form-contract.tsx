@@ -16,8 +16,8 @@
 // import: `row.path` is typed as a place in its own list, so `${row.path}.sku`
 // comes out as a path the registry recognises and a typo does not compile.
 // ===========================================================================
-import { FormProvider, useCreateForm, useField, useRows } from "form-react";
-import type { FormPathTo } from "form-react";
+import { FormProvider, useCreateForm, useField, useRows } from "@maroonedog/form-contract/react";
+import type { FormPathTo } from "@maroonedog/form-contract/react";
 import { orderAdapter } from "./form-registry.js";
 import { defaults, blankLine, blankShipment } from "./schema.js";
 import { Panel, Row } from "./ui.js";
@@ -111,7 +111,7 @@ export function WithFormContract() {
 
   return (
     <FormProvider form={form}>
-      <Panel title="form-contract" note="91 行 / 「shipments」7回">
+      <Panel title="@maroonedog/form-contract" note="91 行 / 「shipments」7回">
         <Text at="customer.name" label="お名前" />
         <Shipments />
       </Panel>

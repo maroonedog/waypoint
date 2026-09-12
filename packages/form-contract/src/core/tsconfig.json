@@ -1,0 +1,13 @@
+{
+  "//": "The `./core` entry: the runtime. No DOM and no Node types, which is the claim the entry is sold on — `warn-unaddressable.ts` reaches `console` through `globalThis` precisely because this config will not hand it one.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "types": [],
+    "rootDir": ".",
+    "outDir": "../../dist/core",
+    "tsBuildInfoFile": "../../.tsbuildinfo/core.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../contract" }]
+}

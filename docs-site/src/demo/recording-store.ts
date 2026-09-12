@@ -21,8 +21,8 @@
 // panel — and that is not the movement a reader came to watch. The demo turns
 // it on after mount, so the first line on the tape is one the reader caused.
 // ===========================================================================
-import { createCellStore } from "form-core";
-import type { CellKey, FormCellStore } from "form-core";
+import { createCellStore } from "@maroonedog/form-contract/core";
+import type { CellKey, FormCellStore } from "@maroonedog/form-contract/core";
 
 export interface Entry {
   readonly seq: number;

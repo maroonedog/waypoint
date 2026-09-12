@@ -9,7 +9,7 @@
 // it cannot drift into different colour ramps.
 //
 // React is here for one reason: the live demo on this site is the library
-// itself, running. The aliases point at the packages' SOURCE, so the form a
+// itself, running. The aliases point at the package's SOURCE, so the form a
 // reader types into is built from the same files as the tests — a screenshot
 // can go stale and a described behaviour can be wrong, and neither of those
 // can happen to something the reader is operating.
@@ -20,9 +20,17 @@ import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
-/** @param {string} name */
-const packageSource = (name) =>
-  fileURLToPath(new URL(`../packages/${name}/src/index.ts`, import.meta.url));
+const PACKAGE = "@maroonedog/form-contract";
+
+/**
+ * One entry point of the package, as the source file behind it.
+ *
+ * @param {string} entry
+ */
+const entrySource = (entry) =>
+  fileURLToPath(
+    new URL(`../packages/form-contract/src/${entry}/index.ts`, import.meta.url)
+  );
 
 // The package sources resolve `zod` and `react` from the repository root when
 // one is installed there, and this directory installs its own — two copies,
@@ -36,19 +44,33 @@ const packageSource = (name) =>
 const here = (name) =>
   fileURLToPath(new URL(`./node_modules/${name}`, import.meta.url));
 
+// Anchored regular expressions rather than bare strings: Vite matches a STRING
+// alias as a prefix, so a `@maroonedog/form-contract` key would also swallow
+// `@maroonedog/form-contract/react` and rewrite it to a path that is not
+// there. zod keeps prefix matching on purpose — a subpath of it has to land in
+// the same copy as the package itself.
+const entryAliases = [
+  ...(
+    /** @type {readonly (readonly [string, string])[]} */ ([
+      [PACKAGE, "contract"],
+      [`${PACKAGE}/core`, "core"],
+      [`${PACKAGE}/react`, "react"],
+      [`${PACKAGE}/resolver-zod`, "resolver-zod"],
+    ])
+  ).map(([specifier, entry]) => ({
+    find: new RegExp(`^${specifier}$`),
+    replacement: entrySource(entry),
+  })),
+  { find: /^zod(?=$|\/)/, replacement: here("zod") },
+];
+
 export default defineConfig({
   site: "https://formcontract.dev",
   integrations: [react(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
     resolve: {
-      alias: {
-        "form-contract": packageSource("spec"),
-        "form-contract-resolver-zod": packageSource("resolver-zod"),
-        "form-core": packageSource("form-core"),
-        "form-react": packageSource("form-react"),
-        zod: here("zod"),
-      },
+      alias: entryAliases,
       // React is deduped rather than aliased. Aliasing it to a directory makes
       // Vite load react/index.js — CommonJS — straight into the SSR runner,
       // which dies on `module is not defined` before a page renders. `dedupe`

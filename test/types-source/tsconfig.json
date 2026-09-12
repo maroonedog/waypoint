@@ -14,10 +14,18 @@
     "noEmit": true,
     "skipLibCheck": true,
     "paths": {
-      "form-contract": ["../../packages/spec/src/index.ts"],
-      "form-contract-resolver-zod": ["../../packages/resolver-zod/src/index.ts"],
-      "form-core": ["../../packages/form-core/src/index.ts"],
-      "form-react": ["../../packages/form-react/src/index.ts"]
+      "@maroonedog/form-contract": [
+        "../../packages/form-contract/src/contract/index.ts"
+      ],
+      "@maroonedog/form-contract/resolver-zod": [
+        "../../packages/form-contract/src/resolver-zod/index.ts"
+      ],
+      "@maroonedog/form-contract/core": [
+        "../../packages/form-contract/src/core/index.ts"
+      ],
+      "@maroonedog/form-contract/react": [
+        "../../packages/form-contract/src/react/index.ts"
+      ]
     }
   },
   "include": ["."]

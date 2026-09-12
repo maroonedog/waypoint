@@ -17,7 +17,7 @@
 //
 // The two floors are subtracted and not published as the answer. `empty` is
 // lib.d.ts, which every TypeScript program in the world pays. `packages-only`
-// is `form-react` and `form-contract` type-checking their own source, which an
+// is the `./react` and `.` entries type-checking their own source, which an
 // application pays once no matter how large its form is. Neither is a cost of
 // the flagship type, and an absolute number that silently contains both is how
 // a figure ends up an order of magnitude away from another one.

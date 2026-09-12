@@ -11,9 +11,9 @@
 // number somebody hoped for. A reader comparing two rows should not have to
 // work out what "flat-60" contained.
 // ===========================================================================
-import type { FormFieldDescriptor } from "form-contract";
-import { zodFormResolver } from "form-contract-resolver-zod";
-import { expandDeclaredPath, writeValueAt } from "form-core";
+import type { FormFieldDescriptor } from "@maroonedog/form-contract";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { expandDeclaredPath, writeValueAt } from "@maroonedog/form-contract/core";
 import { makeOrderSchema, fillerPathOf, type OrderValue } from "./order-schema.ts";
 
 export interface Shape {

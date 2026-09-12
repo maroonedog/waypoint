@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import type { FieldBinding } from "form-react";
+import type { FieldBinding } from "@maroonedog/form-contract/react";
 import { SupportingText, isShowingError } from "./supporting-text.js";
 
 /**

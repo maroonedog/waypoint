@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { zodFormResolver } from "form-contract-resolver-zod";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
 
 const byPath = (fields, path) => fields.find((f) => f.path === path);
 

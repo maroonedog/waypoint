@@ -6,7 +6,7 @@
 // list. Everything the pages claim can be done to it by a reader.
 // ===========================================================================
 import { z } from "zod";
-import { zodFormResolver } from "form-contract-resolver-zod";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
 
 export const orderSchema = z
   .object({
@@ -30,7 +30,7 @@ export const orderSchema = z
 
 export const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "form-react" {
+declare module "@maroonedog/form-contract/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
   }

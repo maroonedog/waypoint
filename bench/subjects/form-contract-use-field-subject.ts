@@ -11,10 +11,10 @@
 // gap recorded in words in the report rather than folded into a number.
 // ===========================================================================
 import { createElement as h, type ReactElement } from "react";
-import { createForm, readValueAt, type FormHandle } from "form-core";
-import { FormProvider, useField } from "form-react";
-import type { FormAdapter } from "form-contract";
-import { zodFormResolver } from "form-contract-resolver-zod";
+import { createForm, readValueAt, type FormHandle } from "@maroonedog/form-contract/core";
+import { FormProvider, useField } from "@maroonedog/form-contract/react";
+import type { FormAdapter } from "@maroonedog/form-contract";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
 import { createRoot, type Root } from "react-dom/client";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
@@ -35,7 +35,7 @@ function Leaf({ path, label }: LeafProps): ReactElement {
 
 export const formContractUseFieldSubject: Subject = {
   id: "form-contract-use-field",
-  library: "form-contract",
+  library: "@maroonedog/form-contract",
   treeClass: "equal-tree",
   policy: "on-change",
   capabilities: [

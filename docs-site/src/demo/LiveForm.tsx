@@ -30,7 +30,7 @@ import {
   useUncontrolledField,
   type FieldErrorProps,
   type FormPathTo,
-} from "form-react";
+} from "@maroonedog/form-contract/react";
 import { blankLine, orderAdapter, orderDefaults } from "./order-form.js";
 import { createPassCounter, type PassCounter } from "./pass-counter.js";
 import { createRecordingStore, type Entry, type Tape } from "./recording-store.js";
@@ -262,7 +262,7 @@ function Sheet({
   readonly tape: Tape;
 }): React.ReactElement {
   // The store is an argument, so instrumenting the runtime needs no hook in
-  // it: this is the same seam form-store-zustand uses.
+  // it: this is the same seam the `./store-zustand` entry uses.
   const form = useCreateForm(() => ({
     adapter: counter.adapter,
     defaultValues: structuredClone(orderDefaults),

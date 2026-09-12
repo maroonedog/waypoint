@@ -11,24 +11,32 @@ written at `createForm` from the descriptor list, before any component exists �
 so mounting is a subscription, and there is no register, no unregister and no
 `shouldUnregister`.
 
-📖 **[formcontract.dev](https://formcontract.dev)** — a form you can type into,
-with a render counter on every row and a tape under it printing every cell the
-runtime writes.
-[Start](https://formcontract.dev/start/) · [Validation](https://formcontract.dev/validation/) · [The runtime](https://formcontract.dev/runtime/) ·
-[Typed paths](https://formcontract.dev/paths/) · [API](https://formcontract.dev/api/) · [Benchmark](https://formcontract.dev/benchmark/)
+📖 The documentation site lives in `docs-site/` and **is not served anywhere
+yet** — `formcontract.dev` does not resolve and GitHub Pages will not publish
+this repository while it is private. `npm run docs:dev` builds it: a form you
+can type into, with a render counter on every row and a tape under it printing
+every cell the runtime writes, plus the contract, the paths, the API and the
+benchmark.
 
-| Package | What it is |
+One package, `@maroonedog/form-contract`, with an entry point per concern.
+They are entry points rather than packages because all six installed together
+anyway — six names bought a reader nothing and cost six versions, six budgets
+and six security surfaces. What the split does buy is **resolution**: `./core`
+loads in a worker with no React resolvable at all, and only `./react` names
+React in its built output.
+
+| Entry | What it is |
 |---|---|
-| `form-contract` | The contract and the path types. No dependencies. |
-| `form-contract-resolver-zod` | Describes and judges a zod schema. zod is a type-only import, erased at build time. |
-| `form-contract-resolver-luq` | The same for [luq](https://luq.dev), through the JSON Schema it can already produce. |
-| `form-core` | The runtime. No React, no validator. |
-| `form-react` | React bindings. |
-| `form-store-zustand` | A zustand-backed store, as a worked example of substituting one. |
+| `@maroonedog/form-contract` | The contract and the path types. One runtime export, `isPending`. |
+| `@maroonedog/form-contract/resolver-zod` | Describes and judges a zod schema. zod is a type-only import, erased at build time. |
+| `@maroonedog/form-contract/resolver-luq` | The same for [luq](https://luq.dev), through the JSON Schema it can already produce. |
+| `@maroonedog/form-contract/core` | The runtime. No React, no validator, no DOM. |
+| `@maroonedog/form-contract/react` | React bindings. |
+| `@maroonedog/form-contract/store-zustand` | A zustand-backed store, as a shipped instance of the store contract `./core` exports. |
 
 Nothing here is published yet. Clone
 [the repository](https://github.com/maroonedog/form-contract), `npm install`,
-then `npm run verify` — it builds every package and runs the tests and the type
+then `npm run verify` — it builds the package and runs the tests and the type
 tests.
 
 ---
@@ -39,7 +47,7 @@ tests.
 // src/form-registry.ts — one file, one declaration, one time.
 const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "form-react" {
+declare module "@maroonedog/form-contract/react" {
   interface FormTypeRegistry {
     form: typeof orderAdapter;
   }
@@ -86,8 +94,6 @@ inspection of the React tree. And an **address** is not a value: it does not
 change when the value does, so passing it down re-renders nobody, there is
 nothing above to lift, and a component may read elsewhere in the form as well.
 
-→ [What a write touches](https://formcontract.dev/runtime/) · [Why a rule reports against a field you did not touch](https://formcontract.dev/validation/)
-
 ## Paths are typed by a registry, not by a prop
 
 One React context object serves every form in an application, so the context
@@ -129,7 +135,7 @@ extends one of its arms ends the path there and keeps its own type and members �
 210,887 instantiations down to 72,707 on a 729-leaf shape. Printed, never gated:
 `typescript` sits at a caret range, and a patch bump rewrites every figure.
 
-→ [Typed paths](https://formcontract.dev/paths/) · [the measurement in full](docs/measurements-types.md)
+→ [The measurement in full](docs/measurements-types.md)
 
 ## Accessibility, and what is not done
 
@@ -160,7 +166,7 @@ does this for a living — and nothing here has met a real screen reader.
   its arity is the vendor's business (`luqFormResolver` is binary, because luq
   judges with one object and describes with another). `T` and `TPath` survive it.
 - **A descriptor is a flat field list. A JSON Schema is not one.** It is a tree
-  with `$ref` and combinators in it, and `form-contract-resolver-luq` is the
+  with `$ref` and combinators in it, and `@maroonedog/form-contract/resolver-luq` is the
   walk that turns one into one descriptor per leaf. Nor is the trip free: on
   zod 4.6.1, `z.toJSONSchema(z.object({ when: z.date() }))` throws
   `Date cannot be represented in JSON Schema` — the most common non-text widget
@@ -183,7 +189,7 @@ does this for a living — and nothing here has met a real screen reader.
 - **A swappable store.** Five members over an opaque key — per-key notification,
   the `Object.is` gate, synchronous delivery and read-your-writes in a batch are
   normative, and `assertFormStoreContract` ships to check them.
-- **These six packages compile no string** — no `new Function`, no `eval`, and
+- **Nothing in the package compiles a string** — no `new Function`, no `eval`, and
   `concrete-path.ts` scans a path rather than building a `RegExp`. (The one
   `new RegExp` compiles a pattern the schema declared.) Table stakes, not a
   feature: react-hook-form, Formik and `@tanstack/form-core` have zero of either
@@ -228,8 +234,6 @@ time lane is printed and never gated:** a keystroke at 201 fields measures 0.57�
 the hand-written reference and the harness **refuses to call that a win**, the
 difference being under the floor its own ladder resolved.
 
-→ [What the benchmark can and cannot see](https://formcontract.dev/benchmark/)
-
 ## Examples
 
 ```bash
@@ -251,8 +255,9 @@ build: every example resolves the packages to their **source**.
 The runtime is complete against its design and is exercised by 171 tests, seven
 compile-time programs — one of them whose only job is to prove that an
 application registering nothing is refused rather than quietly unchecked — and a
-screen that uses all of it. **No package has ever been published — there is no
-publish script and no publish workflow — and nobody has run it in production.**
+screen that uses all of it. **Nothing has ever been published — the publish
+workflow is manual-dispatch only and has never been run — and nobody has run
+it in production.**
 
 Two limits, stated rather than papered over. The concrete path grammar has no
 escape, so a field whose key contains a dot cannot be addressed. And validation
@@ -260,8 +265,8 @@ is proportional to the schema on every settled change: the diff keeps
 *notification* proportional to what moved, but the pass judges the whole root,
 which is what a cross-field rule reporting elsewhere costs.
 
-Every hook and component, with the signature the packages emit, is at
-[formcontract.dev/api](https://formcontract.dev/api/). `CLAUDE.md` carries the
+Every hook and component, with the signature the package emits, is on the
+docs site's API page. `CLAUDE.md` carries the
 naming rule this codebase is held to, and `docs/design/form-runtime.md` is the
 design it was built from; sections 7 and 8 record what was rejected and why.
 

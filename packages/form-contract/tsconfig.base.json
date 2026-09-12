@@ -1,0 +1,19 @@
+{
+  "//": "The options every entry shares. What is deliberately NOT here is `lib` and `types`: the whole point of six projects instead of one is that `./core` compiles with no DOM and no Node globals in scope, so the claim that the runtime does not touch the document is checked rather than asserted. Union those into one config and core silently gains `document`. `composite` is what makes the cross-entry imports resolve to a sibling project's emitted .d.ts instead of being compiled twice, and it is why `tsc -b` can build the six in dependency order without a script that hard-codes one.",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  }
+}

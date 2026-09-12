@@ -84,7 +84,7 @@ const typo: Paths = "owner.emial";          // compile error
 `;
 
 const weight = `
-// packages/resolver-zod — the only mention of zod in the built output.
+// src/resolver-zod — the only mention of zod in the built output.
 import type * as z from "zod";
 `;
 ---
@@ -191,7 +191,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">Bring your own validator, and your own copy of it</h2>
 
-  <Code code={weight} label="packages/resolver-zod" />
+  <Code code={weight} label="src/resolver-zod" />
 
   <div class="mt-5 overflow-x-auto">
     <table class="w-full text-sm">
@@ -224,7 +224,7 @@ import type * as z from "zod";
     common non-text widget in a real form — which is why the zod resolver walks
     the schema itself rather than its JSON Schema.{" "}
     <a class="text-primary underline underline-offset-4" href="/start/"
-      >What each package gives you →</a
+      >What each entry point gives you →</a
     >
   </p>
 </Base>

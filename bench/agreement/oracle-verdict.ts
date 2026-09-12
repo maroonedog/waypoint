@@ -10,7 +10,7 @@
 // its own declared policy and why a library shipping a different default gets
 // `by design` rather than `disagrees`.
 // ===========================================================================
-import { readValueAt, writeValueAt } from "form-core";
+import { readValueAt, writeValueAt } from "@maroonedog/form-contract/core";
 import type { Shape } from "../shape/build-shape.ts";
 import { issuePathToConcretePath } from "../shape/issue-path-to-concrete-path.ts";
 import type { ObservableState } from "./verdict.types.ts";

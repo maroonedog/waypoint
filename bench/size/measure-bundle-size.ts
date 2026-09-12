@@ -1,21 +1,25 @@
 // ===========================================================================
-// measure-bundle-size.ts — what each package costs an application, in bytes.
+// measure-bundle-size.ts — what each entry point costs an application.
 //
-// The repository claims `sideEffects: false` on all six packages and sells
-// itself partly on doing less work. It had never measured what it weighs, and
-// an unmeasured size claim is the same kind of sentence this project refuses
-// everywhere else.
+// The package claims `sideEffects: false` and sells itself partly on doing
+// less work. It had never measured what it weighs, and an unmeasured size
+// claim is the same kind of sentence this project refuses everywhere else.
 //
-// Measured the way an application would get it: esbuild bundles the package's
-// public entry as ESM with React and the validator marked external, minifies,
-// and the result is gzipped. Externals are excluded because they are the
-// application's cost either way — counting React would make every number say
-// the same thing.
+// Measured the way an application would get it: esbuild bundles one entry
+// point as ESM with React and the validator marked external, minifies, and the
+// result is gzipped. Externals are excluded because they are the application's
+// cost either way — counting React would make every number say the same thing.
 //
-// A SECOND figure per package, and it is the more honest one: the entry a
-// screen actually reaches for. Importing `useField` should not cost what
-// importing everything costs, and `sideEffects: false` is the claim that it
-// does not. Both are recorded, so the gap between them is visible.
+// A SECOND figure per entry, and it is the more honest one: the handful of
+// names a screen actually reaches for. Importing `useField` should not cost
+// what importing everything costs, and `sideEffects: false` is the claim that
+// it does not. Both are recorded, so the gap between them is visible.
+//
+// That second figure matters MORE now than it did as six packages, not less.
+// Six separate installs made the barrel figure mean something on its own — you
+// could decline a package. One install cannot be declined, so the only thing
+// standing between a screen and the whole library is tree-shaking, and these
+// are the rows that say whether it is working.
 // ===========================================================================
 import { gzipSync } from "node:zlib";
 import { build } from "esbuild";
@@ -66,25 +70,39 @@ async function measure(id: string, contents: string): Promise<SizeRow> {
   };
 }
 
+const PACKAGE = "@maroonedog/form-contract";
+
 /**
- * The whole barrel, and then the handful of names a screen imports. The second
- * is what `sideEffects: false` is promising; recording only the first would
- * measure a claim nobody makes.
+ * Every barrel, then the handful of names a screen imports, then the two
+ * entries an application really installs together. The barrels alone would
+ * measure a claim nobody makes: nobody imports `*`, and since the collapse
+ * nobody can decline an entry either.
  */
 const SUBJECTS: readonly (readonly [string, string])[] = [
-  ["form-contract", `export * from "form-contract";`],
-  ["form-core", `export * from "form-core";`],
-  ["form-react", `export * from "form-react";`],
-  ["form-contract-resolver-zod", `export * from "form-contract-resolver-zod";`],
-  ["form-contract-resolver-luq", `export * from "form-contract-resolver-luq";`],
-  ["form-store-zustand", `export * from "form-store-zustand";`],
+  [PACKAGE, `export * from "${PACKAGE}";`],
+  [`${PACKAGE}/core`, `export * from "${PACKAGE}/core";`],
+  [`${PACKAGE}/react`, `export * from "${PACKAGE}/react";`],
+  [`${PACKAGE}/resolver-zod`, `export * from "${PACKAGE}/resolver-zod";`],
+  [`${PACKAGE}/resolver-luq`, `export * from "${PACKAGE}/resolver-luq";`],
+  [`${PACKAGE}/store-zustand`, `export * from "${PACKAGE}/store-zustand";`],
   [
-    "form-react (a screen: useField, useRows, FormProvider, useCreateForm)",
-    `export { useField, useRows, FormProvider, useCreateForm } from "form-react";`,
+    "react (a screen: useField, useRows, FormProvider, useCreateForm)",
+    `export { useField, useRows, FormProvider, useCreateForm } from "${PACKAGE}/react";`,
   ],
+  // The floor row. It is the one figure `sideEffects: false` is really
+  // promising, and the one that would go quietly wrong first.
+  ["react (useField alone)", `export { useField } from "${PACKAGE}/react";`],
+  ["core (createForm alone)", `export { createForm } from "${PACKAGE}/core";`],
   [
-    "form-core (createForm alone)",
-    `export { createForm } from "form-core";`,
+    "core (assertFormStoreContract alone)",
+    `export { assertFormStoreContract } from "${PACKAGE}/core";`,
+  ],
+  // What an application actually installs. This row could not exist while the
+  // screen and the resolver were two packages that nobody measured together.
+  [
+    "a screen + resolver-zod (what an application installs)",
+    `export { useField, useRows, FormProvider, useCreateForm } from "${PACKAGE}/react";\n` +
+      `export { zodFormResolver } from "${PACKAGE}/resolver-zod";`,
   ],
 ];
 

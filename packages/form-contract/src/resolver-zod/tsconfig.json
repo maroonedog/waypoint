@@ -1,0 +1,12 @@
+{
+  "//": "The `./resolver-zod` entry. zod is a type-only import that is erased at build time, so this project references the contract and nothing else — the resolver never reaches the runtime.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "rootDir": ".",
+    "outDir": "../../dist/resolver-zod",
+    "tsBuildInfoFile": "../../.tsbuildinfo/resolver-zod.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../contract" }]
+}

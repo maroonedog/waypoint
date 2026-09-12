@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { z } from "zod";
-import { zodFormResolver } from "form-contract-resolver-zod";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
 import {
   createForm,
   buildDescriptorTree,
@@ -10,7 +10,7 @@ import {
   issuesCell,
   submitCountCell,
   rowsCell,
-} from "form-core";
+} from "@maroonedog/form-contract/core";
 
 const SCHEMA = z.object({
   owner: z.object({ name: z.string().min(3), email: z.email() }),

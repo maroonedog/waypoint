@@ -2,7 +2,7 @@
 // ===========================================================================
 // api.astro — everything you can call, with its real signature.
 //
-// The signatures are copied from the packages' emitted .d.ts rather than
+// The signatures are copied from the package's emitted .d.ts rather than
 // written from memory, because a reference that is approximately right is
 // worse than none: a reader trusts it and stops reading the types.
 // ===========================================================================
@@ -263,11 +263,11 @@ const slugOf = (name: string): string =>
 
 <Base
   title="API — form-contract"
-  description="Every hook, component and path type, with the signature emitted by the packages themselves and what each one hands back."
+  description="Every hook, component and path type, with the signature the package itself emits and what each one hands back."
 >
   <h1 class="text-3xl font-bold sm:text-4xl">API</h1>
   <p class="mt-4 max-w-2xl leading-relaxed text-on-surface-variant">
-    Signatures are the ones the packages emit. Each hook also takes a leading
+    Signatures are the ones the package emits. Each hook also takes a leading
     form key — <code>useField("order", path)</code> — when an application
     registered more than one form.
   </p>

@@ -38,7 +38,7 @@ Five members over an opaque key. The store is the swappable half; everything tha
 
 ```ts
 // ===========================================================================
-// packages/form-core/src/store/form-cell-store.types.ts
+// packages/form-contract/src/core/store/form-cell-store.types.ts
 // ===========================================================================
 
 declare const CELL_VALUE: unique symbol;
@@ -131,7 +131,7 @@ export interface FormCellStore {
 Channels and key minting — the one file that decides the spelling, and the one file that casts:
 
 ```ts
-// packages/form-core/src/store/cell-key.ts
+// packages/form-contract/src/core/store/cell-key.ts
 export type CellChannel =
   | "value" | "issues" | "touched" | "dirty" | "participating" | "rows" | "form";
 
@@ -153,7 +153,7 @@ Value and issues are **separate cells on purpose**: a component that displays on
 ### The shipped store
 
 ```ts
-// packages/form-core/src/store/create-cell-store.ts
+// packages/form-contract/src/core/store/create-cell-store.ts
 export function createCellStore(seed?: ReadonlyMap<string, unknown>): FormCellStore {
   const cells = new Map<string, unknown>(seed);
   const listeners = createCellListenerIndex();
@@ -198,7 +198,7 @@ A second version was killed for the opposite half. Its `forget` spelled removal 
 Owning the member also buys the diff a fact it could not previously have: the adapter knows that slice is exactly the cell set, so it can compare PRESENCE as well as value. "Absent" and "present holding `undefined`" are different cells — only the second is a value a field holds — and a diff on values alone calls a forget-then-revive no change at all.
 
 ```ts
-// packages/form-store-zustand/src/create-zustand-cell-store.ts
+// packages/form-contract/src/store-zustand/create-zustand-cell-store.ts
 
 /** The member of the host's state that holds the cells. */
 export const FORM_CELLS_MEMBER = "form-contract:cells";
@@ -282,7 +282,7 @@ Valtio, `@tanstack/store` and `@preact/signals-core` are the same shape and shor
 ### The contract is executable
 
 ```ts
-// packages/form-core/src/store/assert-form-store-contract.ts
+// packages/form-contract/src/core/store/assert-form-store-contract.ts
 export type StoreContractExpect = (held: boolean, what: string) => void;
 
 /** An adapter author runs this. A store that passes it is substitutable; one
@@ -451,7 +451,7 @@ function SubmitButton(): ReactElement {
 The binding a children function and a widget both receive:
 
 ```ts
-// packages/form-react/src/field-binding.types.ts
+// packages/form-contract/src/react/field-binding.types.ts
 export interface FieldBinding<TValue> {
   readonly path: string;               // concrete: "items[3].quantity"
   readonly declaredPath: string;       // "items[*].quantity"
@@ -508,7 +508,7 @@ export interface FieldInputProps {
 **Validating the field on its own.**
 
 ```ts
-// packages/form-core/src/runtime/create-field-handle.ts (the two methods)
+// packages/form-contract/src/core/runtime/create-field-handle.ts (the two methods)
 validate(): readonly FormIssue[] {
   const produced = port.validateRoot(store.read(ROOT_CELL), external);
   distributeIssues(produced);              // the whole map is written back
@@ -537,7 +537,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 
 ## 6. Module layout
 
-### `packages/form-core` — vendor-neutral, no React, no Luq
+### `packages/form-contract/src/core` — vendor-neutral, no React, no Luq
 
 | File | Single responsibility |
 |---|---|
@@ -581,7 +581,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | `runtime/form.types.ts` | `FormHandle`, `FormOptions`, `RowsHandle` |
 | `index.ts` | Re-exports only |
 
-### `packages/form-react`
+### `packages/form-contract/src/react`
 
 | File | Single responsibility |
 |---|---|
@@ -609,7 +609,7 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | `index.ts` | Re-exports only |
 | `widgets/*.tsx` | One file per kind, behind a separate entry point |
 
-### `packages/form-store-zustand`
+### `packages/form-contract/src/store-zustand`
 
 `create-zustand-cell-store.ts`, `index.ts`. Its test file is `assertFormStoreContract(() => createZustandCellStore(createStore(() => ({}))), expect)` and nothing else.
 
@@ -670,11 +670,11 @@ Two flat string fields, `billing.postcode` and `shipping.postcode`, with `compar
 
 **Luq (7 files):** `src/chain/default-declaration-recorder.ts` and its install line in `src/builder/index.ts`; `src/form/slot-to-form-kind.ts`, `declared-calls-to-constraints.ts` (four plugins: `required`, `stringMin`, `stringMax`, `stringPattern`), `is-unconditionally-required.ts`, `describe-luq-fields.ts`, `create-luq-form-adapter.ts`, `luq-issues-to-form-issues.ts`, `index.ts`; plus widening `build()` to carry `TDeclared`.
 
-**form-core (14 files):** `form-cell-store.types.ts`, `cell-key.ts`, `cell-listener-index.ts`, `create-cell-store.ts`, `store-contract-cases.ts`, `assert-form-store-contract.ts`, `concrete-path.ts`, `path-relation.ts`, `read-value-at.ts`, `write-value-at.ts`, `seed-root-value.ts`, `interned-defaults.ts`, `cell-source.ts`, `fan-out-write.ts`, `group-issues-by-path.ts`, `same-issue-list.ts`, `distribute-issues.ts`, `schedule-validation.ts`, `create-field-handle.ts`, `field-handle-cache.ts`, `create-form.ts`.
+**`core` (14 files):** `form-cell-store.types.ts`, `cell-key.ts`, `cell-listener-index.ts`, `create-cell-store.ts`, `store-contract-cases.ts`, `assert-form-store-contract.ts`, `concrete-path.ts`, `path-relation.ts`, `read-value-at.ts`, `write-value-at.ts`, `seed-root-value.ts`, `interned-defaults.ts`, `cell-source.ts`, `fan-out-write.ts`, `group-issues-by-path.ts`, `same-issue-list.ts`, `distribute-issues.ts`, `schedule-validation.ts`, `create-field-handle.ts`, `field-handle-cache.ts`, `create-form.ts`.
 
-**form-react (7 files):** `form-context.ts`, `form-provider.tsx`, `use-create-form.ts`, `use-cell.ts`, `use-field.ts`, `build-input-props.ts`, `field.tsx`.
+**`react` (7 files):** `form-context.ts`, `form-provider.tsx`, `use-create-form.ts`, `use-cell.ts`, `use-field.ts`, `build-input-props.ts`, `field.tsx`.
 
-**form-store-zustand (1 file).**
+**`store-zustand` (1 file).**
 
 Seven tests, and the slice is not done until all seven pass:
 

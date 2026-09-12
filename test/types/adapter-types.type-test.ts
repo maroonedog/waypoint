@@ -10,8 +10,8 @@
 // the compiler report TS2589 rather than a failing assertion.
 // ===========================================================================
 import { z } from "zod";
-import type { FieldPath, FormPaths, FormValues, ValueAtPath } from "form-contract";
-import { zodFormResolver } from "form-contract-resolver-zod";
+import type { FieldPath, FormPaths, FormValues, ValueAtPath } from "@maroonedog/form-contract";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
 
 const schema = z.object({
   name: z.string().min(3),

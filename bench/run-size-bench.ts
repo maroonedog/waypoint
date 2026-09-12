@@ -3,8 +3,8 @@
 //
 // The same shape as the counts lane, and for the same reason: a size that is
 // printed and never compared is a size that grows. `--check` exits non-zero
-// when a package crosses its recorded budget, so a dependency that arrives by
-// accident fails the build rather than the next reader's bundle.
+// when an entry point crosses its recorded budget, so a dependency that arrives
+// by accident fails the build rather than the next reader's bundle.
 //
 // The budget is not the measurement. It is the measurement plus a margin, so
 // that ordinary churn does not cry wolf and a step change does.
@@ -69,5 +69,5 @@ if (recording) {
     );
     process.exit(1);
   }
-  console.log("\nEvery package is inside its recorded budget.");
+  console.log("\nEvery entry point is inside its recorded budget.");
 }

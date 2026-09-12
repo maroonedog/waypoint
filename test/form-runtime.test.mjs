@@ -26,7 +26,7 @@ globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { z } = await import("zod");
 const React = await import("react");
 const { createRoot } = await import("react-dom/client");
-const { zodFormResolver } = await import("form-contract-resolver-zod");
+const { zodFormResolver } = await import("@maroonedog/form-contract/resolver-zod");
 const {
   createForm,
   createCellStore,
@@ -34,9 +34,9 @@ const {
   issuesCell,
   readValueAt,
   ROOT_CELL,
-} = await import("form-core");
-const { FormProvider, Field } = await import("form-react");
-const { createZustandCellStore } = await import("form-store-zustand");
+} = await import("@maroonedog/form-contract/core");
+const { FormProvider, Field } = await import("@maroonedog/form-contract/react");
+const { createZustandCellStore } = await import("@maroonedog/form-contract/store-zustand");
 const { createStore } = await import("zustand/vanilla");
 
 const { act, createElement: h, useState, Fragment } = React;
@@ -402,17 +402,16 @@ test("nothing in the runtime compiles a string", async () => {
 
   const banned = [/new\s+Function\s*\(/, /(^|[^.\w])eval\s*\(/];
   const offenders = [];
-  for (const packageName of [
-    "packages/spec/src",
-    "packages/form-core/src",
-    "packages/form-react/src",
-    "packages/form-store-zustand/src",
-    "packages/resolver-zod/src",
-  ]) {
-    for (const file of await sourceFiles(packageName)) {
-      const text = await readFile(file, "utf8");
-      if (banned.some((pattern) => pattern.test(text))) offenders.push(file);
-    }
+  // One root, so every entry point is covered by construction. Listing the
+  // directories by hand is how `resolver-luq` went unscanned while the five
+  // that were named looked exhaustive.
+  for (const file of await sourceFiles("packages/form-contract/src")) {
+    const text = await readFile(file, "utf8");
+    if (banned.some((pattern) => pattern.test(text))) offenders.push(file);
   }
-  assert.deepEqual(offenders, []);
+  assert.ok(offenders.length === 0, `${offenders.join(", ")} compiles a string`);
+  assert.ok(
+    (await sourceFiles("packages/form-contract/src")).length > 50,
+    "the scan found almost no files — it is pointed somewhere wrong"
+  );
 });

@@ -1,0 +1,12 @@
+{
+  "//": "The build, as one command. Six referenced projects, one per entry point, and `tsc -b` works out the order from the references rather than from a chain of `&&` in package.json that a reader has to trust. `files: []` because this config compiles nothing itself — it only says what the package is made of.",
+  "files": [],
+  "references": [
+    { "path": "./src/contract" },
+    { "path": "./src/core" },
+    { "path": "./src/react" },
+    { "path": "./src/resolver-zod" },
+    { "path": "./src/resolver-luq" },
+    { "path": "./src/store-zustand" }
+  ]
+}

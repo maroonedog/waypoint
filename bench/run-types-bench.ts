@@ -115,9 +115,10 @@ gated**. §6 is the measurement behind that decision.
 \`npm run bench:types\` writes one throwaway TypeScript program per row into a
 temporary directory and compiles it with \`tsc --extendedDiagnostics --noEmit\`.
 Each program holds a root type of the stated shape, a
-\`FormAdapter<Root, FieldPath<Root>>\`, the \`declare module "form-react"\`
+\`FormAdapter<Root, FieldPath<Root>>\`, the
+\`declare module "@maroonedog/form-contract/react"\`
 augmentation that registers it, and one \`useField(...)\` call per leaf. The
-imports resolve to \`packages/*/src\`, so what is measured is the type this
+imports resolve to \`packages/form-contract/src\`, so what is measured is the type this
 repository maintains rather than a \`.d.ts\` that may predate the last edit.
 
 Leaf counts are **counted** off the generated program, never computed as
@@ -146,7 +147,7 @@ can put them back.
 ${renderFloors(result)}
 
 \`empty\` is what every TypeScript program in the world pays. \`packages-only\` is
-\`form-contract\` and \`form-react\` type-checking their own source: an application
+the \`.\` and \`./react\` entries type-checking their own source: an application
 pays it once, and it does not move when the form grows. Neither is a cost of
 typed addressing, and an absolute figure that silently contains both is how two
 honest people measuring the same thing end up an order of magnitude apart.
@@ -212,7 +213,8 @@ than found in a union of literals, and that is what naming a row costs.
 
 ### Where the budget truncates
 
-\`PathDepthBudget\` is a type alias in \`packages/spec/src/path-depth.types.ts\`.
+\`PathDepthBudget\` is a type alias in
+\`packages/form-contract/src/contract/path-depth.types.ts\`.
 Its value is not restated here: a number copied out of a file is the kind of
 claim this lane exists to stop making. This is where the compiler actually
 stops, MEASURED by handing \`useField\` one path

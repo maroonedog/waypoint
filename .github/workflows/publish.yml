@@ -1,0 +1,85 @@
+# ===========================================================================
+# publish.yml — publishes @maroonedog/form-contract to npm, BY HAND ONLY.
+#
+# `workflow_dispatch` is the only trigger, and that is deliberate rather than
+# provisional: nothing here has ever been published, and a workflow that
+# publishes on push turns every merge into a release decision somebody made
+# without noticing. Adding a `push:` trigger to this file is a release-policy
+# change, not a convenience — it belongs in its own reviewed commit.
+#
+# `id-token: write` is what npm's trusted publishing needs; provenance is then
+# generated automatically and `--provenance` is NOT passed. `provenance` is
+# also deliberately absent from package.json's publishConfig, because it makes
+# `npm publish` refuse to run off CI ("Automatic provenance generation not
+# supported for provider: null") and `--no-provenance` does not override it —
+# which would make impossible the one hand publish npm requires before a
+# trusted publisher can be registered at all.
+#
+# node 22 and npm 11 are floors npm documents for trusted publishing (npm CLI
+# 11.5.1+, Node 22.14.0+), not preferences. npm is pinned to the major rather
+# than @latest: a newer npm that demands a newer Node than the runner has is a
+# failure at the last step of a release.
+#
+# The two refusals below exist because each has caught a real mistake in a
+# sibling repository: publishing a version that is already on the registry, and
+# publishing from a tree whose build was never run.
+# ===========================================================================
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      dryRun:
+        description: "Pack and report without publishing"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - run: npm install -g npm@11
+
+      - run: npm ci
+
+      # The same gate a contributor runs. A package that does not build is not
+      # a package, and the tarball is assembled from dist.
+      - run: npm run verify
+
+      - name: Refuse a version that is already on the registry
+        run: |
+          NAME=$(node -p "require('./packages/form-contract/package.json').name")
+          VERSION=$(node -p "require('./packages/form-contract/package.json').version")
+          echo "About to publish $NAME@$VERSION"
+          if npm view "$NAME@$VERSION" version > /dev/null 2>&1; then
+            echo "::error::$NAME@$VERSION is already published. Bump the version first."
+            exit 1
+          fi
+
+      - name: Pack, and list what the tarball actually carries
+        run: npm pack --dry-run --workspace @maroonedog/form-contract
+
+      - name: Publish
+        if: ${{ inputs.dryRun == false }}
+        run: npm publish --workspace @maroonedog/form-contract --access public
+
+      - name: Say what the registry now serves
+        if: ${{ inputs.dryRun == false }}
+        run: npm view @maroonedog/form-contract version dist-tags

@@ -1,0 +1,13 @@
+{
+  "//": "The `./store-zustand` entry: the shipped instance of the store contract `./core` exports. It is typed against a getState/setState/subscribe triad rather than against zustand, so it references the runtime and nothing else — and no DOM, for the same reason the runtime has none.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "types": [],
+    "rootDir": ".",
+    "outDir": "../../dist/store-zustand",
+    "tsBuildInfoFile": "../../.tsbuildinfo/store-zustand.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../core" }]
+}

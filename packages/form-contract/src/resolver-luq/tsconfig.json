@@ -1,0 +1,12 @@
+{
+  "//": "The `./resolver-luq` entry. It never names luq in a type position either — it is structural over the JSON Schema luq already produces — so, like the zod resolver, it depends on the contract alone.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "rootDir": ".",
+    "outDir": "../../dist/resolver-luq",
+    "tsBuildInfoFile": "../../.tsbuildinfo/resolver-luq.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../contract" }]
+}

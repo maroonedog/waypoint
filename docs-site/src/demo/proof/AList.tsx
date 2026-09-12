@@ -1,4 +1,4 @@
-import { FormProvider, useCreateForm, useField, useRows, type FieldRow } from "form-react";
+import { FormProvider, useCreateForm, useField, useRows, type FieldRow } from "@maroonedog/form-contract/react";
 import { blankLine, orderAdapter, orderDefaults } from "../order-form.js";
 
 const INPUT = "min-w-0 flex-1 rounded border border-outline-variant bg-surface px-2 py-1 text-sm";

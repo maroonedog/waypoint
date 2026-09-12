@@ -13,20 +13,36 @@
 import { defineConfig } from "vite";
 import { fileURLToPath } from "node:url";
 
-const packageSource = (name: string): string =>
-  fileURLToPath(new URL(`../../packages/${name}/src/index.ts`, import.meta.url));
+const PACKAGE = "@maroonedog/form-contract";
+
+/** One entry point of the package, as the source file behind it. */
+const entrySource = (entry: string): string =>
+  fileURLToPath(
+    new URL(
+      `../../packages/form-contract/src/${entry}/index.ts`,
+      import.meta.url
+    )
+  );
+
+// Anchored regular expressions, because Vite matches a STRING alias as a
+// prefix: a bare `@maroonedog/form-contract` key would also swallow
+// `@maroonedog/form-contract/react` and rewrite it to a path that is not there.
+const entryAliases = (
+  [
+    [PACKAGE, "contract"],
+    [`${PACKAGE}/core`, "core"],
+    [`${PACKAGE}/react`, "react"],
+    [`${PACKAGE}/resolver-zod`, "resolver-zod"],
+    [`${PACKAGE}/store-zustand`, "store-zustand"],
+  ] as const
+).map(([specifier, entry]) => ({
+  find: new RegExp(`^${specifier}$`),
+  replacement: entrySource(entry),
+}));
 
 export default defineConfig({
   root: fileURLToPath(new URL("./page", import.meta.url)),
-  resolve: {
-    alias: {
-      "form-contract": packageSource("spec"),
-      "form-contract-resolver-zod": packageSource("resolver-zod"),
-      "form-core": packageSource("form-core"),
-      "form-react": packageSource("form-react"),
-      "form-store-zustand": packageSource("form-store-zustand"),
-    },
-  },
+  resolve: { alias: entryAliases },
   build: {
     outDir: fileURLToPath(new URL("./dist", import.meta.url)),
     emptyOutDir: true,

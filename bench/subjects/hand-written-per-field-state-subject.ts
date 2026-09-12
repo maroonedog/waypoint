@@ -25,7 +25,7 @@ import {
   type ReactElement,
 } from "react";
 import { createRoot, type Root } from "react-dom/client";
-import { readValueAt, writeValueAt } from "form-core";
+import { readValueAt, writeValueAt } from "@maroonedog/form-contract/core";
 import { SharedLeaf } from "../shape/shared-leaf.ts";
 import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
 import { issuePathToConcretePath } from "../shape/issue-path-to-concrete-path.ts";

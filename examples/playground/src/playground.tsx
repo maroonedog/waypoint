@@ -1,11 +1,11 @@
 import { useState, type ReactElement } from "react";
 import { z } from "zod";
 import { createStore } from "zustand/vanilla";
-import { zodFormResolver } from "form-contract-resolver-zod";
-import { createCellStore, type FormCellStore } from "form-core";
-import { FormProvider, useField, useCreateForm } from "form-react";
-import type { FormPathTo } from "form-react";
-import { createZustandCellStore } from "form-store-zustand";
+import { zodFormResolver } from "@maroonedog/form-contract/resolver-zod";
+import { createCellStore, type FormCellStore } from "@maroonedog/form-contract/core";
+import { FormProvider, useField, useCreateForm } from "@maroonedog/form-contract/react";
+import type { FormPathTo } from "@maroonedog/form-contract/react";
+import { createZustandCellStore } from "@maroonedog/form-contract/store-zustand";
 import { useRenderCount } from "./render-count.js";
 
 const SCHEMA = z
@@ -31,7 +31,7 @@ const SCHEMA = z
 const ADAPTER = zodFormResolver(SCHEMA);
 
 // The one declaration that types every path below. Nothing imports it.
-declare module "form-react" {
+declare module "@maroonedog/form-contract/react" {
   interface FormTypeRegistry {
     form: typeof ADAPTER;
   }

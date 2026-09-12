@@ -30,12 +30,12 @@ export const EMPTY_PROGRAM_SOURCE = `${BANNER}\nexport {};\n`;
 /**
  * The packages, imported and never used for anything. It separates what the
  * libraries' own source costs from what one application's shape costs, so the
- * shape rows are not reported as if they contained `form-react`'s own
+ * shape rows are not reported as if they contained the `./react` entry's own
  * type-checking.
  */
 export const PACKAGES_ONLY_PROGRAM_SOURCE = `${BANNER}
-import type { FieldPath, FormAdapter } from "form-contract";
-import { useField } from "form-react";
+import type { FieldPath, FormAdapter } from "@maroonedog/form-contract";
+import { useField } from "@maroonedog/form-contract/react";
 
 export type Unused = [FieldPath<{ only: string }>, FormAdapter<unknown>];
 export const alsoUnused = useField;
@@ -50,14 +50,14 @@ export function typeProgramSource(
     .map((path) => `  useField(${JSON.stringify(path)});`)
     .join("\n");
   return `${BANNER}
-import type { FieldPath, FormAdapter } from "form-contract";
-import { useField } from "form-react";
+import type { FieldPath, FormAdapter } from "@maroonedog/form-contract";
+import { useField } from "@maroonedog/form-contract/react";
 
 ${shape.declarations}
 
 declare const adapter: FormAdapter<${shape.rootName}, FieldPath<${shape.rootName}>>;
 
-declare module "form-react" {
+declare module "@maroonedog/form-contract/react" {
   interface FormTypeRegistry {
     form: typeof adapter;
   }

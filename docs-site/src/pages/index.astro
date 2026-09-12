@@ -36,7 +36,7 @@ const whole = `
 const orderAdapter = zodFormResolver(orderSchema);
 
 // 2. Its types, registered once for the whole application.
-declare module "form-react" {
+declare module "@maroonedog/form-contract/react" {
   interface FormTypeRegistry { form: typeof orderAdapter }
 }
 
@@ -118,7 +118,7 @@ items.insert(items.rows.length, { sku: "" });`,
 // index passes and a typo beside it is rejected, exactly as ours is), and
 // "ours is checked and theirs is not" is false wherever the form's type is in
 // scope. The difference is what happens when it is not.
-const LIBS = ["form-contract", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
+const LIBS = ["@maroonedog/form-contract", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
 
 const PATHS: readonly (readonly [string, readonly string[]])[] = [
   [
@@ -236,7 +236,7 @@ const CAN: readonly (readonly [string, string, string, boolean])[] = [
   ],
   [
     "React Native",
-    "form-core has no DOM, but the React bindings do: inputProps are DOM attributes and the uncontrolled ref is an HTMLInputElement.",
+    "The core entry has no DOM, but the React bindings do: inputProps are DOM attributes and the uncontrolled ref is an HTMLInputElement.",
     "",
     true,
   ],
@@ -326,7 +326,7 @@ const TRY = [
     </p>
 
     <p class="note">
-      <strong>What it costs.</strong> One <code>declare module "form-react"</code>{" "}
+      <strong>What it costs.</strong> One <code>declare module "@maroonedog/form-contract/react"</code>{" "}
       block that has to stay inside <code>tsconfig</code>'s <code>include</code> —
       delete it and every call site stops compiling, which is the failure
       direction you want. Two limits with it: register a second form and a
@@ -558,8 +558,9 @@ const TRY = [
   <section class="mt-20 rounded-xl border border-outline-variant p-6">
     <p class="label">Where it stands</p>
     <p class="mt-3 leading-relaxed">
-      <strong>No package has ever been published — there is no publish script
-      and no publish workflow — and nobody has run it in production.</strong>
+      <strong>Nothing has ever been published — the publish workflow is
+      manual-dispatch only and has never been run — and nobody has run it in
+      production.</strong>
     </p>
     <p class="caption">
       171 tests, the seven compile-time programs <code>test:types</code> runs,

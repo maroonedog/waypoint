@@ -18,7 +18,7 @@ import {
   useField,
   useFormStatus,
   type FormPathTo,
-} from "form-react";
+} from "@maroonedog/form-contract/react";
 import { orderAdapter, orderDefaults } from "./order-form.js";
 
 function Text({ at, label }: { at: FormPathTo<string>; label: string }) {

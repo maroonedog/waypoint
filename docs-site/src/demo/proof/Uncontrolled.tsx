@@ -3,7 +3,7 @@ import {
   useCreateForm,
   useField,
   useUncontrolledField,
-} from "form-react";
+} from "@maroonedog/form-contract/react";
 import { orderAdapter, orderDefaults } from "../order-form.js";
 import { useRenderCount } from "../use-render-count.js";
 

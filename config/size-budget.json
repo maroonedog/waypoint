@@ -3,60 +3,81 @@
   "marginPercent": 10,
   "rows": [
     {
-      "id": "form-contract",
-      "entry": "export * from \"form-contract\";",
+      "id": "@maroonedog/form-contract",
+      "entry": "export * from \"@maroonedog/form-contract\";",
       "minified": 101,
       "gzipped": 108,
       "budget": 119
     },
     {
-      "id": "form-core",
-      "entry": "export * from \"form-core\";",
+      "id": "@maroonedog/form-contract/core",
+      "entry": "export * from \"@maroonedog/form-contract/core\";",
       "minified": 17594,
       "gzipped": 6310,
       "budget": 6941
     },
     {
-      "id": "form-react",
-      "entry": "export * from \"form-react\";",
+      "id": "@maroonedog/form-contract/react",
+      "entry": "export * from \"@maroonedog/form-contract/react\";",
       "minified": 23373,
       "gzipped": 8273,
       "budget": 9101
     },
     {
-      "id": "form-contract-resolver-zod",
-      "entry": "export * from \"form-contract-resolver-zod\";",
+      "id": "@maroonedog/form-contract/resolver-zod",
+      "entry": "export * from \"@maroonedog/form-contract/resolver-zod\";",
       "minified": 3124,
       "gzipped": 1278,
       "budget": 1406
     },
     {
-      "id": "form-contract-resolver-luq",
-      "entry": "export * from \"form-contract-resolver-luq\";",
+      "id": "@maroonedog/form-contract/resolver-luq",
+      "entry": "export * from \"@maroonedog/form-contract/resolver-luq\";",
       "minified": 2001,
       "gzipped": 901,
       "budget": 992
     },
     {
-      "id": "form-store-zustand",
-      "entry": "export * from \"form-store-zustand\";",
+      "id": "@maroonedog/form-contract/store-zustand",
+      "entry": "export * from \"@maroonedog/form-contract/store-zustand\";",
       "minified": 1201,
       "gzipped": 648,
       "budget": 713
     },
     {
-      "id": "form-react (a screen: useField, useRows, FormProvider, useCreateForm)",
-      "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"form-react\";",
+      "id": "react (a screen: useField, useRows, FormProvider, useCreateForm)",
+      "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/form-contract/react\";",
       "minified": 18689,
       "gzipped": 6785,
       "budget": 7464
     },
     {
-      "id": "form-core (createForm alone)",
-      "entry": "export { createForm } from \"form-core\";",
+      "id": "react (useField alone)",
+      "entry": "export { useField } from \"@maroonedog/form-contract/react\";",
+      "minified": 3361,
+      "gzipped": 1383,
+      "budget": 1522
+    },
+    {
+      "id": "core (createForm alone)",
+      "entry": "export { createForm } from \"@maroonedog/form-contract/core\";",
       "minified": 14614,
       "gzipped": 5371,
       "budget": 5909
+    },
+    {
+      "id": "core (assertFormStoreContract alone)",
+      "entry": "export { assertFormStoreContract } from \"@maroonedog/form-contract/core\";",
+      "minified": 1900,
+      "gzipped": 614,
+      "budget": 676
+    },
+    {
+      "id": "a screen + resolver-zod (what an application installs)",
+      "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/form-contract/react\";\nexport { zodFormResolver } from \"@maroonedog/form-contract/resolver-zod\";",
+      "minified": 21835,
+      "gzipped": 7813,
+      "budget": 8595
     }
   ]
 }

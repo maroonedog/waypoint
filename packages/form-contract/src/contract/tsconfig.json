@@ -1,0 +1,12 @@
+{
+  "//": "The `.` entry: the contract itself. It references nothing, because a contract that depended on an implementation would not be one. `types: []` and no DOM keep it to lib.d.ts, so a validator author who implements this gets nothing else in scope.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020"],
+    "types": [],
+    "rootDir": ".",
+    "outDir": "../../dist/contract",
+    "tsBuildInfoFile": "../../.tsbuildinfo/contract.tsbuildinfo"
+  },
+  "include": ["."]
+}

@@ -7,7 +7,7 @@
 // had to start honouring, so the test writes one.
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createForm, errorCountCell, issuesCell } from "form-core";
+import { createForm, errorCountCell, issuesCell } from "@maroonedog/form-contract/core";
 
 const FIELDS = [
   { path: "nickname", kind: "string", isRequired: false },

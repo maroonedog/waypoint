@@ -1,9 +1,10 @@
 // ===========================================================================
 // form-contract-registration.ts — the benchmark's form, registered.
 //
-// Every hook in form-react reads its paths from the type registry, and this
-// program's form has none to give: the schema is GENERATED, one leaf per field
-// at whatever width the run asks for, so no type describes it and none could.
+// Every hook in the `./react` entry reads its paths from the type registry,
+// and this program's form has none to give: the schema is GENERATED, one leaf
+// per field at whatever width the run asks for, so no type describes it and
+// none could.
 //
 // Registering `FormAdapter<unknown, string>` says exactly that. The paths of
 // this form are `string`, so `AddressablePath<string>` is `string` and the
@@ -12,9 +13,9 @@
 // down, and it is a line of the application's own source rather than a second
 // API for everyone else to choose between.
 // ===========================================================================
-import type { FormAdapter } from "form-contract";
+import type { FormAdapter } from "@maroonedog/form-contract";
 
-declare module "form-react" {
+declare module "@maroonedog/form-contract/react" {
   interface FormTypeRegistry {
     form: FormAdapter<unknown, string>;
   }

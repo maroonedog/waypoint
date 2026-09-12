@@ -71,9 +71,15 @@ const tsconfigFor = (directory: string): string => {
         types: [],
         baseUrl: ".",
         paths: {
-          "form-contract": [`${back}/packages/spec/src/index.ts`],
-          "form-core": [`${back}/packages/form-core/src/index.ts`],
-          "form-react": [`${back}/packages/form-react/src/index.ts`],
+          "@maroonedog/form-contract": [
+            `${back}/packages/form-contract/src/contract/index.ts`,
+          ],
+          "@maroonedog/form-contract/core": [
+            `${back}/packages/form-contract/src/core/index.ts`,
+          ],
+          "@maroonedog/form-contract/react": [
+            `${back}/packages/form-contract/src/react/index.ts`,
+          ],
         },
       },
       include: ["program.ts"],

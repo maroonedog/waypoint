@@ -23,16 +23,16 @@ const install = `
 git clone https://github.com/maroonedog/form-contract
 cd form-contract
 npm install
-npm run verify     # builds every package, runs the tests and the type tests
+npm run verify     # builds the package, runs the tests and the type tests
 `;
 
-const packages = [
-  ["form-react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
-  ["form-contract", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
-  ["form-contract-resolver-zod", "zodFormResolver", "Describes and judges a zod schema."],
-  ["form-contract-resolver-luq", "luqFormResolver", "The same, for luq, through its JSON Schema."],
-  ["form-core", "createForm · createCellStore · assertFormStoreContract", "The runtime. No React."],
-  ["form-store-zustand", "createZustandCellStore", "A worked example of substituting the store."],
+const entryPoints = [
+  ["@maroonedog/form-contract/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
+  ["@maroonedog/form-contract", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
+  ["@maroonedog/form-contract/resolver-zod", "zodFormResolver", "Describes and judges a zod schema."],
+  ["@maroonedog/form-contract/resolver-luq", "luqFormResolver", "The same, for luq, through its JSON Schema."],
+  ["@maroonedog/form-contract/core", "createForm · createCellStore · assertFormStoreContract", "The runtime. No React."],
+  ["@maroonedog/form-contract/store-zustand", "createZustandCellStore", "A worked example of substituting the store."],
 ];
 ---
 
@@ -44,8 +44,8 @@ const packages = [
 
   <p class="lead">
     <strong class="text-on-surface">Nothing is published yet</strong>, so you
-    clone it and run one command. The six packages are npm workspaces and
-    resolve to each other with no linking step.
+    clone it and run one command. It is one package with six entry points, so
+    there is one version to track and one install to make.
   </p>
 
   <Code code={install} label="shell" lang="ts" />
@@ -84,22 +84,22 @@ const packages = [
 
   <h2 class="mt-16 text-2xl font-bold">Where each symbol comes from</h2>
   <p class="mt-3 leading-relaxed text-on-surface-variant">
-    Six packages, and the only one a screen imports from is{" "}
-    <code>form-react</code>.
+    Six entry points, and the only one a screen imports from is{" "}
+    <code>@maroonedog/form-contract/react</code>.
   </p>
 
   <div class="mt-5 overflow-x-auto">
     <table class="w-full text-sm">
       <thead class="text-left text-on-surface-variant">
         <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">Package</th>
+          <th class="py-2 pr-4 font-medium">Entry point</th>
           <th class="py-2 pr-4 font-medium">What you import from it</th>
           <th class="py-2 font-medium">&nbsp;</th>
         </tr>
       </thead>
       <tbody>
         {
-          packages.map(([name, symbols, what]) => (
+          entryPoints.map(([name, symbols, what]) => (
             <tr class="hairline">
               <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
                 {name}
@@ -132,17 +132,17 @@ npm run example:showcase        # http://localhost:5179`}
   <p class="caption">
     The second is a 23-input application form across six sections, drawn with
     the application's own components. Both have their own README. Neither
-    needs a build: the packages resolve to their <strong>source</strong>, so
-    an edit inside <code>packages/form-core</code> reloads the page.
+    needs a build: the package resolves to its <strong>source</strong>, so
+    an edit inside <code>src/core</code> reloads the page.
   </p>
 
   <section class="mt-16 rounded-xl border border-outline-variant p-6">
     <p class="label">Where it stands</p>
     <p class="mt-3 leading-relaxed text-on-surface-variant">
       171 tests, the seven compile-time programs <code>test:types</code> runs,
-      and a screen that uses all of it. <strong class="text-on-surface">No
-      package has ever been published — there is no publish script and no
-      publish workflow — and nobody has run it in production.</strong>
+      and a screen that uses all of it. <strong class="text-on-surface">Nothing
+      has ever been published — the publish workflow is manual-dispatch only
+      and has never been run — and nobody has run it in production.</strong>
     </p>
   </section>
 </Base>
