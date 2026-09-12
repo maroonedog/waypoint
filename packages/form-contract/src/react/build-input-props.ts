@@ -6,13 +6,22 @@
 // What is left here is the half that differs: who holds the value, and what a
 // keystroke means for the kind of field it landed in.
 //
-// Three kinds need more than "put the string in the cell", and each of them
+// Four kinds need more than "put the string in the cell", and each of them
 // was a field this library could not previously draw at all:
 //
 //   boolean — a checkbox carries `checked`, not `value`, and the answer is
 //   `event.target.checked`. Reading `value` off a checkbox returns the string
 //   "on" whether or not it is ticked, which is why a checkbox wired the
 //   text-input way looks like it works and then never turns off.
+//
+//   file — a file input carries NEITHER. It cannot be controlled at all: its
+//   value is settable only to the empty string, and React has no way to put a
+//   File back onto it. So this branch emits no `value` and no `checked`, the
+//   node is the only holder of what was picked, and the cell is written from
+//   `event.target.files?.[0]`. It has to be decided on `kind` and before the
+//   generic tail, which would coerce for display and write `String(aFile)` —
+//   `"[object File]"` — onto the element. That is also why `file` is a kind
+//   and not a `format` on `string`: a format never reaches a branch at all.
 //
 //   number — the DOM hands back a string and the schema declared a number. The
 //   coercion lives in number-from-typing.ts, along with the transient it
@@ -102,6 +111,23 @@ export function buildInputProps(request: InputPropsRequest): FieldInputProps {
       onChange: (event: FieldChangeEvent) =>
         request.writeValue(
           "checked" in event.target ? event.target.checked : false
+        ),
+      onBlur: request.onBlur,
+    };
+  }
+
+  if (descriptor?.kind === "file") {
+    return {
+      ...shared,
+      // `in` rather than a cast, for the reason the boolean branch gives: the
+      // bag is spreadable onto a textarea and a select, and only an input has
+      // `files`. An empty pick writes `undefined`, so clearing the chooser
+      // clears the cell rather than leaving the last file in it.
+      onChange: (event: FieldChangeEvent) =>
+        request.writeValue(
+          "files" in event.target
+            ? (event.target.files?.[0] ?? undefined)
+            : undefined
         ),
       onBlur: request.onBlur,
     };

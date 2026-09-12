@@ -1,5 +1,5 @@
 {
-  "//": "The `./resolver-zod` entry. zod is a type-only import that is erased at build time, so this project references the contract and nothing else — the resolver never reaches the runtime.",
+  "//": "The `./resolver-zod` entry. It names zod in a type position only, and since the descriptors now come from zod's own JSON Schema it references `./resolver-standard` and keeps just the refinement — the two facts a JSON Schema document cannot carry about the schema that produced it.",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM"],
@@ -8,5 +8,5 @@
     "tsBuildInfoFile": "../../.tsbuildinfo/resolver-zod.tsbuildinfo"
   },
   "include": ["."],
-  "references": [{ "path": "../contract" }]
+  "references": [{ "path": "../contract" }, { "path": "../resolver-standard" }]
 }

@@ -6,6 +6,7 @@ export type {
 } from "./store/form-cell-store.types.js";
 export {
   ROOT_CELL,
+  blockingIssuesCell,
   dirtyCell,
   errorCountCell,
   issuesCell,
@@ -36,6 +37,7 @@ export type {
   FieldSources,
   FormHandle,
   FormOptions,
+  FormValidationMoment,
 } from "./runtime/form.types.js";
 export { declaredPathOf } from "./path/declared-path-of.js";
 export { bindDeclaredPath } from "./path/bind-declared-path.js";
@@ -68,6 +70,11 @@ export type {
 } from "./descriptors/descriptor-tree.types.js";
 export type { SubmitHandler, SubmitOutcome } from "./runtime/submit-form.js";
 export {
+  summarizeIssues,
+  type FieldIssueSummary,
+  type IssueSummaryRequest,
+} from "./runtime/summarize-issues.js";
+export {
   createParticipationIndex,
   type ParticipationIndex,
 } from "./runtime/participation-index.js";
@@ -75,3 +82,12 @@ export { writeDeclaredCells } from "./descriptors/write-declared-cells.js";
 export { planRowCellMoves } from "./runtime/row-cell-move.js";
 export type { RowCellMove, RowOrigins } from "./runtime/row-cell-move.js";
 export { refreshOpenAround } from "./runtime/refresh-open-cells.js";
+// `refreshOpenAround` was exported without either of these, which left it a
+// function no caller outside this package could spell the arguments for. The
+// self-audit bench calls it directly to time the scan it runs on every write,
+// and a hand-rolled OpenValueCells would have timed the hand-rolled one — the
+// array `forEachOpen` allocates is the thing being measured.
+export {
+  createOpenValueCells,
+  type OpenValueCells,
+} from "./runtime/open-value-cells.js";

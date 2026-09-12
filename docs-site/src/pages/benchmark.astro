@@ -19,22 +19,31 @@ import TimingTable from "../components/TimingTable.astro";
   <h1 class="text-3xl font-bold sm:text-4xl">Benchmark</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">form-contract is behind on all three
+    <strong class="text-on-surface">form-contract is behind on all four
     scenarios, at every size.</strong> The report says so in those words, and
     prints the rows it loses before its own table.
   </p>
 
   <ol class="mt-6 grid gap-3">
     <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
-      Two of the three losses are won by <strong>not showing the message</strong>:
+      Two of the four losses are won by <strong>not showing the message</strong>:
       one configuration reports only at submit, and one reports nothing at all.
-      The third is form-contract's own uncontrolled binding.
+      The other two are beaten by form-contract's own uncontrolled binding.
     </li>
     <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
       On the timing lane a keystroke at 201 fields measures{" "}
       <strong>0.57× the hand-written reference</strong>, and the harness
       <strong> refuses to call it a win</strong> — its own calibration ladder
       resolves nothing that far under the floor.
+    </li>
+    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+      <strong>K5 is what coalescing is worth.</strong> Five characters into one
+      field with <em>one</em> settle at the end: at 201 fields both
+      form-contract subjects run <strong>1 validator pass, 201 paths judged</strong>,
+      and react-hook-form, Formik, TanStack Form and the hand-written reference
+      each run <strong>5 passes and 1005 paths judged</strong>. Draining after
+      every keystroke — which is what the other three scenarios do — is the one
+      arrangement in which coalescing can buy nothing.
     </li>
     <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
       Every integer on the counts lane is gated. CI fails when one moves, in

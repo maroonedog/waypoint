@@ -4,18 +4,28 @@
 //
 // This page no longer argues that describing a field before a value exists is
 // scarce. It is not: `getZodConstraint`, `parseSchema`, `superValidate`,
-// `toFieldConfig` and `new ZodBridge` are all schema-in and value-free, and
-// `@standard-schema/spec` has a JSON Schema member that several validators
-// implement — `luqFormResolver` on this very site calls it. So the page states
-// the narrower thing that IS true: a JSON Schema is a TREE, a descriptor list
-// is FLAT, and the walk between them is the work, with a lossy edge the zod
-// resolver has to route around.
+// `toFieldConfig` and `new ZodBridge` are all schema-in and value-free. So the
+// page states the narrower thing that IS true: a JSON Schema is a TREE, a
+// descriptor list is FLAT, and the walk between them is the work.
 //
-// `FormResolver` is gone from the code, so it is gone from here. It claimed a
-// resolver is `(schema) => FormAdapter` and `luqFormResolver` is binary; the
-// block below shows both real signatures instead of a type neither obeys.
+// THE "TWO ROADS" SECTION IS GONE, and that is the change this rewrite records.
+// It used to close by contrasting them — zod walked directly, luq asked for a
+// JSON Schema — and used the `z.date()` throw as the reason zod needed a road
+// of its own. There is one road now. Both resolvers take their descriptors
+// from the same generic walk over `~standard.jsonSchema`, so the page argues
+// neutrality from the BUILD rather than from the existence of two
+// implementations, and the `z.date()` throw appears as what the generic path
+// costs rather than as a reason to avoid it.
 //
-// The three stages in `drawn` were produced by running the zod resolver and
+// `FormResolver` is still gone from the code. The old worked example for why —
+// that `luqFormResolver` is binary — stopped being true when the resolver went
+// unary, so the block below shows the three real signatures and the page gives
+// the reason that survives.
+//
+// The descriptor diff in `roads` is measured output, not prose: it is the
+// three rows where a zod schema and its own JSON Schema disagree, produced by
+// running both paths over the same schemas on zod 4.6.1. The three stages in
+// `drawn` were likewise produced by running the zod resolver and
 // buildInputProps, not typed out.
 // ===========================================================================
 import Base from "../layouts/Base.astro";
@@ -53,18 +63,47 @@ z.object({
 const resolver = `
 interface FormAdapter<T, TPath extends string = string> {
   readonly fields: readonly FormFieldDescriptor[];
-  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
+  // The signal is aborted when a newer pass starts. An adapter that declares
+  // one parameter is never handed one, and no AbortController is constructed.
+  validate(root: unknown, signal?: ValidationSignal): MaybeAsync<readonly FormIssue[]>;
 }
 
-// There is no FormResolver type. A resolver's arity is the vendor's business:
-zodFormResolver(schema)                  // zod describes and judges as one
-luqFormResolver(validator, describable)  // luq judges with one, describes with another
+// One resolver reads both members off specs this package does not own:
+standardFormResolver(schema)   // fields  ← schema["~standard"].jsonSchema.input({ target })
+                               // validate ← schema["~standard"].validate(root)
+
+// The vendor ones are that, plus what the specs have no member for:
+zodFormResolver(schema)        // + kind "date", enum key labels, no synthetic int bounds
+luqFormResolver(describable)   // + issue codes, and warnings graded out
+`;
+
+const neutral = `
+// A validator that declares no JSON Schema cannot reach the unary overload.
+// tsc, on an object carrying only ~standard.validate:
+
+//   error TS2345: Argument of type 'StandardSchemaV1<Order>' is not assignable
+//   to parameter of type 'StandardSchemaWithJSON<unknown>'.
+//     Property 'jsonSchema' is missing in type 'StandardValidatorProps<Order>'
+//     but required in type 'StandardDescriberProps<unknown>'.
+
+// The way out says the true thing: the validator did not describe the form.
+standardFormResolver(judging, { fields: myFields })
+`;
+
+const roads = `
+// zod 4.6.1, every schema in test/zod-resolver.test.mjs, both paths.
+// Identical on every field but these three:
+
+                            vendor            generic, unaided
+z.date()                    kind: "date"      kind: "unknown"
+z.enum({ Admin: "admin" })  label: "Admin"    label: "admin"
+z.number().int()            (no minimum)      minimum: -9007199254740991
 `;
 
 const descriptor = `
 interface FormFieldDescriptor {
   readonly path: string;          // "owner.name", "items[*].quantity"
-  readonly kind: FormFieldKind;   // string | number | boolean | date | array | object | unknown
+  readonly kind: FormFieldKind;   // string | number | boolean | date | file | array | object | unknown
   readonly isRequired: boolean;
   readonly constraints: FormFieldConstraints;    // minimum, maxLength, pattern, format, step…
   readonly choices?: readonly FormFieldChoice[]; // present only on a closed field
@@ -101,7 +140,10 @@ import type * as z from "zod";
     <code>getZodConstraint</code>, <code>superValidate</code>,{" "}
     <code>toFieldConfig</code> and <code>ZodBridge</code> all do it, and
     Standard Schema now carries a JSON Schema member several validators
-    implement. The walk from the tree to the list is the part that is work.
+    implement. The walk from the tree to the list is the part that is work —
+    and it is written once, against the format rather than against a vendor,
+    which is what makes this contract neutral by construction instead of by
+    writing the walk again per validator.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What a descriptor draws</h2>
@@ -156,10 +198,60 @@ import type * as z from "zod";
 
   <p class="caption">
     There is no registry, no vendor tag and no dispatch: a resolver is named at
-    the call site. And there is no <code>FormResolver</code> type — it said a
-    resolver is <code>(schema) =&gt; FormAdapter</code>, which{" "}
-    <code>luqFormResolver</code> is not, so it was a promise to readers the code
-    had already broken. What every vendor does agree to is the two members.
+    the call site. And there is no <code>FormResolver</code> type. All three
+    resolvers happen to be unary today, so such a type would finally be
+    accurate — which is exactly why it still is not written: it would describe
+    what has been built rather than constrain what may be, and the next vendor
+    would widen it. What every vendor does agree to is the two members.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">Neutral by construction</h2>
+
+  <p class="mt-3 leading-relaxed text-on-surface-variant">
+    This used to be argued by shipping two resolvers, which proves only that two
+    can be written. Now the generic one takes{" "}
+    <strong class="text-on-surface">both</strong> its members from specifications
+    this package does not own, and names no vendor anywhere in its entry point —
+    so a validator that implements them works without a file being added here.{" "}
+    <code>draft-2020-12</code> is asked for first and <code>draft-07</code> on a
+    throw, because the spec tells a library to throw on a target it does not
+    support and both drafts are in wide use.
+  </p>
+
+  <Code code={neutral} label="the degradation, in the type system" />
+
+  <p class="caption">
+    <strong class="text-on-surface">A form that draws nothing now says so.</strong>{" "}
+    A resolver with no descriptors still returns a working{" "}
+    <code>validate</code>, so the form judges correctly, gates submit correctly
+    and renders nothing — and every symptom points at the renderer. The
+    compiler catches the case it can see, naming the missing member. The two it
+    cannot — a converter that threw, a document with nothing in it — each get
+    their own sentence on the console, because they are different bugs with
+    different fixes. Nothing throws: a form that validates and draws nothing is
+    the better failure.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">So why do two vendor resolvers remain?</h2>
+
+  <Code code={roads} label="measured, zod 4.6.1" />
+
+  <p class="caption">
+    Because a spec member that does not exist cannot carry anything. Over every
+    schema in the zod resolver's own test file, the generic walk reproduced the
+    old hand-written one <em>byte for byte</em> — including{" "}
+    <code>.describe()</code> and <code>.meta()</code> text, which survives into
+    JSON Schema <code>title</code> and <code>description</code> on its own, so
+    the 103-line walk that reached{" "}
+    <code>globalThis.__zod_globalRegistry</code> for it is deleted. The three
+    rows above are what is left, and each is UI that would otherwise change
+    under a version bump: a date picker becoming a text box, an option losing
+    its capital, <code>min="-9007199254740991"</code> appearing on a number
+    input. The other gap is <code>code</code>:{" "}
+    <code>StandardSchemaV1.Issue</code> has <code>message</code> and{" "}
+    <code>path</code> and nothing else, so both vendor resolvers keep the{" "}
+    <strong class="text-on-surface">verdict</strong> and take the{" "}
+    <strong class="text-on-surface">descriptors</strong> from the generic one.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">One descriptor is one field</h2>
@@ -215,14 +307,19 @@ import type * as z from "zod";
   </div>
 
   <p class="caption">
-    Two resolvers ship and they do not work alike: zod is walked directly, luq
-    is asked for the JSON Schema it can already produce and that document is
-    walked — a tree with <code>$ref</code> and combinators in it, flattened into
-    one descriptor per leaf. Nor is the JSON Schema route free. On zod 4.6.1,
-    run here, <code>z.toJSONSchema(z.object(&#123; when: z.date() &#125;))</code>{" "}
-    throws <code>Date cannot be represented in JSON Schema</code> — the most
-    common non-text widget in a real form — which is why the zod resolver walks
-    the schema itself rather than its JSON Schema.{" "}
+    Three resolvers ship and they now work alike: all of them flatten the same
+    tree — one with <code>$ref</code> and combinators in it — into one
+    descriptor per leaf, through the same walk. Nor is that route free. Run here
+    on zod 4.6.1, asking a schema containing <code>z.date()</code> for its JSON
+    Schema throws <code>Date cannot be represented in JSON Schema</code> and
+    emits <strong class="text-on-surface">no property at all</strong> — the
+    whole document is lost to one field, and it is the most common non-text
+    widget in a real form. zod offers a way through, spelled{" "}
+    <code>&#123; unrepresentable: "any" &#125;</code>, and{" "}
+    <code>zodFormResolver</code> passes it on every call; the generic resolver
+    forwards such an option but never invents one, because it is the vendor's
+    own vocabulary and an unknown library is entitled to reject a key it does
+    not know.{" "}
     <a class="text-primary underline underline-offset-4" href="/start/"
       >What each entry point gives you →</a
     >

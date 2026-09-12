@@ -34,6 +34,10 @@
       "types": "./dist/react/index.d.ts",
       "default": "./dist/react/index.js"
     },
+    "./resolver-standard": {
+      "types": "./dist/resolver-standard/index.d.ts",
+      "default": "./dist/resolver-standard/index.js"
+    },
     "./resolver-zod": {
       "types": "./dist/resolver-zod/index.d.ts",
       "default": "./dist/resolver-zod/index.js"
@@ -55,6 +59,9 @@
       ],
       "react": [
         "dist/react/index.d.ts"
+      ],
+      "resolver-standard": [
+        "dist/resolver-standard/index.d.ts"
       ],
       "resolver-zod": [
         "dist/resolver-zod/index.d.ts"

@@ -35,6 +35,17 @@ export interface Scenario {
   /** True when the root before the steps must carry no issues at all. */
   readonly startsClean: boolean;
   /**
+   * Whether the harness settles after EVERY step, or only after the last one.
+   *
+   * Required rather than defaulted, because when it is `false` it is the whole
+   * point of the scenario. Draining after each keystroke is the one
+   * arrangement in which coalescing and debouncing buy nothing: every library
+   * gets its pass per character whether it wanted one or not, so a harness
+   * that only ever drains per keystroke cannot measure the mechanism those
+   * features exist to be. A burst says `false` and is read at the end.
+   */
+  readonly settlesBetweenSteps: boolean;
+  /**
    * Whether the verdict is SUPPOSED to move. A steady-state scenario exists to
    * measure the path where nothing changes, so requiring its verdict to move
    * would be requiring it not to be the scenario it is. It has to prove itself

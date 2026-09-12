@@ -1,43 +1,40 @@
 // ===========================================================================
-// unwrap-zod-definition.ts — removes the wrappers that decide presence.
+// unwrap-zod-definition.ts — looks through the wrappers to the definition
+// that carries the shape.
 //
-// `optional`, `nullish` and `default` all mean the form may be submitted with
-// the field empty, so each one clears the requirement. `nullable` does not:
-// null is a value the field must still carry, and a renderer that treated it
-// as optional would drop the required mark from a field that has one.
+// IT NO LONGER DECIDES PRESENCE, and losing that job is the point. It used to
+// return an `isRequired` beside the definition, worked out from which wrappers
+// it passed — `optional`, `nullish` and `default` clear the requirement,
+// `nullable` does not, because null is a value the field must still carry.
+// Every one of those rules is now answered by the `required` list in zod's own
+// JSON Schema, which is zod's reading of its own wrappers rather than this
+// package's imitation of it. Two readings of one fact is the arrangement where
+// they get to disagree, so this one was deleted rather than kept in reserve.
 //
-// The loop unwraps repeatedly because the wrappers nest.
+// What is left is the reason a wrapper is looked through at all: `z.date()
+// .optional()` has `type: "optional"` on the outside, and the fact worth
+// knowing — that there is a Date in there — is underneath. The loop unwraps
+// repeatedly because the wrappers nest.
 // ===========================================================================
 import { readZodDefinition, type ZodDefinition } from "./read-zod-definition.js";
 
-const CLEARS_REQUIREMENT: ReadonlySet<string> = new Set([
+/** The wrappers that describe presence or access rather than shape. */
+const WRAPPERS: ReadonlySet<string> = new Set([
   "optional",
   "nullish",
   "default",
   "prefault",
+  "nullable",
+  "readonly",
 ]);
 
-const TRANSPARENT: ReadonlySet<string> = new Set(["nullable", "readonly"]);
-
-export interface UnwrappedZodDefinition {
-  readonly definition: ZodDefinition;
-  readonly isRequired: boolean;
-}
-
-/** The innermost definition, and whether a value must be supplied for it. */
-export function unwrapZodDefinition(
-  definition: ZodDefinition
-): UnwrappedZodDefinition {
+/** The innermost definition, with the wrappers taken off. */
+export function unwrapZodDefinition(definition: ZodDefinition): ZodDefinition {
   let current = definition;
-  let isRequired = true;
   for (;;) {
-    const clears = CLEARS_REQUIREMENT.has(current.type);
-    if (!clears && !TRANSPARENT.has(current.type)) {
-      return { definition: current, isRequired };
-    }
-    if (clears) isRequired = false;
+    if (!WRAPPERS.has(current.type)) return current;
     const inner = readZodDefinition(current.innerType);
-    if (inner === undefined) return { definition: current, isRequired };
+    if (inner === undefined) return current;
     current = inner;
   }
 }

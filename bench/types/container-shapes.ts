@@ -5,11 +5,14 @@
 // here because each one exercises a different clause of the path types, and
 // each one is a thing a real schema actually contains:
 //
-//   arrays      — `FieldPath` emits `[*]` and `ConcretePath` turns it into
-//                 `[${number}]`. The flagship claim is that a leaf component
-//                 can name `items[3].sku`, so the concrete spelling has to be
-//                 measured separately from the declared one rather than
-//                 assumed to cost the same.
+//   arrays      — `FieldPath` emits `[*]`, `ConcretePath` turns it into
+//                 `[${number}]` for `useField`, and `PartlyBoundPath` keeps or
+//                 binds each one for `useFieldValues`. The flagship claim is
+//                 that a leaf component can name `items[3].sku`, so the
+//                 concrete spelling has to be measured separately from the
+//                 declared one rather than assumed to cost the same — and the
+//                 two now go through different hooks, which is a second
+//                 reason not to assume it.
 //   Record      — `Extract<keyof Record<string, T>, string>` is `string`, so
 //                 the union grows a TEMPLATE member rather than a literal one.
 //                 What that costs, and what it stops refusing, is the point.

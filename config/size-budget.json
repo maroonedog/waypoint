@@ -12,30 +12,44 @@
     {
       "id": "@maroonedog/form-contract/core",
       "entry": "export * from \"@maroonedog/form-contract/core\";",
-      "minified": 17594,
-      "gzipped": 6310,
-      "budget": 6941
+      "minified": 20122,
+      "gzipped": 7229,
+      "budget": 7952
     },
     {
       "id": "@maroonedog/form-contract/react",
       "entry": "export * from \"@maroonedog/form-contract/react\";",
-      "minified": 23373,
-      "gzipped": 8273,
-      "budget": 9101
+      "minified": 27105,
+      "gzipped": 9609,
+      "budget": 10570
+    },
+    {
+      "id": "@maroonedog/form-contract/resolver-standard",
+      "entry": "export * from \"@maroonedog/form-contract/resolver-standard\";",
+      "minified": 5040,
+      "gzipped": 2125,
+      "budget": 2338
     },
     {
       "id": "@maroonedog/form-contract/resolver-zod",
       "entry": "export * from \"@maroonedog/form-contract/resolver-zod\";",
-      "minified": 3124,
-      "gzipped": 1278,
-      "budget": 1406
+      "minified": 6616,
+      "gzipped": 2599,
+      "budget": 2859
     },
     {
       "id": "@maroonedog/form-contract/resolver-luq",
       "entry": "export * from \"@maroonedog/form-contract/resolver-luq\";",
-      "minified": 2001,
-      "gzipped": 901,
-      "budget": 992
+      "minified": 5204,
+      "gzipped": 2141,
+      "budget": 2356
+    },
+    {
+      "id": "resolver-standard (standardFormResolver alone)",
+      "entry": "export { standardFormResolver } from \"@maroonedog/form-contract/resolver-standard\";",
+      "minified": 4774,
+      "gzipped": 2002,
+      "budget": 2203
     },
     {
       "id": "@maroonedog/form-contract/store-zustand",
@@ -47,23 +61,23 @@
     {
       "id": "react (a screen: useField, useRows, FormProvider, useCreateForm)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/form-contract/react\";",
-      "minified": 18689,
-      "gzipped": 6785,
-      "budget": 7464
+      "minified": 20289,
+      "gzipped": 7385,
+      "budget": 8124
     },
     {
       "id": "react (useField alone)",
       "entry": "export { useField } from \"@maroonedog/form-contract/react\";",
-      "minified": 3361,
-      "gzipped": 1383,
-      "budget": 1522
+      "minified": 3505,
+      "gzipped": 1419,
+      "budget": 1561
     },
     {
       "id": "core (createForm alone)",
       "entry": "export { createForm } from \"@maroonedog/form-contract/core\";",
-      "minified": 14614,
-      "gzipped": 5371,
-      "budget": 5909
+      "minified": 16067,
+      "gzipped": 5922,
+      "budget": 6515
     },
     {
       "id": "core (assertFormStoreContract alone)",
@@ -75,9 +89,9 @@
     {
       "id": "a screen + resolver-zod (what an application installs)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/form-contract/react\";\nexport { zodFormResolver } from \"@maroonedog/form-contract/resolver-zod\";",
-      "minified": 21835,
-      "gzipped": 7813,
-      "budget": 8595
+      "minified": 26921,
+      "gzipped": 9639,
+      "budget": 10603
     }
   ]
 }

@@ -12,6 +12,16 @@
 // has one wildcard left, so it reads that row's column rather than every row's.
 // Nothing here treats that as a case — a bound index is just a path.
 //
+// SO THE PATH TYPE IS THE WIDE ONE, and this is the hook that wants it. Every
+// other path surface in the package narrowed to `ConcretePath`, because every
+// other one addresses a single value. This one addresses a set, and it reaches
+// `expandDeclaredPath`, which handles any number of wildcards still standing.
+// The rule-or-place union was therefore too NARROW here, not too wide: it
+// offers all wildcards or none, and the partly bound spelling the paragraph
+// above promises is in neither half, so the sentence was true of the runtime
+// and a compile error. `PartlyBoundPath` is each `[*]` kept or bound
+// independently, which is exactly the set this hook can answer.
+//
 // WHAT IT COSTS, because it is the one hook here that is not O(1): it
 // subscribes to one cell per place the wildcard covers, plus the row order of
 // each array it crosses. Reading a column of two hundred rows is two hundred
@@ -20,7 +30,11 @@
 // ===========================================================================
 import { useMemo, useSyncExternalStore } from "react";
 import { expandDeclaredPath } from "../core/index.js";
-import type { AddressablePath, DeclaredOf } from "../contract/index.js";
+import type {
+  DeclaredOf,
+  InhabitedPath,
+  PartlyBoundPath,
+} from "../contract/index.js";
 import { splitFormArgs } from "./split-form-args.js";
 import { useFormHandle } from "./use-form.js";
 import type {
@@ -45,13 +59,16 @@ const arraysCrossed = (declared: string): readonly string[] => {
   return crossed;
 };
 
-export function useFieldValues<K extends AddressablePath<AnyPath>>(
-  path: K
+export function useFieldValues<K extends PartlyBoundPath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): readonly ValueOfPath<AnyValues, DeclaredOf<K>>[];
 export function useFieldValues<
   TKey extends FormKey,
-  K extends AddressablePath<PathsFor<TKey>>,
->(key: TKey, path: K): readonly ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>[];
+  K extends PartlyBoundPath<PathsFor<TKey>>,
+>(
+  key: TKey,
+  path: K & InhabitedPath<ValuesFor<TKey>, K>
+): readonly ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>[];
 export function useFieldValues(
   first: string,
   second?: string

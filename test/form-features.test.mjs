@@ -114,6 +114,39 @@ test("a dormant subtree stops blocking and keeps its values", async () => {
   assert.equal(outcome.submitted, true);
 });
 
+// The evidence behind `useParticipation` narrowing its path to a PLACE, and
+// behind `setParticipating` asserting it. A dormant root is matched against
+// concrete paths with `isAncestorPath` — a segment-anchored prefix test a
+// wildcard root can never satisfy — so a rule silenced nothing at all while
+// the subtree the caller asked about went on blocking the submit, and nothing
+// anywhere said so. The type refused the spelling first; the runtime refuses
+// it too now, which is what a caller arriving from JavaScript needed.
+test("a wildcard dormant root is refused, because it would have silenced nothing", () => {
+  const form = build({ ...GOOD, items: [{ sku: "" }, { sku: "" }] });
+  form.validate();
+  assert.equal(form.store.read(errorCountCell), 2);
+
+  assert.throws(
+    () => form.setParticipating("items[*]", false),
+    /is a rule, not a place/
+  );
+  form.validate();
+  assert.equal(
+    form.store.read(errorCountCell),
+    2,
+    "and nothing was silenced on the way out"
+  );
+
+  form.setParticipating("items[0]", false);
+  form.setParticipating("items[1]", false);
+  form.validate();
+  assert.equal(
+    form.store.read(errorCountCell),
+    0,
+    "the places are what silences them"
+  );
+});
+
 test("switching a subtree back on makes it block again", () => {
   const form = build({ ...GOOD, owner: { name: "A", email: "nope" } });
   form.setParticipating("owner", false);

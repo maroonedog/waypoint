@@ -78,7 +78,11 @@ export async function measureScenario(request: MeasureRequest): Promise<{
   for (const step of scenario.steps) {
     if (step.kind === "type") driveInput(target, step.path, step.value);
     else driveBlur(target, step.path);
-    await settle();
+    // A burst does not settle between its steps — see `settlesBetweenSteps`.
+    // Settling after every one is what makes coalescing unmeasurable: it hands
+    // every subject its pass per character whether it asked for one or not, so
+    // the mechanism such a scenario exists to measure never gets to run.
+    if (scenario.settlesBetweenSteps) await settle();
   }
   await settle();
 

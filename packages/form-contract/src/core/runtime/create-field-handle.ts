@@ -11,6 +11,14 @@
 // the same as putting it in the form, and a probe that mutated the store would
 // move every cross-field verdict as a side effect of asking. The name is a
 // noun phrase for that reason: it answers rather than acts.
+//
+// A FIELD REPORTS MOMENTS; IT DOES NOT DECIDE THEM. `setValue` says "change"
+// and `markTouched` says "blur", and whether either turns into a pass is
+// `validateOn`, which lives on the form. It has to: one pass judges the whole
+// root, so a field that decided for itself would be overruled by every other
+// field's edit. `setParticipating` asks unconditionally through a different
+// member, because switching a subtree off changes which issues BLOCK rather
+// than what any value is.
 // ===========================================================================
 import {
   isPending,
@@ -44,7 +52,16 @@ export interface FieldHandleRequest {
   readonly judgeRoot: (root: unknown) => MaybeAsync<readonly FormIssue[]>;
   /** Judges now, through the scheduler, so a late answer is discarded. */
   readonly runValidation: () => MaybeAsync<readonly FormIssue[]>;
+  /** Unconditional. For an edit that changes WHICH issues block, not a value. */
   readonly requestValidation: () => void;
+  /**
+   * Asks for a pass if `validateOn` wants one at this moment. The decision
+   * belongs to the form and not to the field, because one pass judges the
+   * whole root and there is no per-field pass a field could gate.
+   */
+  readonly requestValidationAt: (moment: "change" | "blur") => void;
+  /** Drops adopted issues a write here made stale; see adopted-issues.ts. */
+  readonly forgetAdoptedAround: (path: string) => void;
   readonly setParticipating: (path: string, participating: boolean) => void;
 }
 
@@ -61,6 +78,8 @@ export function createFieldHandle<TValue>(
     judgeRoot,
     runValidation,
     requestValidation,
+    requestValidationAt,
+    forgetAdoptedAround,
     setParticipating,
   } = request;
 
@@ -84,10 +103,16 @@ export function createFieldHandle<TValue>(
     },
     setValue(next) {
       fanOutWrite({ store, openCells, initialRoot, path, next });
-      requestValidation();
+      // Between the write and the pass, so the pass that follows judges a root
+      // the stale server verdict is no longer attached to — and so that under
+      // `validateOn: "submit"`, where no pass follows at all, the stale
+      // verdict still leaves the screen.
+      forgetAdoptedAround(path);
+      requestValidationAt("change");
     },
     markTouched() {
       store.write(touchedCell(path), true);
+      requestValidationAt("blur");
     },
     setParticipating(participating) {
       setParticipating(path, participating);

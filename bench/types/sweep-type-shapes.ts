@@ -109,11 +109,18 @@ export function shapeCatalogue(): readonly ShapeUnderTest[] {
   ];
 }
 
-/** The path each `useField` call names, by the line it sits on. */
+/**
+ * The path each addressing call names, by the line it sits on.
+ *
+ * Both hooks, because the generator picks one by the path: a place goes to
+ * `useField` and a rule to `useFieldValues`. Matching only the first would
+ * leave every array row's refusals unattributed and the `addressable` column
+ * silently wrong.
+ */
 const pathByLine = (source: string): Map<number, string> => {
   const found = new Map<number, string>();
   source.split("\n").forEach((text, index) => {
-    const call = /useField\("(.*)"\)/.exec(text);
+    const call = /use(?:Field|FieldValues)\("(.*)"\)/.exec(text);
     if (call !== null) found.set(index + 1, String(call[1]));
   });
   return found;

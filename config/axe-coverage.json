@@ -1,0 +1,34 @@
+{
+  "//": "What test/accessibility-axe.test.mjs is allowed to claim. `decided` is every axe rule that reached a verdict — a pass or a violation — over the union of that file's cases. `undecided` must stay empty: a rule that matched elements and could not decide is a rule this suite is not checking, and it belongs in `notRunUnderJsdom` with a reason instead. Anything in none of the three lists was inapplicable, which is a fact about this markup rather than about jsdom. Re-record with `npm run axe:record` and READ what it wrote: a rule leaving `decided` means a check stopped happening.",
+  "axeVersion": "4.13.0",
+  "tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa"
+  ],
+  "notRunUnderJsdom": {
+    "color-contrast": "jsdom paints nothing, so axe cannot sample the pixels on either side of the text. Left enabled it reports `incomplete`, which is at least honest — but it is still a criterion (WCAG 1.4.3) this suite does not cover.",
+    "target-size": "jsdom's getBoundingClientRect() returns all zeros, so the rule measures nothing. Left enabled it reports a PASS for a button styled 2px by 2px — measured against jsdom 26.1.0 in a scratch run — which is the silent pass this file exists to prevent. WCAG 2.5.8 is not covered here."
+  },
+  "decided": [
+    "aria-allowed-attr",
+    "aria-conditional-attr",
+    "aria-deprecated-role",
+    "aria-prohibited-attr",
+    "aria-required-attr",
+    "aria-roles",
+    "aria-valid-attr",
+    "aria-valid-attr-value",
+    "button-name",
+    "duplicate-id-aria",
+    "form-field-multiple-labels",
+    "label",
+    "list",
+    "listitem",
+    "nested-interactive",
+    "select-name"
+  ],
+  "undecided": []
+}

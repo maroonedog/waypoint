@@ -41,7 +41,7 @@ const Leaf = ({ path, label }: LeafProps) => {
 };
 ```
 
-Knobs: there are three (`adapter`, `defaultValues`, `store`) and none of them is a validation mode — `FormOptions` in `packages/form-contract/src/core/runtime/form.types.ts` has no `validateOn` member, which design §7 item 3 lists among its mitigations. **That gap is a published row, in words, not folded into a number.** `f.inputProps` is deliberately not used: `build-input-props.ts` emits descriptor-derived `required`/`min`/`max`/`pattern`, which would change the DOM and therefore the layout cost. The `inputProps` path ships as `form-contract-auto-form-subject` in `own-tree`, with its extra DOM-attribute count published.
+Knobs: there are four (`adapter`, `defaultValues`, `store`, `validateOn`). This row said there were three and that none was a validation mode; it has been corrected rather than deleted. `FormOptions` in `packages/form-contract/src/core/runtime/form.types.ts` now carries `validateOn: "change" | "blur" | "submit"`, defaulting to `"change"`, which is the setting every subject in this lane is measured under. It is a FORM-level knob and not a per-field one, because one pass judges the whole root — **that remains a published difference from the four competitors, in words, not folded into a number.** `f.inputProps` is deliberately not used: `build-input-props.ts` emits descriptor-derived `required`/`min`/`max`/`pattern`, which would change the DOM and therefore the layout cost. The `inputProps` path ships as `form-contract-auto-form-subject` in `own-tree`, with its extra DOM-attribute count published.
 
 ### 2.2 form-contract — zustand store (`equal-tree`)
 
@@ -146,7 +146,7 @@ The typed field is recorded per interaction and swept over `{first, middle, last
 | `K2` | type one char that introduces an error on the typed field | the write path |
 | `K3` | type one char that clears it | the other half |
 | `K4` | retype the identical character | the `Object.is` bailout. Published in the self-audit tier only, not as a cross-library row — it is a store-contract conformance case, not a user interaction |
-| `K5` | burst of five characters, one settle at the end | the workload every library's coalescing and debouncing exists for. Drain-per-keystroke is the one arrangement in which those mechanisms buy nothing |
+| `K5` | burst of five characters, one settle at the end | the workload every library's coalescing and debouncing exists for. Drain-per-keystroke is the one arrangement in which those mechanisms buy nothing. **Implemented**, in `bench/agreement/scenarios/index.ts`, gated by `settlesBetweenSteps: false` |
 | `B1` | blur a touched-but-empty field | without it, RHF `onTouched`/`onBlur`, Formik's `validateOnBlur` default and TanStack `onBlur` validators are all unreachable, and the DOM channel forces eager error display on libraries whose idiom is `touched && error` |
 | `X1` | toggle `sameAsBilling` so the rule reports on `billing.postcode` | the cross-field claim, started from an otherwise-valid root |
 | `A1` | append a row | |
@@ -191,7 +191,7 @@ Three, read from the rendered DOM only, never through a library API:
 
 Three separate dispositions, and none of them is free:
 
-- **`not applicable`** is decided *before* the scenario runs, from the capability the scenario `requires` and the capabilities the subject declares, with a reason written by the adapter author in code. Every subject must contribute at least one capability to the vocabulary (this is asserted), so form-contract's column has greys in it too: `validateOn` / `mode` is a capability all four competitors have and it does not.
+- **`not applicable`** is decided *before* the scenario runs, from the capability the scenario `requires` and the capabilities the subject declares, with a reason written by the adapter author in code. Every subject must contribute at least one capability to the vocabulary (this is asserted). The example that used to stand here — `validateOn` / `mode` as a capability form-contract lacked — expired when `FormOptions.validateOn` shipped. What form-contract still does not have, and what the vocabulary should draw on instead, is a PER-FIELD mode: one pass judges the whole root, so a field set to `"blur"` would be re-judged the moment any other field changed.
 - **`by design`** carries a citation to the library's own documentation and a **repair row**: where a supported configuration exists (`register(name,{deps})`, `onChangeListenTo`, Formik's `validate` prop), the repaired configuration is measured and its price published in the same table. "It cannot do this" and "it can, and here is what it costs" are different sentences.
 - **`disagrees`** publishes both strings side by side. Its counts stay visible and struck through, and **it stays in the losses list**. Disagreeing rows are excluded only from ratio sentences in the timing section — never from the losses list, because the cheapest competitor configurations are exactly the ones that disagree, and removing them from the loss list by a fairness rule would be the rig.
 
@@ -228,20 +228,26 @@ Only after all six pass is anything written to the baseline.
 
 ### Tier 2 — self-audit. form-contract only, **gated**, no competitor column.
 
-Obtained from `counting-cell-store.ts`, a `FormCellStore` decorator that satisfies the contract and counts. These exist because the largest attack on the winning design was that its metric set was structurally blind to the library's own per-keystroke work.
+**Built.** `npm run bench:self-audit`; baseline `config/self-audit-baseline.json`; report `docs/measurements-self-audit.md`; gated by `npm run bench:self-audit:check`, which runs in `verify.yml`. Obtained from `counting-cell-store.ts`, a `FormCellStore` decorator that satisfies the contract and counts, handed to `createForm` through `FormOptions.store` — nothing in `packages/` is instrumented in order to be measured. Driven through `./core` with **no React**, because the number this tier exists for is the one React cannot see, and the subscription it installs per field is the one `useCell` hands to `useSyncExternalStore`.
 
-| metric | what it tests |
-|---|---|
-| `storeWrites`, `storeReads`, `notificationsDelivered` | design §3's "Work is O(cells that changed), not O(mounted fields)" |
-| `openCellScanLength` | `refresh-open-cells.ts` calls `openCells.forEachOpen` on **every** write, and `open-value-cells.ts` implements it as `Array.from(readerCounts.keys())` plus an `isAncestorPath` per entry. At `flat-200` that is a 200-element allocation and 200 comparisons per character, producing zero commits, zero fiber visits and zero validator passes. **This is the number Tier 1 cannot see, and it is gated** |
-| `issueObjectsAllocated` | `distribute-issues.ts` per pass |
-| `cellsSeededAtMount` | `write-declared-cells.ts` writes one `valueCell` per expanded declared path inside `createForm`, so this is O(N) and never 0. The README's "mounting is a subscription and nothing else" is about the React mount commit, which is trivially 0 by construction; both numbers are published with that distinction spelled out, because the ambiguity lets the weak measurement be read as the strong claim |
+These exist because the largest attack on the winning design was that its metric set was structurally blind to the library's own per-keystroke work.
 
-Stated in the report: this tier gates the author's library against the author's own design document and carries no competitor column, because the competitors expose no equivalent. It is a self-audit, not a comparison.
+| metric | what it tests | what it read |
+|---|---|---|
+| `storeWrites`, `storeReads`, `notificationsDelivered` | design §3's "Work is O(cells that changed), not O(mounted fields)" | it holds: a leaf edit is 3 writes and 1 read whether one field is on screen or 401, plus one write per open cell the scan found |
+| `openCellScanLength` | `refresh-open-cells.ts` calls `openCells.forEachOpen` on **every** write, and `open-value-cells.ts` implements it as `Array.from(readerCounts.keys())` plus an `isAncestorPath` per entry. **This is the number Tier 1 cannot see, and it is gated** | at `leaves-201` with every field on screen, a 201-element allocation and 201 comparisons per character, refreshing **0** cells; at `leaves-401`, 401 of each, also refreshing 0 |
+| `issuesProduced`, `issueCellsWritten` | what one pass hands `distribute-issues.ts`, and how many issue cells it writes — which is what wakes a field | 1 and 1 at every size, for one broken leaf. Renamed from `issueObjectsAllocated`, which named an allocation no store decorator can see and which nothing in this lane counts |
+| `cellsSeededAtMount` | `write-declared-cells.ts` writes one `valueCell` per expanded declared path inside `createForm`, so this is O(N) and never 0. The README's "mounting is a subscription and nothing else" is about the React mount commit, which is trivially 0 by construction; both numbers are published with that distinction spelled out, because the ambiguity lets the weak measurement be read as the strong claim | 39 / 69 / 209 / 409 at 31 / 61 / 201 / 401 leaves — the leaves, the root, the `items` array cell and its row order, and the five form-state cells. The overhead is derived from the runs in `bench/run-self-audit.ts` rather than written down, because this sentence said seven for a while after a fifth form-state cell arrived |
+
+The open set is taken **twice**, out of code that shares nothing: from the store's live `value:` subscriptions, and from the runtime's own `isOpen` branch in `create-form-cell-sources.ts`, where an open cell is read from its own key and a closed one from the root. `assert-design-claims.ts` refuses to print a scan length unless the two agree **and** the value cells the write actually refreshed are exactly the open ancestors and open descendants the scan shape predicts. That is what makes the gated integer a measurement rather than a derivation.
+
+**The cost is printed and not gated,** because it is a nanosecond. `refreshOpenAround` is called directly with the real `createOpenValueCells` behind it, so the array under measurement is the one the library allocates: **≈6.5 ns per open cell**, agreeing to within 2% across all four sizes. At `leaves-401` with every field on screen that is 2.7 µs of scanning against 195 µs for the write plus the whole-root pass the same keystroke schedules — **1.4% of it**. So the design was right about the SHAPE and wrong about the SIZE, and the report says so in those words. It was also looking in the wrong place: a *refreshed* cell costs ≈760 ns, so the twelve refreshed by a write at `items` cost more than scanning four hundred.
+
+Stated in the report: this tier gates the author's library against the author's own design document and carries no competitor column, because the competitors expose no equivalent. It is a self-audit, not a comparison — and a self-audit that only confirmed its author's fears would not be one.
 
 ### Tier 3 — printed, hedged, not counts.
 
-`bytesPerInteraction` (heapUsed delta over 500 drained interactions under `--expose-gc`, three repeats with spread), `retainedHeapAfterMount` per field (the cross-library mount-cost metric), `bundleBytes` (each subject's entry built through one vite config, gzipped, minus a React-only baseline entry — a rough attribution, labelled as one). RHF is the ~9 kB zero-dependency incumbent and form-contract ships one package with six entry points; a benchmark that counts nine kinds of render work and no bytes leaves a reader assuming bytes were checked.
+`bytesPerInteraction` (heapUsed delta over 500 drained interactions under `--expose-gc`, three repeats with spread), `retainedHeapAfterMount` per field (the cross-library mount-cost metric), `bundleBytes` (each subject's entry built through one vite config, gzipped, minus a React-only baseline entry — a rough attribution, labelled as one). RHF is the ~9 kB zero-dependency incumbent and form-contract ships one package with seven entry points; a benchmark that counts nine kinds of render work and no bytes leaves a reader assuming bytes were checked.
 
 ### Tier 4 — time. Browser lane only. **Printed, never gated.**
 
@@ -378,11 +384,15 @@ bench/react-work/
   observe-gc.ts
   measure-allocation.ts
 
-bench/self-audit/
+bench/self-audit/                BUILT — see Tier 2 above
   self-audit.types.ts
-  counting-cell-store.ts        FormCellStore decorator
-  count-open-cell-scan.ts
+  counting-cell-store.ts        FormCellStore decorator, taken via FormOptions.store
+  count-open-cell-scan.ts       the open set, taken twice, and what a scan will find
   assert-design-claims.ts       §3's O(cells that changed) against openCellScanLength
+  measure-self-audit.ts         one size: mount, four write scenarios, one pass
+  measure-scan-cost.ts          refreshOpenAround alone; printed, never gated
+  measure-write-cost.ts         the setValue and the pass it is a part of
+  self-audit-baseline.ts        id + named integers; a NEW metric fails --check
 
 bench/time/
   vite.config.ts                builds the same .ts subjects for the browser
@@ -450,7 +460,9 @@ Stdout mirrors this, with `MACHINE WAS NOISY` inline per figure that never got u
 
 ### CI
 
-`forms-counts.yml`, **no path filter** (luq's rule: "I did not touch code, so this is safe" is designed not to hold, and `package-lock.json` is where competitor versions move). Fails on: any policy-conformance cell changing; any disagreement whose **identity** changed, not merely its count; any Tier 1 or Tier 2 integer differing by one; any **loss row identity** disappearing from the set; the six proofs; zero matched rows. **Competitor count drift also fails**, with a re-record instruction rather than a threshold — determinism is the argument for this lane, so a deterministic metric that never gates for competitors is a table that can only go stale in one direction. It prints, unconditionally: *"Timings do not fail this check: they move when the runner does, which is the same reason the baselines are per environment."*
+`forms-counts.yml`, **no path filter** (luq's rule: "I did not touch code, so this is safe" is designed not to hold, and `package-lock.json` is where competitor versions move). Fails on: any policy-conformance cell changing; any disagreement whose **identity** changed, not merely its count; any Tier 1 integer differing by one; any **loss row identity** disappearing from the set; the six proofs; zero matched rows. **Competitor count drift also fails**, with a re-record instruction rather than a threshold — determinism is the argument for this lane, so a deterministic metric that never gates for competitors is a table that can only go stale in one direction. It prints, unconditionally: *"Timings do not fail this check: they move when the runner does, which is the same reason the baselines are per environment."*
+
+**Tier 2 gates from `verify.yml` instead**, as `npm run bench:self-audit:check` against `config/self-audit-baseline.json`. It landed there rather than here because it mounts no competitor and imports no React, so it has nothing to do with `package-lock.json` moving and no reason to wait behind a jsdom run. Its `--check` compares integers only and measures no nanoseconds at all.
 
 `forms-time.yml` records `config/form-baseline.ci.json` and uploads `form-baseline-${{ github.run_id }}`. CI never commits to `config/`. Ceilings are sticky; `--recalibrate` is the only mover and is always a reviewed diff, because otherwise the response to a regression is to re-run the recorder and a command that looks like housekeeping converts the gate into a rubber stamp. `--record` writing the loss-row identity set is guarded by the same flag, so re-recording after a change cannot silently re-baseline the loss floor.
 
@@ -507,7 +519,9 @@ bench/react-work/{install-devtools-hook, attribute-commit-to-root,
                   snapshot-committed-fibers, count-fiber-visits,
                   classify-fiber-visit, count-dom-mutations,
                   drive-input, settle}.ts
-bench/self-audit/{self-audit.types, counting-cell-store, count-open-cell-scan}.ts
+bench/self-audit/{self-audit.types, counting-cell-store, count-open-cell-scan,
+                  assert-design-claims, measure-self-audit, measure-scan-cost,
+                  measure-write-cost, self-audit-baseline}.ts
 bench/report/{stability-screen, order-losses-first, render-markdown-tables}.ts
 ```
 
@@ -517,10 +531,10 @@ bench/report/{stability-screen, order-losses-first, render-markdown-tables}.ts
 2. `assert-dom-shape-matches` and `assert-tree-fibers-match` pass for the pair.
 3. `assert-subject-is-live` passes for both under the OR rule.
 4. `assert-validated-root-matches` deep-equals both subjects' validated roots against the reducer's.
-5. `assert-oracle-is-not-vacuous` passes for all three scenarios, and `X1` starts from a zero-issue root.
+5. `assert-oracle-is-not-vacuous` passes for all four scenarios, and `X1` starts from a zero-issue root.
 6. All Tier 1 and Tier 2 integers read identically on three consecutive runs.
 
-**The one table it prints** — losses first, `validatorPasses` and `pathsJudged` on every row, `openCellScanLength` in a fenced self-audit block below, and a standing line saying no milliseconds are published from jsdom.
+**The one table it prints** — losses first, `validatorPasses` and `pathsJudged` on every row, and a standing line saying no milliseconds are published from jsdom. `openCellScanLength` was to have been a fenced block below it; it is instead its own report, `docs/measurements-self-audit.md`, because a self-audit tier that has to be appended to a cross-library table is a tier that gets read as a column of one.
 
 Everything else is ordered behind it: **slice 2** adds the policy axis and `react-hook-form-scoped-subject` plus `-on-submit` (the first subject whose declared policy differs, and therefore the first real test of the matrix's five cell values); **slice 3** adds the remaining subjects, the shape sweep and the CI counts gate; **slice 4** adds the browser time lane with the null band and the three-position calibration ladder, which is the first slice permitted to publish a millisecond.
 
@@ -547,18 +561,18 @@ Everything else is ordered behind it: **slice 2** adds the policy axis and `reac
 | A15 | Prose mechanism claims untested, and one (RHF `startsWith`) already wrong at 7.87 | **Closed.** Every mechanism sentence beside a number carries `file:line` at the pinned version, and the RHF claim is corrected |
 | A16 | Liveness canary near-vacuous and leaves residue | **Closed.** OR rule + library-getter read-back + remount afterwards |
 | A17 | The ms ratio cancels the whole-root zod pass | **Closed.** `validatorMicroseconds` and `runtimeMicroseconds` published separately; crossover reported as a bracket |
-| A18 | `refresh-open-cells`'s O(mounted fields) scan invisible to every metric, contradicting design §3 | **Closed.** `openCellScanLength` is a gated Tier 2 integer with `assert-design-claims.ts` behind it |
+| A18 | `refresh-open-cells`'s O(mounted fields) scan invisible to every metric, contradicting design §3 | **Closed, and measured.** `openCellScanLength` is a gated Tier 2 integer with `assert-design-claims.ts` behind it. The scan is real — 401 comparisons and a 401-element allocation per character at `leaves-401`, refreshing nothing at all on a leaf edit — and it costs ≈6.5 ns per open cell, 1.4% of the write plus pass one keystroke already does. The attack was right that no metric could see it and wrong that it mattered; the report says which |
 | A19 | `assert-scenarios-cover-conceded-limits` unsatisfiable; §7 items 2, 4, 5, 6 uncovered; no zustand subject | **Closed.** zustand and `<Field>` subjects added (items 6 and 4); item 2 and item 5 are named in §9 as regimes the harness does not enter, and the assert requires either a scenario **or** an explicit §9 entry per item |
 | A20 | Memory, bundle, retention unmeasured | **Closed.** Tier 3 |
 | A21 | The promised declared≫mounted shape had no file | **Closed.** `wizard-shape.ts` |
 | A22 | The splice scenario picks the cheap index | **Closed.** `A2` (index 0), `A3` (middle) and `A4` (insert at 0), at 12 rows |
 | A23 | No many-fields-invalid-at-once scenario | **Closed.** `S1` |
-| A24 | Capability vocabulary drawn only from form-contract's feature list | **Closed.** Every subject must contribute a capability (asserted); `validateOn`/`mode` is a capability form-contract lacks |
+| A24 | Capability vocabulary drawn only from form-contract's feature list | **Closed.** Every subject must contribute a capability (asserted). The example given was `validateOn`/`mode`; that expired when `FormOptions.validateOn` shipped, and the standing example is a PER-FIELD mode, which this architecture cannot honestly offer |
 | A25 | Both ends of the dial for everyone except the author | **Closed.** Four form-contract configurations |
 | A26 | The hand-written denominator is a strawman | **Closed.** Two hand-written subjects; the store claim is scored only against the memoised per-field one |
 | A27 | `lossRowCount` gates on a count | **Closed.** Gated on row identity |
 | A28 | `componentBodyInvocations` printed with "do not compare this" beside it | **Closed.** Not printed at all, and the refusal is explained with the 0-vs-1 measurement |
-| A29 | `storeWritesAtMount` self-contradictory and single-subject | **Closed.** `cellsSeededAtMount` (O(N), in Tier 2, self-audit) and `retainedHeapAfterMount` (Tier 3, cross-library) |
+| A29 | `storeWritesAtMount` self-contradictory and single-subject | **Closed, and measured.** `cellsSeededAtMount` is a gated Tier 2 integer — 38 / 68 / 208 / 408 at 31 / 61 / 201 / 401 leaves, so O(N) and never 0, exactly as the row said. `retainedHeapAfterMount` (Tier 3, cross-library) is still unbuilt |
 | A30 | `--recalibrate` is one flag in a single-author repo | **Partially closed.** Exclusions live in code, the flag is required for both ceilings and the loss set, and CI never commits to `config/`. A single-author repository cannot manufacture a second reviewer; stated |
 | A31 | No burst typing; drain-per-keystroke defeats coalescing | **Closed.** `K5` |
 | A32 | `.tsx` does not type-strip under Node | **Closed.** No JSX anywhere |

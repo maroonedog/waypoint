@@ -36,15 +36,24 @@
 //   </select>
 // ===========================================================================
 import { useContext, type ReactElement, type ReactNode } from "react";
-import type { AddressablePath, DeclaredOf } from "../contract/index.js";
+import type {
+  ConcretePath,
+  DeclaredOf,
+  InhabitedPath,
+} from "../contract/index.js";
 import type { FieldBinding } from "./field-binding.types.js";
 import { useField } from "./use-field.js";
 import { WidgetRegistryContext } from "./widget-registry-context.js";
 import { resolveWidget } from "./resolve-widget.js";
 import type { AnyPath, AnyValues, ValueOfPath } from "./form-type-registry.js";
 
-export interface FieldProps<K extends AddressablePath<AnyPath>> {
-  readonly path: K;
+export interface FieldProps<K extends ConcretePath<AnyPath>> {
+  /**
+   * The PLACE this field occupies. It goes straight to `useField`, so a rule
+   * has no answer here — a list hands each row `row.path`, and
+   * `` `${row.path}.sku` `` is the spelling that names one of them.
+   */
+  readonly path: K & InhabitedPath<AnyValues, K>;
   /** Layer 3. When present, nothing else is consulted. */
   readonly children?: (
     binding: FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>
@@ -53,10 +62,14 @@ export interface FieldProps<K extends AddressablePath<AnyPath>> {
   readonly as?: string;
 }
 
-export function Field<K extends AddressablePath<AnyPath>>(
+export function Field<K extends ConcretePath<AnyPath>>(
   props: FieldProps<K>
 ): ReactElement {
-  const binding = useField(props.path);
+  // The type argument is written rather than inferred. `props.path` is already
+  // `K & InhabitedPath<…, K>`, and inferring from it would make K that
+  // intersection and then narrow it a second time — which the compiler cannot
+  // see is the same question asked twice, so it refuses its own output.
+  const binding = useField<K>(props.path);
   const registry = useContext(WidgetRegistryContext);
 
   if (props.children !== undefined) {

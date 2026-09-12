@@ -89,8 +89,16 @@ const triggers = [
   ["form.validate()", "1", "Immediately, not on the microtask."],
   ["field.issuesFor(candidate)", "1", "On a probe root. Writes nothing at all."],
   ["form.submit(handler)", "1", "Immediately, before the handler is considered."],
-  ["field.markTouched()", "0", "Touched is display state. Nothing to re-judge."],
+  ["form.adoptIssues(issues)", "0", "Committed off the last pass, so a server's answer does not wait behind the validator's."],
+  ["field.markTouched()", "0 or 1", "1 under validateOn: \"blur\" — that is the blur. Otherwise touched is display state."],
   ["createForm(...)", "0", "Nothing is judged until something asks."],
+];
+
+/** Which moments a VALUE EDIT asks at. Everything else is unconditional. */
+const moments = [
+  ["\"change\"", "the default", "A pass follows every keystroke, coalesced to one per settled turn."],
+  ["\"blur\"", "markTouched()", "setValue asks for nothing; the blur asks."],
+  ["\"submit\"", "submit() only", "Neither asks. errorCount is 0 until the first submit."],
 ];
 ---
 
@@ -180,9 +188,19 @@ const triggers = [
 
   <p class="caption">
     <code>form.validating</code> is true only while a pass is in flight; a pass
-    that <em>throws</em> leaves the previous verdict standing. There is no
-    validation mode and no debounce, so a slow validator is asked on every
-    settled change.
+    that <em>throws</em> leaves the previous verdict standing.
+  </p>
+
+  <p class="note">
+    <strong>There is no debounce.</strong> One pass judges the whole root, so a
+    delay on the pass would delay the required-field message along with the
+    network rule — which is not a smaller version of what other libraries ship
+    but a different and worse thing. Debounce inside the async rule, and take
+    the second argument to <code>validate</code>: it is an{" "}
+    <code>AbortSignal</code>, aborted the moment a newer pass starts, so a round
+    trip whose answer is already going to be discarded can stop rather than
+    finish. An adapter that declares only <code>root</code> is never handed one,
+    and no <code>AbortController</code> is constructed for it.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What asks for a pass, and what does not</h2>
@@ -219,6 +237,68 @@ const triggers = [
     <code>0</code> — not because the form is clean, but because nothing has
     asked yet. Call <code>form.validate()</code> if a screen should open
     showing its errors.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">Which moments ask at all</h2>
+
+  <p class="caption">
+    <code>validateOn</code> goes on <code>createForm</code> and governs value
+    edits. <code>reset</code>, <code>setParticipating</code> and a row edit
+    still judge under every setting, because each changes <em>which</em> issues
+    block rather than what one value is.
+  </p>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="text-left text-on-surface-variant">
+        <tr class="hairline">
+          <th class="py-2 pr-4 font-medium">validateOn</th>
+          <th class="py-2 pr-4 font-medium">A value edit asks at</th>
+          <th class="py-2 font-medium">What that means</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          moments.map(([setting, asks, what]) => (
+            <tr class="hairline">
+              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
+                {setting}
+              </td>
+              <td class="py-3 pr-4 align-top font-mono text-xs">{asks}</td>
+              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+                {what}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p class="note">
+    <strong>It is on the form and never on a field.</strong> One pass judges the
+    whole root, so a field set to <code>"blur"</code> would still be re-judged
+    the moment any <em>other</em> field changed — there is no per-field pass to
+    gate, and a per-field knob here would be a promise this runtime cannot
+    keep. And after a <em>rejected</em> submit every setting judges on change
+    again: a person fixing the field the form has just complained about has to
+    watch the complaint go.
+  </p>
+
+  <h2 class="mt-16 text-2xl font-bold">Errors a server sent back</h2>
+
+  <p class="caption">
+    <code>form.adoptIssues(issues)</code> is the <code>setError</code> of this
+    library, and the name differs because the behaviour does: the runtime does
+    not merely display them, it owns them. They are merged onto every pass
+    before anything is written, so they reach their fields, are counted by{" "}
+    <code>errorCount</code> and appear in <code>blockedBy</code> — a hand-written
+    issue cell was shown, not counted, and did not block. They are dropped by a
+    write at the path, at an ancestor or at a descendant; by <code>reset</code>;
+    and by the end of the next <code>submit()</code>, which that attempt was
+    already refused by. One press is refused and told why; the next press asks
+    the server again, which is what keeps an issue on a path nobody can type
+    into — a declined card — from wedging the form for good.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">What it costs</h2>

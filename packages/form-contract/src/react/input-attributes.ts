@@ -21,6 +21,15 @@
 // that goes stale. It would be worth emitting only for a widget with no native
 // required, and this library authors no widgets.
 //
+// `accept` is NOT emitted on a file field, and that is a stated gap rather
+// than an oversight. The MIME list a vendor declares does reach the document —
+// zod 4.6.1 writes `z.file().mime(["image/png"])` as
+// `contentMediaType: "image/png"`, and two of them as an `anyOf` of
+// `contentMediaType` nodes, both measured here — but `FormFieldConstraints`
+// has no member that means "the media types this accepts", and inventing one
+// for a single browser attribute would be adding to the contract's smallest
+// type to serve one widget. A caller that wants `accept` spells it.
+//
 // `aria-invalid` is emitted only when the field actually carries issues. The
 // alternative, `aria-invalid={false}` on every field, is what a form looks like
 // when nobody has typed in it yet, and stamping a negative assertion on forty
@@ -90,6 +99,10 @@ export function inputTypeFor(
       return "number";
     case "boolean":
       return "checkbox";
+    // Whatever `format` says. A file's format is the document's word for how
+    // the bytes are carried — zod writes `"binary"` — and it is not a widget.
+    case "file":
+      return "file";
     case "date":
       return (format === undefined ? undefined : TYPE_FOR_DATE_FORMAT[format]) ??
         "date";

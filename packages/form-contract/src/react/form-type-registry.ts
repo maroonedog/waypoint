@@ -19,9 +19,10 @@
 //
 // A form whose paths are genuinely unknown until run time — a schema built
 // from a response, the benchmark's generated fields — registers an adapter
-// typed `string`. `AddressablePath<string>` is `string`, so that form is back
-// to unchecked paths without anything else in the package knowing. The escape
-// is one line of the application's own registration rather than a second API.
+// typed `string`. `string` has no `[*]` in it to bind, so `ConcretePath<string>`
+// is `string` and that form is back to unchecked paths without anything else
+// in the package knowing. The escape is one line of the application's own
+// registration rather than a second API.
 //
 // WHAT KEEPS THE UNREGISTERED CASE FROM SILENTLY PASSING, because it is subtle
 // and was got wrong once: `PathsOfAdapter` takes a NAKED type parameter, so it
@@ -34,7 +35,7 @@
 // file compiled `useField("owner.emial")` clean for exactly that reason.
 // ===========================================================================
 import type {
-  AddressablePath,
+  ConcretePath,
   DeclaredOf,
   FormAdapter,
   ValueAtPath,
@@ -93,12 +94,18 @@ export type ValueOfPath<TValues, P extends string> = TValues extends unknown
   : never;
 
 /**
- * Any path any registered form accepts — the type a VIEW component's `path`
- * prop takes. A component that draws one field for whatever path it is handed
+ * Any PLACE any registered form has — the type a VIEW component's `path` prop
+ * takes. A component that draws one field for whatever path it is handed
  * belongs to the design system rather than to a form, and this is how it says
  * so without giving up on checking what it is handed.
+ *
+ * A place and not a rule, because that is what such a component does with it:
+ * it hands it to `useField`, which addresses one value. It used to be the
+ * rule-or-place union, so `<Text at="items[*].sku" />` type-checked and threw
+ * on the first render. A row's own `` `${row.path}.sku` `` is a place, so the
+ * spelling every list already hands down is the one that fits.
  */
-export type FormPath = AddressablePath<AnyPath>;
+export type FormPath = ConcretePath<AnyPath>;
 
 /** Naked, so the union of paths is filtered one member at a time. */
 type PathToValue<P, TValue> = P extends string

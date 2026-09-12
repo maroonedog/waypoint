@@ -1,8 +1,8 @@
 # ===========================================================================
 # verify.yml — the tests and the type programs, in CI.
 #
-# They were not here. The repository gated its BENCHMARK in CI and ran its 128
-# tests and seven compile-time programs on one laptop, which is the wrong way
+# They were not here. The repository gated its BENCHMARK in CI and ran its
+# tests and type programs on one laptop, which is the wrong way
 # round: a benchmark drifting is a number to re-record, a test failing is a
 # defect shipping.
 #
@@ -29,10 +29,25 @@ jobs:
 
       - run: npm ci
 
-      # build, then the tests, then the seven type programs. `verify` is the
+      # build, then the tests, then the eight type programs. `verify` is the
       # same command a contributor runs locally, so CI cannot pass on a
       # different set of checks from the one they were told to use.
+      #
+      # The axe-core suite is one of those tests rather than a step of its own,
+      # and deliberately: it asserts zero violations AND that the rules which
+      # reached a verdict are the ones config/axe-coverage.json records, so a
+      # rule going quiet fails the build the way a violation does. A separate
+      # step would run it twice and say nothing new. Re-recording the rule list
+      # is `npm run axe:record`, which is NOT run here — a recorded list that
+      # rewrites itself in CI is not a gate.
       - run: npm run verify
 
       - name: Bundle size, against the recorded budget
         run: npm run size:check
+
+      # The self-audit counts: what a mount seeds, and how far a write has to
+      # look. Every figure it compares is an integer taken from the store, so it
+      # is the same integer on this runner as on a laptop — which is why it can
+      # fail a build and why its timing section is skipped under `--check`.
+      - name: Self-audit counts, against the recorded baseline
+        run: npm run bench:self-audit:check

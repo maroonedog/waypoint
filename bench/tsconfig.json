@@ -1,5 +1,5 @@
 {
-  "//": "The harness is never emitted — Node strips its types and runs it. This checks the browser lane and every report writer, which are the parts of the harness whose types nothing else would ever look at. `bench/subjects/**` is deliberately outside it: those files cast against three libraries' generics on purpose, because the point is to render each library's own idiom rather than a version of it that happened to type-check. `run-forms-bench.ts` stays out for the same reason — it imports the subjects, so including it would drag them all in.",
+  "//": "The harness is never emitted — Node strips its types and runs it. This checks the browser lane, the self-audit lane and every report writer, which are the parts of the harness whose types nothing else would ever look at. `bench/subjects/**` is deliberately outside it: those files cast against three libraries' generics on purpose, because the point is to render each library's own idiom rather than a version of it that happened to type-check. `run-forms-bench.ts` stays out for the same reason — it imports the subjects, so including it would drag them all in. `run-self-audit.ts` is IN: it mounts no competitor and no React, so there is nothing in it that has to be cast past somebody else's generics.",
   "compilerOptions": {
     "target": "ES2022",
     "module": "Preserve",
@@ -41,7 +41,9 @@
   "include": [
     "browser/*.ts",
     "report/*.ts",
+    "self-audit/*.ts",
     "types/*.ts",
+    "run-self-audit.ts",
     "run-time-bench.ts",
     "run-types-bench.ts"
   ]

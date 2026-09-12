@@ -33,8 +33,8 @@ Each subject is scored at the moment its OWN policy claims a verdict, and the ci
 
 | subject | library | policy | documented as | notes |
 |---|---|---|---|---|
-| form-contract-use-field | form-contract | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | No validation-mode knob exists; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly. |
-| form-contract-uncontrolled | form-contract | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for. |
+| form-contract-use-field | @maroonedog/form-contract | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | No validation-mode knob exists; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly. |
+| form-contract-uncontrolled | @maroonedog/form-contract | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for. |
 | hand-written-per-field-state | (none) | on-change | written for this benchmark to judge on every change | One useState per leaf, a mutable root, one whole-root pass per change, per-path notification. No store, no library. |
 | react-hook-form-scoped | react-hook-form | on-change | react-hook-form useForm options: mode | register with a per-leaf useFormState({name, exact}). mode onChange, criteriaMode all, shouldUnregister false. The root reads no formState. |
 | react-hook-form-deps | react-hook-form | on-change | react-hook-form register options: deps | The scoped subject plus register(name, { deps }) on the one field the shared schema makes another field depend on. |
@@ -47,10 +47,11 @@ Each subject is scored at the moment its OWN policy claims a verdict, and the ci
 
 Wiring fibers, measured by mounting each subject with no fields at all: form-contract-use-field 6, form-contract-uncontrolled 6, hand-written-per-field-state 3, react-hook-form-scoped 7, react-hook-form-deps 7, react-hook-form-on-submit 7, formik-use-field 5, formik-fast-field 5, tanstack-form-level 4. The trees are compared with these taken out, and the figure is taken rather than declared.
 
-form-contract is behind on 3 scenario(s); those rows are first:
+form-contract is behind on 4 scenario(s); those rows are first:
 
 - **K1**: 42 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **K2**: 84 changed fibers against 0 for `react-hook-form-on-submit`, which was scored **agrees at submit only**
+- **K5**: 210 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **X1**: 84 changed fibers against 0 for `react-hook-form-scoped`, which was scored **disagrees**
 
 | subject | scenario | agreement | commits | changed fibers | host fibers | DOM attrs | DOM nodes | validator passes | paths judged | tree fibers |
@@ -73,6 +74,15 @@ form-contract is behind on 3 scenario(s); those rows are first:
 | react-hook-form-on-submit | K2 | agrees at submit only | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 193 |
 | react-hook-form-scoped | K2 | agrees | 1 | 43 | 5 | 7 | 1 | 1 | 31 | 193 |
 | tanstack-form-level | K2 | agrees | 1 | 40 | 5 | 8 | 1 | 1 | 31 | 190 |
+| form-contract-uncontrolled | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 1 | 31 | 192 |
+| form-contract-use-field | K5 | agrees | 5 | 210 | 25 | 35 | 0 | 1 | 31 | 192 |
+| formik-fast-field | K5 | agrees | 6 | 799 | 26 | 35 | 0 | 5 | 155 | 284 |
+| formik-use-field | K5 | agrees | 6 | 1146 | 750 | 578 | 0 | 5 | 155 | 191 |
+| hand-written-per-field-state | K5 | agrees | 5 | 195 | 25 | 35 | 0 | 5 | 155 | 189 |
+| react-hook-form-deps | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 5 | 155 | 193 |
+| react-hook-form-on-submit | K5 | agrees at submit only | 0 | 0 | 0 | 15 | 0 | 0 | 0 | 193 |
+| react-hook-form-scoped | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 5 | 155 | 193 |
+| tanstack-form-level | K5 | agrees | 5 | 200 | 25 | 35 | 0 | 5 | 155 | 190 |
 | form-contract-uncontrolled | X1 | agrees | 1 | 42 | 5 | 7 | 1 | 1 | 31 | 192 |
 | form-contract-use-field | X1 | agrees | 2 | 84 | 10 | 11 | 1 | 1 | 31 | 192 |
 | formik-fast-field | X1 | agrees | 2 | 268 | 10 | 11 | 1 | 1 | 31 | 284 |
@@ -91,10 +101,11 @@ form-contract is behind on 3 scenario(s); those rows are first:
 
 Wiring fibers, measured by mounting each subject with no fields at all: form-contract-use-field 6, form-contract-uncontrolled 6, hand-written-per-field-state 3, react-hook-form-scoped 7, react-hook-form-deps 7, react-hook-form-on-submit 7, formik-use-field 5, formik-fast-field 5, tanstack-form-level 4. The trees are compared with these taken out, and the figure is taken rather than declared.
 
-form-contract is behind on 3 scenario(s); those rows are first:
+form-contract is behind on 4 scenario(s); those rows are first:
 
 - **K1**: 72 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **K2**: 144 changed fibers against 0 for `react-hook-form-on-submit`, which was scored **agrees at submit only**
+- **K5**: 360 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **X1**: 144 changed fibers against 0 for `react-hook-form-scoped`, which was scored **disagrees**
 
 | subject | scenario | agreement | commits | changed fibers | host fibers | DOM attrs | DOM nodes | validator passes | paths judged | tree fibers |
@@ -117,6 +128,15 @@ form-contract is behind on 3 scenario(s); those rows are first:
 | react-hook-form-on-submit | K2 | agrees at submit only | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 373 |
 | react-hook-form-scoped | K2 | agrees | 1 | 73 | 5 | 7 | 1 | 1 | 61 | 373 |
 | tanstack-form-level | K2 | agrees | 1 | 70 | 5 | 8 | 1 | 1 | 61 | 370 |
+| form-contract-uncontrolled | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 1 | 61 | 372 |
+| form-contract-use-field | K5 | agrees | 5 | 360 | 25 | 35 | 0 | 1 | 61 | 372 |
+| formik-fast-field | K5 | agrees | 6 | 1519 | 26 | 35 | 0 | 5 | 305 | 554 |
+| formik-use-field | K5 | agrees | 6 | 2226 | 1470 | 1118 | 0 | 5 | 305 | 371 |
+| hand-written-per-field-state | K5 | agrees | 5 | 345 | 25 | 35 | 0 | 5 | 305 | 369 |
+| react-hook-form-deps | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 5 | 305 | 373 |
+| react-hook-form-on-submit | K5 | agrees at submit only | 0 | 0 | 0 | 15 | 0 | 0 | 0 | 373 |
+| react-hook-form-scoped | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 5 | 305 | 373 |
+| tanstack-form-level | K5 | agrees | 5 | 350 | 25 | 35 | 0 | 5 | 305 | 370 |
 | form-contract-uncontrolled | X1 | agrees | 1 | 72 | 5 | 7 | 1 | 1 | 61 | 372 |
 | form-contract-use-field | X1 | agrees | 2 | 144 | 10 | 11 | 1 | 1 | 61 | 372 |
 | formik-fast-field | X1 | agrees | 2 | 508 | 10 | 11 | 1 | 1 | 61 | 554 |
@@ -135,10 +155,11 @@ form-contract is behind on 3 scenario(s); those rows are first:
 
 Wiring fibers, measured by mounting each subject with no fields at all: form-contract-use-field 6, form-contract-uncontrolled 6, hand-written-per-field-state 3, react-hook-form-scoped 7, react-hook-form-deps 7, react-hook-form-on-submit 7, formik-use-field 5, formik-fast-field 5, tanstack-form-level 4. The trees are compared with these taken out, and the figure is taken rather than declared.
 
-form-contract is behind on 3 scenario(s); those rows are first:
+form-contract is behind on 4 scenario(s); those rows are first:
 
 - **K1**: 212 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **K2**: 424 changed fibers against 0 for `react-hook-form-on-submit`, which was scored **agrees at submit only**
+- **K5**: 1060 changed fibers against 0 for `form-contract-uncontrolled`, which was scored **agrees**
 - **X1**: 424 changed fibers against 0 for `react-hook-form-scoped`, which was scored **disagrees**
 
 | subject | scenario | agreement | commits | changed fibers | host fibers | DOM attrs | DOM nodes | validator passes | paths judged | tree fibers |
@@ -161,6 +182,15 @@ form-contract is behind on 3 scenario(s); those rows are first:
 | react-hook-form-on-submit | K2 | agrees at submit only | 0 | 0 | 0 | 3 | 0 | 0 | 0 | 1213 |
 | react-hook-form-scoped | K2 | agrees | 1 | 213 | 5 | 7 | 1 | 1 | 201 | 1213 |
 | tanstack-form-level | K2 | agrees | 1 | 210 | 5 | 8 | 1 | 1 | 201 | 1210 |
+| form-contract-uncontrolled | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 1 | 201 | 1212 |
+| form-contract-use-field | K5 | agrees | 5 | 1060 | 25 | 35 | 0 | 1 | 201 | 1212 |
+| formik-fast-field | K5 | agrees | 6 | 4879 | 26 | 35 | 0 | 5 | 1005 | 1814 |
+| formik-use-field | K5 | agrees | 6 | 7266 | 4830 | 3638 | 0 | 5 | 1005 | 1211 |
+| hand-written-per-field-state | K5 | agrees | 5 | 1045 | 25 | 35 | 0 | 5 | 1005 | 1209 |
+| react-hook-form-deps | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 5 | 1005 | 1213 |
+| react-hook-form-on-submit | K5 | agrees at submit only | 0 | 0 | 0 | 15 | 0 | 0 | 0 | 1213 |
+| react-hook-form-scoped | K5 | agrees | 0 | 0 | 0 | 15 | 0 | 5 | 1005 | 1213 |
+| tanstack-form-level | K5 | agrees | 5 | 1050 | 25 | 35 | 0 | 5 | 1005 | 1210 |
 | form-contract-uncontrolled | X1 | agrees | 1 | 212 | 5 | 7 | 1 | 1 | 201 | 1212 |
 | form-contract-use-field | X1 | agrees | 2 | 424 | 10 | 11 | 1 | 1 | 201 | 1212 |
 | formik-fast-field | X1 | agrees | 2 | 1628 | 10 | 11 | 1 | 1 | 201 | 1814 |

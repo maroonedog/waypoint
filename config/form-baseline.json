@@ -24,6 +24,17 @@
   {
     "shapeId": "leaves-201",
     "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 1,
+    "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "form-contract-uncontrolled",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 1,
@@ -51,6 +62,17 @@
     "commits": 2,
     "changedFibers": 424,
     "changedHostFibers": 10,
+    "validatorPasses": 1,
+    "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "form-contract-use-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 1060,
+    "changedHostFibers": 25,
     "validatorPasses": 1,
     "pathsJudged": 201
   },
@@ -90,6 +112,17 @@
   {
     "shapeId": "leaves-201",
     "subjectId": "formik-fast-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 6,
+    "changedFibers": 4879,
+    "changedHostFibers": 26,
+    "validatorPasses": 5,
+    "pathsJudged": 1005
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "formik-fast-field",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 2,
@@ -123,6 +156,17 @@
   {
     "shapeId": "leaves-201",
     "subjectId": "formik-use-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 6,
+    "changedFibers": 7266,
+    "changedHostFibers": 4830,
+    "validatorPasses": 5,
+    "pathsJudged": 1005
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "formik-use-field",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 2,
@@ -152,6 +196,17 @@
     "changedHostFibers": 5,
     "validatorPasses": 1,
     "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "hand-written-per-field-state",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 1045,
+    "changedHostFibers": 25,
+    "validatorPasses": 5,
+    "pathsJudged": 1005
   },
   {
     "shapeId": "leaves-201",
@@ -189,6 +244,17 @@
   {
     "shapeId": "leaves-201",
     "subjectId": "react-hook-form-deps",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 5,
+    "pathsJudged": 1005
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "react-hook-form-deps",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 1,
@@ -212,6 +278,17 @@
     "shapeId": "leaves-201",
     "subjectId": "react-hook-form-on-submit",
     "scenarioId": "K2",
+    "agreement": "agrees at submit only",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 0,
+    "pathsJudged": 0
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "react-hook-form-on-submit",
+    "scenarioId": "K5",
     "agreement": "agrees at submit only",
     "commits": 0,
     "changedFibers": 0,
@@ -255,6 +332,17 @@
   {
     "shapeId": "leaves-201",
     "subjectId": "react-hook-form-scoped",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 5,
+    "pathsJudged": 1005
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "react-hook-form-scoped",
     "scenarioId": "X1",
     "agreement": "disagrees",
     "commits": 0,
@@ -284,6 +372,17 @@
     "changedHostFibers": 5,
     "validatorPasses": 1,
     "pathsJudged": 201
+  },
+  {
+    "shapeId": "leaves-201",
+    "subjectId": "tanstack-form-level",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 1050,
+    "changedHostFibers": 25,
+    "validatorPasses": 5,
+    "pathsJudged": 1005
   },
   {
     "shapeId": "leaves-201",
@@ -321,6 +420,17 @@
   {
     "shapeId": "leaves-31",
     "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 1,
+    "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "form-contract-uncontrolled",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 1,
@@ -348,6 +458,17 @@
     "commits": 2,
     "changedFibers": 84,
     "changedHostFibers": 10,
+    "validatorPasses": 1,
+    "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "form-contract-use-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 210,
+    "changedHostFibers": 25,
     "validatorPasses": 1,
     "pathsJudged": 31
   },
@@ -387,6 +508,17 @@
   {
     "shapeId": "leaves-31",
     "subjectId": "formik-fast-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 6,
+    "changedFibers": 799,
+    "changedHostFibers": 26,
+    "validatorPasses": 5,
+    "pathsJudged": 155
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "formik-fast-field",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 2,
@@ -420,6 +552,17 @@
   {
     "shapeId": "leaves-31",
     "subjectId": "formik-use-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 6,
+    "changedFibers": 1146,
+    "changedHostFibers": 750,
+    "validatorPasses": 5,
+    "pathsJudged": 155
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "formik-use-field",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 2,
@@ -449,6 +592,17 @@
     "changedHostFibers": 5,
     "validatorPasses": 1,
     "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "hand-written-per-field-state",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 195,
+    "changedHostFibers": 25,
+    "validatorPasses": 5,
+    "pathsJudged": 155
   },
   {
     "shapeId": "leaves-31",
@@ -486,6 +640,17 @@
   {
     "shapeId": "leaves-31",
     "subjectId": "react-hook-form-deps",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 5,
+    "pathsJudged": 155
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "react-hook-form-deps",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 1,
@@ -509,6 +674,17 @@
     "shapeId": "leaves-31",
     "subjectId": "react-hook-form-on-submit",
     "scenarioId": "K2",
+    "agreement": "agrees at submit only",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 0,
+    "pathsJudged": 0
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "react-hook-form-on-submit",
+    "scenarioId": "K5",
     "agreement": "agrees at submit only",
     "commits": 0,
     "changedFibers": 0,
@@ -552,6 +728,17 @@
   {
     "shapeId": "leaves-31",
     "subjectId": "react-hook-form-scoped",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 5,
+    "pathsJudged": 155
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "react-hook-form-scoped",
     "scenarioId": "X1",
     "agreement": "disagrees",
     "commits": 0,
@@ -581,6 +768,17 @@
     "changedHostFibers": 5,
     "validatorPasses": 1,
     "pathsJudged": 31
+  },
+  {
+    "shapeId": "leaves-31",
+    "subjectId": "tanstack-form-level",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 200,
+    "changedHostFibers": 25,
+    "validatorPasses": 5,
+    "pathsJudged": 155
   },
   {
     "shapeId": "leaves-31",
@@ -618,6 +816,17 @@
   {
     "shapeId": "leaves-61",
     "subjectId": "form-contract-uncontrolled",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 1,
+    "pathsJudged": 61
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "form-contract-uncontrolled",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 1,
@@ -645,6 +854,17 @@
     "commits": 2,
     "changedFibers": 144,
     "changedHostFibers": 10,
+    "validatorPasses": 1,
+    "pathsJudged": 61
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "form-contract-use-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 360,
+    "changedHostFibers": 25,
     "validatorPasses": 1,
     "pathsJudged": 61
   },
@@ -684,6 +904,17 @@
   {
     "shapeId": "leaves-61",
     "subjectId": "formik-fast-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 6,
+    "changedFibers": 1519,
+    "changedHostFibers": 26,
+    "validatorPasses": 5,
+    "pathsJudged": 305
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "formik-fast-field",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 2,
@@ -717,6 +948,17 @@
   {
     "shapeId": "leaves-61",
     "subjectId": "formik-use-field",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 6,
+    "changedFibers": 2226,
+    "changedHostFibers": 1470,
+    "validatorPasses": 5,
+    "pathsJudged": 305
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "formik-use-field",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 2,
@@ -746,6 +988,17 @@
     "changedHostFibers": 5,
     "validatorPasses": 1,
     "pathsJudged": 61
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "hand-written-per-field-state",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 345,
+    "changedHostFibers": 25,
+    "validatorPasses": 5,
+    "pathsJudged": 305
   },
   {
     "shapeId": "leaves-61",
@@ -783,6 +1036,17 @@
   {
     "shapeId": "leaves-61",
     "subjectId": "react-hook-form-deps",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 5,
+    "pathsJudged": 305
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "react-hook-form-deps",
     "scenarioId": "X1",
     "agreement": "agrees",
     "commits": 1,
@@ -806,6 +1070,17 @@
     "shapeId": "leaves-61",
     "subjectId": "react-hook-form-on-submit",
     "scenarioId": "K2",
+    "agreement": "agrees at submit only",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 0,
+    "pathsJudged": 0
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "react-hook-form-on-submit",
+    "scenarioId": "K5",
     "agreement": "agrees at submit only",
     "commits": 0,
     "changedFibers": 0,
@@ -849,6 +1124,17 @@
   {
     "shapeId": "leaves-61",
     "subjectId": "react-hook-form-scoped",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 0,
+    "changedFibers": 0,
+    "changedHostFibers": 0,
+    "validatorPasses": 5,
+    "pathsJudged": 305
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "react-hook-form-scoped",
     "scenarioId": "X1",
     "agreement": "disagrees",
     "commits": 0,
@@ -878,6 +1164,17 @@
     "changedHostFibers": 5,
     "validatorPasses": 1,
     "pathsJudged": 61
+  },
+  {
+    "shapeId": "leaves-61",
+    "subjectId": "tanstack-form-level",
+    "scenarioId": "K5",
+    "agreement": "agrees",
+    "commits": 5,
+    "changedFibers": 350,
+    "changedHostFibers": 25,
+    "validatorPasses": 5,
+    "pathsJudged": 305
   },
   {
     "shapeId": "leaves-61",

@@ -3,9 +3,13 @@
 //
 // Every clause of the flagship claim is in here and none of it is stubbed:
 // a root type, `FormAdapter<Root, FieldPath<Root>>`, the module augmentation
-// that registers it, and real `useField` calls. The imports resolve to the
-// packages' SOURCE, so what is measured is the type the repository maintains
-// rather than a `.d.ts` that may have been emitted before the last edit.
+// that registers it, and real hook calls. The imports resolve to the packages'
+// SOURCE, so what is measured is the type the repository maintains rather than
+// a `.d.ts` that may have been emitted before the last edit.
+//
+// WHICH hook is chosen by the path, because the library decides it that way:
+// a place goes to `useField` and a rule goes to `useFieldValues`. See
+// `hookFor` below.
 //
 // `declare const adapter` rather than a resolver call, because a resolver
 // would drag zod's own inference into the number and the question here is what
@@ -41,17 +45,30 @@ export type Unused = [FieldPath<{ only: string }>, FormAdapter<unknown>];
 export const alsoUnused = useField;
 `;
 
-/** The flagship shape, with one `useField` call per path given. */
+/**
+ * Which hook a path is addressed through, decided by the path itself.
+ *
+ * This is the library's own rule and not the harness's convenience: a place
+ * names one value and `useField` takes it, a rule names a column and
+ * `useFieldValues` takes it. The generator used to write `useField` for both,
+ * which measured a call the compiler now refuses — so the `array-declared`
+ * row would have reported the cost of ten type errors rather than the cost of
+ * addressing by rule.
+ */
+const hookFor = (path: string): string =>
+  path.includes("[*]") ? "useFieldValues" : "useField";
+
+/** The flagship shape, with one call per path given. */
 export function typeProgramSource(
   shape: ShapeUnderTest,
   calledPaths: readonly string[]
 ): string {
   const calls = calledPaths
-    .map((path) => `  useField(${JSON.stringify(path)});`)
+    .map((path) => `  ${hookFor(path)}(${JSON.stringify(path)});`)
     .join("\n");
   return `${BANNER}
 import type { FieldPath, FormAdapter } from "@maroonedog/form-contract";
-import { useField } from "@maroonedog/form-contract/react";
+import { useField, useFieldValues } from "@maroonedog/form-contract/react";
 
 ${shape.declarations}
 

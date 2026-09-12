@@ -20,9 +20,11 @@ import {
   useFieldValue,
   useFieldValues,
   useForm,
+  useParticipation,
   useRows,
   useUncontrolledField,
   type AnyPath,
+  type FormPath,
   type FormTypeRegistry,
 } from "@maroonedog/form-contract/react";
 
@@ -65,7 +67,6 @@ void values;
 // ---- what a component may ask for ----------------------------------------
 function accepted(): void {
   useField("owner.email");
-  useField("items[*].quantity"); // a rule, for a column read
   useField("items[0].quantity"); // a place
   useField("items"); // the container
   useFieldIssues("name");
@@ -96,6 +97,65 @@ function refused(): void {
   useField(`items[${spelled}].quantity`);
 }
 void refused;
+
+// ---- a rule is not a place, and the type says so before the runtime does ---
+//
+// Every one of these compiled clean before `ConcretePath` replaced
+// `AddressablePath` on these surfaces, and every one of them then threw on the
+// first render — except `useParticipation`, which threw nothing and silently
+// went on blocking the submit, because a dormant root is matched with
+// `isAncestorPath` and `isAncestorPath("items[*]", "items[0].sku")` is false.
+function ruleWhereAPlaceIsRequired(): void {
+  // @ts-expect-error one field is one place; the column read is useFieldValues
+  useField("items[*].quantity");
+  // @ts-expect-error the same handle, so the same answer
+  useFieldValue("items[*].sku");
+  // @ts-expect-error likewise
+  useFieldIssues("items[*].sku");
+  // @ts-expect-error likewise
+  useUncontrolledField("items[*].sku");
+  // @ts-expect-error one list has one row order; this names as many as there are shipments
+  useRows("shipments[*].lines");
+  // @ts-expect-error a wildcard dormant root matches nothing and silences nothing
+  useParticipation(useForm(), "items[*]", false);
+}
+void ruleWhereAPlaceIsRequired;
+
+// ---- a column read is WIDER than either, which is the other half -----------
+function columns(): void {
+  useFieldValues("items[*].sku"); // every sku in the list
+  useFieldValues("shipments[*].lines[*].sku"); // every sku in every shipment
+  // One shipment's column. The runtime has always expanded this — the type
+  // used to refuse it, because `AddressablePath` offers all the wildcards or
+  // none and a partly bound path is in neither half.
+  useFieldValues("shipments[0].lines[*].sku");
+  useFieldValues(`shipments[${index}].lines[*].sku`);
+  assertExact<
+    Exact<
+      ReturnType<typeof useFieldValues<"shipments[0].lines[*].sku">>,
+      readonly string[]
+    >
+  >(true);
+  // @ts-expect-error a string spliced into an index is still how a path is mis-built
+  useFieldValues(`shipments[${spelled}].lines[*].sku`);
+  // @ts-expect-error and a misspelling is still a misspelling
+  useFieldValues("items[*].skuu");
+}
+void columns;
+
+// ---- a place a VIEW component is handed -----------------------------------
+//
+// `FormPath` is what a design-system component's `path` prop takes, so it is
+// the places and not the rules: such a component hands what it receives to
+// `useField`.
+declare const viewPath: FormPath;
+const onlyPlaces:
+  | "name" | "owner" | "owner.email" | "items" | `items[${number}]`
+  | `items[${number}].quantity` | `items[${number}].sku` | "shipments"
+  | `shipments[${number}]` | `shipments[${number}].lines`
+  | `shipments[${number}].lines[${number}]`
+  | `shipments[${number}].lines[${number}].sku` | "handle" | "age" = viewPath;
+void onlyPlaces;
 
 // ---- naming a form narrows to that form ----------------------------------
 function named(): void {

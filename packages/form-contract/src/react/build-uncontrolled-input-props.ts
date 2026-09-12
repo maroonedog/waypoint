@@ -14,6 +14,13 @@
 // also why a boolean gets `defaultChecked` rather than `defaultValue` —
 // `defaultValue="true"` on a checkbox sets the string value of a box that is
 // still unticked, which is the quiet wrong answer rather than a loud one.
+//
+// A FILE GETS NEITHER DEFAULT. `<input type="file">` is the one element whose
+// value may only ever be assigned the empty string, so `defaultValue` on it is
+// a string the DOM will not take — and there is nothing for it to mean, since
+// a file nobody has picked is a file the page does not have. This binding is
+// already the arrangement where the node owns the value, which is how a file
+// input works whether or not anybody asked, so it needs no third shape here.
 // ===========================================================================
 import type { RefObject } from "react";
 import type { FormFieldDescriptor, FormIssue } from "../contract/index.js";
@@ -50,9 +57,11 @@ export function buildUncontrolledInputProps(
     hasIssues: issues.length > 0,
   });
   const value =
-    descriptor?.kind === "boolean"
-      ? { defaultChecked: request.held === true }
-      : { defaultValue: request.defaultValue };
+    descriptor?.kind === "file"
+      ? {}
+      : descriptor?.kind === "boolean"
+        ? { defaultChecked: request.held === true }
+        : { defaultValue: request.defaultValue };
   return {
     ...shared,
     ...value,

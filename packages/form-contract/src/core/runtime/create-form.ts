@@ -8,11 +8,32 @@
 // Every handle is cached by path for the life of the form. The handle owns the
 // callbacks an input is given, so a fresh one per render would hand every
 // input a new onChange every render.
+//
+// ONE LIST REACHES THE CELLS, THE COUNT AND THE SUBMIT VERDICT, which is what
+// `commitVerdict` is for. Adopted issues — what a server said; see
+// adopted-issues.ts — are merged onto the produced list BEFORE any of it is
+// written, so the rendered issue cells, `errorCount` and `blockedBy` cannot
+// come to disagree. A hand-written issue cell, which is what this replaces,
+// disagrees by construction: it is shown, not counted, and does not block.
+//
+// That same merged list is PUBLISHED, as `blockedBy`, and not merely counted.
+// An error summary has to name what blocked, and naming it is not derivable
+// from the per-path cells: a store is five opaque members with no iteration,
+// and an issue on a path no descriptor declares has no cell to be found in.
+// `publishBlockingIssues` writes the list and its length together for that
+// reason — two cells, one write site, so they cannot describe different passes.
+//
+// `lastProduced` is kept for one reason and it is worth the variable. Adopting
+// and forgetting both have to change what is on screen IMMEDIATELY, and the
+// alternative — asking the scheduler for a fresh pass — makes a server's
+// verdict wait behind another round trip of the validator's, which for an
+// async adapter is exactly the wait the server response just ended.
 // ===========================================================================
 import type { FormIssue, MaybeAsync } from "../../contract/index.js";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   ROOT_CELL,
+  blockingIssuesCell,
   errorCountCell,
   participatingCell,
   submitCountCell,
@@ -36,15 +57,20 @@ import { createOpenValueCells } from "./open-value-cells.js";
 import { createFieldHandle } from "./create-field-handle.js";
 import { createFieldHandleCache } from "./field-handle-cache.js";
 import { createParticipationIndex } from "./participation-index.js";
-import { blockingIssues, writeErrorCount } from "./form-state-cells.js";
+import {
+  blockingIssues,
+  publishBlockingIssues,
+} from "./form-state-cells.js";
 import {
   createIssuedPathRecord,
   distributeIssues,
   followIssuedPaths,
 } from "./distribute-issues.js";
+import { createAdoptedIssues } from "./adopted-issues.js";
 import { createValidationScheduler } from "./schedule-validation.js";
 import { submitForm } from "./submit-form.js";
 import { resetForm } from "./reset-form.js";
+import { NO_ISSUES } from "./interned-defaults.js";
 import type { FieldHandle, FormHandle, FormOptions } from "./form.types.js";
 
 export function createForm<T, TPath extends string = string>(
@@ -63,20 +89,27 @@ export function createForm<T, TPath extends string = string>(
   const sources = createFormCellSources(store, openCells);
 
   const issued = createIssuedPathRecord();
+  const adopted = createAdoptedIssues();
+  let lastProduced: readonly FormIssue[] = NO_ISSUES;
   const blockingOf = (produced: readonly FormIssue[]): readonly FormIssue[] =>
     blockingIssues(produced, participation.isParticipating);
   const commitVerdict = (produced: readonly FormIssue[]): void => {
+    lastProduced = produced;
+    const merged = adopted.mergedWith(produced);
     store.batch(() => {
-      distributeIssues(store, issued, produced, participation.isParticipating);
-      writeErrorCount(store, blockingOf(produced));
+      distributeIssues(store, issued, merged, participation.isParticipating);
+      publishBlockingIssues(store, blockingOf(merged));
     });
   };
   const judgeRoot = (root: unknown): MaybeAsync<readonly FormIssue[]> =>
     adapter.validate(root);
   const scheduler = createValidationScheduler({
     store,
-    judge: () => judgeRoot(store.read(ROOT_CELL)),
+    judge: (signal) => adapter.validate(store.read(ROOT_CELL), signal),
     commit: commitVerdict,
+    // Arity, read once. An adapter that declared one parameter never causes an
+    // AbortController to be constructed — see form-adapter.types.ts.
+    cancelsSupersededPasses: adapter.validate.length >= 2,
   });
 
   const initialRoot = seedRootValue(descriptors, options.defaultValues);
@@ -93,16 +126,41 @@ export function createForm<T, TPath extends string = string>(
     store.write(participatingCell(path), participating);
   };
 
-  // Two things hold concrete paths OUTSIDE the store, so renumbering the
-  // cells alone would leave both pointing at whichever row moved into that
-  // index: the record of which paths carried issues, and the set of subtrees
-  // that were switched off.
+  const validateOn = options.validateOn ?? "change";
+  /**
+   * One pass judges the whole root, so this is the form's decision and the
+   * field only reports which moment it is at. The submit-count clause is what
+   * makes "blur" and "submit" usable rather than merely present: once the form
+   * has refused a submit, fixing the field it complained about has to clear
+   * the complaint.
+   */
+  const requestValidationAt = (moment: "change" | "blur"): void => {
+    if (moment === validateOn) {
+      scheduler.request();
+      return;
+    }
+    if (moment === "change" && (store.read(submitCountCell) ?? 0) > 0) {
+      scheduler.request();
+    }
+  };
+
+  const forgetAdoptedAround = (path: string): void => {
+    if (adopted.forgetAround(path)) commitVerdict(lastProduced);
+  };
+
+  // Three things hold concrete paths OUTSIDE the store, so renumbering the
+  // cells alone would leave all three pointing at whichever row moved into
+  // that index: the record of which paths carried issues, the set of subtrees
+  // that were switched off, and the issues a server handed us. Each is a list
+  // that has to be ENUMERATED to be re-addressed, and a store is five opaque
+  // members with no iteration.
   const followMovedCells = (moves: readonly RowCellMove[]): void => {
     followIssuedPaths(issued, moves);
     const movedTo = new Map(moves.map((move) => [move.source, move.target]));
-    participation.remap((path) =>
-      movedTo.has(path) ? movedTo.get(path) : path
-    );
+    const followOne = (path: string): string | undefined =>
+      movedTo.has(path) ? movedTo.get(path) : path;
+    participation.remap(followOne);
+    adopted.remap(followOne);
   };
 
   const handles = createFieldHandleCache();
@@ -113,6 +171,7 @@ export function createForm<T, TPath extends string = string>(
     tree,
     store,
     errorCount: sources.of(errorCountCell, 0),
+    blockedBy: sources.of(blockingIssuesCell, NO_ISSUES),
     submitting: sources.of(submittingCell, false),
     submitCount: sources.of(submitCountCell, 0),
     validating: sources.of(validatingCell, false),
@@ -134,6 +193,8 @@ export function createForm<T, TPath extends string = string>(
           judgeRoot,
           runValidation: scheduler.runNow,
           requestValidation: scheduler.request,
+          requestValidationAt,
+          forgetAdoptedAround,
           setParticipating,
         })
       ) as FieldHandle<never>;
@@ -158,17 +219,60 @@ export function createForm<T, TPath extends string = string>(
     },
 
     setParticipating(path, participating) {
+      // The same refusal `field` and `rows` make, and it was missing here:
+      // a dormant root is matched against concrete paths with
+      // `isAncestorPath`, which is segment-anchored, so `items[*]` matched
+      // nothing and switching a subtree off silently did nothing at all.
+      assertConcretePath(path);
       setParticipating(path, participating);
       scheduler.request();
     },
 
-    submit: (handler) =>
-      submitForm({
+    adoptIssues(issues) {
+      adopted.adopt(issues);
+      // Now, off the last pass, rather than by asking for a new one. See the
+      // header: a fresh pass would put a server's answer behind the
+      // validator's, which for an async adapter is another round trip.
+      commitVerdict(lastProduced);
+    },
+
+    // ONE SUBMIT CONSUMES THE SERVER'S LAST ANSWER: this attempt is refused by
+    // it and REPORTS it, and then it is dropped so the next press asks again.
+    //
+    // "Last answer" means the one that was already held when the press
+    // happened. The handler is where the round trip lives — `await api.save()`
+    // and then `form.adoptIssues(response.issues)` is the shape this member
+    // exists for — and dropping unconditionally afterwards wiped exactly that,
+    // so the message the server had just sent never reached the screen at all.
+    // Measured: an adopt inside the handler ended with errorCount 0 and no
+    // issue anywhere. So the drop is conditional on nothing having been
+    // adopted while this attempt was in flight.
+    //
+    // Both halves are load-bearing and neither works alone. Without the merge
+    // into `blockingOf` an adopted issue would be shown and counted and then
+    // not block — which is the whole defect a hand-written issue cell already
+    // had, arrived at by a longer road. Without the drop afterwards, an issue
+    // on a path with no input ("the card was declined") could never be cleared
+    // by any edit, `errorCount` would hold it at one for ever, and the
+    // disabled-button idiom built on that count would make pressing submit —
+    // the only thing that could clear it — impossible. Measured as a test:
+    // two presses with nothing changed between them always get through.
+    //
+    // `blockingOf` is merged HERE rather than inside submitForm, which
+    // computes `blockedBy` from the raw produced list and stays ignorant of
+    // this function's bookkeeping.
+    submit: (handler) => {
+      const adoptedWhenPressed = adopted.adoptionCount();
+      return submitForm({
         store,
         judgeNow: () => scheduler.runNow(),
-        blockingOf,
+        blockingOf: (produced) => blockingOf(adopted.mergedWith(produced)),
         handler,
-      }),
+      }).finally(() => {
+        if (adopted.adoptionCount() !== adoptedWhenPressed) return;
+        if (adopted.forgetEverything()) commitVerdict(lastProduced);
+      });
+    },
 
     reset(defaultValues) {
       resetForm({
@@ -182,6 +286,7 @@ export function createForm<T, TPath extends string = string>(
         ),
       });
       issued.paths.clear();
+      adopted.forgetEverything();
       scheduler.request();
     },
 

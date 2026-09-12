@@ -1,0 +1,12 @@
+{
+  "//": "The `./resolver-standard` entry. It names no vendor at all — not even in a type position — because the two specs it reads are declared in standard-schema.types.ts rather than installed. That is what makes it the entry the other two resolvers build on rather than a third sibling beside them: it depends on the contract alone, and every vendor resolver depends on it.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "rootDir": ".",
+    "outDir": "../../dist/resolver-standard",
+    "tsBuildInfoFile": "../../.tsbuildinfo/resolver-standard.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../contract" }]
+}

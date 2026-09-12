@@ -30,11 +30,18 @@ export type FieldChangeEvent = ChangeEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >;
 
-/** Enough of a change event for the uncontrolled binding to read a node. */
+/**
+ * Enough of a change event for the uncontrolled binding to read a node.
+ *
+ * `files` is the third channel a node can answer on, and it is here for the
+ * same reason `checked` is: a file input's `value` is a fake path string and
+ * reading it would put `"C:\\fakepath\\photo.png"` in the cell.
+ */
 export interface UncontrolledChangeEvent {
   readonly currentTarget: {
     readonly value: string;
     readonly checked?: boolean;
+    readonly files?: FileList | null;
   };
 }
 
@@ -55,10 +62,12 @@ export interface FieldErrorProps {
 }
 
 /**
- * Spreadable onto an `<input>`, a `<textarea>` or a `<select>`. Exactly one of
+ * Spreadable onto an `<input>`, a `<textarea>` or a `<select>`. At most one of
  * `value` and `checked` is present: a checkbox carries neither a value the
  * person typed nor one React can control it by, and giving it both is how a
- * checkbox ends up ignoring clicks.
+ * checkbox ends up ignoring clicks. A `file` field carries NEITHER — it is the
+ * one input React cannot control at all, so the node holds what was picked and
+ * the cell is written from the change event.
  */
 export interface FieldInputProps {
   readonly id: string;

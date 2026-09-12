@@ -26,12 +26,26 @@ import type { FormFieldConstraints } from "./form-field-constraints.types.js";
  * The families a renderer is expected to handle. `unknown` is the honest
  * answer when a vendor cannot decide, and a renderer is expected to fall
  * back rather than fail on it.
+ *
+ * `file` is `<input type="file">`, and the cell holds a `File`. It is a KIND
+ * rather than a `format` on `string` because the widget decision is taken on
+ * `kind`: build-input-props.ts branches on it to decide WHO HOLDS THE VALUE,
+ * and a file input is the one input that cannot be controlled at all. A format
+ * would never reach a branch that omits `value`, so it would have been drawn
+ * by the generic tail — which writes `String(value)`, and `String(aFile)` is
+ * `"[object File]"`.
+ *
+ * ONE file. `multiple` is deliberately not describable: a multi-file pick is
+ * one event replacing a whole list at once, and `rows()` offers append, remove
+ * and move with no replace-the-list edit to express it. That is a change to
+ * the array runtime, not to this union.
  */
 export type FormFieldKind =
   | "string"
   | "number"
   | "boolean"
   | "date"
+  | "file"
   | "array"
   | "object"
   | "unknown";

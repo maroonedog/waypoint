@@ -19,6 +19,19 @@ Verified against source before writing: `rememberDeclaredCalls` runs uncondition
 > read with its comment to know that it returns issues and writes nothing,
 > which the naming rule in CLAUDE.md does not allow.
 >
+> **A rule is no longer a legal argument where a place is required.** The
+> `<Field path="items[*].quantity">` below reads as it does because a
+> `<FieldScope>` above it was supplying the index; with the scope gone, that
+> spelling reached `form.field()`, which refuses a wildcard on its first line.
+> The path types followed the runtime rather than the other way round:
+> `useField`, `useFieldValue`, `useFieldIssues`, `useUncontrolledField`,
+> `useRows`, `useParticipation`, `<Field>` and `<FieldRows>` take
+> `ConcretePath`, and `useFieldValues` — the column read, the one surface that
+> addresses a SET — takes `PartlyBoundPath`, which is wider than either and
+> accepts `shipments[0].lines[*].sku`. `useParticipation` is the one that had
+> been failing silently: a dormant root is matched with a segment-anchored
+> prefix test, so a wildcard root matched no descendant and silenced nothing.
+>
 > **`useField` is no longer spelled `useField<string>(path)`.** The path type
 > comes from a module-augmentation registry the application declares once, so
 > both the path and the value type are checked rather than asserted. See the
@@ -568,7 +581,9 @@ It is also **strictly more correct than `pick()` for an array element**: `pick("
 | `runtime/same-issue-list.ts` | Content equality that keeps an issue cell `Object.is`-stable |
 | `runtime/distribute-issues.ts` | Writes only changed issue cells; honours participation |
 | `runtime/participation-index.ts` | Which subtrees currently report issues |
-| `runtime/schedule-validation.ts` | Microtask coalescing, pass id, the `validateOn` policy |
+| `runtime/schedule-validation.ts` | Microtask coalescing, pass id, and the `AbortSignal` a superseded pass is cancelled with |
+| `runtime/create-form.ts` | Assembly, and where the `validateOn` policy decides whether a moment becomes a pass |
+| `runtime/adopted-issues.ts` | Issues a server sent, merged onto every pass rather than written as a cell |
 | `runtime/row-index.ts` | Opaque row ids per array path; insert, remove, move |
 | `runtime/create-rows-handle.ts` | `RowsHandle`: the row list and the three structural edits |
 | `runtime/splice-row-cells.ts` | Rewrites and forgets the cells a splice renumbers |

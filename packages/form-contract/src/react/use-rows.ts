@@ -13,8 +13,14 @@
 // `items[*]`, so the lists are what is left when that suffix is removed. An
 // inner list is reached by its concrete outer index — `shipments[0].lines` —
 // which is exactly the address the outer row already handed down.
+//
+// CONCRETE, therefore, and the sentence above is why. One list has one row
+// order, and `shipments[*].lines` names as many orders as there are shipments;
+// `rows()` asserts as much before it does anything else. The type used to
+// accept the wildcard and throw on it, which put the working spelling and the
+// checking spelling on opposite sides.
 // ===========================================================================
-import type { AddressablePath } from "../contract/index.js";
+import type { ConcretePath } from "../contract/index.js";
 import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
@@ -35,12 +41,12 @@ export interface RowsBinding<TPath extends string = string> {
   move(from: number, to: number): void;
 }
 
-export function useRows<K extends AddressablePath<ArrayPath<AnyPath>>>(
+export function useRows<K extends ConcretePath<ArrayPath<AnyPath>>>(
   path: K
 ): RowsBinding<K>;
 export function useRows<
   TKey extends FormKey,
-  K extends AddressablePath<ArrayPath<PathsFor<TKey>>>,
+  K extends ConcretePath<ArrayPath<PathsFor<TKey>>>,
 >(key: TKey, path: K): RowsBinding<K>;
 export function useRows(first: string, second?: string): RowsBinding<string> {
   const [formKey, path] = splitFormArgs(first, second);

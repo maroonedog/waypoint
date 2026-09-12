@@ -22,9 +22,25 @@
 // It emits the same `inputProps` as `useField`, minus the value. It used to
 // emit none, which meant the binding the benchmark recommends was the one that
 // made every caller re-derive the descriptor by hand.
+//
+// It takes a PLACE for the same reason `useField` does: it reaches the same
+// field handle, and one DOM node holds one value.
+//
+// A FILE FIELD IS THE ONE THAT NEVER GETS WRITTEN BACK. The effect below
+// reconciles the node from the cell, and for `<input type="file">` there is
+// nothing it may write: the DOM allows a file input's `value` to be assigned
+// only the empty string, so `element.value = String(aFile)` is not a bad
+// display but a thrown `InvalidStateError`. It is also the one kind where the
+// write is pointless in principle — a page cannot put a file into a chooser
+// the person did not pick — so the cell follows the node here and never leads
+// it, which is the only direction that was ever available.
 // ===========================================================================
 import { useCallback, useEffect, useId, useRef } from "react";
-import type { AddressablePath, DeclaredOf } from "../contract/index.js";
+import type {
+  ConcretePath,
+  DeclaredOf,
+  InhabitedPath,
+} from "../contract/index.js";
 import type {
   UncontrolledChangeEvent,
   UncontrolledFieldBinding,
@@ -56,15 +72,15 @@ import type {
 const displayValue = (value: unknown): string =>
   value === undefined || value === null ? "" : String(value);
 
-export function useUncontrolledField<K extends AddressablePath<AnyPath>>(
-  path: K
+export function useUncontrolledField<K extends ConcretePath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): UncontrolledFieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>;
 export function useUncontrolledField<
   TKey extends FormKey,
-  K extends AddressablePath<PathsFor<TKey>>,
+  K extends ConcretePath<PathsFor<TKey>>,
 >(
   key: TKey,
-  path: K
+  path: K & InhabitedPath<ValuesFor<TKey>, K>
 ): UncontrolledFieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
 export function useUncontrolledField(
   first: string,
@@ -83,11 +99,14 @@ export function useUncontrolledField(
   const node = useRef<HTMLInputElement | null>(null);
   const isCheckbox = handle.descriptor?.kind === "boolean";
   const isNumber = handle.descriptor?.kind === "number";
+  const isFileChooser = handle.descriptor?.kind === "file";
 
   useEffect(() => {
     const writeToDom = (): void => {
       const element = node.current;
       if (element === null) return;
+      // See the header: a file input takes no value from the page at all.
+      if (isFileChooser) return;
       const held = handle.sources.value.read();
       // A checkbox holds its answer in `checked`; its `value` is the string
       // "on" whether or not it is ticked, so writing there would look like it
@@ -110,7 +129,7 @@ export function useUncontrolledField(
     // next notification.
     writeToDom();
     return handle.sources.value.subscribe(writeToDom);
-  }, [handle, isCheckbox]);
+  }, [handle, isCheckbox, isFileChooser]);
 
   const onChange = useCallback(
     (event: UncontrolledChangeEvent) => {
@@ -119,11 +138,17 @@ export function useUncontrolledField(
         handle.setValue((target.checked === true) as never);
         return;
       }
+      // A file input's `value` is a fake path — "C:\fakepath\photo.png" — so
+      // the answer is the file list, and an empty pick clears the cell.
+      if (isFileChooser) {
+        handle.setValue((target.files?.[0] ?? undefined) as never);
+        return;
+      }
       handle.setValue(
         (isNumber ? numberOrTextWhileTyping(target.value) : target.value) as never
       );
     },
-    [handle, isCheckbox, isNumber]
+    [handle, isCheckbox, isFileChooser, isNumber]
   );
 
   // A number that stood as text while it was being typed becomes a number when

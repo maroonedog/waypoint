@@ -18,22 +18,55 @@
 // splitting them would make every vendor ship two adapters to be wired up in
 // the right pairs.
 //
-// There is no `FormResolver` type here any more, and that is the correction
-// rather than an omission. It said a resolver is `(schema) => FormAdapter`,
-// the README presented it as the contract — and one of the two shipped
-// resolvers is not assignable to it: `luqFormResolver` is binary,
-// `(validator, describable)`, because luq judges with one object and describes
-// with another, and tsc rejects the assignment with "Target signature provides
-// too few arguments. Expected 2 or more, but got 1." Nothing referenced the
-// type: zero call sites, zero type tests, so it was never a constraint on
-// anybody, only a promise to readers that the code already broke. A resolver's
-// honest shape is vendor-specific arity — however many arguments that vendor
-// needs to hand over. What every vendor does agree to is the two members
-// below, and that is the whole contract.
+// There is still no `FormResolver` type here, and the reason has changed. It
+// used to be that the type was refuted by a shipped resolver: it said a
+// resolver is `(schema) => FormAdapter`, and `luqFormResolver` was binary
+// because luq appeared to judge with one object and describe with another. That
+// example is gone — the object `toStandardJsonSchema` returns carries both, so
+// every resolver in this package is unary now, and a type saying so would
+// finally be true of all three.
+//
+// It stays absent anyway, because being true of today's three is not what such
+// a type would be claiming. `standardFormResolver` is `(schema, options?)`,
+// where `options` is required for a vendor that cannot describe itself; a
+// vendor arriving tomorrow may need a call this package has not imagined; and
+// the type would have to be widened for each, which is a type that describes
+// what has already been written rather than one that constrains what may be.
+// Arity was never the part worth promising, and nothing ever referenced it:
+// zero call sites, zero type tests. What every vendor agrees to is the two
+// members below, and that is the whole contract.
+//
+// `validate` GREW A SECOND ARGUMENT, AND THE FILE THAT REFUSES MEMBERS OWES A
+// REASON FOR IT. What was asked for was a `debounceMs` knob, and it does not
+// port. TanStack debounces ONE ASYNC VALIDATOR, per cause, and forces the
+// delay to zero on submit — read here in `@tanstack/form-core` 1.33.5,
+// `dist/esm/utils.js` lines 180-215: `debounceMs` resolves from
+// `options.asyncDebounceMs ?? 0`, is overridden per cause by
+// `onChangeAsyncDebounceMs` / `onBlurAsyncDebounceMs` /
+// `onDynamicAsyncDebounceMs`, and is set to 0 when the cause is `submit`.
+// Only `getAsyncValidatorArray` computes it, so a synchronous rule is never
+// delayed at all. Here there is one `validate(root)` for the WHOLE root, so a
+// delay on the pass would delay the required-field message along with the
+// network rule. That is not a smaller version of what TanStack ships; it is a
+// different and worse thing, and there is no knob.
+//
+// What the runtime knows and an adapter cannot is the other half of the same
+// fact: that a pass has been SUPERSEDED. The scheduler already drops an
+// overtaken answer by pass number (schedule-validation.ts); the signal is that
+// same fact told to the validator early enough to stop. So the delay stays
+// where it belongs — inside the one async rule that wants it — and the
+// cancellation comes from the only party in a position to know.
+//
+// It is a second ARGUMENT rather than a second MEMBER because an adapter that
+// does not want it says nothing at all: a one-parameter `validate` is still
+// assignable, and the runtime reads `validate.length` and never constructs a
+// controller for it. Both shipped vendor resolvers are in that case — neither
+// zod's nor luq's verdict call takes a signal, so neither forwards one.
 // ===========================================================================
 import type { FormFieldDescriptor } from "./form-field-descriptor.types.js";
 import type { FormIssue } from "./form-issue.types.js";
 import type { MaybeAsync } from "./maybe-async.types.js";
+import type { ValidationSignal } from "./validation-signal.types.js";
 
 /** What one validator's schema offers a form runtime. */
 export interface FormAdapter<T, TPath extends string = string> {
@@ -48,8 +81,20 @@ export interface FormAdapter<T, TPath extends string = string> {
    * judges synchronously returns the list itself and nothing downstream pays
    * for the possibility — which is why this is one member that may be async
    * rather than a second member that always is.
+   *
+   * `signal` is aborted when a NEWER pass starts, so an async rule can stop a
+   * round trip whose answer is already going to be discarded. An adapter that
+   * declares only `root` is never handed one and never causes an
+   * `AbortController` to be constructed — the runtime gates on
+   * `validate.length >= 2`. An adapter that DOES take it changes what a
+   * superseded pass does: instead of resolving with an answer the runtime
+   * drops, it rejects. The coalesced path already catches that; a caller who
+   * awaits `form.validate()` and then edits the form will see the rejection.
    */
-  validate(root: unknown): MaybeAsync<readonly FormIssue[]>;
+  validate(
+    root: unknown,
+    signal?: ValidationSignal
+  ): MaybeAsync<readonly FormIssue[]>;
 }
 
 /** The value type an adapter carries. */

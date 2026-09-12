@@ -7,7 +7,7 @@
 // none could.
 //
 // Registering `FormAdapter<unknown, string>` says exactly that. The paths of
-// this form are `string`, so `AddressablePath<string>` is `string` and the
+// this form are `string`, so `ConcretePath<string>` is `string` and the
 // hooks stop checking — for this program only, by its own declaration, in one
 // place a reader can find. That is the escape hatch for a schema nobody wrote
 // down, and it is a line of the application's own source rather than a second

@@ -16,13 +16,24 @@
 // mean "trust me", and what it usually meant was a misspelt path rendering an
 // empty input that was never validated and said nothing.
 //
+// It is a PLACE, not a rule. One field is one value, so `items[*].sku` has no
+// answer here — it names every sku in the list, and that question is
+// `useFieldValues`. The type used to accept it anyway and the runtime threw on
+// the first render, which made the checked spelling the broken one. The rule
+// is still what the VALUE type is computed from, because a descriptor and a
+// declared type are both keyed by the rule.
+//
 // `useId` is the fifth hook and the only one that is not a subscription. It
 // scopes this binding's element ids, for the reason field-element-ids.ts
 // gives: a path is unique within one form and this hook is deliberately
 // callable twice on the same path.
 // ===========================================================================
 import { useCallback, useId } from "react";
-import type { AddressablePath, DeclaredOf } from "../contract/index.js";
+import type {
+  ConcretePath,
+  DeclaredOf,
+  InhabitedPath,
+} from "../contract/index.js";
 import type { FieldBinding } from "./field-binding.types.js";
 import { buildInputProps } from "./build-input-props.js";
 import {
@@ -43,13 +54,16 @@ import type {
   ValuesFor,
 } from "./form-type-registry.js";
 
-export function useField<K extends AddressablePath<AnyPath>>(
-  path: K
+export function useField<K extends ConcretePath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>;
 export function useField<
   TKey extends FormKey,
-  K extends AddressablePath<PathsFor<TKey>>,
->(key: TKey, path: K): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
+  K extends ConcretePath<PathsFor<TKey>>,
+>(
+  key: TKey,
+  path: K & InhabitedPath<ValuesFor<TKey>, K>
+): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
 export function useField(first: string, second?: string): FieldBinding<never> {
   const [key, path] = splitFormArgs(first, second);
   const form = useFormHandle(key);

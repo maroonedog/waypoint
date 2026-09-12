@@ -82,8 +82,21 @@ const SUBJECTS: readonly (readonly [string, string])[] = [
   [PACKAGE, `export * from "${PACKAGE}";`],
   [`${PACKAGE}/core`, `export * from "${PACKAGE}/core";`],
   [`${PACKAGE}/react`, `export * from "${PACKAGE}/react";`],
+  [
+    `${PACKAGE}/resolver-standard`,
+    `export * from "${PACKAGE}/resolver-standard";`,
+  ],
   [`${PACKAGE}/resolver-zod`, `export * from "${PACKAGE}/resolver-zod";`],
   [`${PACKAGE}/resolver-luq`, `export * from "${PACKAGE}/resolver-luq";`],
+  // The row that says whether a vendor resolver is now mostly the generic one.
+  // Both vendor barrels re-export nothing from `./resolver-standard`, so what
+  // they carry of it is what they actually call — and if one of them ever
+  // drifts back into describing a schema itself, this figure is where it shows
+  // before anybody reads the diff.
+  [
+    "resolver-standard (standardFormResolver alone)",
+    `export { standardFormResolver } from "${PACKAGE}/resolver-standard";`,
+  ],
   [`${PACKAGE}/store-zustand`, `export * from "${PACKAGE}/store-zustand";`],
   [
     "react (a screen: useField, useRows, FormProvider, useCreateForm)",

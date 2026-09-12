@@ -1,0 +1,282 @@
+[
+  {
+    "id": "leaves-201|mount",
+    "counts": {
+      "leaves": 201,
+      "cellsSeededAtMount": 209,
+      "valueCellsSeeded": 202,
+      "storeReadsAtMount": 0
+    }
+  },
+  {
+    "id": "leaves-201|pass",
+    "counts": {
+      "leaves": 201,
+      "issuesProduced": 1,
+      "issueCellsWritten": 1,
+      "notificationsDelivered": 0
+    }
+  },
+  {
+    "id": "leaves-201|write|every-field-and-its-group",
+    "counts": {
+      "leaves": 201,
+      "openValueCells": 202,
+      "openCellScanLength": 202,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 1,
+      "storeWrites": 4,
+      "storeReads": 1,
+      "notificationsDelivered": 2
+    }
+  },
+  {
+    "id": "leaves-201|write|every-field-on-screen",
+    "counts": {
+      "leaves": 201,
+      "openValueCells": 201,
+      "openCellScanLength": 201,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-201|write|one-field-on-screen",
+    "counts": {
+      "leaves": 201,
+      "openValueCells": 1,
+      "openCellScanLength": 1,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-201|write|write-at-a-container",
+    "counts": {
+      "leaves": 201,
+      "openValueCells": 201,
+      "openCellScanLength": 201,
+      "ancestorProbes": 0,
+      "valueCellsRefreshed": 12,
+      "storeWrites": 15,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-31|mount",
+    "counts": {
+      "leaves": 31,
+      "cellsSeededAtMount": 39,
+      "valueCellsSeeded": 32,
+      "storeReadsAtMount": 0
+    }
+  },
+  {
+    "id": "leaves-31|pass",
+    "counts": {
+      "leaves": 31,
+      "issuesProduced": 1,
+      "issueCellsWritten": 1,
+      "notificationsDelivered": 0
+    }
+  },
+  {
+    "id": "leaves-31|write|every-field-and-its-group",
+    "counts": {
+      "leaves": 31,
+      "openValueCells": 32,
+      "openCellScanLength": 32,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 1,
+      "storeWrites": 4,
+      "storeReads": 1,
+      "notificationsDelivered": 2
+    }
+  },
+  {
+    "id": "leaves-31|write|every-field-on-screen",
+    "counts": {
+      "leaves": 31,
+      "openValueCells": 31,
+      "openCellScanLength": 31,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-31|write|one-field-on-screen",
+    "counts": {
+      "leaves": 31,
+      "openValueCells": 1,
+      "openCellScanLength": 1,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-31|write|write-at-a-container",
+    "counts": {
+      "leaves": 31,
+      "openValueCells": 31,
+      "openCellScanLength": 31,
+      "ancestorProbes": 0,
+      "valueCellsRefreshed": 12,
+      "storeWrites": 15,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-401|mount",
+    "counts": {
+      "leaves": 401,
+      "cellsSeededAtMount": 409,
+      "valueCellsSeeded": 402,
+      "storeReadsAtMount": 0
+    }
+  },
+  {
+    "id": "leaves-401|pass",
+    "counts": {
+      "leaves": 401,
+      "issuesProduced": 1,
+      "issueCellsWritten": 1,
+      "notificationsDelivered": 0
+    }
+  },
+  {
+    "id": "leaves-401|write|every-field-and-its-group",
+    "counts": {
+      "leaves": 401,
+      "openValueCells": 402,
+      "openCellScanLength": 402,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 1,
+      "storeWrites": 4,
+      "storeReads": 1,
+      "notificationsDelivered": 2
+    }
+  },
+  {
+    "id": "leaves-401|write|every-field-on-screen",
+    "counts": {
+      "leaves": 401,
+      "openValueCells": 401,
+      "openCellScanLength": 401,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-401|write|one-field-on-screen",
+    "counts": {
+      "leaves": 401,
+      "openValueCells": 1,
+      "openCellScanLength": 1,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-401|write|write-at-a-container",
+    "counts": {
+      "leaves": 401,
+      "openValueCells": 401,
+      "openCellScanLength": 401,
+      "ancestorProbes": 0,
+      "valueCellsRefreshed": 12,
+      "storeWrites": 15,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-61|mount",
+    "counts": {
+      "leaves": 61,
+      "cellsSeededAtMount": 69,
+      "valueCellsSeeded": 62,
+      "storeReadsAtMount": 0
+    }
+  },
+  {
+    "id": "leaves-61|pass",
+    "counts": {
+      "leaves": 61,
+      "issuesProduced": 1,
+      "issueCellsWritten": 1,
+      "notificationsDelivered": 0
+    }
+  },
+  {
+    "id": "leaves-61|write|every-field-and-its-group",
+    "counts": {
+      "leaves": 61,
+      "openValueCells": 62,
+      "openCellScanLength": 62,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 1,
+      "storeWrites": 4,
+      "storeReads": 1,
+      "notificationsDelivered": 2
+    }
+  },
+  {
+    "id": "leaves-61|write|every-field-on-screen",
+    "counts": {
+      "leaves": 61,
+      "openValueCells": 61,
+      "openCellScanLength": 61,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-61|write|one-field-on-screen",
+    "counts": {
+      "leaves": 61,
+      "openValueCells": 1,
+      "openCellScanLength": 1,
+      "ancestorProbes": 1,
+      "valueCellsRefreshed": 0,
+      "storeWrites": 3,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  },
+  {
+    "id": "leaves-61|write|write-at-a-container",
+    "counts": {
+      "leaves": 61,
+      "openValueCells": 61,
+      "openCellScanLength": 61,
+      "ancestorProbes": 0,
+      "valueCellsRefreshed": 12,
+      "storeWrites": 15,
+      "storeReads": 1,
+      "notificationsDelivered": 1
+    }
+  }
+]

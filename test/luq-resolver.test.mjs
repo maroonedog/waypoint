@@ -1,11 +1,18 @@
-// The second resolver, which is the point: the contract claimed to be
-// validator-neutral and had exactly one implementation, so the claim was a
-// design intention rather than a demonstrated one.
+// luq no longer reaches the contract by a road of its own, and that is the
+// change this file now records. Both resolvers get their descriptors from the
+// same place — the generic walk over `~standard.jsonSchema` — so the two roads
+// this file used to contrast have become one, and neutrality is a property of
+// the build rather than of there being two implementations.
 //
-// luq reaches the contract by a different road from zod's. zod is walked
-// directly; luq is asked for a JSON Schema and the schema is walked, so this
-// file is also a check that the contract's two members are wide enough for a
-// vendor that describes itself in somebody else's format.
+// What is left vendor-specific here is the VERDICT, and only because the spec
+// has no room for it. `StandardSchemaV1.Issue` has `message` and `path` and no
+// `code`; luq's own bridge says so in its source and drops both `code` and
+// `severity` on the way into the spec. The tests below that assert on
+// `code: "stringMin"` are the reason resolver-luq still exists.
+//
+// The resolver is UNARY now. `toStandardJsonSchema(validator)` returns one
+// object carrying luq's native `validate` AND the spec's two members, so there
+// was never a second argument to pass.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { Builder } from "@maroonedog/luq";
@@ -36,10 +43,7 @@ const build = () =>
     .v("quantity", (one) => one.number.required().min(1).max(99))
     .build();
 
-const adapterOf = () => {
-  const validator = build();
-  return luqFormResolver(validator, toStandardJsonSchema(validator));
-};
+const adapterOf = () => luqFormResolver(toStandardJsonSchema(build()));
 
 const GOOD = { owner: { name: "Ada Lovelace", nickname: "" }, quantity: 2 };
 
@@ -80,7 +84,17 @@ test("a container contributes no descriptor of its own", () => {
 // resolver the document directly tests the mapping that a luq release adding
 // those keywords, or any other producer of draft-07, would exercise.
 const describableDocument = (document) => ({
-  "~standard": { jsonSchema: { input: () => document } },
+  "~standard": {
+    version: 1,
+    vendor: "luq",
+    validate: () => ({}),
+    jsonSchema: { input: () => document },
+  },
+  // luq's own judging method travels on the same object as the spec's two
+  // members — `toStandardJsonSchema` returns one value carrying both — which
+  // is why this resolver is unary. These two tests only read descriptors, so
+  // this one has nothing to say.
+  validate: () => ({ valid: true, issues: [] }),
 });
 
 const ANNOTATED = {
@@ -104,7 +118,7 @@ const ANNOTATED = {
 };
 
 test("a document's own title and description reach the descriptor", () => {
-  const adapter = luqFormResolver(build(), describableDocument(ANNOTATED));
+  const adapter = luqFormResolver(describableDocument(ANNOTATED));
   assert.deepEqual(descriptorAt(adapter, "owner.name"), {
     path: "owner.name",
     kind: "string",
@@ -119,7 +133,7 @@ test("an unannotated field carries neither member, rather than undefined ones", 
   // The sibling in the same document says nothing, so the descriptor says
   // nothing — no name is derived from `owner.nickname`, because choosing the
   // wording and the language of that text is the application's job.
-  const adapter = luqFormResolver(build(), describableDocument(ANNOTATED));
+  const adapter = luqFormResolver(describableDocument(ANNOTATED));
   const nickname = descriptorAt(adapter, "owner.nickname");
   assert.equal("label" in nickname, false);
   assert.equal("description" in nickname, false);
@@ -173,4 +187,43 @@ test("the runtime drives a luq adapter exactly as it drives a zod one", async ()
   // And the descriptor reached the field handle, which is what a renderer
   // draws from before anybody types.
   assert.equal(form.field("owner.name").descriptor.constraints.minLength, 3);
+});
+
+test("a warning is graded out, because luq grades and the spec does not", () => {
+  // A warning that blocked a submit would be a warning that is an error. The
+  // spec has no severity at all, so this is the other thing only the vendor
+  // can say.
+  const graded = {
+    "~standard": {
+      version: 1,
+      vendor: "luq",
+      validate: () => ({}),
+      jsonSchema: { input: () => ANNOTATED },
+    },
+    validate: () => ({
+      valid: false,
+      issues: [
+        { path: "owner.name", message: "too short", code: "stringMin", severity: "error" },
+        { path: "owner.name", message: "unusual", code: "styleOdd", severity: "warning" },
+      ],
+    }),
+  };
+  assert.deepEqual(luqFormResolver(graded).validate({}), [
+    { path: "owner.name", message: "too short", code: "stringMin" },
+  ]);
+});
+
+test("the one object carries both halves, which is why this takes one argument", () => {
+  // Asserted rather than described: `toStandardJsonSchema` returns a NEW object
+  // whose own `validate` is luq's, with `~standard` beside it.
+  const validator = build();
+  const describable = toStandardJsonSchema(validator);
+  assert.notEqual(describable, validator);
+  assert.equal(typeof describable.validate, "function");
+  assert.equal(typeof describable["~standard"].jsonSchema.input, "function");
+  assert.equal(
+    describable.validate({ owner: { name: "a" }, quantity: 2 }, { abortEarly: false })
+      .issues[0].code,
+    "stringMin"
+  );
 });

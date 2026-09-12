@@ -1,0 +1,17 @@
+{
+  "//": "Its own program because a `declare module` registration is program-wide: test/types asserts the EXACT union of every registered path, so a second form registered beside it there would change that union rather than test anything. A union, a tuple and a record each widen the path type in a way worth pinning alone.",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ES2020", "DOM"],
+    "strict": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "noEmit": true
+  },
+  "include": ["."]
+}

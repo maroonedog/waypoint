@@ -21,6 +21,7 @@ const hooks = [
     example: `const form = useCreateForm(() => ({
   adapter: orderAdapter,
   defaultValues,
+  validateOn: "blur",   // "change" (the default) | "blur" | "submit"
 }));
 
 <FormProvider form={form}>…</FormProvider>`,
@@ -28,14 +29,14 @@ const hooks = [
   {
     name: "useField()",
     summary:
-      "One field: its value, its issues, its flags, and the writers for them. Subscribes to five cells, so a keystroke re-renders this component and nothing else.",
-    signature: `function useField<K extends AddressablePath<AnyPath>>(
-  path: K
+      "One field: its value, its issues, its flags, and the writers for them. Subscribes to five cells, so a keystroke re-renders this component and nothing else. The path is a PLACE — one field is one value, so items[*].sku has no answer here and does not compile; that question is useFieldValues.",
+    signature: `function useField<K extends ConcretePath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>
 
 // naming one registered form
-function useField<TKey extends FormKey, K extends AddressablePath<PathsFor<TKey>>>(
-  key: TKey, path: K
+function useField<TKey extends FormKey, K extends ConcretePath<PathsFor<TKey>>>(
+  key: TKey, path: K & InhabitedPath<ValuesFor<TKey>, K>
 ): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>`,
     example: `const field = useField("owner.name");
 
@@ -48,12 +49,12 @@ function useField<TKey extends FormKey, K extends AddressablePath<PathsFor<TKey>
       { name: "isTouched", type: "boolean", note: "Set by markTouched, usually on blur." },
       { name: "isDirty", type: "boolean", note: "Differs from the value it was built with." },
       { name: "isParticipating", type: "boolean", note: "Whether it counts toward blocking a submit." },
-      { name: "setValue", type: "(next) => void", note: "Writes, then asks for one coalesced pass." },
-      { name: "markTouched", type: "() => void", note: "Display state only. Asks for no pass." },
+      { name: "setValue", type: "(next) => void", note: "Writes, then asks for one coalesced pass — under validateOn \"change\", or once a submit has been refused." },
+      { name: "markTouched", type: "() => void", note: "Display state, and the blur moment: it asks for a pass under validateOn \"blur\" and for none otherwise." },
       { name: "setParticipating", type: "(on) => void", note: "Keeps the value either way." },
       { name: "validate", type: "() => MaybeAsync<FormIssue[]>", note: "The form's own pass, filtered to this path." },
       { name: "issuesFor", type: "(candidate) => MaybeAsync<FormIssue[]>", note: "What a value WOULD produce. Writes nothing." },
-      { name: "inputProps", type: "FieldInputProps", note: "id / name / required / type, value or checked, onChange / onBlur, the declared bounds, and aria-invalid and aria-describedby when they apply." },
+      { name: "inputProps", type: "FieldInputProps", note: "id / name / required / type, value or checked (and neither, for a file — the one input React cannot control), onChange / onBlur, the declared bounds, and aria-invalid and aria-describedby when they apply." },
       { name: "labelProps", type: "FieldLabelProps", note: "htmlFor, pointing at the same id inputProps carries." },
       { name: "descriptionProps", type: "FieldDescriptionProps | undefined", note: "An id for the help line. Undefined when the schema declared no description, so nothing points at an element you do not draw." },
       { name: "errorProps", type: "FieldErrorProps", note: "An id and role=\"alert\". A live region announces reliably only if the element was already in the document, so render it always and let it be empty." },
@@ -66,8 +67,8 @@ function useField<TKey extends FormKey, K extends AddressablePath<PathsFor<TKey>
     name: "useUncontrolledField()",
     summary:
       "The same field, subscribed imperatively: the listener writes the DOM node instead of re-rendering, so typing reaches React not at all. It cannot transform a value as it is typed — masking and formatting need useField.",
-    signature: `function useUncontrolledField<K extends AddressablePath<AnyPath>>(
-  path: K
+    signature: `function useUncontrolledField<K extends ConcretePath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): UncontrolledFieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>`,
     example: `const field = useUncontrolledField("owner.name");
 
@@ -88,17 +89,17 @@ function useField<TKey extends FormKey, K extends AddressablePath<PathsFor<TKey>
     name: "useFieldValue()",
     summary:
       "One field's value and nothing else. A summary that only mirrors a value has no reason to be woken when the error on it moves.",
-    signature: `function useFieldValue<K extends AddressablePath<AnyPath>>(
-  path: K
+    signature: `function useFieldValue<K extends ConcretePath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): ValueOfPath<AnyValues, DeclaredOf<K>> | undefined`,
     example: `const sameAsBilling = useFieldValue("sameAsBilling") === true;`,
   },
   {
     name: "useFieldValues()",
     summary:
-      "Every place a wildcard covers, read as a column. The one hook here that is not O(1): it subscribes to one cell per place, plus the row order of every array the path crosses.",
-    signature: `function useFieldValues<K extends AddressablePath<AnyPath>>(
-  path: K
+      "Every place a wildcard covers, read as a column. The one hook here that is not O(1): it subscribes to one cell per place, plus the row order of every array the path crosses. Its path type is the WIDE one — each [*] independently kept or bound — because this is the one hook that addresses a set rather than a value.",
+    signature: `function useFieldValues<K extends PartlyBoundPath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): readonly ValueOfPath<AnyValues, DeclaredOf<K>>[]`,
     example: `const skus  = useFieldValues("items[*].sku");        // readonly string[]
 const inRow = useFieldValues("shipments[0].lines[*].sku");  // one row's column`,
@@ -107,16 +108,16 @@ const inRow = useFieldValues("shipments[0].lines[*].sku");  // one row's column`
     name: "useFieldIssues()",
     summary:
       "One field's issues and nothing else, so typing in an input never re-renders the summary beside it.",
-    signature: `function useFieldIssues(
-  path: AddressablePath<AnyPath>
+    signature: `function useFieldIssues<K extends ConcretePath<AnyPath>>(
+  path: K & InhabitedPath<AnyValues, K>
 ): readonly FormIssue[]`,
     example: `const listIssues = useFieldIssues("items");   // the array-level rule`,
   },
   {
     name: "useRows()",
     summary:
-      "The row ORDER of one array, and the three edits that change it. Editing a member of a row leaves the order untouched, so a list does not re-render because somebody typed in it.",
-    signature: `function useRows<K extends AddressablePath<ArrayPath<AnyPath>>>(
+      "The row ORDER of one array, and the three edits that change it. Editing a member of a row leaves the order untouched, so a list does not re-render because somebody typed in it. Concrete, because one list has one order: an inner list is reached through the outer row's own address, `${row.path}.lines`.",
+    signature: `function useRows<K extends ConcretePath<ArrayPath<AnyPath>>>(
   path: K
 ): RowsBinding<K>`,
     example: `const items = useRows("items");
@@ -152,10 +153,10 @@ items.move(0, 2);`,
   {
     name: "useParticipation()",
     summary:
-      "Switches a subtree out of what blocks a submit, and back on unmount. The values stay in the store, so a rule comparing against them goes on reading them.",
+      "Switches a subtree out of what blocks a submit, and back on unmount. The values stay in the store, so a rule comparing against them goes on reading them. A place, not a rule: a dormant root is matched with a segment-anchored prefix test, so a wildcard root matches nothing and would silence nothing.",
     signature: `function useParticipation<T, TPath extends string>(
   form: FormHandle<T, TPath>,
-  path: AddressablePath<TPath>,
+  path: ConcretePath<TPath>,
   participating: boolean | undefined
 ): void`,
     example: `useParticipation(form, "shipping", !sameAsBilling);`,
@@ -172,6 +173,7 @@ await form.submit(save);`,
       { name: "field", type: "(path) => FieldHandle", note: "Outside React too: sources, setValue, validate, issuesFor." },
       { name: "rows", type: "(arrayPath) => RowsHandle", note: "" },
       { name: "submit", type: "(handler) => Promise<SubmitOutcome>", note: "{ submitted, blockedBy }. Judges the whole root first." },
+      { name: "adoptIssues", type: "(issues) => void", note: "The setError of this library. Merged into every pass, so they are counted and reported; one submit is refused by them and consumes them." },
       { name: "reset", type: "(defaultValues?) => void", note: "" },
       { name: "validate", type: "() => MaybeAsync<FormIssue[]>", note: "Judges now, not on the microtask." },
       { name: "readRoot", type: "() => unknown", note: "A root being edited is a draft, so it is not a T." },
@@ -231,21 +233,37 @@ type SubmitHandler = (root: unknown) => void | Promise<void>;
 const pathTypes = `
 // A declared path names the RULE: "items[*].sku".
 // A value has PLACES:             "items[0].sku", "items[1].sku".
-// Both are things a caller may legitimately write, so both are addressable.
+// Which of them a surface takes is decided by what it addresses.
 
-type ConcretePath<P>    // every [*] replaced by an index position
-type AddressablePath<P> // P | ConcretePath<P> — what a hook accepts
-type DeclaredOf<P>      // the reverse: every [0] back to [*]
+type ConcretePath<P>     // every [*] replaced by an index position
+type PartlyBoundPath<P>  // each [*] independently kept or bound
+type AddressablePath<P>  // P | ConcretePath<P> — the rule or a place
+type DeclaredOf<P>       // the reverse: every [0] back to [*]
+type InhabitedPath<T, K> // K, unless T has no value at K
 
-// AddressablePath<string> is string, which is why a form registered as
+// A surface addressing ONE value takes ConcretePath: useField, useFieldValue,
+// useFieldIssues, useUncontrolledField, useParticipation, <Field>, and
+// useRows / <FieldRows> over one list's order. Each of them reaches a runtime
+// that refuses a wildcard, so accepting one only moved the failure later.
+//
+// useFieldValues takes PartlyBoundPath, which is WIDER than either: it reads a
+// column, so "shipments[0].lines[*].sku" — one row's column — is a question it
+// can answer and the rule-or-place union could not spell.
+//
+// ConcretePath<string> is string, which is why a form registered as
 // FormAdapter<unknown, string> is back to unchecked paths.
+//
+// InhabitedPath is intersected into the path parameter, and it is what checks
+// the one place a path union cannot: below a Record<string, T> key the union
+// widens to \`bag.\${string}\`, which absorbs every path beneath it, so
+// ValueAtPath is asked instead — it walks the path and answers never.
 `;
 
 const types = `
 // The registry. One declaration, anywhere in the compilation.
 interface FormTypeRegistry {}
 
-FormPath                       // every registered path, containers included
+FormPath                       // every registered PLACE, containers included
 FormPathTo<string>             // only the paths whose value is a string
 FormPathOver<"postcode">       // only the prefixes that have those underneath
 
@@ -306,11 +324,12 @@ const slugOf = (name: string): string =>
   <Code code={submitTypes} />
 
   <h3 class="mt-10 font-mono text-lg font-semibold">
-    AddressablePath, ConcretePath, DeclaredOf
+    ConcretePath, PartlyBoundPath, DeclaredOf, InhabitedPath
   </h3>
   <p class="mt-2 leading-relaxed text-on-surface-variant">
     The types every signature above is written in. A descriptor is keyed by the
-    rule; a value lives at a place; a hook accepts either.
+    rule and a value lives at a place; which one a surface takes follows from
+    whether it addresses one value or a set of them.
   </p>
   <Code code={pathTypes} />
 

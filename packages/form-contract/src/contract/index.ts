@@ -15,9 +15,15 @@ export type {
   AddressablePath,
   ConcretePath,
   DeclaredOf,
+  PartlyBoundPath,
 } from "./addressable-path.types.js";
+export type { InhabitedPath } from "./inhabited-path.types.js";
 export type { ValueAtPath } from "./value-at-path.types.js";
 export type { ElementOf } from "./element-of.types.js";
 export type { IsOpaqueObject, OpaqueObject } from "./opaque-object.types.js";
 export { isPending } from "./maybe-async.types.js";
 export type { MaybeAsync } from "./maybe-async.types.js";
+export type {
+  PollableAbortSignal,
+  ValidationSignal,
+} from "./validation-signal.types.js";

@@ -164,8 +164,9 @@ const byId = Object.fromEntries(proofMeta.map((one) => [one.id, one]));
 const m = (id: string): { claim: string; watch: string } => byId[id];
 
 // What a reader is actually shopping for. Every row is something the
-// repository does or plainly does not — the two it does not are in the table
-// because a capability list without them is an advertisement.
+// repository does or plainly does not, and the ones it does not say what to
+// use instead — a capability list without them is an advertisement, and one
+// that says only "no" leaves the reader exactly where they started.
 const CAN: readonly (readonly [string, string, string, boolean])[] = [
   ["Validate a field", "Your schema already says it. One resolver call.", "/contract/", false],
   [
@@ -230,14 +231,56 @@ const CAN: readonly (readonly [string, string, string, boolean])[] = [
   ],
   [
     "Server errors after a submit",
-    "No setError. Writing the issue cell by hand shows the message and it survives the next pass — but errorCount does not count it, so it does not block a submit.",
+    "form.adoptIssues(issues) — the setError of this library. They are merged into every pass, so they reach their fields, are counted by errorCount and appear in blockedBy. One submit is refused by them and reports them; the next press asks the server again.",
+    "/validation/",
+    false,
+  ],
+  [
+    "Validate on blur, or only on submit",
+    "validateOn on createForm. After a rejected submit every setting judges on change again, so fixing the field the form just complained about clears it.",
+    "/validation/",
+    false,
+  ],
+  [
+    "A file upload",
+    'kind: "file", read off the document rather than off a vendor — a binary string is format: "binary" or contentEncoding: "binary" — so every validator that answers Standard Schema gets a file widget.',
+    "/contract/",
+    false,
+  ],
+  [
+    "Import the bindings into a Next Server Component",
+    'The ./react entry carries "use client", so it imports without a wrapper module of your own.',
+    "",
+    false,
+  ],
+  [
+    "Debounce the validator",
+    "There is no debounceMs. One pass judges the whole root, so a delay on the pass would delay the required-field message along with the network rule. Debounce inside the async rule; the second argument to adapter.validate is the AbortSignal a superseded pass is cancelled with.",
+    "/validation/",
+    true,
+  ],
+  [
+    "Several files at once, or a maximum file size",
+    'kind: "file" is ONE file. A multi-file pick is one event replacing a whole list, and rows() offers append, remove and move with no replace-the-list edit. Byte bounds are dropped rather than carried, because constraints.minLength already means characters and array elements. Draw the multiple input yourself and keep the list with rows().',
+    "",
+    true,
+  ],
+  [
+    "FormData, server actions, RSC data flow",
+    'Every input already carries name set to its concrete path, so posting them arrives at the server as flat pairs keyed owner.name and items[0].quantity — but nothing here folds them back into a root, and nothing decides whether an absent checkbox means false, or whether "" is the empty string or an absent value. Decode it yourself, or post JSON from readRoot().',
     "",
     true,
   ],
   [
     "React Native",
-    "The core entry has no DOM, but the React bindings do: inputProps are DOM attributes and the uncontrolled ref is an HTMLInputElement.",
+    'The core entry has no DOM — it compiles with lib: ["ES2020"] and no DOM types, which is what the project split exists to check — but the bindings do: inputProps are DOM attributes like minLength and aria-describedby, and useUncontrolledField writes an HTMLInputElement. It would take an eighth entry point whose buildTextInputProps returned { value, onChangeText, onBlur }, and no uncontrolled hook at all. Until then: ./core, and write the bindings.',
     "",
+    true,
+  ],
+  [
+    "A devtools extension",
+    "There is none. There is the seam one would be built on: createForm takes a store, a store is five members over an opaque key, and a store that records every write is an ordinary substitution rather than an instrumentation hook. The tape under the form above is exactly that, in 148 lines.",
+    "/contract/",
     true,
   ],
 ];
@@ -423,8 +466,9 @@ const TRY = [
   <section class="mt-20">
     <h2 class="text-2xl font-bold">What you can build with it</h2>
     <p class="caption">
-      The last two rows are things it does not do. They are in the table
-      because leaving them out is how a table like this becomes useless.
+      The struck-through rows are things it does not do, and each says what to
+      reach for instead. They are in the table because leaving them out is how
+      a table like this becomes an advertisement.
     </p>
 
     <div class="mt-6 overflow-x-auto">
@@ -563,7 +607,7 @@ const TRY = [
       production.</strong>
     </p>
     <p class="caption">
-      171 tests, the seven compile-time programs <code>test:types</code> runs,
+      270 tests, the eight compile-time programs <code>test:types</code> runs,
       and a screen that uses all of it. Two limits: a field whose key contains a
       dot cannot be addressed, and the validation pass judges the whole root on
       every settled change.
