@@ -98,6 +98,56 @@ items.insert(items.rows.length, { sku: "" });`,
   },
 ];
 
+// The differentiator, and the only table on this site whose cells are another
+// library's behaviour. Every one of them is tsc's own verdict on ONE shared
+// schema — shipments[*].lines[*].sku — compiled under TypeScript 5.9 strict,
+// not read out of anybody's documentation.
+//
+// Two things a reader would expect here are absent because the compiler
+// refused them: interpolated map indices are NOT a differentiator (RHF's
+// `shipments.${number}...` and TanStack's are real union members, so a map
+// index passes and a typo beside it is rejected, exactly as ours is), and
+// "ours is checked and theirs is not" is false wherever the form's type is in
+// scope. The difference is what happens when it is not.
+const LIBS = ["form-contract", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
+
+const PATHS: readonly (readonly [string, readonly string[]])[] = [
+  [
+    "Typo deep in a static path",
+    ["compile error", "compile error", "compile error", "no error"],
+  ],
+  [
+    "Typo beside interpolated map indices",
+    ["compile error", "compile error", "compile error", "no error"],
+  ],
+  [
+    "Typo reading that field's error message",
+    ["compile error", "compile error, on the errors object", "compile error", "no error"],
+  ],
+  [
+    "Correct path, component two levels down, no props and no form object",
+    [
+      "checked; value typed string | undefined",
+      "no error — and neither is not.a.real.path.at.all",
+      "no path compiles there at all",
+      "no error — every string compiles",
+    ],
+  ],
+  [
+    "Typo in that same props-free component",
+    ["compile error", "no error", "n/a — nothing compiles there", "no error"],
+  ],
+  [
+    "…after re-declaring or threading the form type by hand",
+    [
+      "nothing to declare; it was already checked",
+      "compile error, via useFormContext<Order>()",
+      "compile error, via a typed form prop",
+      "no error — the path stays unchecked",
+    ],
+  ],
+];
+
 // The pair table: each entry is a component, its own source, and the two
 // lines that frame it. The source is a ?raw import of the very file the
 // component is, so the code shown and the code running are one file.
@@ -214,6 +264,65 @@ const TRY = [
       href="https://github.com/maroonedog/form-contract">GitHub</a
     >
   </div>
+
+  <!-- ================================================== the thesis -->
+  <section class="mt-16">
+    <h2 class="text-2xl font-bold">A field is a string, and the string is checked</h2>
+    <p class="lead">
+      react-hook-form and TanStack Form reject a typo too — while the form's
+      type is in scope. Here it is in scope once, for the whole application: a
+      leaf with no props, no form object and no import still rejects{" "}
+      <code>shipments[0].lines[0].skuu</code>.
+    </p>
+
+    <div class="mt-6 overflow-x-auto">
+      <table class="w-full">
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">Compiled, TypeScript 5.9 strict</th>
+            {LIBS.map((lib) => <th class="pr-4">{lib}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            PATHS.map(([theCase, cells]) => (
+              <tr class="hairline">
+                <td class="py-2.5 pr-4 align-top font-medium">{theCase}</td>
+                {cells.map((cell) => (
+                  <td
+                    class:list={[
+                      "py-2.5 pr-4 align-top",
+                      cell.startsWith("compile error") || cell.startsWith("checked")
+                        ? "text-primary"
+                        : "text-on-surface-variant",
+                    ]}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="caption">
+      One shared schema — <code>shipments[*].lines[*].sku</code> — compiled in
+      all four. An interpolated <code>{"${i}"}</code> is not a differentiator:
+      it is a real member of react-hook-form's and TanStack's path unions too.
+    </p>
+
+    <p class="note">
+      <strong>What it costs.</strong> One <code>declare module "form-react"</code>{" "}
+      block that has to stay inside <code>tsconfig</code>'s <code>include</code> —
+      delete it and every call site stops compiling, which is the failure
+      direction you want. Two limits with it: register a second form and a
+      keyless <code>useField</code> is checked against the union of both until
+      you name the form key; and the path union is built to a depth of six, so
+      a correct leaf deeper than that is rejected rather than accepted.
+    </p>
+  </section>
 
   <!-- ================================================== proof -->
   <section class="mt-16">
