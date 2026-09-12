@@ -21,6 +21,17 @@
         "docs-site/vite.config.ts"
       ],
       "port": 5180
+    },
+    {
+      "name": "nested-arrays",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "vite",
+        "--config",
+        "examples/nested-arrays/vite.config.ts",
+        "examples/nested-arrays"
+      ],
+      "port": 5181
     }
   ]
 }

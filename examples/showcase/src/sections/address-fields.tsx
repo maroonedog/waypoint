@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { Field } from "form-react";
+import { Field, type FormPathOver } from "form-react";
 import { MdTextField } from "../md/text-field.js";
 import { MdSelectField } from "../md/select-field.js";
 
@@ -8,8 +8,18 @@ import { MdSelectField } from "../md/select-field.js";
  * It is told WHERE by a prop, and that prop is the only thing it is told: no
  * value, no setter, no change handler. An address does not move when a value
  * does, so passing it re-renders nobody and there is nothing above to lift.
+ *
+ * The prop's type is the set of places this whole section fits, computed from
+ * the registered form — so the paths it builds by interpolation stay checked,
+ * and a prefix that is missing one of these five fields will not compile.
  */
-export function AddressFields({ at }: { readonly at: string }): ReactElement {
+export function AddressFields({
+  at,
+}: {
+  readonly at: FormPathOver<
+    "postcode" | "prefecture" | "city" | "street" | "building"
+  >;
+}): ReactElement {
   return (
     <>
       <Field path={`${at}.postcode`}>

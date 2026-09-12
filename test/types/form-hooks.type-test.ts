@@ -1,115 +1,122 @@
 // ===========================================================================
-// form-hooks.type-test.ts — the hook that knows which paths exist.
+// form-hooks.type-test.ts — the hooks that know which paths exist.
 //
-// `useField` takes a `string`, and it has to: one React context object serves
-// every form, so the context cannot be generic and the path union dies at that
-// boundary. Measured consequence, before this file existed: a misspelt path
-// rendered an empty input that was never validated and threw nothing.
+// One React context object serves every form, so the context cannot be
+// generic and a path union cannot travel through it. The types therefore do
+// not travel: the application REGISTERS them once, and every hook reads them
+// from the registry. A component imports nothing and is still checked.
 //
-// `createFormHooks` closes it from the other side — the hooks are made once
-// from the adapter, so they carry `TPath` without the context having to. The
-// `@ts-expect-error` lines below are the whole point: each one FAILS TO
-// COMPILE if the typing ever degrades back to `string`, because a
-// `@ts-expect-error` with nothing to suppress is itself an error.
+// The `@ts-expect-error` lines are the whole point: each one FAILS TO COMPILE
+// if the typing ever degrades back to `string`, because a `@ts-expect-error`
+// with nothing to suppress is itself an error. That is not hypothetical — the
+// first draft of the registry degraded exactly that way, because inferring
+// from an unregistered `never` falls back to the parameter's constraint.
 // ===========================================================================
 import { z } from "zod";
 import { zodFormResolver } from "form-contract-resolver-zod";
 import {
-  createFormHooks,
   useField,
-  type PathsOf,
-  type ValuesOf,
+  useFieldIssues,
+  useFieldValue,
+  useFieldValues,
+  useForm,
+  useRows,
+  useUncontrolledField,
+  type AnyPath,
+  type FormTypeRegistry,
 } from "form-react";
 
-const schema = z.object({
+const orderSchema = z.object({
   name: z.string().min(3),
   owner: z.object({ email: z.string() }),
-  items: z.array(z.object({ quantity: z.number() })),
+  items: z.array(z.object({ quantity: z.number(), sku: z.string() })),
+  shipments: z.array(
+    z.object({ lines: z.array(z.object({ sku: z.string() })) })
+  ),
 });
+const profileSchema = z.object({ handle: z.string(), age: z.number() });
 
-const OrderForm = createFormHooks(zodFormResolver(schema));
+const orderAdapter = zodFormResolver(orderSchema);
+const profileAdapter = zodFormResolver(profileSchema);
+
+// The application's one registration, which nothing below imports.
+declare module "form-react" {
+  interface FormTypeRegistry {
+    form: typeof orderAdapter;
+    profile: typeof profileAdapter;
+  }
+}
+void (null as unknown as FormTypeRegistry);
+
+declare const index: number;
+declare const spelled: string;
 
 type Exact<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 const assertExact = <T extends true>(_proof: T): void => undefined;
 
-// ---- the paths and the value type come back out --------------------------
-assertExact<Exact<ValuesOf<typeof OrderForm>["name"], string>>(true);
-assertExact<Exact<ValuesOf<typeof OrderForm>["owner"]["email"], string>>(true);
+// ---- the value type is INFERRED, never asserted ---------------------------
+function values(): void {
+  assertExact<Exact<ReturnType<typeof useField<"owner.email">>["value"], string | undefined>>(true);
+  assertExact<Exact<ReturnType<typeof useFieldValue<"items[0].quantity">>, number | undefined>>(true);
+  assertExact<Exact<ReturnType<typeof useFieldValues<"items[*].sku">>, readonly string[]>>(true);
+}
+void values;
 
-declare const somePath: PathsOf<typeof OrderForm>;
-// The element container itself is a declared path too, which is what lets a
-// row scope address the row rather than only the fields inside it.
-const known:
-  | "name"
-  | "owner"
-  | "owner.email"
-  | "items"
-  | "items[*]"
-  | "items[*].quantity" = somePath;
-void known;
-
-// ---- what a component is allowed to ask for ------------------------------
-declare function inAComponent(): void;
-
+// ---- what a component may ask for ----------------------------------------
 function accepted(): void {
-  OrderForm.useField("owner.email");
-  OrderForm.useFieldValue("items[*].quantity");
-  OrderForm.useFieldIssues("name");
-  OrderForm.useUncontrolledField("name");
+  useField("owner.email");
+  useField("items[*].quantity"); // a rule, for a column read
+  useField("items[0].quantity"); // a place
+  useField("items"); // the container
+  useFieldIssues("name");
+  useUncontrolledField("name");
+  useRows("items");
+  useRows("shipments[0].lines"); // an inner list, by the outer row's address
+
+  // A row hands its own address down, and a path built from it stays checked.
+  const shipments = useRows("shipments");
+  for (const row of shipments.rows) {
+    useRows(`${row.path}.lines`);
+  }
 }
 void accepted;
-void inAComponent;
 
-declare const rowIndex: number;
-declare const rowName: string;
+function refused(): void {
+  // @ts-expect-error "owner.emial" is not a path this form declares
+  useField("owner.emial");
+  // @ts-expect-error the profile form has no items, and this call names it
+  useField("profile", "items[0].quantity");
+  // @ts-expect-error no such form is registered
+  useField("billing", "name");
+  // @ts-expect-error "name" is not a list
+  useRows("name");
 
-// ---- a place in the value is addressable, and an index is what makes it one
-function indices(): void {
-  OrderForm.useField("items[0].quantity");
-  OrderForm.useFieldValue(`items[${rowIndex}].quantity`);
+  useField(`items[${index}].quantity`);
+  // @ts-expect-error a string spliced into an index is how a path is mis-built
+  useField(`items[${spelled}].quantity`);
 }
-void indices;
+void refused;
 
-// ---- the aggregate is an array, and one place is not ---------------------
-// The same path spelled the same way, read two ways, with two types. That is
-// only possible because they are two hooks: one expression cannot be a number
-// inside a row scope and an array outside one.
-declare const column: ReturnType<typeof OrderForm.useFieldValues<number>>;
-declare const place: ReturnType<typeof OrderForm.useFieldValue<number>>;
-assertExact<Exact<typeof column, readonly number[]>>(true);
-assertExact<Exact<typeof place, number | undefined>>(true);
-
-function rejected(): void {
-  // @ts-expect-error a misspelt path is not a member of the path union
-  OrderForm.useField("owner.emial");
-
-  // @ts-expect-error a path from a different form is not a member either
-  OrderForm.useFieldValue("billing.postcode");
-
-  // @ts-expect-error the local name of a scoped field is not a whole path
-  OrderForm.useFieldIssues("email");
-
-  // THE DISTINCTION. A number interpolated into the index position is a row;
-  // a string spliced in is how a mis-built path is usually made, and the
-  // template literal type can tell them apart.
-  // @ts-expect-error a string is not an index
-  OrderForm.useField(`items[${rowName}].quantity`);
-
-  // @ts-expect-error and an index does not rescue a misspelt tail
-  OrderForm.useField(`items[${rowIndex}].quantitee`);
+// ---- naming a form narrows to that form ----------------------------------
+function named(): void {
+  assertExact<Exact<ReturnType<typeof useFieldValue<"profile", "age">>, number | undefined>>(true);
+  // The handle a named form hands back is that form's handle. `readRoot`
+  // stays `unknown` on purpose — defaultValues is `unknown`, so a root being
+  // edited is a draft and not yet a T — but every path off it is typed.
+  const profile = useForm("profile");
+  assertExact<
+    Exact<ReturnType<typeof profile.field<"age">>["sources"]["value"]["read"] extends
+      () => infer V ? V : never, number | undefined>
+  >(true);
+  // @ts-expect-error the order form's paths are not this form's
+  profile.field("owner.email");
 }
-void rejected;
+void named;
 
-// ---- and the untyped hook is still there, still taking anything ----------
-// This is the escape hatch, and it is deliberately not narrowed: a record
-// field addressed dynamically has no declared path to check against.
-function stillPermissive(): void {
-  useField("anything.at.all");
-}
-void stillPermissive;
-
-// ---- the value type of a field follows the path --------------------------
-declare const quantity: ReturnType<
-  typeof OrderForm.useFieldValue<number>
->;
-assertExact<Exact<typeof quantity, number | undefined>>(true);
+// ---- the union a keyless call is checked against --------------------------
+declare const anyPath: AnyPath;
+const across: "name" | "owner" | "owner.email" | "items" | "items[*]"
+  | "items[*].quantity" | "items[*].sku" | "shipments" | "shipments[*]"
+  | "shipments[*].lines" | "shipments[*].lines[*]"
+  | "shipments[*].lines[*].sku" | "handle" | "age" = anyPath;
+void across;

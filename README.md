@@ -161,34 +161,72 @@ error now names `useFieldValues` as the other thing you might have meant.
 
 ### The path a hook is allowed to ask for
 
-`useField` takes a `string`, and it has to. One React context object serves
-every form in the application, so the context cannot be generic, and the path
-union dies at that boundary. What that cost was, before it was closed: a
-misspelt path rendered an empty input that was never validated and threw
-nothing.
+One React context object serves every form in the application, so the context
+cannot be generic and a path union cannot travel through it. What that cost,
+before it was closed: `useField` took a `string`, and a misspelt path rendered
+an empty input that was never validated and threw nothing.
 
-`createFormHooks` closes it from the other side. The hooks are built once from
-the adapter, so they carry `TPath` without the context having to:
+The types therefore do not travel. The application **registers** them once, and
+every hook reads them from there:
 
 ```ts
-export const OrderForm = createFormHooks(zodFormResolver(orderSchema));
+// src/form-registry.ts — one file, one declaration
+const orderAdapter = zodFormResolver(orderSchema);
+
+declare module "form-react" {
+  interface FormTypeRegistry {
+    form: typeof orderAdapter;
+  }
+}
 ```
 
 ```tsx
-const postcode = OrderForm.useField("billing.postcode");   // ok
-const typo     = OrderForm.useField("billing.postcod");    // compile error
+// any component, at any depth. It imports nothing from the file above.
+const postcode = useField("billing.postcode");   // string | undefined, inferred
+const typo     = useField("billing.postcod");    // compile error
+const sku      = useField("items[0].sku");       // a place, checked as its rule
+const count    = useField(`items[${i}].sku`);    // a computed index, fine
 ```
 
-**Assign it to a PascalCase name.** `eslint-plugin-react-hooks` only treats a
-member expression as a hook when the object is a single PascalCase identifier
-(`isHook` in v7.1.1): `Order.useField()` is checked by the rules of hooks,
-`order.useField()` and `forms.order.useField()` are not. Destructuring is fine
-too, since a bare `useField` is a hook name by itself — it just stops naming
-which form. React itself does not care: the runtime only sees call order.
+Nothing is passed down and nothing is asserted. `useField<string>(path)` used
+to mean "trust me"; there is no longer anything to trust.
 
-At run time these still read the enclosing `<FormProvider>`, so a nested
-component stays propless. They add **types and nothing else**: whether a path
-exists is the store's question, and the store answers it for every caller.
+**Several forms** are several keys, named at the call site:
+
+```ts
+declare module "form-react" {
+  interface FormTypeRegistry {
+    order: typeof orderAdapter;
+    profile: typeof profileAdapter;
+  }
+}
+```
+
+```tsx
+useField("order", "items[0].sku");
+useField("profile", "items[0].sku");   // compile error: profile has no items
+useField("items[0].sku");              // no key: checked against every form
+```
+
+A key names a form in the REGISTRY, and the instance still comes from the
+nearest provider — the one thing the types cannot relate. So a provider carries
+its key (`<FormProvider form={form} formKey="order">`) and a keyed hook throws
+when they disagree. Naming no key accepts whichever provider is there, which is
+what a component shared by two forms wants.
+
+**A schema nobody wrote down** — built from a response, generated in a
+benchmark — registers `FormAdapter<unknown, string>`. `AddressablePath<string>`
+is `string`, so that form is back to unchecked paths by its own declaration, in
+one place a reader can find. There is no second API for anyone else to choose
+between.
+
+**Registration is global to the compilation, not to the import graph.** A
+component that never imports the registry is still checked; a registration file
+that falls out of `tsconfig`'s `include` fails loudly rather than degrading —
+the error quotes the declaration you are missing.
+
+At run time none of this exists. Whether a path is real is the store's
+question, and the store answers it for every caller:
 
 ```
 [form-contract] "billing.postcod" is not a field this form has, so it will draw
@@ -196,9 +234,8 @@ nothing and validate nothing. Did you mean: billing.postcode?
 ```
 
 That comes from `form.field()`, which every hook, every `<Field>` and every
-non-React caller funnels through — so plain `useField` is as loud as the typed
-one, and a component rendered under a different form's provider is caught by
-the store it is actually inside.
+non-React caller funnels through — so a component rendered under a different
+form's provider is caught by the store it is actually inside.
 
 It **warns**, once per path; it does not throw. A mis-addressed field is inert,
 but it cannot let bad data through: the pass judges the whole root, so the

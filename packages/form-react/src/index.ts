@@ -1,17 +1,25 @@
 export { FormContext } from "./form-context.js";
+export { DEFAULT_FORM_KEY, FormKeyContext } from "./form-key-context.js";
+export type {
+  AnyPath,
+  AnyValues,
+  ArrayPath,
+  FormKey,
+  FormPath,
+  FormPathOver,
+  FormPathTo,
+  FormTypeRegistry,
+  PathsFor,
+  ValueOfPath,
+  ValuesFor,
+} from "./form-type-registry.js";
 export { FormProvider, type FormProviderProps } from "./form-provider.js";
 export { useCreateForm } from "./use-create-form.js";
-export { useForm } from "./use-form.js";
+export { useForm, useFormHandle } from "./use-form.js";
 export { useCell } from "./use-cell.js";
 export { forgetUnaddressableWarnings } from "form-core";
 export { useField } from "./use-field.js";
 export { useUncontrolledField } from "./use-uncontrolled-field.js";
-export {
-  createFormHooks,
-  type FormHooks,
-  type PathsOf,
-  type ValuesOf,
-} from "./create-form-hooks.js";
 export { useFieldValue } from "./use-field-value.js";
 export { useFieldValues } from "./use-field-values.js";
 export { useFieldIssues } from "./use-field-issues.js";

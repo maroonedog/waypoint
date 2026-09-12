@@ -8,10 +8,9 @@
 // was rendered, which TypeScript cannot express and a reader could not
 // predict. So the aggregate is its own hook, and the ambiguity never exists.
 //
-// Partly bound, deliberately. Inside `<FieldScope row={row}>` for an outer
-// array, the outer wildcard takes that row's index and only the inner one
-// stays open — so a component inside one row reads that row's column rather
-// than every row's.
+// A partly bound path works for the same reason: `shipments[0].lines[*].sku`
+// has one wildcard left, so it reads that row's column rather than every row's.
+// Nothing here treats that as a case — a bound index is just a path.
 //
 // WHAT IT COSTS, because it is the one hook here that is not O(1): it
 // subscribes to one cell per place the wildcard covers, plus the row order of
@@ -20,8 +19,18 @@
 // by the component that asks it.
 // ===========================================================================
 import { useMemo, useSyncExternalStore } from "react";
-import { expandDeclaredPath, type FormHandle } from "form-core";
-import { useForm } from "./use-form.js";
+import { expandDeclaredPath } from "form-core";
+import type { AddressablePath, DeclaredOf } from "form-contract";
+import { splitFormArgs } from "./split-form-args.js";
+import { useFormHandle } from "./use-form.js";
+import type {
+  AnyPath,
+  AnyValues,
+  FormKey,
+  PathsFor,
+  ValueOfPath,
+  ValuesFor,
+} from "./form-type-registry.js";
 
 const WILDCARD = "[*]";
 
@@ -36,9 +45,19 @@ const arraysCrossed = (declared: string): readonly string[] => {
   return crossed;
 };
 
-export function useFieldValues<TValue>(path: string): readonly TValue[] {
-  const form = useForm() as FormHandle<unknown, string>;
-  const open = path;
+export function useFieldValues<K extends AddressablePath<AnyPath>>(
+  path: K
+): readonly ValueOfPath<AnyValues, DeclaredOf<K>>[];
+export function useFieldValues<
+  TKey extends FormKey,
+  K extends AddressablePath<PathsFor<TKey>>,
+>(key: TKey, path: K): readonly ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>[];
+export function useFieldValues(
+  first: string,
+  second?: string
+): readonly never[] {
+  const [formKey, open] = splitFormArgs(first, second);
+  const form = useFormHandle(formKey);
 
   // Which places the wildcard covers right now. Read during render rather than
   // subscribed to, because it is only used to decide WHAT to subscribe to —
@@ -68,7 +87,7 @@ export function useFieldValues<TValue>(path: string): readonly TValue[] {
     // Cached so the snapshot is reference-stable: useSyncExternalStore calls
     // read on every render, and a fresh array each time is what React reports
     // as "The result of getSnapshot should be cached" before it loops.
-    let held: readonly TValue[] = [];
+    let held: readonly never[] = [];
 
     return {
       subscribe: (listener: () => void) => {
@@ -79,8 +98,8 @@ export function useFieldValues<TValue>(path: string): readonly TValue[] {
           for (const stop of stops) stop();
         };
       },
-      read: (): readonly TValue[] => {
-        const next = values.map((one) => one.read() as TValue);
+      read: (): readonly never[] => {
+        const next = values.map((one) => one.read() as never);
         const same =
           next.length === held.length &&
           next.every((one, index) => Object.is(one, held[index]));

@@ -8,8 +8,8 @@ import {
   useForm,
   useFormStatus,
 } from "form-react";
-import { zodFormResolver } from "form-contract-resolver-zod";
-import { applicationSchema, EMPTY_APPLICATION } from "./schema.js";
+import { applicationAdapter } from "./form-registry.js";
+import { EMPTY_APPLICATION } from "./schema.js";
 import { AddressFields } from "./sections/address-fields.js";
 import { ItemsSection } from "./sections/items-section.js";
 import { MdTextField } from "./md/text-field.js";
@@ -76,7 +76,7 @@ function CompanySection(): ReactElement {
 
 function AddressSections(): ReactElement {
   const form = useForm();
-  const sameAsBilling = useFieldValue<boolean>("sameAsBilling") === true;
+  const sameAsBilling = useFieldValue("sameAsBilling") === true;
   // The values stay in the store either way; what stops is the verdict
   // counting toward whether the form can be submitted.
   useParticipation(form, "shipping", !sameAsBilling);
@@ -210,7 +210,7 @@ export function ApplicationForm({
   onSubmitted: (root: unknown) => void;
 }): ReactElement {
   const form = useCreateForm(() => ({
-    adapter: zodFormResolver(applicationSchema),
+    adapter: applicationAdapter,
     defaultValues: structuredClone(EMPTY_APPLICATION),
   }));
 

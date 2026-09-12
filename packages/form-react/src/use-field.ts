@@ -10,25 +10,48 @@
 // Calling this opens subscriptions and nothing else. It does not register the
 // field, seed a default or reset anything, so a field rendered in a portal, in
 // a lazily loaded chunk, or behind a condition is not a case.
+//
+// The path is checked against the registry and the value type comes from it.
+// Neither is asserted by the caller any more: `useField<string>(path)` used to
+// mean "trust me", and what it usually meant was a misspelt path rendering an
+// empty input that was never validated and said nothing.
 // ===========================================================================
 import { useCallback } from "react";
+import type { AddressablePath, DeclaredOf } from "form-contract";
 import type { FieldBinding } from "./field-binding.types.js";
 import { buildInputProps } from "./build-input-props.js";
+import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useForm } from "./use-form.js";
+import { useFormHandle } from "./use-form.js";
+import type {
+  AnyPath,
+  AnyValues,
+  FormKey,
+  PathsFor,
+  ValueOfPath,
+  ValuesFor,
+} from "./form-type-registry.js";
 
-export function useField<TValue>(path: string): FieldBinding<TValue> {
-  const form = useForm();
+export function useField<K extends AddressablePath<AnyPath>>(
+  path: K
+): FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>;
+export function useField<
+  TKey extends FormKey,
+  K extends AddressablePath<PathsFor<TKey>>,
+>(key: TKey, path: K): FieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
+export function useField(first: string, second?: string): FieldBinding<never> {
+  const [key, path] = splitFormArgs(first, second);
+  const form = useFormHandle(key);
   const handle = form.field(path);
 
-  const value = useCell(handle.sources.value) as TValue | undefined;
+  const value = useCell(handle.sources.value);
   const issues = useCell(handle.sources.issues);
   const isTouched = useCell(handle.sources.touched);
   const isDirty = useCell(handle.sources.dirty);
   const isParticipating = useCell(handle.sources.participating);
 
   const onChangeValue = useCallback(
-    (next: string) => handle.setValue(next as unknown as TValue),
+    (next: string) => handle.setValue(next),
     [handle]
   );
   const onBlur = useCallback(() => handle.markTouched(), [handle]);
@@ -36,7 +59,7 @@ export function useField<TValue>(path: string): FieldBinding<TValue> {
   return {
     path: handle.path,
     descriptor: handle.descriptor,
-    value,
+    value: value as never,
     issues,
     isTouched,
     isDirty,

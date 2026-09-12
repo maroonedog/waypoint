@@ -9,11 +9,12 @@
 // last opinion behind would silence a subtree nobody can see any more.
 // ===========================================================================
 import { useEffect } from "react";
+import type { AddressablePath } from "form-contract";
 import type { FormHandle } from "form-core";
 
-export function useParticipation(
-  form: FormHandle<unknown, string>,
-  path: string,
+export function useParticipation<T, TPath extends string>(
+  form: FormHandle<T, TPath>,
+  path: AddressablePath<TPath>,
   participating: boolean | undefined
 ): void {
   useEffect(() => {

@@ -7,14 +7,18 @@
 // three edits.
 // ===========================================================================
 import type { ReactElement, ReactNode } from "react";
+import type { AddressablePath } from "form-contract";
 import { useRows, type RowsBinding } from "./use-rows.js";
+import type { AnyPath, ArrayPath } from "./form-type-registry.js";
 
-export interface FieldRowsProps {
-  readonly path: string;
-  readonly children: (binding: RowsBinding) => ReactNode;
+export interface FieldRowsProps<K extends AddressablePath<ArrayPath<AnyPath>>> {
+  readonly path: K;
+  readonly children: (binding: RowsBinding<K>) => ReactNode;
 }
 
-export function FieldRows(props: FieldRowsProps): ReactElement {
+export function FieldRows<K extends AddressablePath<ArrayPath<AnyPath>>>(
+  props: FieldRowsProps<K>
+): ReactElement {
   const binding = useRows(props.path);
   return <>{props.children(binding)}</>;
 }

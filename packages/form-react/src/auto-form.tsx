@@ -17,12 +17,18 @@
 // What surrounds a row — the remove button, the heading, the add control — is
 // left to `renderList`, because a list that looked the same in every
 // application would be a list nobody could use.
+//
+// The paths here are RUN-TIME data: they are read out of the descriptor tree
+// and have row indices spliced into them, so no type describes them and the
+// two casts below say so. This is the one layer where that is not a loss —
+// layer 1 exists to draw a form nobody wrote component code for, and checking
+// a path against a registry only means anything where somebody typed it.
 // ===========================================================================
 import { Fragment, type ReactElement, type ReactNode } from "react";
 import { bindDeclaredPath, type DescriptorNode } from "form-core";
 import { Field } from "./field.js";
 import { FieldRows } from "./field-rows.js";
-import { useForm } from "./use-form.js";
+import { useFormHandle } from "./use-form.js";
 import type { RowsBinding } from "./use-rows.js";
 
 export interface AutoFormProps {
@@ -50,7 +56,7 @@ function renderNode(
 ): ReactElement {
   const here = at(node.path, indices);
   if (node.kind === "field") {
-    return <Field key={here} path={here} />;
+    return <Field key={here} path={here as never} />;
   }
   if (node.kind === "group") {
     return (
@@ -60,7 +66,7 @@ function renderNode(
     );
   }
   return (
-    <FieldRows key={here} path={here}>
+    <FieldRows key={here} path={here as never}>
       {(binding) => {
         const rows = binding.rows.map((row) => (
           <Fragment key={row.key}>
@@ -76,7 +82,7 @@ function renderNode(
 }
 
 export function AutoForm(props: AutoFormProps): ReactElement {
-  const form = useForm();
+  const form = useFormHandle();
   const { only, renderList } = props;
   const drawn =
     only === undefined

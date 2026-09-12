@@ -21,7 +21,7 @@ import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
 import type { MountedSubject, Subject } from "./subject.types.ts";
 
 function Leaf({ path, label }: LeafProps): ReactElement {
-  const field = useField<string>(path);
+  const field = useField(path);
   return h(SharedLeaf, {
     label,
     name: path,

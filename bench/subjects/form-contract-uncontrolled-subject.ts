@@ -22,7 +22,7 @@ import { SharedSkeleton, type LeafProps } from "../shape/shared-skeleton.ts";
 import type { MountedSubject, Subject } from "./subject.types.ts";
 
 function Leaf({ path, label }: LeafProps): ReactElement {
-  const field = useUncontrolledField<string>(path);
+  const field = useUncontrolledField(path);
   return h(SharedLeaf, {
     label,
     name: path,

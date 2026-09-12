@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", "module": "NodeNext", "moduleResolution": "NodeNext",
+    "lib": ["ES2020", "DOM"], "strict": true, "jsx": "react-jsx",
+    "exactOptionalPropertyTypes": true, "noUncheckedIndexedAccess": true,
+    "isolatedModules": true, "verbatimModuleSyntax": true, "noEmit": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/form-registry.ts", "src/with-form-contract.tsx", "src/schema.ts", "src/ui.tsx"]
+}

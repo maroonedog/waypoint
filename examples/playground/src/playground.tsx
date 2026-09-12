@@ -4,6 +4,7 @@ import { createStore } from "zustand/vanilla";
 import { zodFormResolver } from "form-contract-resolver-zod";
 import { createCellStore, type FormCellStore } from "form-core";
 import { FormProvider, useField, useCreateForm } from "form-react";
+import type { FormPathTo } from "form-react";
 import { createZustandCellStore } from "form-store-zustand";
 import { useRenderCount } from "./render-count.js";
 
@@ -27,6 +28,15 @@ const SCHEMA = z
 // The form starts acceptable. Starting it invalid would put an error on every
 // field at the first keystroke, and a counter that moves because an error
 // appeared says nothing about whether one field can be edited alone.
+const ADAPTER = zodFormResolver(SCHEMA);
+
+// The one declaration that types every path below. Nothing imports it.
+declare module "form-react" {
+  interface FormTypeRegistry {
+    form: typeof ADAPTER;
+  }
+}
+
 const DEFAULTS = {
   owner: { name: "Ada Lovelace" },
   billing: { postcode: "100-0001" },
@@ -51,9 +61,17 @@ function Issues({ messages }: { messages: readonly string[] }): ReactElement {
   );
 }
 
-/** Layer 3: an ordinary text input, spelled by the caller. */
-function TextField({ path, label }: { path: string; label: string }): ReactElement {
-  const field = useField<string>(path);
+/** Layer 3: an ordinary text input, spelled by the caller. The path type says
+ *  which fields this widget can draw, so a number field handed to it is a
+ *  compile error rather than a coercion. */
+function TextField({
+  path,
+  label,
+}: {
+  path: FormPathTo<string>;
+  label: string;
+}): ReactElement {
+  const field = useField(path);
   const renders = useRenderCount();
   return (
     <label className="row">
@@ -68,8 +86,14 @@ function TextField({ path, label }: { path: string; label: string }): ReactEleme
 }
 
 /** Layer 3 again: nothing about this widget came from the library. */
-function Stepper({ path, label }: { path: string; label: string }): ReactElement {
-  const field = useField<number>(path);
+function Stepper({
+  path,
+  label,
+}: {
+  path: FormPathTo<number>;
+  label: string;
+}): ReactElement {
+  const field = useField(path);
   const renders = useRenderCount();
   const held = typeof field.value === "number" ? field.value : 0;
   return (
@@ -98,7 +122,7 @@ function Stepper({ path, label }: { path: string; label: string }): ReactElement
 
 function Sheet({ store }: { store: FormCellStore }): ReactElement {
   const form = useCreateForm(() => ({
-    adapter: zodFormResolver(SCHEMA),
+    adapter: ADAPTER,
     defaultValues: structuredClone(DEFAULTS),
     store,
   }));

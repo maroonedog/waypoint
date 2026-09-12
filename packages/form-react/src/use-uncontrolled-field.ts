@@ -20,18 +20,40 @@
 // is a second hook rather than a change to the first.
 // ===========================================================================
 import { useCallback, useEffect, useRef } from "react";
+import type { AddressablePath, DeclaredOf } from "form-contract";
 import type { UncontrolledFieldBinding } from "./field-binding.types.js";
+import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useForm } from "./use-form.js";
+import { useFormHandle } from "./use-form.js";
+import type {
+  AnyPath,
+  AnyValues,
+  FormKey,
+  PathsFor,
+  ValueOfPath,
+  ValuesFor,
+} from "./form-type-registry.js";
 
 /** The same coercion buildInputProps applies, so both hooks agree on empty. */
 const displayValue = (value: unknown): string =>
   value === undefined || value === null ? "" : String(value);
 
-export function useUncontrolledField<TValue>(
-  path: string
-): UncontrolledFieldBinding<TValue> {
-  const form = useForm();
+export function useUncontrolledField<K extends AddressablePath<AnyPath>>(
+  path: K
+): UncontrolledFieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>;
+export function useUncontrolledField<
+  TKey extends FormKey,
+  K extends AddressablePath<PathsFor<TKey>>,
+>(
+  key: TKey,
+  path: K
+): UncontrolledFieldBinding<ValueOfPath<ValuesFor<TKey>, DeclaredOf<K>>>;
+export function useUncontrolledField(
+  first: string,
+  second?: string
+): UncontrolledFieldBinding<never> {
+  const [formKey, path] = splitFormArgs(first, second);
+  const form = useFormHandle(formKey);
   const handle = form.field(path);
 
   // The channels a message is drawn from. NOT the value: subscribing to that
@@ -63,7 +85,7 @@ export function useUncontrolledField<TValue>(
 
   const onChange = useCallback(
     (event: { readonly currentTarget: { readonly value: string } }) =>
-      handle.setValue(event.currentTarget.value as unknown as TValue),
+      handle.setValue(event.currentTarget.value as never),
     [handle]
   );
   const onBlur = useCallback(() => handle.markTouched(), [handle]);

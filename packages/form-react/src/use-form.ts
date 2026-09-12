@@ -1,20 +1,49 @@
 // ===========================================================================
 // use-form.ts — the handle for the enclosing form.
 //
-// The value type is stated by the caller. A context cannot carry it: one
-// context object is shared by every form in the app, so the type has to come
-// from the call site or not at all. `form.field()` is where a path is checked
-// against it.
+// The value type no longer comes from the call site. It comes from the
+// registry, which is the only place in an application that states it, so
+// `useForm()` is checked rather than asserted.
+//
+// Naming a key checks that key against the provider's. Naming none accepts
+// whatever provider is there, which is what a component shared by two forms
+// wants — it gets the union of their paths and nothing narrower.
 // ===========================================================================
 import { useContext } from "react";
 import type { FormHandle } from "form-core";
 import { FormContext } from "./form-context.js";
+import { FormKeyContext } from "./form-key-context.js";
+import type {
+  AnyPath,
+  AnyValues,
+  FormKey,
+  PathsFor,
+  ValuesFor,
+} from "./form-type-registry.js";
 
-export function useForm<T = unknown, TPath extends string = string>():
-  FormHandle<T, TPath> {
+/**
+ * The enclosing handle, untyped, with the key checked when one was named.
+ * Every hook in this package goes through here.
+ */
+export function useFormHandle(expectedKey?: string): FormHandle<unknown, string> {
   const handle = useContext(FormContext);
+  const key = useContext(FormKeyContext);
   if (handle === null) {
     throw new Error("useForm was called outside a <FormProvider>.");
   }
-  return handle as unknown as FormHandle<T, TPath>;
+  if (expectedKey !== undefined && expectedKey !== key) {
+    throw new Error(
+      `This call is typed against the "${expectedKey}" form, but the ` +
+        `enclosing <FormProvider> carries "${key}".`
+    );
+  }
+  return handle;
+}
+
+export function useForm(): FormHandle<AnyValues, AnyPath>;
+export function useForm<TKey extends FormKey>(
+  key: TKey
+): FormHandle<ValuesFor<TKey>, PathsFor<TKey>>;
+export function useForm(key?: string): FormHandle<never, string> {
+  return useFormHandle(key) as unknown as FormHandle<never, string>;
 }

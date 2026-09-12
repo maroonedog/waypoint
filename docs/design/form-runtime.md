@@ -4,6 +4,22 @@ Verified against source before writing: `rememberDeclaredCalls` runs uncondition
 
 # Cells — the final architecture
 
+> **Two things below did not survive contact with the implementation.** The
+> architecture did; these two did not, and they are left in place rather than
+> quietly edited so the reasons stay readable.
+>
+> **`<FieldScope>` was removed.** A scope rewrote EVERY path beneath it with no
+> way out: a component inside `prefix="billing"` asking for
+> `shipping.postcode` silently got `billing.shipping.postcode` and rendered
+> nothing. A row now carries its own address (`row.path` is `items[2]`) and a
+> section is told where it is by an ordinary prop, which cannot do that to
+> anybody. `setParticipating` moved onto the field handle and `useParticipation`.
+>
+> **`useField` is no longer spelled `useField<string>(path)`.** The path type
+> comes from a module-augmentation registry the application declares once, so
+> both the path and the value type are checked rather than asserted. See the
+> README section "The path a hook is allowed to ask for".
+
 ## 1. The decision
 
 The runtime is a **flat, path-keyed cell space that lives outside React, plus one whole-root validation pass per settled change whose results are scattered back into per-path issue cells, writing only where the content actually differs.** The primitive is a **cell**: an opaque string key holding one `Object.is`-comparable value with its own listener set. A field's value, its issue list, its touched flag, its dirty flag, its participation flag, an array's row-key order, and the form's aggregates are all cells that differ only by the channel prefix in their key; the store never parses a key and knows nothing about paths, fields, arrays or validation. Every cell exists from `createForm`, seeded from the descriptors, so **mounting is a subscription and nothing else** — it creates no value, seeds no default, registers no field, and unmounting destroys nothing. Reactivity is one `useSyncExternalStore` per subscribed cell over a reader that returns a primitive or a value the runtime interned, so there is no selector, no equality function, no `useSyncExternalStoreWithSelector`, and no read-tracking. There is no reactive graph of our own, no tracking Proxy, no dependency index, and no second DSL: the only thing this library owns is where values live, and that is invisible from inside a children function.
@@ -349,14 +365,16 @@ export function OrderScreen(): ReactElement {
 // A reusable group authored against LOCAL names, bound where it is placed.
 // This is TanStack's FieldGroupApi remapping, which is the only mechanism in
 // either prior-art library that makes a genuinely location-independent group.
-function PostcodeInput(): ReactElement {
-  const field = useField<string>("postcode");
+// AS SHIPPED: the group is told where it is, and the prop's type is the set of
+// places the group fits — computed from the registered form, not listed here.
+function PostcodeInput({ at }: { at: FormPathOver<"postcode"> }): ReactElement {
+  const field = useField(`${at}.postcode`);
   return <input {...field.inputProps} />;
 }
 const Addresses = () => (
   <>
-    <FieldScope prefix="billing"><PostcodeInput /></FieldScope>
-    <FieldScope prefix="shipping"><PostcodeInput /></FieldScope>
+    <PostcodeInput at="billing" />
+    <PostcodeInput at="shipping" />
   </>
 );
 

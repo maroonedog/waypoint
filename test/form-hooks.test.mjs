@@ -1,7 +1,8 @@
 // Hooks that know which paths exist.
 //
-// The types do the work in TypeScript; this file is the half that has to hold
-// in JavaScript, where there are no types to help.
+// The types do the work in TypeScript — the registry states them once and
+// every hook reads them from there. This file is the half that has to hold in
+// JavaScript, where there are no types to help.
 //
 // A path the form does not declare is WARNED ABOUT, not thrown. Such a field
 // is inert — it draws nothing and validates nothing — but it cannot let bad
@@ -36,8 +37,13 @@ const React = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { zodFormResolver } = await import("form-contract-resolver-zod");
 const { createForm } = await import("form-core");
-const { FormProvider, createFormHooks, forgetUnaddressableWarnings, useField, useFieldIssues } =
-  await import("form-react");
+const {
+  FormProvider,
+  forgetUnaddressableWarnings,
+  useField,
+  useFieldIssues,
+  useFieldValue,
+} = await import("form-react");
 
 const { act, createElement: h } = React;
 
@@ -47,8 +53,6 @@ const ORDER = z.object({
   items: z.array(z.object({ sku: z.string() })),
 });
 const OTHER = z.object({ unrelated: z.object({ token: z.string() }) });
-
-const OrderForm = createFormHooks(zodFormResolver(ORDER));
 
 const DEFAULTS = {
   billing: { postcode: "100-0001", city: "Chiyoda" },
@@ -95,7 +99,7 @@ const text = (container, id) => container.querySelector("#" + id).textContent;
 
 test("a declared path works exactly as the untyped hook does", async () => {
   function Screen() {
-    const postcode = OrderForm.useField("billing.postcode");
+    const postcode = useField("billing.postcode");
     return h("span", { id: "v" }, String(postcode.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
@@ -109,8 +113,8 @@ test("a declared path works exactly as the untyped hook does", async () => {
 
 test("a misspelt path warns and leaves the rest of the form standing", async () => {
   function Screen() {
-    const typo = OrderForm.useField("billing.postcod");
-    const fine = OrderForm.useField("shipping.postcode");
+    const typo = useField("billing.postcod");
+    const fine = useField("shipping.postcode");
     return h(
       "div",
       null,
@@ -133,7 +137,7 @@ test("a misspelt path warns and leaves the rest of the form standing", async () 
 
 test("the warning names the paths it might have meant", async () => {
   function Screen() {
-    OrderForm.useFieldValue("billing.postcod");
+    useFieldValue("billing.postcod");
     return null;
   }
   const { root, warned } = await mountCatching(
@@ -146,7 +150,7 @@ test("the warning names the paths it might have meant", async () => {
 
 test("the same path is warned about once, not once per render", async () => {
   function Screen() {
-    OrderForm.useFieldValue("billing.nope");
+    useFieldValue("billing.nope");
     return null;
   }
   const form = orderForm();
@@ -162,7 +166,7 @@ test("hooks rendered under a DIFFERENT form's provider warn", async () => {
   // The one mistake the types cannot see. The store the component is actually
   // inside is what answers, so it needs no separate check in the hooks.
   function Screen() {
-    OrderForm.useFieldValue("billing.postcode");
+    useFieldValue("billing.postcode");
     return null;
   }
   const { root, escaped, warned } = await mountCatching(
@@ -175,7 +179,7 @@ test("hooks rendered under a DIFFERENT form's provider warn", async () => {
 
 test("two forms on one screen stay independent", async () => {
   function Show({ id }) {
-    const postcode = OrderForm.useFieldValue("billing.postcode");
+    const postcode = useFieldValue("billing.postcode");
     return h("span", { id }, String(postcode));
   }
   const a = orderForm();
@@ -199,7 +203,7 @@ test("two forms on one screen stay independent", async () => {
 test("a component needs nothing wrapped around it", async () => {
   // There is no scope to be inside or outside of. A path is a path.
   function Screen() {
-    const postcode = OrderForm.useField("billing.postcode");
+    const postcode = useField("billing.postcode");
     return h("span", { id: "v" }, String(postcode.value));
   }
   const { container, root, escaped } = await mountCatching(
@@ -214,7 +218,7 @@ test("a rule where a place is needed throws, and names the column reading", asyn
   // Not a mis-addressing: the path is declared and correct, and binding index
   // zero instead would silently address a row nobody asked for.
   function Screen() {
-    OrderForm.useField("items[*].sku");
+    useField("items[*].sku");
     return null;
   }
   const { escaped } = await mountCatching(
@@ -230,7 +234,7 @@ test("a concrete index is addressable, and reads that row", async () => {
   // never contained a bare index; what changed is that the hooks now accept
   // one, and check it as the rule it belongs to.
   function Screen() {
-    const sku = OrderForm.useField("items[0].sku");
+    const sku = useField("items[0].sku");
     return h("span", { id: "v" }, String(sku.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
@@ -245,7 +249,7 @@ test("a concrete index is addressable, and reads that row", async () => {
 test("a computed row index is addressable too", async () => {
   function Screen() {
     const which = 1;
-    const sku = OrderForm.useField(`items[${which}].sku`);
+    const sku = useField(`items[${which}].sku`);
     return h("span", { id: "v" }, String(sku.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
@@ -262,9 +266,10 @@ test("a computed row index is addressable too", async () => {
 // and the second is a bug this pins closed.
 // ---------------------------------------------------------------------------
 
-test("the plain hooks warn too, not only the typed ones", async () => {
-  // The hole as it actually shipped: the check lived in createFormHooks, so
-  // useField — which the examples and the showcase all use — was silent.
+test("the check is the store's, so every hook gets it", async () => {
+  // The hole as it actually shipped: the check lived in a hook factory, so
+  // useField — which the examples and the showcase all use — was silent. It
+  // now lives in form.field(), which every hook here funnels through.
   function Screen() {
     const typo = useField("billing.postcod");
     return h("span", { id: "v" }, String(typo.value));
@@ -308,5 +313,51 @@ test("a row that does not exist yet is addressable", async () => {
     h(FormProvider, { form: orderForm() }, h(Screen))
   );
   assert.equal(warned, "");
+  root.unmount();
+});
+
+// ---------------------------------------------------------------------------
+// The key. A hook typed against one registered form, rendered under another,
+// is the single thing the registry cannot see — so it is checked here.
+// ---------------------------------------------------------------------------
+
+test("naming a form that is not the enclosing one throws and says which", async () => {
+  function Screen() {
+    useFieldValue("order", "billing.postcode");
+    return null;
+  }
+  const { escaped } = await mountCatching(
+    h(FormProvider, { form: orderForm(), formKey: "checkout" }, h(Screen))
+  );
+  assert.ok(escaped !== null, "expected a mismatched key to throw");
+  assert.match(escaped.message, /"order"/);
+  assert.match(escaped.message, /"checkout"/);
+});
+
+test("naming the enclosing form is accepted", async () => {
+  function Screen() {
+    const postcode = useFieldValue("order", "billing.postcode");
+    return h("span", { id: "v" }, String(postcode));
+  }
+  const { container, root, escaped } = await mountCatching(
+    h(FormProvider, { form: orderForm(), formKey: "order" }, h(Screen))
+  );
+  assert.equal(escaped, null);
+  assert.equal(text(container, "v"), "100-0001");
+  root.unmount();
+});
+
+test("naming no form accepts whichever provider is there", async () => {
+  // What a component shared by two forms does. It gives up telling them
+  // apart, and nothing else.
+  function Screen() {
+    const postcode = useFieldValue("billing.postcode");
+    return h("span", { id: "v" }, String(postcode));
+  }
+  const { container, root, escaped } = await mountCatching(
+    h(FormProvider, { form: orderForm(), formKey: "anything" }, h(Screen))
+  );
+  assert.equal(escaped, null);
+  assert.equal(text(container, "v"), "100-0001");
   root.unmount();
 });

@@ -16,30 +16,33 @@
 // than one that fails to render at all.
 // ===========================================================================
 import { useContext, type ReactElement, type ReactNode } from "react";
+import type { AddressablePath, DeclaredOf } from "form-contract";
 import type { FieldBinding } from "./field-binding.types.js";
 import { useField } from "./use-field.js";
 import { WidgetRegistryContext } from "./widget-registry-context.js";
 import { resolveWidget } from "./resolve-widget.js";
+import type { AnyPath, AnyValues, ValueOfPath } from "./form-type-registry.js";
 
-export interface FieldProps<TValue> {
-  readonly path: string;
+export interface FieldProps<K extends AddressablePath<AnyPath>> {
+  readonly path: K;
   /** Layer 3. When present, nothing else is consulted. */
-  readonly children?: (binding: FieldBinding<TValue>) => ReactNode;
+  readonly children?: (
+    binding: FieldBinding<ValueOfPath<AnyValues, DeclaredOf<K>>>
+  ) => ReactNode;
   /** Layer 2: the widget to draw this field with, by name. */
   readonly as?: string;
 }
 
-export function Field<TValue>(props: FieldProps<TValue>): ReactElement {
-  const binding = useField<TValue>(props.path);
+export function Field<K extends AddressablePath<AnyPath>>(
+  props: FieldProps<K>
+): ReactElement {
+  const binding = useField(props.path);
   const registry = useContext(WidgetRegistryContext);
 
   if (props.children !== undefined) {
     return <>{props.children(binding)}</>;
   }
-  const widget = resolveWidget(
-    registry,
-    binding as FieldBinding<unknown>,
-    props.as
-  );
-  return <>{widget === undefined ? null : widget({ field: binding as FieldBinding<unknown> })}</>;
+  const shown = binding as FieldBinding<unknown>;
+  const widget = resolveWidget(registry, shown, props.as);
+  return <>{widget === undefined ? null : widget({ field: shown })}</>;
 }

@@ -10,14 +10,30 @@
 // by the library. `useRows` takes a concrete path, so an inner list is reached
 // by naming the row it lives in, which is what the outer row already handed
 // down.
+//
+// Every path here is CHECKED, including the ones built by interpolation. The
+// types come from the registry in form-registry.ts, which this file does not
+// import: `row.path` is typed as a place in its own list, so `${row.path}.sku`
+// comes out as a path the registry recognises and a typo does not compile.
 // ===========================================================================
 import { FormProvider, useCreateForm, useField, useRows } from "form-react";
-import { zodFormResolver } from "form-contract-resolver-zod";
-import { orderSchema, defaults, blankLine, blankShipment } from "./schema.js";
+import type { FormPathTo } from "form-react";
+import { orderAdapter } from "./form-registry.js";
+import { defaults, blankLine, blankShipment } from "./schema.js";
 import { Panel, Row } from "./ui.js";
 
-function Text({ at, label }: { readonly at: string; readonly label: string }) {
-  const field = useField<string>(at);
+/** Draws one text field, whatever text field it is handed. It belongs to the
+ *  UI rather than to the form, so it takes a path rather than knowing one —
+ *  and `FormPathTo<string>` is every path in the form whose value it can
+ *  actually put in an input. */
+function Text({
+  at,
+  label,
+}: {
+  readonly at: FormPathTo<string>;
+  readonly label: string;
+}) {
+  const field = useField(at);
   return (
     <Row label={label} error={field.issues[0]?.message}>
       <input
@@ -29,7 +45,7 @@ function Text({ at, label }: { readonly at: string; readonly label: string }) {
   );
 }
 
-function Lines({ at }: { readonly at: string }) {
+function Lines({ at }: { readonly at: `shipments[${number}]` }) {
   const lines = useRows(`${at}.lines`);
   const issues = useField(`${at}.lines`).issues;
   return (
@@ -89,7 +105,7 @@ function Shipments() {
 
 export function WithFormContract() {
   const form = useCreateForm(() => ({
-    adapter: zodFormResolver(orderSchema),
+    adapter: orderAdapter,
     defaultValues: defaults,
   }));
 

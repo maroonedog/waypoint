@@ -5,11 +5,24 @@
 // value moves. Subscribing to the one channel it reads is what keeps typing in
 // an input from re-rendering the summary beside it.
 // ===========================================================================
-import type { FormIssue } from "form-contract";
+import type { AddressablePath, FormIssue } from "form-contract";
+import { splitFormArgs } from "./split-form-args.js";
 import { useCell } from "./use-cell.js";
-import { useForm } from "./use-form.js";
+import { useFormHandle } from "./use-form.js";
+import type { AnyPath, FormKey, PathsFor } from "./form-type-registry.js";
 
-export function useFieldIssues(path: string): readonly FormIssue[] {
-  const form = useForm();
+export function useFieldIssues(
+  path: AddressablePath<AnyPath>
+): readonly FormIssue[];
+export function useFieldIssues<TKey extends FormKey>(
+  key: TKey,
+  path: AddressablePath<PathsFor<TKey>>
+): readonly FormIssue[];
+export function useFieldIssues(
+  first: string,
+  second?: string
+): readonly FormIssue[] {
+  const [key, path] = splitFormArgs(first, second);
+  const form = useFormHandle(key);
   return useCell(form.field(path).sources.issues);
 }

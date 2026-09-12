@@ -1,0 +1,19 @@
+// ===========================================================================
+// form-registry.ts — this application's form, declared once.
+//
+// Nothing imports this file. A module augmentation belongs to the COMPILATION,
+// not to the import graph, so every component below is checked against these
+// paths without receiving anything or knowing this file exists.
+// ===========================================================================
+import { zodFormResolver } from "form-contract-resolver-zod";
+import { orderSchema } from "./schema.js";
+
+const orderAdapter = zodFormResolver(orderSchema);
+
+declare module "form-react" {
+  interface FormTypeRegistry {
+    form: typeof orderAdapter;
+  }
+}
+
+export { orderAdapter };

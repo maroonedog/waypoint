@@ -29,7 +29,7 @@ Versions are read at run time from `node_modules/<pkg>/package.json` on disk (ne
 ```ts
 // bench/subjects/form-contract-use-field-subject.ts
 const Leaf = ({ path, label }: LeafProps) => {
-  const f = useField<string>(path);
+  const f = useField(path);
   return h(SharedLeaf, {
     label, name: path,
     value: f.value ?? "",
