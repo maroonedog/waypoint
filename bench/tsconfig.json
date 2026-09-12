@@ -1,12 +1,18 @@
 {
-  "//": "The harness is never emitted — Node strips its types and runs it. This checks the browser lane, which is the part of the harness with types nothing else would ever look at. `bench/subjects/**` is deliberately outside it: those files cast against three libraries' generics on purpose, because the point is to render each library's own idiom rather than a version of it that happened to type-check.",
+  "//": "The harness is never emitted — Node strips its types and runs it. This checks the browser lane and every report writer, which are the parts of the harness whose types nothing else would ever look at. `bench/subjects/**` is deliberately outside it: those files cast against three libraries' generics on purpose, because the point is to render each library's own idiom rather than a version of it that happened to type-check. `run-forms-bench.ts` stays out for the same reason — it imports the subjects, so including it would drag them all in.",
   "compilerOptions": {
     "target": "ES2022",
     "module": "Preserve",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["node"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "types": [
+      "node"
+    ],
     "strict": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
@@ -15,12 +21,26 @@
     "skipLibCheck": true,
     "noEmit": true,
     "paths": {
-      "form-contract": ["../packages/spec/src/index.ts"],
-      "form-contract-resolver-zod": ["../packages/resolver-zod/src/index.ts"],
-      "form-core": ["../packages/form-core/src/index.ts"],
-      "form-react": ["../packages/form-react/src/index.ts"],
-      "form-store-zustand": ["../packages/form-store-zustand/src/index.ts"]
+      "form-contract": [
+        "../packages/spec/src/index.ts"
+      ],
+      "form-contract-resolver-zod": [
+        "../packages/resolver-zod/src/index.ts"
+      ],
+      "form-core": [
+        "../packages/form-core/src/index.ts"
+      ],
+      "form-react": [
+        "../packages/form-react/src/index.ts"
+      ],
+      "form-store-zustand": [
+        "../packages/form-store-zustand/src/index.ts"
+      ]
     }
   },
-  "include": ["browser/*.ts", "report/render-time-*.ts", "report/markdown-table.ts", "run-time-bench.ts"]
+  "include": [
+    "browser/*.ts",
+    "report/*.ts",
+    "run-time-bench.ts"
+  ]
 }

@@ -50,7 +50,7 @@ export function findLosses(
       losses.push({
         scenarioId,
         subjectId,
-        headline: HEADLINE(mine),
+        headline: HEADLINE(ours),
         bestSubjectId: best.subjectId,
         best: HEADLINE(best),
         bestAgreement: agreementOf(best.subjectId, scenarioId),
