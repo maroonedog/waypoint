@@ -7,96 +7,119 @@
 // entirely: the instance travels at run time through React, and the type
 // travels at compile time through the compilation. Drawing them as two lanes
 // says it faster than the paragraphs it replaces.
+//
+// THE TWO LANES ARE DRAWN IDENTICALLY, ON PURPOSE. They were two stacks of
+// filled cards in two different fills — the left in a container role, the
+// right's last box in another — so the eye read two unrelated components and
+// had to be told by the caption that they were a pair. Now every box in both
+// lanes is the same outline at the same weight, mirrored about the same
+// centres, and the only things drawn as surfaces are the one adapter they both
+// come from and the one call they both arrive at. What differs between the
+// lanes is what they SAY, which is the diagram's entire argument.
+//
+// THE COLOURS ARE WRITTEN AS var(--wp-…) RATHER THAN AS UTILITIES because
+// `fill` and `stroke` are presentation attributes and there is no class to put
+// them in here; they are the same tokens styles.css declares, not new values.
+// The faces are utilities, since those exist: mono for what is addressed —
+// a call, a declaration, a path — and the serif for what is argued about it.
 // ===========================================================================
 ---
 
-<figure class="mt-8">
+<figure class="mt-[var(--gap-block)]">
   <!-- Scrolls rather than shrinks. Scaled to a 375px column the labels come
        out around five pixels tall, which is a diagram nobody can read; the
        minimum width keeps them legible and the page still never scrolls. -->
   <div class="overflow-x-auto">
-  <svg
-    viewBox="0 0 720 300"
-    role="img"
-    aria-labelledby="lanes-title lanes-desc"
-    class="w-full min-w-[620px]"
-  >
-    <title id="lanes-title">The instance and the type take different roads</title>
-    <desc id="lanes-desc">
-      One adapter feeds two lanes. At run time the form instance travels down
-      the React tree through a provider and a component receives it by being
-      inside one. At compile time the same adapter is registered by a module
-      augmentation, which belongs to the whole compilation, so a component is
-      type-checked without importing or receiving anything.
-    </desc>
-
-    <g
-      font-family="var(--md-font-sans, ui-sans-serif, system-ui, sans-serif)"
-      fill="var(--md-on-surface)"
+    <svg
+      viewBox="0 0 720 300"
+      role="img"
+      aria-labelledby="lanes-title lanes-desc"
+      class="w-full min-w-[620px]"
     >
-      <!-- source -->
-      <rect x="250" y="8" width="220" height="40" rx="8"
-        fill="var(--md-primary-container)" />
-      <text x="360" y="26" font-size="13" font-weight="600" text-anchor="middle"
-        fill="var(--md-on-primary-container)">zodFormResolver(orderSchema)</text>
-      <text x="360" y="41" font-size="11" text-anchor="middle"
-        fill="var(--md-on-primary-container)">one adapter</text>
+      <title id="lanes-title">The instance and the type take different roads</title>
+      <desc id="lanes-desc">
+        One adapter feeds two lanes. At run time the form instance travels down
+        the React tree through a provider and a component receives it by being
+        inside one. At compile time the same adapter is registered by a module
+        augmentation, which belongs to the whole compilation, so a component is
+        type-checked without importing or receiving anything.
+      </desc>
 
-      <path d="M 300 48 L 300 62 L 150 62 L 150 84" fill="none"
-        stroke="var(--md-outline)" stroke-width="1.5" />
-      <path d="M 420 48 L 420 62 L 570 62 L 570 84" fill="none"
-        stroke="var(--md-outline)" stroke-width="1.5" />
+      <g class="font-sans" fill="var(--wp-ink)">
+        <!-- The source, and at the bottom the destination: the only two boxes
+             cut into the page rather than outlined on it, because they are the
+             two things both lanes share. -->
+        <rect x="240" y="8" width="240" height="40" rx="3"
+          fill="var(--wp-sunk)" stroke="var(--wp-line)" />
+        <text x="360" y="26" font-size="12" font-weight="500" text-anchor="middle"
+          class="font-mono">zodFormResolver(orderSchema)</text>
+        <text x="360" y="41" font-size="10.5" text-anchor="middle"
+          fill="var(--wp-ink-quiet)">one adapter</text>
 
-      <!-- lane headings -->
-      <text x="150" y="80" font-size="11" font-weight="600" text-anchor="middle"
-        fill="var(--md-on-surface-variant)">AT RUN TIME</text>
-      <text x="570" y="80" font-size="11" font-weight="600" text-anchor="middle"
-        fill="var(--md-on-surface-variant)">AT COMPILE TIME</text>
+        <path d="M 300 48 L 300 62 L 150 62 L 150 84" fill="none"
+          stroke="var(--wp-line)" stroke-width="1" />
+        <path d="M 420 48 L 420 62 L 570 62 L 570 84" fill="none"
+          stroke="var(--wp-line)" stroke-width="1" />
 
-      <!-- left lane: the instance -->
-      <rect x="24" y="88" width="252" height="52" rx="8"
-        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
-      <text x="40" y="110" font-size="12.5" font-weight="600">createForm(adapter)</text>
-      <text x="40" y="128" font-size="11" fill="var(--md-on-surface-variant)">the cell space — one per form on screen</text>
+        <!-- lane headings -->
+        <text x="150" y="80" font-size="10" font-weight="500" text-anchor="middle"
+          class="font-mono" fill="var(--wp-ink-quiet)">AT RUN TIME</text>
+        <text x="570" y="80" font-size="10" font-weight="500" text-anchor="middle"
+          class="font-mono" fill="var(--wp-ink-quiet)">AT COMPILE TIME</text>
 
-      <line x1="150" y1="140" x2="150" y2="162" stroke="var(--md-outline)" stroke-width="1.5" />
+        <!-- Left lane: the instance. The boxes are wider than they were and
+             both lanes grew by the same amount about their own centre line, so
+             every connector below still meets them at 150 and at 570. -->
+        <rect x="4" y="88" width="292" height="52" rx="3"
+          fill="none" stroke="var(--wp-line-faint)" />
+        <text x="18" y="110" font-size="11.5" font-weight="500"
+          class="font-mono">createForm(adapter)</text>
+        <text x="18" y="128" font-size="10.5" fill="var(--wp-ink-quiet)">the cell space — one per form on screen</text>
 
-      <rect x="24" y="166" width="252" height="52" rx="8"
-        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
-      <text x="40" y="188" font-size="12.5" font-weight="600">&lt;FormProvider form={"{form}"}&gt;</text>
-      <text x="40" y="206" font-size="11" fill="var(--md-on-surface-variant)">travels DOWN the React tree</text>
+        <line x1="150" y1="140" x2="150" y2="162" stroke="var(--wp-line)" stroke-width="1" />
 
-      <!-- right lane: the type -->
-      <rect x="444" y="88" width="252" height="52" rx="8"
-        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
-      <text x="460" y="110" font-size="12.5" font-weight="600">declare module "@maroonedog/waypoint"</text>
-      <text x="460" y="128" font-size="11" fill="var(--md-on-surface-variant)">WaypointForms — one file, one time</text>
+        <rect x="4" y="166" width="292" height="52" rx="3"
+          fill="none" stroke="var(--wp-line-faint)" />
+        <text x="18" y="188" font-size="11.5" font-weight="500"
+          class="font-mono">&lt;FormProvider form={"{form}"}&gt;</text>
+        <text x="18" y="206" font-size="10.5" fill="var(--wp-ink-quiet)">travels DOWN the React tree</text>
 
-      <line x1="570" y1="140" x2="570" y2="162" stroke="var(--md-outline)" stroke-width="1.5" />
+        <!-- right lane: the type -->
+        <rect x="424" y="88" width="292" height="52" rx="3"
+          fill="none" stroke="var(--wp-line-faint)" />
+        <text x="438" y="110" font-size="11.5" font-weight="500"
+          class="font-mono">declare module "@maroonedog/waypoint"</text>
+        <text x="438" y="128" font-size="10.5" fill="var(--wp-ink-quiet)">WaypointForms — one file, one time</text>
 
-      <rect x="444" y="166" width="252" height="52" rx="8"
-        fill="var(--md-secondary-container)" />
-      <text x="460" y="188" font-size="12.5" font-weight="600"
-        fill="var(--md-on-secondary-container)">the whole COMPILATION</text>
-      <text x="460" y="206" font-size="11"
-        fill="var(--md-on-secondary-container)">not the import graph — nothing is imported</text>
+        <line x1="570" y1="140" x2="570" y2="162" stroke="var(--wp-line)" stroke-width="1" />
 
-      <!-- they meet -->
-      <path d="M 150 218 L 150 238 L 360 238 L 360 252" fill="none"
-        stroke="var(--md-outline)" stroke-width="1.5" />
-      <path d="M 570 218 L 570 238 L 360 238" fill="none"
-        stroke="var(--md-outline)" stroke-width="1.5" />
+        <rect x="424" y="166" width="292" height="52" rx="3"
+          fill="none" stroke="var(--wp-line-faint)" />
+        <!-- Serif, where its opposite number on the left is mono: this box is
+             the one claim in the diagram that names nothing you could type. -->
+        <text x="438" y="188" font-size="12" font-weight="600">the whole COMPILATION</text>
+        <text x="438" y="206" font-size="10.5" fill="var(--wp-ink-quiet)">not the import graph — nothing is imported</text>
 
-      <rect x="196" y="252" width="328" height="40" rx="8"
-        fill="var(--md-surface-container-high)" stroke="var(--md-outline-variant)" />
-      <text x="360" y="270" font-size="13" font-weight="600" text-anchor="middle"
-        >useField("form:billing.postcode")</text>
-      <text x="360" y="285" font-size="11" text-anchor="middle"
-        fill="var(--md-on-surface-variant)">no import, no prop, and still checked</text>
-    </g>
-  </svg>
+        <!-- they meet -->
+        <path d="M 150 218 L 150 238 L 360 238 L 360 252" fill="none"
+          stroke="var(--wp-line)" stroke-width="1" />
+        <path d="M 570 218 L 570 238 L 360 238" fill="none"
+          stroke="var(--wp-line)" stroke-width="1" />
+
+        <rect x="196" y="252" width="328" height="40" rx="3"
+          fill="var(--wp-sunk)" stroke="var(--wp-line)" />
+        <!-- The one accent in the diagram, on the one character the addressing
+             scheme turns on. It is the same three ranks a code block's label
+             is set in, and nothing else here is allowed to wear the mark. -->
+        <text x="360" y="270" font-size="12.5" font-weight="500" text-anchor="middle"
+          class="font-mono"
+          >useField("form<tspan fill="var(--wp-mark)">:</tspan>billing.postcode")</text>
+        <text x="360" y="285" font-size="10.5" text-anchor="middle"
+          fill="var(--wp-ink-quiet)">no import, no prop, and still checked</text>
+      </g>
+    </svg>
   </div>
-  <figcaption class="mt-3 text-sm leading-relaxed text-on-surface-variant">
+  <figcaption class="caption">
     The right-hand lane is the unusual one. A module augmentation belongs to the
     compilation, so a component ten levels down is checked by a file it has
     never heard of — and a registration that falls out of <code>tsconfig</code>'s{" "}

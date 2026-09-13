@@ -28,7 +28,7 @@ import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
   title="Showcase — waypoint"
   description="A real form running on this page: six sections, every label, bound and aria attribute off the schema, and a submit that names what blocked it."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">Showcase</h1>
+  <h1>Showcase</h1>
 
   <p class="lead">
     A trade account application — six sections, an address written once and
@@ -52,19 +52,34 @@ import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
     message arrives at <code>items</code>, a path with no input of its own.
   </p>
 
-  <div class="mt-8">
-    <ShowcaseScreen client:load />
-  </div>
+  <!-- THE GUEST IS NAMED, AND IN THE SITE'S OWN GRAMMAR. Every other block of
+       evidence on this site arrives under `qualifier: value` — `file:`,
+       `shell:`, `app:` — and the one block a reader can actually type into was
+       the only one that arrived unannounced. Code.astro cannot label this one:
+       the strip it draws lives inside the block, and this block is somebody
+       else's application with a border and a radius of its own.
 
-  <h2 class="mt-16 text-2xl font-bold">The same thing, locally</h2>
+       Flush, with no gap of its own, for the same reason the code strip is
+       flush: a label spaced evenly between the paragraph above and the screen
+       below belongs to neither. The screen draws its own frame in
+       ShowcaseScreen.tsx, so nothing is drawn around it here — a second border
+       would frame a framed thing. -->
+  <p class="label">
+    <span class="qualifies">app</span><span class="colon">:</span>{" "}
+    <span class="named">showcase</span>
+  </p>
+
+  <ShowcaseScreen client:load />
+
+  <h2>The same thing, locally</h2>
 
   <p class="caption">
     The screen above imports <code>examples/showcase</code> directly, so it is
     the example rather than a copy of it. To run it on its own — with the
     package resolving to source, so editing the runtime reloads the page —
-    <code>npm run example:showcase</code>, then localhost:5179. The other five
-    are on the <a class="underline underline-offset-4" href="/examples/">Examples</a>
-    page.
+    <code>npm run example:showcase</code>, then <code>localhost:5179</code>. The
+    other five are on the
+    <a class="underline underline-offset-4" href="/examples/">Examples</a> page.
   </p>
 
   <p class="caption">

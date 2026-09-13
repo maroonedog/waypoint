@@ -16,27 +16,35 @@ import TimingTable from "../components/TimingTable.astro";
   title="Benchmark — waypoint"
   description="Two lanes: deterministic counts gated in CI, and microseconds from Chrome's own trace that are printed and never gated. The harness publishes its own resolution above its results."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">Benchmark</h1>
+  <h1>Benchmark</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">waypoint is behind on all four
+    <strong>waypoint is behind on all four
     scenarios, at every size.</strong> The report says so in those words, and
     prints the rows it loses before its own table.
   </p>
 
-  <ol class="mt-6 grid gap-3">
-    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+  <!-- Four findings, divided by the faint rule rather than sat in four filled
+       blocks. The recess (`bg-surface-low`) is not free on this page: every
+       table below it uses that ground to mark which rows are ours, so spending
+       it here on a summary would leave two different claims wearing one
+       ground. `mt-6` stays because nothing in the stylesheet spaces an element
+       after `.lead`; 1.5rem is `--gap-block`, the value the sheet would have
+       used. -->
+  <ol class="mt-6 border-b border-outline-variant">
+    <li class="border-t border-outline-variant py-4 text-sm">
       Two of the four losses are won by <strong>not showing the message</strong>:
       one configuration reports only at submit, and one reports nothing at all.
       The other two are beaten by waypoint's own uncontrolled binding.
     </li>
-    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+    <li class="border-t border-outline-variant py-4 text-sm">
       On the timing lane a keystroke at 201 fields measures{" "}
-      <strong>0.57× the hand-written reference</strong>, and the harness
+      <strong><span class="font-mono measured">0.57×</span> the hand-written
+      reference</strong>, and the harness
       <strong> refuses to call it a win</strong> — its own calibration ladder
       resolves nothing that far under the floor.
     </li>
-    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+    <li class="border-t border-outline-variant py-4 text-sm">
       <strong>K5 is what coalescing is worth.</strong> Five characters into one
       field with <em>one</em> settle at the end: at 201 fields both
       waypoint subjects run <strong>1 validator pass, 201 paths judged</strong>,
@@ -45,7 +53,7 @@ import TimingTable from "../components/TimingTable.astro";
       every keystroke — which is what the other three scenarios do — is the one
       arrangement in which coalescing can buy nothing.
     </li>
-    <li class="rounded-lg bg-surface-low p-4 text-sm leading-relaxed">
+    <li class="border-t border-outline-variant py-4 text-sm">
       Every integer on the counts lane is gated. CI fails when one moves, in
       either direction.
     </li>
@@ -61,8 +69,8 @@ import TimingTable from "../components/TimingTable.astro";
   </p>
 
   <!-- ================================================== counts -->
-  <h2 class="mt-16 text-2xl font-bold">The counts lane, which is gated</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
+  <h2>The counts lane, which is gated</h2>
+  <p>
     These integers do not depend on the machine, which is the only reason a CI
     gate can exist at all.
   </p>
@@ -100,7 +108,7 @@ import TimingTable from "../components/TimingTable.astro";
   </p>
 
   <!-- ================================================== time -->
-  <h2 class="mt-16 text-2xl font-bold">The timing lane, which is never gated</h2>
+  <h2>The timing lane, which is never gated</h2>
 
   <TimingTable />
 
@@ -111,7 +119,7 @@ import TimingTable from "../components/TimingTable.astro";
     renderer processes. Before it compares anything it measures itself: a known
     cost injected at seven sizes, and every subject run against a byte-identical
     twin of itself at every size. A band that overlaps the twin's band prints{" "}
-    <code>indistinguishable</code>, never a win.
+    <code class="verdict">indistinguishable</code>, never a win.
   </p>
 
   <!-- ================================================== excluded -->
@@ -127,12 +135,15 @@ import TimingTable from "../components/TimingTable.astro";
   </p>
 
   <!-- ================================================== a third lane -->
-  <h2 class="mt-16 text-2xl font-bold">A third lane, at the compiler</h2>
-  <p class="mt-4 leading-relaxed text-on-surface-variant">
+  <h2>A third lane, at the compiler</h2>
+  <p>
     <code>npm run bench:types</code> measures what the path types cost{" "}
     <code>tsc</code>, in the compiler's own accounting: the union built once per
-    shape at 77–137 instantiations per leaf, an accepted <code>useField</code>{" "}
-    at 275.0, a refused one at 475,034, and the depth where the budget stops —{" "}
+    shape at <span class="font-mono measured">77–137</span> instantiations per
+    leaf, an accepted <code>useField</code>{" "}
+    at <span class="font-mono measured">275.0</span>, a refused one at{" "}
+    <span class="font-mono measured">475,034</span>, and the depth where the
+    budget stops —{" "}
     <strong class="text-on-surface">seven path segments are addressable and
     eight are not</strong>. It is <strong class="text-on-surface">printed and
     never gated</strong>, for a reason the time lane does not have:{" "}

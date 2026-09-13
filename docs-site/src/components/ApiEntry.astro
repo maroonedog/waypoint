@@ -5,6 +5,16 @@
 // The same order every time: what it is in a line, the signature, then what
 // comes back. A reference is scanned rather than read, and a shape that varies
 // per entry makes the reader re-learn the layout at every heading.
+//
+// THE NAME IS THE ONLY LOUD THING IN THE BLOCK, and that is the whole of this
+// component's typography. The page is in the finding register, so the
+// stylesheet already sets an entry heading in the mono — see
+// `main[data-register="finding"] :is(h2, h3)`. Everything under it was
+// competing with it: the summary carried its own leading, the cells their own
+// size, and the type column wore the mark, so the one accent on the page was
+// spent forty times over on strings nobody is looking for. They are all set
+// from the sheet now, and the mark appears in an entry only under the pointer,
+// on the name itself.
 // ===========================================================================
 import Code from "./Code.astro";
 
@@ -33,13 +43,19 @@ const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
      pt-6 against the grid's own gap-10: the rule sits nearer the entry it
      opens than the one it closes. Centred between two, it opens neither. -->
 <section id={slug} class="hairline min-w-0 pt-6 first:border-t-0 first:pt-0">
-  <h3 class="font-mono text-lg font-semibold">
+  <!-- text-lg is the one heading utility that stays. The register rule gives
+       this h3 its face and its weight, but the sheet writes h3 SIZE for
+       `main > section > h3` and an entry is a grid item rather than a direct
+       child of a section — so the size is the single thing the sheet cannot
+       reach from here. The value is the sheet's own 1.125rem. -->
+  <h3 class="text-lg">
     <a href={`#${slug}`} class="hover:text-primary">{name}</a>
   </h3>
   <!-- Not the muted role: in a reference the one-line summary IS the entry,
        and on-surface-variant is spoken for now by captions and table notes.
-       The gap under the heading and the measure come from the stylesheet. -->
-  <p class="leading-relaxed">{summary}</p>
+       The gap under the heading, the measure and the leading come from the
+       stylesheet. -->
+  <p>{summary}</p>
 
   <Code code={signature} />
 
@@ -47,17 +63,23 @@ const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
   {
     returns !== undefined && (
-      <div class="mt-6">
+      <div class="mt-[var(--gap-block)]">
         <p class="label">{returnsTitle ?? "Returns"}</p>
-        <div class="mt-2 overflow-x-auto">
+        {/* The label and its table are one thing, so what separates them is
+            the smallest gap on the site — the same variable the sheet
+            attaches a caption with. The block above it gets --gap-block,
+            which the finding register tightens along with everything else. */}
+        <div class="mt-[var(--gap-caption)] overflow-x-auto">
           <table>
             <tbody>
               {returns.map((member) => (
                 <tr class="hairline">
-                  <td class="pr-4 font-mono text-xs whitespace-nowrap">
-                    {member.name}
-                  </td>
-                  <td class="pr-4 font-mono text-xs whitespace-nowrap text-primary">
+                  <td class="pr-4 font-mono whitespace-nowrap">{member.name}</td>
+                  {/* Quiet rather than the mark. A returned type is what the
+                      name is at rest, not a judgement and not a figure this
+                      project measured; it is told apart from the name beside
+                      it by rank, and from the note by face. */}
+                  <td class="pr-4 font-mono whitespace-nowrap text-on-surface-variant">
                     {member.type}
                   </td>
                   <td class="text-on-surface-variant">{member.note}</td>

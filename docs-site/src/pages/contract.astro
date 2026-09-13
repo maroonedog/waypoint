@@ -133,11 +133,11 @@ import type * as z from "zod";
   title="The contract — waypoint"
   description="A form needs a flat list of fields and a schema is a tree. Two members are the whole contract — a descriptor per leaf and one whole-root verdict — and the value type and the path union survive them."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">The contract</h1>
+  <h1>The contract</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">A form needs a flat list of fields. A schema
-    is a tree.</strong> Describing a schema without a value is not scarce —
+    <strong>A form needs a flat list of fields. A schema is a tree.</strong>{" "}
+    Describing a schema without a value is not scarce —
     <code>getZodConstraint</code>, <code>superValidate</code>,{" "}
     <code>toFieldConfig</code> and <code>ZodBridge</code> all do it, and
     Standard Schema now carries a JSON Schema member several validators
@@ -147,7 +147,7 @@ import type * as z from "zod";
     writing the walk again per validator.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">What a descriptor draws</h2>
+  <h2>What a descriptor draws</h2>
 
   <Code code={drawn} label="schema → descriptor → input" />
 
@@ -163,16 +163,16 @@ import type * as z from "zod";
     something about each of them that nothing has checked.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">What a screen reader is handed</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <h2>What a screen reader is handed</h2>
+  <p>
     Both bindings hand back four bags, not one. <code>inputProps</code> carries
     the <code>id</code> — scoped by <code>useId</code>, so two forms on one page
     cannot collide — and <code>aria-describedby</code> naming the help line and
     then the message, in the order they are read. <code>labelProps</code> is the
     matching <code>htmlFor</code>; <code>errorProps</code> is that id and{" "}
     <code>role="alert"</code>; <code>descriptionProps</code> is{" "}
-    <strong class="text-on-surface">undefined</strong> when the schema declared
-    no description, so nothing ever points at an element you do not draw.{" "}
+    <code>undefined</code> when the schema declared no description, so nothing
+    ever points at an element you do not draw.{" "}
     <code>aria-required</code> is deliberately not emitted: <code>required</code>{" "}
     is already on the element, and the second copy of one fact is the copy that
     goes stale.
@@ -185,17 +185,17 @@ import type * as z from "zod";
     from a parsed schema, and Conform ships <code>id</code>,{" "}
     <code>errorId</code>, <code>descriptionId</code>, <code>ariaInvalid</code>,{" "}
     <code>ariaDescribedBy</code> and <code>focusFirst</code>.{" "}
-    <strong class="text-on-surface">Not done, and not scheduled:</strong> an
-    error summary with focus management on a failed submit, a WCAG map criterion
+    <strong>Not done, and not scheduled:</strong> an error summary with focus
+    management on a failed submit, a WCAG map criterion
     by criterion, a gated <code>axe</code> suite, and an audit by somebody who
     does this for a living. Nothing here has met a real screen reader; the live
     region caveat above is what the ARIA practices describe, not something
     measured in this repository.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Two members</h2>
+  <h2>Two members</h2>
 
-  <Code code={resolver} label="the contract" />
+  <Code code={resolver} label="type: FormAdapter" />
 
   <p class="caption">
     There is no registry, no vendor tag and no dispatch: a resolver is named at
@@ -206,13 +206,13 @@ import type * as z from "zod";
     would widen it. What every vendor does agree to is the two members.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Neutral by construction</h2>
+  <h2>Neutral by construction</h2>
 
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <p>
     This used to be argued by shipping two resolvers, which proves only that two
     can be written. Now the generic one takes{" "}
-    <strong class="text-on-surface">both</strong> its members from specifications
-    this package does not own, and names no vendor anywhere in its entry point —
+    <strong>both</strong> its members from specifications this package does not
+    own, and names no vendor anywhere in its entry point —
     so a validator that implements them works without a file being added here.{" "}
     <code>draft-2020-12</code> is asked for first and <code>draft-07</code> on a
     throw, because the spec tells a library to throw on a target it does not
@@ -233,9 +233,9 @@ import type * as z from "zod";
     the better failure.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">So why do two vendor resolvers remain?</h2>
+  <h2>So why do two vendor resolvers remain?</h2>
 
-  <Code code={roads} label="measured, zod 4.6.4" />
+  <Code code={roads} label="measured: zod 4.6.4" />
 
   <p class="caption">
     Because a spec member that does not exist cannot carry anything. Over every
@@ -255,9 +255,9 @@ import type * as z from "zod";
     <strong class="text-on-surface">descriptors</strong> from the generic one.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">One descriptor is one field</h2>
+  <h2>One descriptor is one field</h2>
 
-  <Code code={descriptor} label="one field" />
+  <Code code={descriptor} label="type: FormFieldDescriptor" />
 
   <p class="caption">
     One entry per leaf, and an array is described once through a wildcard
@@ -269,9 +269,9 @@ import type * as z from "zod";
     <code>date</code>, because that is the input a person should be given.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">The type survives</h2>
+  <h2>The type survives</h2>
 
-  <Code code={types} label="the type survives" />
+  <Code code={types} label="type: FormValues, FormPaths" />
 
   <p class="caption">
     The contract is neutral about direction: a type-first validator passes the
@@ -282,22 +282,26 @@ import type * as z from "zod";
     >
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Bring your own validator, and your own copy of it</h2>
+  <h2>Bring your own validator, and your own copy of it</h2>
 
-  <Code code={weight} label="src/resolver-zod" />
+  <Code code={weight} label="file: src/resolver-zod" />
 
+  <!-- The one margin this page still writes. `--gap-block` is carried by the
+       code block itself and `--gap-heading` by whatever follows a heading; a
+       wrapper that follows a code block is neither, so with no margin here the
+       table would sit on the block above it. -->
   <div class="mt-5 overflow-x-auto">
-    <table class="w-full text-sm">
+    <table>
       <tbody>
         <tr class="hairline">
-          <td class="w-40 py-3 pr-4 align-top font-medium">At run time</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+          <td class="w-40 pr-4 font-medium">At run time</td>
+          <td class="text-on-surface-variant">
             Nothing — one <code>import type</code>, erased at build.
           </td>
         </tr>
         <tr class="hairline">
-          <td class="w-40 py-3 pr-4 align-top font-medium">At install time</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+          <td class="w-40 pr-4 font-medium">At install time</td>
+          <td class="text-on-surface-variant">
             zod is declared as a peer, so the copy you already installed is the
             one it describes; the resolver cannot pin a version or pull in a
             second.
@@ -312,7 +316,8 @@ import type * as z from "zod";
     tree — one with <code>$ref</code> and combinators in it — into one
     descriptor per leaf, through the same walk. Nor is that route free. Run here
     on zod 4.6.4, asking a schema containing <code>z.date()</code> for its JSON
-    Schema throws <code>Date cannot be represented in JSON Schema</code> and
+    Schema throws{" "}
+    <code class="verdict">Date cannot be represented in JSON Schema</code> and
     emits <strong class="text-on-surface">no property at all</strong> — the
     whole document is lost to one field, and it is the most common non-text
     widget in a real form. zod offers a way through, spelled{" "}

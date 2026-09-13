@@ -151,9 +151,20 @@ body:has(.wp-page) { margin: 0; }
 .wp-example ul.plain { margin: 0; padding-left: 1.1rem; list-style: disc; }
 .wp-example ul.plain li { margin: .2rem 0; }
 
+/* THE GROUND IS SET TO NOTHING ON PURPOSE. The documentation site gives an
+   inline `code` a recess of its own — right for a name inside a sentence on
+   a page with one colour scheme, and wrong here: the recess is the HOST's
+   token, so in dark it resolved to near-black while this file's text colour
+   stayed light-scheme grey. Measured on /examples/ in dark: #5a6a67 on
+   #0b0d0c, 1.9:1, on three words. These examples are one scheme by design
+   and their code is a word in a sentence, not a chip. */
 .wp-example code, .wp-example .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: .86em;
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
 }
 
 .wp-example .log {

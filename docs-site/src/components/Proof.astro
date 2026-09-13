@@ -10,6 +10,15 @@
 // One claim line above the pair and one line of what-to-do under it. Nothing
 // else — the screen is the argument, and prose beside a live demo is prose
 // the reader has to take on trust while looking at the thing itself.
+//
+// THE TWO HALVES ARE DRAWN AS ONE EXHIBIT. The demo is framed exactly the way
+// Code.astro frames the source — a `--wp-line` boundary, the site's one
+// radius, a strip on the same rule and the same padding — because the claim
+// this component makes is that the two halves are the same thing. A frame
+// that differed from the code block's would be the reader's first hint that
+// they are two different kinds of evidence. Everything inside the frame is
+// left alone: the stage keeps the page's own ground so the running form is
+// not tinted by the chrome around it.
 // ===========================================================================
 import Code from "./Code.astro";
 
@@ -17,30 +26,88 @@ interface Props {
   readonly claim: string;
   readonly watch: string;
   readonly source: string;
+  /** The file name alone. The qualifier is added here — see below. */
   readonly file: string;
 }
 
 const { claim, watch, source, file } = Astro.props;
+
+// THE QUALIFIER IS ADDED IN ONE PLACE, AND THIS IS IT. `Code` typesets a label
+// written as `qualifier: name` in three ranks, and every block this component
+// draws is a file — so the call sites name the file and the word is added here.
+// Written at the five call sites instead it would be five copies of one fact,
+// and five chances to hand `Code` a label that already carries it, which sets
+// as `file: file: AField.tsx`. The strip accepts either spelling for the same
+// reason: a caller who writes the qualifier is not punished for it.
+const label = `file: ${file.replace(/^\s*file:\s*/, "")}`;
 ---
 
-<div class="mt-8">
-  <p class="text-[0.9375rem] leading-relaxed font-medium">{claim}</p>
+<div class="proof">
+  <p>{claim}</p>
 
-  <div class="mt-3 grid items-start gap-4 lg:grid-cols-2">
+  <div class="proof-pair grid items-start gap-4 lg:grid-cols-2">
     <div class="min-w-0">
-      <Code code={source} lang="tsx" label={file} flush />
+      <Code code={source} lang="tsx" label={label} flush />
     </div>
 
-    <div class="min-w-0 overflow-hidden rounded-lg border border-outline-variant">
-      <p class="label border-b border-outline-variant bg-surface-low px-4 py-2">
-        running, right here
-      </p>
-      <div class="p-4">
+    <div class="proof-demo min-w-0 overflow-hidden">
+      <p class="label proof-strip">running, right here</p>
+      <div class="proof-stage">
         <slot />
       </div>
-      <p class="caption border-t border-outline-variant bg-surface-low px-4 py-2">
-        {watch}
-      </p>
+      <p class="caption proof-foot">{watch}</p>
     </div>
   </div>
 </div>
+
+<style is:global>
+  /* GLOBAL, AND FOR THE SAME REASON Code.astro's block is: these rules have to
+     sit at the specificity the stylesheet expects, and Astro's scoping adds an
+     attribute selector that would lift them above it. */
+
+  /* Spaced by the sheet's own subsection gap, at zero specificity, exactly as
+     `main :where(.code-block)` is. Five of these run one after another with no
+     heading between them, and nothing in the stylesheet spaces a bare div — but
+     :where() keeps the FIRST one bound to the heading it opens, which a margin
+     utility could not do. */
+  main :where(.proof) {
+    margin-top: var(--gap-subsection);
+  }
+
+  /* The claim owns the pair under it, the way a heading owns its block. */
+  main :where(.proof-pair) {
+    margin-top: var(--gap-heading);
+  }
+
+  .proof-demo {
+    border: 1px solid var(--wp-line);
+    border-radius: 3px;
+  }
+
+  /* The strip carries the code label's padding, not its own, so the two halves
+     of the pair start on the same line across the gap. */
+  .proof-strip {
+    padding: 0.45rem 1.25rem;
+    border-bottom: 1px solid var(--wp-line-faint);
+    background: var(--wp-sunk);
+  }
+
+  /* No ground of its own: a demo tinted by its frame is a demo the reader has
+     to discount. */
+  .proof-stage {
+    padding: 1.1rem 1.25rem;
+  }
+
+  /* A caption is normally attached to the block above it by the smallest gap
+     on the site. Inside the frame it is attached by the rule instead, and the
+     inherited gap would only make the strip taller at the top than the bottom.
+     Two classes deliberately: `.caption` sets that gap at one class of
+     specificity, and a component's style block has no guaranteed order against
+     the sheet's. */
+  .caption.proof-foot {
+    margin-top: 0;
+    padding: 0.45rem 1.25rem;
+    border-top: 1px solid var(--wp-line-faint);
+    background: var(--wp-sunk);
+  }
+</style>

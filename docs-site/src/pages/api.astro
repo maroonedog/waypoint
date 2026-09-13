@@ -301,18 +301,33 @@ const slugOf = (name: string): string =>
   title="API — waypoint"
   description="Every hook, component and path type, with the signature the package itself emits and what each one hands back."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">API</h1>
-  <p class="mt-4 max-w-2xl leading-relaxed text-on-surface-variant">
+  <h1>API</h1>
+  <p class="lead">
     Signatures are the ones the package emits. Every path names its form —{" "}
     <code>useField("order:billing.postcode")</code> — and with a single form
     registered the prefix is optional.
   </p>
 
-  <nav class="mt-6 flex flex-wrap gap-x-4 gap-y-1.5 text-sm" aria-label="On this page">
+  <!-- THE NAMES ARE THE INSTRUMENT, so they are set in the reading ink rather
+       than the quiet one. This index is not chrome like the section list in the
+       left margin — it is the only thing on the page that puts all seventeen
+       entry names in one field of view, and a reader who came here for one of
+       them is scanning it, not reading past it. The mark is left out of the
+       hover on purpose: it means a place with a value in it, and it stops
+       meaning that the moment it also means "a link is under the pointer".
+
+       The top margin is kept because nothing in styles.css spaces this element:
+       the sheet spaces headings, sections and code blocks, and a `nav` after a
+       lead is none of those. It is written as the sheet's own variable so it
+       tracks this page's denser register instead of restating a number. -->
+  <nav
+    class="mt-[var(--gap-block)] flex flex-wrap gap-x-4 gap-y-1.5"
+    aria-label="On this page"
+  >
     {
       INDEX.map((name) => (
         <a
-          class="font-mono text-xs text-on-surface-variant underline-offset-4 hover:text-primary hover:underline"
+          class="font-mono text-xs text-on-surface underline-offset-4 hover:underline"
           href={`#${slugOf(name)}`}
         >
           {name}
@@ -321,39 +336,40 @@ const slugOf = (name: string): string =>
     }
   </nav>
 
-  <h2 class="mt-14 text-2xl font-bold">Hooks</h2>
-  <div class="mt-6 grid gap-10">
+  <h2>Hooks</h2>
+  <!-- gap-10 against ApiEntry's own `pt-6`: the rule opening an entry sits
+       nearer the entry it opens than the one it closes. Changing it here would
+       centre every rule between two entries. -->
+  <div class="grid gap-10">
     {hooks.map((one) => <ApiEntry {...one} />)}
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">Components</h2>
-  <div class="mt-6 grid gap-10">
+  <h2>Components</h2>
+  <div class="grid gap-10">
     {components.map((one) => <ApiEntry {...one} />)}
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">Types</h2>
+  <h2>Types</h2>
 
-  <h3 class="mt-8 font-mono text-lg font-semibold">SubmitOutcome, SubmitHandler</h3>
-  <p class="mt-2 leading-relaxed text-on-surface-variant">
+  <h3>SubmitOutcome, SubmitHandler</h3>
+  <p>
     What <code>form.submit()</code> resolves to, and what it hands your handler.
     <code>blockedBy</code> carries every blocking issue, including paths with no
     component on screen.
   </p>
   <Code code={submitTypes} />
 
-  <h3 class="mt-10 font-mono text-lg font-semibold">
-    ConcretePath, PartlyBoundPath, DeclaredOf, InhabitedPath
-  </h3>
-  <p class="mt-2 leading-relaxed text-on-surface-variant">
+  <h3>ConcretePath, PartlyBoundPath, DeclaredOf, InhabitedPath</h3>
+  <p>
     The types every signature above is written in. A descriptor is keyed by the
     rule and a value lives at a place; which one a surface takes follows from
     whether it addresses one value or a set of them.
   </p>
   <Code code={pathTypes} />
 
-  <h3 class="mt-10 font-mono text-lg font-semibold">The registry, and the view-layer paths</h3>
-  <p class="mt-2 leading-relaxed text-on-surface-variant">
-    <a class="text-primary underline underline-offset-4" href="/paths/"
+  <h3>The registry, and the view-layer paths</h3>
+  <p>
+    <a class="underline decoration-outline underline-offset-4" href="/paths/"
       >How the registry works →</a
     >
   </p>

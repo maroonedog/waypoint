@@ -39,48 +39,60 @@ const SHOWN = [
   "formik-fast-field",
 ];
 
-const cell = (row: Row | undefined): string =>
+// A cell in this table is one of two things and they are not interchangeable:
+// a pair of counts the harness recorded, or a sentence saying there was
+// nothing to record. Only the first is a figure, and `.measured` is the
+// colour styles.css keeps for a figure this project measured — so the two
+// have to be told apart here rather than at the call site, where all that
+// arrives is a string.
+const cell = (row: Row | undefined): { text: string; figure: boolean } =>
   row === undefined
-    ? "—"
+    ? { text: "—", figure: false }
     : row.agreement === "disagrees"
-      ? "shows nothing"
-      : `${row.commits} / ${row.changedFibers}`;
+      ? { text: "shows nothing", figure: false }
+      : { text: `${row.commits} / ${row.changedFibers}`, figure: true };
+
+/** One row, resolved here so the markup below reads as the table it draws. */
+const line = (id: string) => ({
+  id,
+  /** Both of ours are highlighted; the point is the difference between them. */
+  ours: id === PRIMARY || id === UNCONTROLLED,
+  unchanged: cell(at(id, "K1")),
+  here: cell(at(id, "K2")),
+  elsewhere: cell(at(id, "X1")),
+});
 ---
 
-<p class="mt-10 font-medium">
+<p class="table-name font-medium">
   The same keystroke, when the verdict <em>does</em> move — 201 fields
 </p>
 
-<div class="mt-3 overflow-x-auto">
-  <table class="w-full text-sm">
-    <thead class="text-left text-on-surface-variant">
+<div class="table-scroll">
+  <table>
+    <thead class="text-left">
       <tr class="hairline">
-        <th class="py-2 pr-4 font-medium">subject</th>
-        <th class="py-2 pr-4 font-medium">verdict unchanged</th>
-        <th class="py-2 pr-4 font-medium">this field becomes wrong</th>
-        <th class="py-2 font-medium">a rule reports elsewhere</th>
+        <th class="pr-4">subject</th>
+        <th class="num pr-4">verdict unchanged</th>
+        <th class="num pr-4">this field becomes wrong</th>
+        <th class="num">a rule reports elsewhere</th>
       </tr>
     </thead>
     <tbody>
       {
-        SHOWN.map((id) => (
-          <tr
-            class:list={[
-              "hairline",
-              (id === PRIMARY || id === UNCONTROLLED) && "bg-surface-low",
-            ]}
-          >
-            <td
-              class:list={[
-                "py-2 pr-4",
-                (id === PRIMARY || id === UNCONTROLLED) && "font-medium",
-              ]}
-            >
-              {label(id)}
+        SHOWN.map(line).map((row) => (
+          <tr class:list={["hairline", row.ours && "bg-surface-low"]}>
+            <td class:list={["pr-4", row.ours && "font-medium"]}>
+              {label(row.id)}
             </td>
-            <td class="py-2 pr-4">{cell(at(id, "K1"))}</td>
-            <td class="py-2 pr-4">{cell(at(id, "K2"))}</td>
-            <td class="py-2">{cell(at(id, "X1"))}</td>
+            <td class:list={["num pr-4", row.unchanged.figure && "measured"]}>
+              {row.unchanged.text}
+            </td>
+            <td class:list={["num pr-4", row.here.figure && "measured"]}>
+              {row.here.text}
+            </td>
+            <td class:list={["num", row.elsewhere.figure && "measured"]}>
+              {row.elsewhere.text}
+            </td>
           </tr>
         ))
       }
@@ -88,7 +100,21 @@ const cell = (row: Row | undefined): string =>
   </table>
 </div>
 
-<p class="mt-3 text-xs text-on-surface-variant">
+<p class="caption">
   commits / changed fibers. <code>shows nothing</code> means the subject never
   displayed the error at all, so there was no work for it to do.
 </p>
+
+<style>
+  /* The gaps this block owns, for the reason CountsTable states at length:
+     styles.css spaces a page's own flow, and a component dropped between two
+     of that page's paragraphs is outside it. The values are the sheet's gap
+     tokens, so the finding register retunes them. */
+  .table-name {
+    margin-top: var(--gap-subsection);
+  }
+  .table-scroll {
+    margin-top: var(--gap-heading);
+    overflow-x: auto;
+  }
+</style>

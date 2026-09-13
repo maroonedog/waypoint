@@ -16,6 +16,23 @@
 // 1px line every other edge on the site is drawn with — and Shiki is left to
 // colour the tokens and nothing else.
 //
+// THE THEME PAIR WAS MEASURED, NOT PREFERRED, and the prettier candidates
+// lost. Every theme the package ships was read, its token colours pulled out
+// and each one rated against THIS site's code ground rather than against the
+// white the theme assumes. What that found:
+//   vitesse-light    #999999 punctuation at 2.47:1, #a0ada0 comments at 2.03
+//   vitesse-dark     #666666 punctuation at 3.40:1 — and unfixable, because
+//                    4.5:1 against #666666 is unreachable from ANY darker
+//                    ground, so no amount of tuning the recess saves it
+//   everforest-light keywords at 2.0-2.8:1, 788 failing pairs on the site
+//   one-light, min-light, rose-pine-dawn, light-plus — five to eight tokens
+//                    under the floor each
+// GitHub's high-contrast pair was the only matched pair that came through
+// clean: nothing under 4.5:1 in dark (worst 9.19) and one token at 4.37 in
+// light, which is why `--wp-sunk` is a step lighter than it started. They are
+// louder than this site's own palette and that is the trade: a quiet block
+// nobody can read is not quiet, it is unread.
+//
 // THE LABEL IS A QUALIFIED NAME. `file: AField.tsx`, `shell: install`,
 // `app: application-form` — the qualifier quiet, the colon in the mark, the
 // name in ink. It is the punctuation the library sells, so the chrome writes
@@ -27,11 +44,16 @@ import { Code as Shiki } from "astro:components";
 interface Props {
   readonly code: string;
   /**
-   * The two this site writes. Narrower than Shiki's own union on purpose:
+   * The three this site writes. Narrower than Shiki's own union on purpose:
    * `string` does not satisfy it, and a typo in a language name should be a
    * build error rather than an unhighlighted block nobody notices.
+   *
+   * `sh` was missing, and the block it was missing for is the install on
+   * /start/ — the first code a reader of this site meets. Passed as `ts`, it
+   * was highlighted against the wrong grammar: `git` and `npm` set as
+   * identifiers, `#` opening nothing.
    */
-  readonly lang?: "ts" | "tsx";
+  readonly lang?: "ts" | "tsx" | "sh";
   /** Drop the top margin, for a block that sits directly under its own label. */
   readonly flush?: boolean;
   /**
@@ -72,7 +94,7 @@ const named = cut > 0 ? label!.slice(cut + 1).trim() : label;
   <Shiki
     code={code.trim()}
     lang={lang}
-    themes={{ light: "vitesse-light", dark: "vitesse-dark" }}
+    themes={{ light: "github-light-high-contrast", dark: "github-dark-high-contrast" }}
     defaultColor={false}
   />
 </figure>

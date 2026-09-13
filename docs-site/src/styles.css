@@ -86,7 +86,13 @@
    =========================================================================== */
 :root {
   --wp-paper: #f9f9f7;
-  --wp-sunk: #efefec;
+  /* #f3f3f0 RATHER THAN A DEEPER RECESS, AND THE REASON IS THE CODE ON IT.
+     The syntax theme's weakest token is #66707b, which measured 4.37:1 against
+     a #efefec ground — under the floor for text, on every comment in every
+     block. Lifting the recess one step puts it at 4.53:1. The step off the
+     page is smaller now and the block does not read as any less inset: what
+     bounds it is the line around it, which is the whole design. */
+  --wp-sunk: #f3f3f0;
   --wp-line-faint: #d8dad6;
   --wp-line: #7b8a85;
   --wp-ink: #141816;
@@ -195,8 +201,22 @@
   --radius-xl: 28px;
 }
 
-/* md3-tokens.css sets these on `body` for the standalone application. On this
-   site the page is not that application. */
+/* ===========================================================================
+   The base layer.
+
+   `@layer base` IS LOad-BEARING, and it was learnt the hard way. Tailwind
+   emits its utilities into `@layer utilities`, and an UNLAYERED rule beats
+   every layered one no matter how weak its selector — so `a { color: inherit }`
+   written outside a layer silently overrode `text-on-primary` on the landing
+   page's one filled button, which rendered reading ink on the mark and was
+   unreadable in dark. Element-level defaults belong in `base`; the site's own
+   components stay unlayered on purpose, because those are meant to win.
+   =========================================================================== */
+/* md3-tokens.css sets these on `body` for the standalone application, and it
+   sets them UNLAYERED. So this rule is unlayered too and wins by coming later
+   — put in `base` with the rest, it lost, and the whole site went on rendering
+   against Material's ground (measured: #0e1513 in dark, where this palette
+   says #111312). The page is not that application. */
 body {
   background: var(--wp-paper);
   color: var(--wp-ink);
@@ -205,11 +225,13 @@ body {
   line-height: 1.65;
 }
 
-/* A ring the same weight as the boundaries it lands on, at the one value that
-   clears 3:1 on both grounds. */
-:focus-visible {
-  outline: 2px solid var(--wp-line);
-  outline-offset: 2px;
+@layer base {
+  /* A ring the same weight as the boundaries it lands on, at the one value
+     that clears 3:1 on both grounds. */
+  :focus-visible {
+    outline: 2px solid var(--wp-line);
+    outline-offset: 2px;
+  }
 }
 
 /* ===========================================================================
@@ -231,39 +253,44 @@ body {
    The faces are requested in Base.astro. Only /showcase/ asks for Roboto and
    the icon face, because only /showcase/ draws Material.
    =========================================================================== */
-h1,
-h2,
-h3 {
-  font-weight: 600;
-  letter-spacing: -0.012em;
-  text-wrap: balance;
-}
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    text-wrap: balance;
+  }
 
-code,
-kbd,
-samp,
-pre {
-  font-family: var(--font-mono);
-  font-feature-settings: normal;
-}
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-mono);
+    font-feature-settings: normal;
+  }
 
-/* Inline code is a name inside a sentence. It gets the recess, not a border —
-   a boxed word inside running text stops the line. */
-:not(pre) > code {
-  background: var(--wp-sunk);
-  padding: 0.1em 0.3em;
-  border-radius: 3px;
-  font-size: 0.875em;
-}
+  /* Inline code is a name inside a sentence. It gets the recess, not a border
+     — a boxed word inside running text stops the line. */
+  :not(pre) > code {
+    background: var(--wp-sunk);
+    padding: 0.1em 0.3em;
+    border-radius: 3px;
+    font-size: 0.875em;
+  }
 
-a {
-  color: inherit;
-}
+  /* A link is ink with a rule under it, not a colour. The mark is the dot, and
+     a page whose every link is the accent has spent the accent on navigation.
+     In `base` so that a `text-*` utility on a link still wins. */
+  a {
+    color: inherit;
+  }
 
-/* A code block is read rather than skimmed, and a long type signature must
-   never widen the page to reach it. */
-pre {
-  overflow-x: auto;
+  /* A code block is read rather than skimmed, and a long type signature must
+     never widen the page to reach it. */
+  pre {
+    overflow-x: auto;
+  }
 }
 
 /* The one piece of structure Material has no token for: a rule that reads as a

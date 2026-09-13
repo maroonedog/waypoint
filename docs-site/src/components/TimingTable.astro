@@ -62,12 +62,25 @@ const ordered = rung === undefined
   : [...rung.comparisons].sort((one, other) => other.band.middle - one.band.middle);
 
 const ladder = fromCi ? summary!.result.ladder : undefined;
-const resolvedAt = (position: string): string => {
-  const any = ladder?.rungs.some((one) => one.position === position && one.resolved);
-  if (ladder === undefined) return "—";
+
+// What the ladder answers is one of two kinds of thing, and the site sets them
+// differently: a duration the harness resolved is a figure somebody could read
+// off a trace, so it goes in the mono and in the measured colour, and "nothing
+// up to 4 ms" is a sentence, which must wear neither.
+const resolvedAt = (position: string): { text: string; figure: boolean } => {
+  if (ladder === undefined) return { text: "—", figure: false };
+  const any = ladder.rungs.some(
+    (one) => one.position === position && one.resolved
+  );
   const smallest = (ladder.smallestResolved[position] ?? 0) / 1000;
-  return any === true ? `${smallest} ms` : "nothing up to 4 ms";
+  return any
+    ? { text: `${smallest} ms`, figure: true }
+    : { text: "nothing up to 4 ms", figure: false };
 };
+
+const synchronous = resolvedAt("synchronous");
+const microtask = resolvedAt("microtask");
+const macrotask = resolvedAt("macrotask");
 
 /** Both of ours are highlighted; the point is the difference between them. */
 const ours = (id: string): boolean => id === PRIMARY || id === UNCONTROLLED;
@@ -79,9 +92,9 @@ const policy: Readonly<Record<string, string>> = {
 
 {
   !fromCi && (
-    <div class="mt-6 rounded-lg border border-outline-variant p-6">
+    <div class="empty-state rounded-sm border border-outline p-6">
       <p class="font-medium">No timings are published here yet.</p>
-      <p class="mt-3 leading-relaxed text-on-surface-variant">
+      <p class="text-on-surface-variant">
         The lane runs, and its report is in the repository. What is not here is
         a table of microseconds taken on the author's own machine — a reader
         cannot reproduce those, cannot inspect the machine, and has only the
@@ -89,7 +102,7 @@ const policy: Readonly<Record<string, string>> = {
         on this page when a CI run has produced them and somebody has committed
         that run's summary, with the run it came from printed beside it.
       </p>
-      <p class="mt-3 leading-relaxed text-on-surface-variant">
+      <p class="text-on-surface-variant">
         The deterministic lane above is unaffected: those integers do not depend
         on the machine at all, which is the whole reason CI can gate them.
       </p>
@@ -99,17 +112,35 @@ const policy: Readonly<Record<string, string>> = {
 
 {
   fromCi && (
-    <div class="mt-6">
-      <div class="rounded-lg bg-surface-container p-5 leading-relaxed">
+    <div>
+      <div class="note">
         <p class="font-medium">What this harness could see, on that machine</p>
-        <p class="mt-2 text-sm text-on-surface-variant">
+        <p class="text-on-surface-variant">
           Injected cost resolved at{" "}
-          <strong class="text-on-surface">{resolvedAt("synchronous")}</strong>{" "}
+          <strong
+            class:list={[
+              synchronous.figure ? "font-mono measured" : "text-on-surface",
+            ]}
+          >
+            {synchronous.text}
+          </strong>{" "}
           synchronously,{" "}
-          <strong class="text-on-surface">{resolvedAt("microtask")}</strong> at
-          the microtask position, and{" "}
-          <strong class="text-on-surface">{resolvedAt("macrotask")}</strong> at
-          the macrotask position. The headline metric is the{" "}
+          <strong
+            class:list={[
+              microtask.figure ? "font-mono measured" : "text-on-surface",
+            ]}
+          >
+            {microtask.text}
+          </strong>{" "}
+          at the microtask position, and{" "}
+          <strong
+            class:list={[
+              macrotask.figure ? "font-mono measured" : "text-on-surface",
+            ]}
+          >
+            {macrotask.text}
+          </strong>{" "}
+          at the macrotask position. The headline metric is the{" "}
           <code>EventDispatch</code> trace event filtered to <code>input</code>,
           and that event closes before a microtask runs — so a runtime that
           defers its work, as waypoint does, is cheap on this metric{" "}
@@ -117,19 +148,19 @@ const policy: Readonly<Record<string, string>> = {
         </p>
       </div>
 
-      <p class="mt-8 font-medium">
+      <p class="table-name font-medium">
         Per keystroke at {rung!.leaves} fields, against {label(DENOMINATOR)}
       </p>
-      <div class="mt-3 overflow-x-auto">
-        <table class="w-full text-sm">
-          <thead class="text-left text-on-surface-variant">
+      <div class="table-scroll">
+        <table>
+          <thead class="text-left">
             <tr class="hairline">
-              <th class="py-2 pr-4 font-medium">subject</th>
-              <th class="py-2 pr-4 font-medium">ratio</th>
-              <th class="py-2 pr-4 font-medium">handler</th>
-              <th class="py-2 pr-4 font-medium">pass inside it</th>
-              <th class="py-2 pr-4 font-medium">spread</th>
-              <th class="py-2 font-medium">verdict</th>
+              <th class="pr-4">subject</th>
+              <th class="num pr-4">ratio</th>
+              <th class="num pr-4">handler</th>
+              <th class="num pr-4">pass inside it</th>
+              <th class="num pr-4">spread</th>
+              <th>verdict</th>
             </tr>
           </thead>
           <tbody>
@@ -142,7 +173,7 @@ const policy: Readonly<Record<string, string>> = {
               >
                 <td
                   class:list={[
-                    "py-2 pr-4",
+                    "pr-4",
                     ours(row.one.label) && "font-medium",
                   ]}
                 >
@@ -154,20 +185,29 @@ const policy: Readonly<Record<string, string>> = {
                     </span>
                   )}
                 </td>
-                <td class="py-2 pr-4">{row.band.middle}x</td>
-                <td class="py-2 pr-4">{row.one.inputHandlerMicroseconds} µs</td>
-                <td class="py-2 pr-4">
+                <td class="num measured pr-4">{row.band.middle}x</td>
+                <td class="num measured pr-4">
+                  {row.one.inputHandlerMicroseconds} µs
+                </td>
+                <td class="num measured pr-4">
                   {Math.round(row.one.insideDispatchShare * 100)}%
                 </td>
-                <td class="py-2 pr-4">{row.relativeSpreadPercent}%</td>
-                <td class="py-2">{row.verdict}</td>
+                <td class="num measured pr-4">{row.relativeSpreadPercent}%</td>
+                {/* `indistinguishable` is the one judgement on this table: the
+                    harness refusing to call a win when the bands overlap, and
+                    the page prints that same word in the verdict colour in the
+                    caption below. `faster` and `slower` are comparisons rather
+                    than refusals, so they stay in the reading ink. */}
+                <td class:list={[row.verdict === "indistinguishable" && "verdict"]}>
+                  {row.verdict}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
 
-      <p class="mt-3 text-xs text-on-surface-variant">
+      <p class="caption">
         {summary!.takenBy}, {summary!.takenAt.slice(0, 10)} —{" "}
         {summary!.browser.product}, headless {String(summary!.browser.headless)},
         crossOriginIsolated {String(summary!.browser.crossOriginIsolated)}, on{" "}
@@ -177,7 +217,7 @@ const policy: Readonly<Record<string, string>> = {
       </p>
 
       {ordered.some((row) => row.one.label === UNCONTROLLED) && (
-        <p class="mt-5 rounded-lg bg-surface-container p-5 leading-relaxed">
+        <p class="note">
           <strong>The rows to read carefully are ours.</strong>{" "}
           {(() => {
             const mine = ordered.find((row) => row.one.label === UNCONTROLLED)!;
@@ -196,7 +236,7 @@ const policy: Readonly<Record<string, string>> = {
         </p>
       )}
 
-      <p class="mt-4 leading-relaxed text-on-surface-variant">
+      <p class="closing text-on-surface-variant">
         Neither of our rows is called faster, and the reason is printed with
         them: the work is real and it is outside the window. Both still run a
         full whole-root schema pass per keystroke — the counts lane counts it —
@@ -206,3 +246,30 @@ const policy: Readonly<Record<string, string>> = {
     </div>
   )
 }
+
+<style>
+  /* Everything this component draws sits inside its own wrapper, which is
+     where the page's rhythm stops: styles.css spaces `main`'s own children
+     and the block under a heading, and nothing below is either. So the gaps
+     are declared here — in the sheet's gap tokens, not in utilities carrying
+     numbers, so that the finding register /benchmark/ is set in still retunes
+     them. The wrapper itself is left alone on purpose: it is the h2's next
+     sibling, and the sheet already spaces it. */
+  .table-name {
+    margin-top: var(--gap-subsection);
+  }
+  .table-scroll {
+    margin-top: var(--gap-heading);
+    /* Six columns scroll inside the block rather than widening the page. */
+    overflow-x: auto;
+  }
+  .closing {
+    margin-top: var(--gap-block);
+  }
+  /* `.note` zeroes its first child's margin and says nothing about the rest,
+     and the empty region is this component's own. Both hold running prose. */
+  .note > p + p,
+  .empty-state > p + p {
+    margin-top: var(--gap-block);
+  }
+</style>

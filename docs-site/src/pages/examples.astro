@@ -91,7 +91,7 @@ const COMMANDS = [
   title="Examples — waypoint"
   description="Three applications running on this page — a server-error round trip, two forms sharing one component, and a wizard — plus the showcase, and the two that need libraries this site does not carry."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">Examples</h1>
+  <h1>Examples</h1>
 
   <p class="lead">
     Six applications that run, and four of them run here. Each one exists to
@@ -104,7 +104,7 @@ const COMMANDS = [
     not screenshots and not transcriptions. They are compiled by
     <code>npm run test:types</code> alongside the library, so one that stopped
     being what this page describes would fail the build. The biggest, a
-    designed Material Design 3 screen, has a page of its own:
+    designed Material Design 3 screen, has a page of its own:{" "}
     <a class="underline underline-offset-4" href="/showcase/">Showcase</a>.
   </p>
 
@@ -114,7 +114,7 @@ const COMMANDS = [
     interface; these are about one behaviour each and do not compete with it.
   </p>
 
-  <h2 id="server-errors" class="mt-16 text-2xl font-bold">server-errors</h2>
+  <h2 id="server-errors">server-errors</h2>
 
   <p class="caption">
     One round trip, and the two ways a complaint stops being true. The handler
@@ -137,11 +137,11 @@ const COMMANDS = [
     tree has never heard of it.
   </p>
 
-  <div class="mt-8"><ServerErrorsExample client:load /></div>
+  <div><ServerErrorsExample client:load /></div>
 
-  <Code code={serverErrors} label="examples/server-errors" lang="tsx" flush />
+  <Code code={serverErrors} label="app: server-errors" lang="tsx" flush />
 
-  <h2 id="two-forms" class="mt-16 text-2xl font-bold">two-forms</h2>
+  <h2 id="two-forms">two-forms</h2>
 
   <p class="caption">
     Both forms declare <code>owner.email</code> and mean different things by
@@ -162,11 +162,11 @@ const COMMANDS = [
     starts compiling.
   </p>
 
-  <div class="mt-8"><TwoFormsExample client:load /></div>
+  <div><TwoFormsExample client:load /></div>
 
-  <Code code={sharedLeaf} label="examples/two-forms" lang="tsx" flush />
+  <Code code={sharedLeaf} label="app: two-forms" lang="tsx" flush />
 
-  <h2 id="wizard" class="mt-16 text-2xl font-bold">wizard</h2>
+  <h2 id="wizard">wizard</h2>
 
   <p class="caption">
     One form across three screens. Nothing is lifted, merged or stored per
@@ -184,11 +184,11 @@ const COMMANDS = [
     really was forgotten.
   </p>
 
-  <div class="mt-8"><WizardExample client:load /></div>
+  <div><WizardExample client:load /></div>
 
-  <Code code={wizardProvider} label="examples/wizard" lang="tsx" flush />
+  <Code code={wizardProvider} label="app: wizard" lang="tsx" flush />
 
-  <h2 class="mt-16 text-2xl font-bold">The two that stay commands</h2>
+  <h2>The two that stay commands</h2>
 
   <p class="caption">
     These two draw other people&rsquo;s APIs and other people&rsquo;s stores.
@@ -219,7 +219,7 @@ const COMMANDS = [
     <code>@tanstack/react-form</code>.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Running them from a clone</h2>
+  <h2>Running them from a clone</h2>
 
   <p class="caption">
     None of them needs a build: every example resolves the package to its
@@ -231,20 +231,25 @@ const COMMANDS = [
 
   <!-- A table rather than a code block: `Code` takes ts or tsx, and a list of
        npm scripts highlighted as TypeScript is a block pretending to be
-       something it is not. -->
-  <div class="mt-6 overflow-x-auto rounded-md bg-surface-container p-4">
-    <table class="w-full text-sm">
+       something it is not.
+
+       The scroller is the only thing left around the table. A command and a
+       host:port are both unbreakable strings, so on a narrow screen this is
+       the one block on the page that cannot be made to fit — and a table that
+       widens the page takes the reading column with it. -->
+  <div class="overflow-x-auto">
+    <table>
       <tbody>
         {
           COMMANDS.map((one) => (
             <tr class="hairline">
-              <td class="py-2 pr-6 font-mono text-xs whitespace-nowrap">
+              <td class="pr-6 font-mono whitespace-nowrap">
                 npm run example:{one.name}
               </td>
-              <td class="py-2 pr-6 font-mono text-xs text-on-surface-variant">
+              <td class="pr-6 font-mono text-on-surface-variant">
                 localhost:{one.port}
               </td>
-              <td class="py-2 text-xs text-on-surface-variant">
+              <td class="text-on-surface-variant">
                 {one.here === undefined ? (
                   "command only"
                 ) : (
@@ -260,7 +265,7 @@ const COMMANDS = [
     </table>
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">Vue</h2>
+  <h2>Vue</h2>
 
   <p class="caption">
     The examples above are React. The <code>./vue</code> entry reads the same

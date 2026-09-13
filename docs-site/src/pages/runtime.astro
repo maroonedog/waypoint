@@ -69,10 +69,10 @@ const woken = [
   title="The runtime — waypoint"
   description="A live form you can type into, with a render counter on every row. One coalesced whole-root pass per settled change, and a verdict scattered back only onto the paths whose issues actually moved."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">How a value changes</h1>
+  <h1>How a value changes</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">A keystroke wakes the row it landed in,
+    <strong>A keystroke wakes the row it landed in,
     plus the row an error moved to — no other field row renders.</strong>{" "}
     Nothing is lifted and there is no dependency array: values live in a flat,
     path-keyed cell space outside React, and a component subscribes to the
@@ -89,20 +89,24 @@ const woken = [
     appears only on the pass where a verdict actually moved.
   </p>
 
-  <div class="mt-6 grid gap-3 sm:grid-cols-2">
+  <!-- Six things to try, drawn as a divided list rather than as six filled
+       tiles: each entry is an instruction and its consequence, which is a pair
+       of lines, not an object. The column gap is wide enough that two rules
+       side by side read as two columns of one list. -->
+  <div class="grid gap-x-8 sm:grid-cols-2">
     {
       TRY.map(([what, why]) => (
-        <div class="rounded-lg bg-surface-low p-4">
+        <div class="hairline py-3">
           <p class="text-sm font-medium">{what}</p>
-          <p class="mt-1.5 text-sm leading-relaxed text-on-surface-variant">{why}</p>
+          <p class="caption">{why}</p>
         </div>
       ))
     }
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">The same runtime, on your machine</h2>
+  <h2>The same runtime, on your machine</h2>
 
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <p>
     Nothing is published, so there is no sandbox to link to — you clone it. Both
     examples resolve the package to its <strong>source</strong>, so an edit
     inside <code>src/core</code> reloads the page with no build step
@@ -116,33 +120,38 @@ cd waypoint && npm install
 npm run example:showcase        # 23 inputs, six sections, one screen
 npm run example:nested-arrays   # the same shape in four libraries, side by side
 npm run docs:dev                # this site, with the form above`}
-    label="shell"
+    label="shell: clone and run"
   />
 
-  <h2 class="mt-16 text-2xl font-bold">Typing that costs React nothing</h2>
+  <h2>Typing that costs React nothing</h2>
 
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
-        <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">per keystroke, 201 fields</th>
-          <th class="py-2 pr-4 font-medium">verdict does not move</th>
-          <th class="py-2 pr-4 font-medium">the field becomes wrong</th>
-          <th class="py-2 font-medium">a rule reports elsewhere</th>
+  <div class="overflow-x-auto">
+    <table>
+      <thead class="text-left">
+        <tr>
+          <th class="pr-4">per keystroke, 201 fields</th>
+          <th class="pr-4">verdict does not move</th>
+          <th class="pr-4">the field becomes wrong</th>
+          <th>a rule reports elsewhere</th>
         </tr>
       </thead>
-      <tbody class="tabular-nums">
+      <tbody>
+        <!-- Every cell in the three right-hand columns is a count this project
+             took with a counting adapter, so the whole cell is `.measured` and
+             set in the mono: the unit is part of the figure, and splitting the
+             number out of "2 commits, 424" would leave the word behind in a
+             face that says it was argued rather than counted. -->
         <tr class="hairline">
-          <td class="py-3 pr-4 font-mono text-xs">useField</td>
-          <td class="py-3 pr-4">1 commit, 212 fibers</td>
-          <td class="py-3 pr-4">2 commits, 424</td>
-          <td class="py-3">2 commits, 424</td>
+          <td class="pr-4 font-mono">useField</td>
+          <td class="measured pr-4 font-mono">1 commit, 212 fibers</td>
+          <td class="measured pr-4 font-mono">2 commits, 424</td>
+          <td class="measured font-mono">2 commits, 424</td>
         </tr>
         <tr class="hairline">
-          <td class="py-3 pr-4 font-mono text-xs">useUncontrolledField</td>
-          <td class="py-3 pr-4 font-semibold text-primary">0 commits, 0</td>
-          <td class="py-3 pr-4">1 commit, 212</td>
-          <td class="py-3">1 commit, 212</td>
+          <td class="pr-4 font-mono">useUncontrolledField</td>
+          <td class="measured pr-4 font-mono">0 commits, 0</td>
+          <td class="measured pr-4 font-mono">1 commit, 212</td>
+          <td class="measured font-mono">1 commit, 212</td>
         </tr>
       </tbody>
     </table>
@@ -156,11 +165,11 @@ npm run docs:dev                # this site, with the form above`}
     through React, which is what <code>useField</code> is for.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">What one keystroke does</h2>
+  <h2>What one keystroke does</h2>
 
   <WriteFlow />
 
-  <h2 class="mt-16 text-2xl font-bold">Writing</h2>
+  <h2>Writing</h2>
 
   <Code code={writing} label="every write goes through a handle" />
 
@@ -168,35 +177,31 @@ npm run docs:dev                # this site, with the form above`}
     No <code>setState</code>, and no form object to spread.
   </p>
 
-  <p
-    class="mt-8 rounded-lg border border-outline-variant p-4 text-sm leading-relaxed text-on-surface-variant"
-  >
+  <p class="note">
     What asks for a pass, and what does not — and what one costs — is on{" "}
-    <a class="text-primary underline underline-offset-4" href="/validation/"
+    <a class="underline decoration-outline underline-offset-4" href="/validation/"
       >Validation</a
     >.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Who gets woken</h2>
+  <h2>Who gets woken</h2>
 
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
-        <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">The write</th>
-          <th class="py-2 pr-4 font-medium">Woken</th>
-          <th class="py-2 font-medium">Note</th>
+  <div class="overflow-x-auto">
+    <table>
+      <thead class="text-left">
+        <tr>
+          <th class="pr-4">The write</th>
+          <th class="pr-4">Woken</th>
+          <th>Note</th>
         </tr>
       </thead>
       <tbody>
         {
           woken.map(([what, who, note]) => (
             <tr class="hairline">
-              <td class="py-3 pr-4 align-top leading-relaxed">{what}</td>
-              <td class="py-3 pr-4 align-top font-mono text-xs">{who}</td>
-              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-                {note}
-              </td>
+              <td class="pr-4">{what}</td>
+              <td class="pr-4">{who}</td>
+              <td class="text-on-surface-variant">{note}</td>
             </tr>
           ))
         }

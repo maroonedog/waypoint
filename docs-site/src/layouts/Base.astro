@@ -281,7 +281,12 @@ const flat = SECTIONS.flatMap((section) => section.items);
         <p class="label shrink-0">
           <span class="qualifies">status</span><span class="colon">:</span>{" "}
           <span class="named">unpublished</span>
-          <span class="px-2 text-outline">·</span>
+          <!-- The separator is punctuation between two facts, not a fact. It
+               is hidden from a screen reader, and it takes the quiet ink
+               rather than the boundary line: measured at 3.3:1 in the line
+               colour, which is the floor for a drawn boundary and under it
+               for anything that is read. -->
+          <span aria-hidden="true" class="px-2 text-on-surface-variant">·</span>
           <a
             class="named underline decoration-outline underline-offset-4"
             href="https://github.com/maroonedog/waypoint">GitHub</a

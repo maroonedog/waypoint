@@ -118,6 +118,13 @@ items.insert(items.rows.length, { sku: "" });`,
 // index passes and a typo beside it is rejected, exactly as ours is), and
 // "ours is checked and theirs is not" is false wherever the form's type is in
 // scope. The difference is what happens when it is not.
+//
+// THREE RANKS IN THE CELLS, and they are three different facts. A refusal is
+// `.verdict`, which is what that class is for: the compiler refusing the line.
+// A cell that starts `checked` takes the mark instead — nothing was
+// refused there, a place was named and it had a value in it. Everything else
+// stays quiet, "no error" included, because an absence of a judgement is not a
+// judgement and must not be drawn as one.
 const LIBS = ["@maroonedog/waypoint", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
 
 const PATHS: readonly (readonly [string, readonly string[]])[] = [
@@ -178,7 +185,7 @@ const CAN: readonly (readonly [string, string, string, boolean])[] = [
   [
     "Field arrays, nested",
     "useRows takes a concrete path and a row hands down its own address. There is no nested-array API.",
-    "/api/#useRows-",
+    "/api/#useRows",
     false,
   ],
   [
@@ -297,32 +304,40 @@ const TRY = [
   bare
 >
   <!-- No eyebrow. The name is already in the header, two centimetres above. -->
-  <h1 class="text-4xl font-bold leading-tight text-balance sm:text-5xl">
+  <h1>
     A field's address exists before the component that draws it.
   </h1>
   <p class="lead">
-    One claim, two halves. It is a <strong class="text-on-surface">type the
+    One claim, two halves. It is a <strong>type the
     compiler has already checked</strong> — one registry declaration, no prop,
     no generic argument, nothing imported at the leaf — and it is{" "}
-    <strong class="text-on-surface">state already written</strong>: every cell
+    <strong>state already written</strong>: every cell
     is seeded at <code>createForm</code>, so mounting is a subscription and
     there is no register, no unregister and no <code>shouldUnregister</code>.
   </p>
 
+  <!-- ONE FILL ON THE WHOLE SITE, AND IT IS THIS ONE. The mark is a line
+       everywhere else; the single control a reader is meant to press is the one
+       place it becomes a ground, and it means nothing if a second control
+       beside it is filled too. So the secondary is drawn rather than filled,
+       and it is drawn in `--wp-line` rather than the faint division: the faint
+       one is a rule between rows, and the edge of something you press has to be
+       visible enough to read as pressable. `mt-7` stays because nothing spaces
+       a block after `.lead` — the sheet's rhythm starts at the first heading. -->
   <div class="mt-7 flex flex-wrap gap-3">
     <a
-      class="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
+      class="rounded-[3px] bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
       href="/runtime/">See how it behaves →</a
     >
     <a
-      class="rounded-xl border border-outline-variant px-5 py-2.5 text-sm font-medium"
+      class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
       href="https://github.com/maroonedog/waypoint">GitHub</a
     >
   </div>
 
   <!-- ================================================== the thesis -->
-  <section class="mt-16">
-    <h2 class="text-2xl font-bold">A field is a string, and the string is checked</h2>
+  <section>
+    <h2>A field is a string, and the string is checked</h2>
     <p class="lead">
       react-hook-form and TanStack Form reject a typo too — while the form's
       type is in scope. Here it is in scope once, for the whole application: a
@@ -330,8 +345,10 @@ const TRY = [
       <code>shipments[0].lines[0].skuu</code>.
     </p>
 
+    <!-- `mt-6` stays: this wrapper follows a `.lead`, and the sheet spaces what
+         follows a heading and what follows a caption, not what follows a lead. -->
     <div class="mt-6 overflow-x-auto">
-      <table class="w-full">
+      <table>
         <thead class="text-left">
           <tr>
             <th class="pr-4">Compiled, TypeScript 5.9 strict</th>
@@ -342,14 +359,16 @@ const TRY = [
           {
             PATHS.map(([theCase, cells]) => (
               <tr class="hairline">
-                <td class="py-2.5 pr-4 align-top font-medium">{theCase}</td>
+                <td class="pr-4 font-medium">{theCase}</td>
                 {cells.map((cell) => (
                   <td
                     class:list={[
-                      "py-2.5 pr-4 align-top",
-                      cell.startsWith("compile error") || cell.startsWith("checked")
-                        ? "text-primary"
-                        : "text-on-surface-variant",
+                      "pr-4",
+                      cell.startsWith("compile error")
+                        ? "verdict"
+                        : cell.startsWith("checked")
+                          ? "text-primary"
+                          : "text-on-surface-variant",
                     ]}
                   >
                     {cell}
@@ -376,18 +395,20 @@ const TRY = [
       direction you want. Two limits with it: register a second form and a
       keyless <code>useField</code> is checked against the union of both until
       you name the form key; and{" "}
-      <strong class="text-on-surface">seven path segments are addressable and
+      <strong>seven path segments are addressable and
       eight are not</strong>, so a correct leaf deeper than that is rejected
       rather than accepted. What the union costs the compiler, where it stops,
       and the escape hatch for a subtree you do not address are measured in{" "}
+      <!-- Mono, because the link text is a path in the repository rather than
+           the name of a document: it is a thing the reader could type. -->
       <a
-        class="text-primary underline underline-offset-4"
+        class="font-mono text-primary underline underline-offset-4"
         href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
         >docs/measurements-types.md</a
       >.
     </p>
 
-    <p class="mt-8 leading-relaxed text-on-surface-variant">
+    <p class="mt-8">
       <strong class="text-on-surface">The other half is that the cell the
       address names is already written.</strong> Every cell is seeded at{" "}
       <code>createForm</code> from the descriptor list, before any component
@@ -401,33 +422,37 @@ const TRY = [
   </section>
 
   <!-- ================================================== proof -->
-  <section class="mt-16">
-    <h2 class="text-2xl font-bold">Five things, each beside itself running</h2>
+  <section>
+    <h2>Five things, each beside itself running</h2>
 
-    <Proof claim={m("a-field").claim} watch={m("a-field").watch} source={aFieldSource} file="AField.tsx">
+    <!-- The `file` prop is the code block's label, so it is written in the
+         label grammar — qualifier, colon, name. Code.astro splits on the first
+         colon and sets `file` quiet, the colon in the mark and the file name in
+         ink, which is the same three ranks a rendered address has. -->
+    <Proof claim={m("a-field").claim} watch={m("a-field").watch} source={aFieldSource} file="file: AField.tsx">
       <AField client:visible />
     </Proof>
 
-    <Proof claim={m("cross-field").claim} watch={m("cross-field").watch} source={crossFieldSource} file="CrossField.tsx">
+    <Proof claim={m("cross-field").claim} watch={m("cross-field").watch} source={crossFieldSource} file="file: CrossField.tsx">
       <CrossField client:visible />
     </Proof>
 
-    <Proof claim={m("a-list").claim} watch={m("a-list").watch} source={aListSource} file="AList.tsx">
+    <Proof claim={m("a-list").claim} watch={m("a-list").watch} source={aListSource} file="file: AList.tsx">
       <AList client:visible />
     </Proof>
 
-    <Proof claim={m("uncontrolled").claim} watch={m("uncontrolled").watch} source={uncontrolledSource} file="Uncontrolled.tsx">
+    <Proof claim={m("uncontrolled").claim} watch={m("uncontrolled").watch} source={uncontrolledSource} file="file: Uncontrolled.tsx">
       <Uncontrolled client:visible />
     </Proof>
 
-    <Proof claim={m("switch-a-step-off").claim} watch={m("switch-a-step-off").watch} source={switchAStepOffSource} file="SwitchAStepOff.tsx">
+    <Proof claim={m("switch-a-step-off").claim} watch={m("switch-a-step-off").watch} source={switchAStepOffSource} file="file: SwitchAStepOff.tsx">
       <SwitchAStepOff client:visible />
     </Proof>
   </section>
 
   <!-- ================================================== live -->
-  <section class="mt-20">
-    <h2 class="text-2xl font-bold">The runtime, with its writes printed</h2>
+  <section>
+    <h2>The runtime, with its writes printed</h2>
     <p class="caption">
       A rule reporting onto a field nobody touched is not scarce — every
       whole-record validator does it. What differs is the bill. At 201 fields
@@ -458,22 +483,22 @@ const TRY = [
   </section>
 
   <!-- ================================================== the whole idea -->
-  <section class="mt-20">
-    <h2 class="text-2xl font-bold">All of that, in ten lines</h2>
+  <section>
+    <h2>All of that, in ten lines</h2>
     <Code code={whole} label="the whole idea" />
   </section>
 
   <!-- ================================================== what you can build -->
-  <section class="mt-20">
-    <h2 class="text-2xl font-bold">What you can build with it</h2>
+  <section>
+    <h2>What you can build with it</h2>
     <p class="caption">
       The struck-through rows are things it does not do, and each says what to
       reach for instead. They are in the table because leaving them out is how
       a table like this becomes an advertisement.
     </p>
 
-    <div class="mt-6 overflow-x-auto">
-      <table class="w-full">
+    <div class="overflow-x-auto">
+      <table>
         <thead class="text-left">
           <tr>
             <th class="pr-4">What you need</th>
@@ -485,18 +510,17 @@ const TRY = [
           {
             CAN.map(([need, how, where, no]) => (
               <tr class="hairline">
-                <td
-                  class:list={[
-                    "py-2.5 pr-4 align-top",
-                    no ? "text-on-surface-variant line-through decoration-error/60" : "font-medium",
-                  ]}
-                >
+                {/* A struck-through row is a refusal, which is what `.verdict`
+                    is for. The rule is in the text's own colour rather than a
+                    second one, so the row reads as one judgement instead of a
+                    grey name with a red line drawn over it. */}
+                <td class:list={["pr-4", no ? "verdict line-through" : "font-medium"]}>
                   {need}
                 </td>
-                <td class="py-2.5 pr-4 align-top text-on-surface-variant">
+                <td class="pr-4 text-on-surface-variant">
                   {how}
                 </td>
-                <td class="py-2.5 align-top whitespace-nowrap">
+                <td class="whitespace-nowrap">
                   {where === "" ? (
                     ""
                   ) : (
@@ -517,12 +541,12 @@ const TRY = [
   </section>
 
   <!-- ================================================== in code -->
-  <section class="mt-20">
-    <h2 class="text-2xl font-bold">Six things, in code</h2>
+  <section>
+    <h2>Six things, in code</h2>
     <!-- min-w-0 on the item: a grid item defaults to min-width:auto, so the
          widest code block sizes the track and the page scrolls sideways on a
          phone. Same trap as the API entries. -->
-    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-6 lg:grid-cols-2">
       {
         snippets.map((one) => (
           <div class="min-w-0">
@@ -542,50 +566,48 @@ const TRY = [
   </section>
 
   <!-- ================================================== measured -->
-  <section class="mt-20">
-    <h2 class="text-2xl font-bold">Measured, losses first</h2>
+  <section>
+    <h2>Measured, losses first</h2>
     <p class="caption">
       <strong class="text-on-surface">waypoint is behind on all three
       scenarios, at every size</strong> — the report says so in those words
       before it prints a table.
     </p>
 
-    <div class="mt-6 overflow-x-auto">
-      <table class="w-full text-sm">
-        <thead class="text-left text-on-surface-variant">
-          <tr class="hairline">
-            <th class="py-2 pr-4 font-medium">at 201 fields</th>
-            <th class="py-2 pr-4 font-medium">waypoint</th>
-            <th class="py-2 pr-4 font-medium">beaten by</th>
-            <th class="py-2 font-medium">which was scored</th>
+    <!-- `.num measured` on the waypoint column and not on "beaten by": the
+         fiber counts are figures this project measured and they are compared
+         down the column, so they are right-aligned; the cell beside them is a
+         zero and a library's name, and colouring a name as a measurement would
+         claim the name was one. The head is not given a rule of its own — the
+         sheet already draws the boundary under it. -->
+    <div class="overflow-x-auto">
+      <table>
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">at 201 fields</th>
+            <th class="pr-4">waypoint</th>
+            <th class="pr-4">beaten by</th>
+            <th>which was scored</th>
           </tr>
         </thead>
         <tbody>
           <tr class="hairline">
-            <td class="py-3 pr-4 align-top">type a character, verdict unchanged</td>
-            <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">212 fibers</td>
-            <td class="py-3 pr-4 align-top font-mono text-xs"
-              >0 — waypoint (uncontrolled)</td
-            >
-            <td class="py-3 align-top text-on-surface-variant">agrees</td>
+            <td class="pr-4">type a character, verdict unchanged</td>
+            <td class="num measured pr-4">212 fibers</td>
+            <td class="pr-4 font-mono">0 — waypoint (uncontrolled)</td>
+            <td class="text-on-surface-variant">agrees</td>
           </tr>
           <tr class="hairline">
-            <td class="py-3 pr-4 align-top">the typed field becomes wrong</td>
-            <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">424 fibers</td>
-            <td class="py-3 pr-4 align-top font-mono text-xs"
-              >0 — react-hook-form-on-submit</td
-            >
-            <td class="py-3 align-top text-on-surface-variant"
-              >agrees at submit only</td
-            >
+            <td class="pr-4">the typed field becomes wrong</td>
+            <td class="num measured pr-4">424 fibers</td>
+            <td class="pr-4 font-mono">0 — react-hook-form-on-submit</td>
+            <td class="text-on-surface-variant">agrees at submit only</td>
           </tr>
           <tr class="hairline">
-            <td class="py-3 pr-4 align-top">a rule reports elsewhere</td>
-            <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">424 fibers</td>
-            <td class="py-3 pr-4 align-top font-mono text-xs"
-              >0 — react-hook-form-scoped</td
-            >
-            <td class="py-3 align-top font-medium text-error">disagrees</td>
+            <td class="pr-4">a rule reports elsewhere</td>
+            <td class="num measured pr-4">424 fibers</td>
+            <td class="pr-4 font-mono">0 — react-hook-form-scoped</td>
+            <td class="verdict">disagrees</td>
           </tr>
         </tbody>
       </table>
@@ -600,9 +622,9 @@ const TRY = [
   </section>
 
   <!-- ================================================== status -->
-  <section class="mt-20 rounded-xl border border-outline-variant p-6">
+  <section class="rounded-[3px] border border-outline-variant p-6">
     <p class="label">Where it stands</p>
-    <p class="mt-3 leading-relaxed">
+    <p class="mt-3">
       <strong>Nothing has ever been published — the publish workflow is
       manual-dispatch only and has never been run — and nobody has run it in
       production.</strong>

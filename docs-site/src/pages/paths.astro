@@ -90,18 +90,18 @@ const viewTypes = [
   title="Typed paths — waypoint"
   description="One React context serves every form, so the context cannot be generic and a path union cannot travel through it. The types are registered once by the application instead, and a component ten levels down is checked without being handed anything."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">Typed paths</h1>
+  <h1>Typed paths</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">A misspelt field path is a compile error
+    <strong>A misspelt field path is a compile error
     instead of an input that renders blank and is never validated</strong> —
     inside arrays, and with a computed index. A typo in an optional-chained
     error lookup is worse than blank: it reads as <em>no error here</em>.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">One declaration, once</h2>
+  <h2>One declaration, once</h2>
 
-  <Code code={registration} label="src/waypoint-forms.ts" />
+  <Code code={registration} label="file: src/waypoint-forms.ts" />
   <Code code={usage} label="any component, any depth" lang="tsx" />
 
   <p class="caption">
@@ -114,8 +114,8 @@ const viewTypes = [
     belongs to the compilation, so you inherit that one's paths instead.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Why a registry and not a prop</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <h2>Why a registry and not a prop</h2>
+  <p>
     Because the types cannot travel with the instance: one React context object
     serves every form in an application, so the context cannot be generic and a
     path union cannot pass through it.
@@ -123,11 +123,11 @@ const viewTypes = [
 
   <TypeAndInstance />
 
-  <h2 class="mt-16 text-2xl font-bold">Interpolated paths stay checked</h2>
+  <h2>Interpolated paths stay checked</h2>
 
   <Code code={rows} label="three levels inside a list" lang="tsx" />
 
-  <h2 class="mt-16 text-2xl font-bold">Several forms are several keys</h2>
+  <h2>Several forms are several keys</h2>
 
   <Code code={several} label="two forms, two keys" />
 
@@ -158,28 +158,27 @@ const viewTypes = [
     registry to consult, only the one key its provider carries.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Path types for the view layer</h2>
+  <h2>Path types for the view layer</h2>
 
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
-        <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">Type</th>
-          <th class="py-2 pr-4 font-medium">What it is</th>
-          <th class="py-2 font-medium">Where it goes</th>
+  <div class="overflow-x-auto">
+    <table>
+      <thead class="text-left">
+        <tr>
+          <th class="pr-4">Type</th>
+          <th class="pr-4">What it is</th>
+          <th>Where it goes</th>
         </tr>
       </thead>
       <tbody>
         {
-          viewTypes.map(([name, what, where]) => (
-            <tr class="hairline">
-              <td class="py-3 pr-4 align-top font-mono text-xs">{name}</td>
-              <td class="py-3 pr-4 align-top leading-relaxed text-on-surface-variant">
-                {what}
-              </td>
-              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-                {where}
-              </td>
+          /* The first row takes no rule: the stylesheet already draws the
+             boundary line under the header, and a faint rule immediately
+             below it reads as one thick smudge rather than as two ranks. */
+          viewTypes.map(([name, what, where], row) => (
+            <tr class:list={[row > 0 && "hairline"]}>
+              <td class="pr-4 font-mono">{name}</td>
+              <td class="pr-4">{what}</td>
+              <td>{where}</td>
             </tr>
           ))
         }
@@ -192,36 +191,39 @@ const viewTypes = [
     third address arriving in it needs no edit in the section that draws one.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">What the union costs, and where it stops</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <h2>What the union costs, and where it stops</h2>
+  <p>
     <code>npm run bench:types</code> compiles one throwaway program per shape
     under <code>--extendedDiagnostics</code> and prints the deltas. Like the
-    timing lane, it is <strong class="text-on-surface">printed and never
+    timing lane, it is <strong>printed and never
     gated</strong>: <code>typescript</code> sits at a caret range, so a patch
     bump rewrites every figure without anybody touching a type.
   </p>
 
   <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
+    <table>
       <tbody>
         <tr class="hairline">
-          <td class="w-64 py-3 pr-4 align-top font-medium">Building the union</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            77–137 instantiations per leaf, once, in whatever file declares the
-            adapter. It does not grow with the number of components.
+          <td class="w-64 pr-4 font-medium">Building the union</td>
+          <td>
+            <span class="measured font-mono">77–137</span> instantiations per
+            leaf, once, in whatever file declares the adapter. It does not grow
+            with the number of components.
           </td>
         </tr>
         <tr class="hairline">
-          <td class="py-3 pr-4 align-top font-medium">One accepted call</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            129.0 instantiations at width 300, and 275.0 at depth 7. A thousand
-            components addressing one form is not where this goes wrong.
+          <td class="pr-4 font-medium">One accepted call</td>
+          <td>
+            <span class="measured font-mono">129.0</span> instantiations at
+            width 300, and <span class="measured font-mono">275.0</span> at
+            depth 7. A thousand components addressing one form is not where this
+            goes wrong.
           </td>
         </tr>
         <tr class="hairline">
-          <td class="py-3 pr-4 align-top font-medium">The depth budget</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            <strong class="text-on-surface">Seven path segments are addressable
+          <td class="pr-4 font-medium">The depth budget</td>
+          <td>
+            <strong>Seven path segments are addressable
             and eight are not.</strong> <code>PathDepthBudget</code> is 6, in{" "}
             <code>src/contract/path-depth.types.ts</code>. A form nested
             past seven segments does not compile slowly — its fields stop being
@@ -229,22 +231,24 @@ const viewTypes = [
           </td>
         </tr>
         <tr class="hairline">
-          <td class="py-3 pr-4 align-top font-medium">One refused call</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-            475,034 instantiations, because the compiler elaborates the whole
-            union into the message. That is a fact about a mistyped path in an
-            editor, not about correct code.
+          <td class="pr-4 font-medium">One refused call</td>
+          <td>
+            <span class="measured font-mono">475,034</span> instantiations,
+            because the compiler elaborates the whole union into the message.
+            That is a fact about a mistyped path in an editor, not about correct
+            code.
           </td>
         </tr>
         <tr class="hairline">
-          <td class="py-3 pr-4 align-top font-medium">The escape hatch</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+          <td class="pr-4 font-medium">The escape hatch</td>
+          <td>
             <code>OpaqueObject</code>. A member whose interface extends one of
             its arms ends the path there and keeps its own type and its own
             members, so the container stays nameable and nothing below it is.
-            On a 729-leaf shape that took the union from 99,592 instantiations
-            to 35,508 for two of three subtrees — exactly the paths given up,
-            and no discount on the rest.
+            On a 729-leaf shape that took the union from{" "}
+            <span class="measured font-mono">99,592</span> instantiations to{" "}
+            <span class="measured font-mono">35,508</span> for two of three
+            subtrees — exactly the paths given up, and no discount on the rest.
           </td>
         </tr>
       </tbody>
@@ -262,7 +266,7 @@ const viewTypes = [
     >
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">A schema nobody wrote down</h2>
+  <h2>A schema nobody wrote down</h2>
 
   <Code code={dynamic} label="a schema with no static shape" />
 
@@ -272,15 +276,19 @@ const viewTypes = [
     reader can find.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">At run time none of this exists</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <h2>At run time none of this exists</h2>
+  <p>
     Whether a path is real is the <em>store's</em> question, and every caller —
     every hook, every <code>&lt;Field&gt;</code> and every non-React consumer —
     funnels through <code>form.field()</code>.
   </p>
 
-  <div class="mt-6 overflow-hidden rounded-lg bg-surface-low p-5">
-    <p class="font-mono text-xs leading-relaxed break-words">
+  <!-- Quoted machine output, so it is drawn the way Code.astro draws a code
+       block: the sunk ground behind a boundary line, no shadow, the one
+       radius. `.verdict` because what the box contains is a judgement the
+       library made about a path, which is the colour's whole job. -->
+  <div class="mt-6 rounded-[3px] border border-outline bg-surface-low p-5">
+    <p class="verdict font-mono text-xs leading-relaxed break-words">
       [waypoint] "order:billing.postcod" is not a field this form has, so it
       will draw nothing and validate nothing. Did you mean: order:billing.postcode,
       order:billing, order:billing.city?

@@ -76,6 +76,10 @@ field.setValue("Ada");   // pass 2 leaves
 // scenario K1 — one keystroke whose verdict does not move. That subject id is
 // spelled the way the baseline spells it, which is the name the package had
 // when those rows were recorded; see bench/subjects/subject-ids.ts.
+//
+// The first column is the scenario's own input — the size the form was built
+// at — and the other two are what the baseline recorded coming out of it. Only
+// those two are set as `.measured` in the table below.
 const cost = [
   ["31", "1", "31"],
   ["61", "1", "61"],
@@ -108,17 +112,17 @@ const moments = [
   title="Validation — waypoint"
   description="One pass judges the whole root on every settled change. That is what lets a rule report against a field that did not move, what lets an unrendered field block a submit — and what it costs."
 >
-  <h1 class="text-3xl font-bold sm:text-4xl">Validation</h1>
+  <h1>Validation</h1>
 
   <p class="lead">
-    <strong class="text-on-surface">Every settled change judges the whole
+    <strong>Every settled change judges the whole
     root.</strong> That is what lets a rule report against a field that did not
     move, and what lets a field nobody rendered still block a submit. It is
     also what it costs.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">A rule that spans two fields</h2>
-  <Code code={crossField} label="the demo's own schema" />
+  <h2>A rule that spans two fields</h2>
+  <Code code={crossField} label="schema: the demo's own" />
 
   <p class="caption">
     <strong class="text-on-surface">Reporting onto a field nobody touched is
@@ -131,12 +135,12 @@ const moments = [
     component is <em>not mounted</em>. The benchmark asks every subject for it
     as scenario X1: waypoint pays one whole-root pass, the react-hook-form{" "}
     <code>deps</code> configuration pays two passes and 402 paths judged, and{" "}
-    <code>react-hook-form-scoped</code> is scored <em>disagrees</em> at all
+    <code>react-hook-form-scoped</code> is scored <em class="verdict">disagrees</em> at all
     three sizes because it showed no message at all.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">A field nobody has rendered</h2>
-  <p class="mt-3 leading-relaxed text-on-surface-variant">
+  <h2>A field nobody has rendered</h2>
+  <p>
     A field behind a tab, a lazy chunk or an <code>if</code> keeps its value,
     still blocks a submit, and paints the current value and the current error
     on its first render when it comes back.
@@ -149,23 +153,23 @@ const moments = [
     right section instead of disabling a button with no explanation.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Hiding a section without throwing its data away</h2>
+  <h2>Hiding a section without throwing its data away</h2>
   <Code code={participation} label="switching a subtree off" />
 
-  <div class="mt-5 overflow-x-auto">
-    <table class="w-full text-sm">
+  <div class="mt-6 overflow-x-auto">
+    <table>
       <tbody>
         <tr class="hairline">
-          <td class="w-40 py-3 pr-4 align-top font-medium">Changes</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+          <td class="w-40 pr-4 font-medium">Changes</td>
+          <td class="text-on-surface-variant">
             <code>errorCount</code> drops that subtree's issues; a submit is no
             longer blocked by them; a dormant field's own issues cell reads
             empty.
           </td>
         </tr>
         <tr class="hairline">
-          <td class="w-40 py-3 pr-4 align-top font-medium">Does not change</td>
-          <td class="py-3 align-top leading-relaxed text-on-surface-variant">
+          <td class="w-40 pr-4 font-medium">Does not change</td>
+          <td class="text-on-surface-variant">
             The values in <code>readRoot()</code>; that the pass judges the
             subtree at all; the count once it is switched back on — the hook's
             teardown puts it back.
@@ -175,8 +179,8 @@ const moments = [
     </table>
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">What submit says when it refuses</h2>
-  <Code code={submitTypes} label="what submit resolves to" />
+  <h2>What submit says when it refuses</h2>
+  <Code code={submitTypes} label="type: SubmitOutcome" />
 
   <p class="caption">
     The handler runs only when nothing blocks. A handler that throws does not
@@ -184,7 +188,7 @@ const moments = [
     <code>submitCount</code> goes up either way.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">A validator that has to ask something</h2>
+  <h2>A validator that has to ask something</h2>
   <Code code={asyncOne} label="an adapter that asks a server" />
   <Code code={numbered} label="passes are numbered" />
 
@@ -205,27 +209,23 @@ const moments = [
     and no <code>AbortController</code> is constructed for it.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">What asks for a pass, and what does not</h2>
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
+  <h2>What asks for a pass, and what does not</h2>
+  <div class="overflow-x-auto">
+    <table>
+      <thead class="text-left">
         <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">Call</th>
-          <th class="py-2 pr-4 font-medium">Passes</th>
-          <th class="py-2 font-medium">Why</th>
+          <th class="pr-4">Call</th>
+          <th class="pr-4 num">Passes</th>
+          <th>Why</th>
         </tr>
       </thead>
       <tbody>
         {
           triggers.map(([call, n, why]) => (
             <tr class="hairline">
-              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
-                {call}
-              </td>
-              <td class="py-3 pr-4 align-top font-mono text-xs tabular-nums">{n}</td>
-              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-                {why}
-              </td>
+              <td class="pr-4 font-mono whitespace-nowrap">{call}</td>
+              <td class="pr-4 num">{n}</td>
+              <td class="text-on-surface-variant">{why}</td>
             </tr>
           ))
         }
@@ -241,7 +241,7 @@ const moments = [
     showing its errors.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Which moments ask at all</h2>
+  <h2>Which moments ask at all</h2>
 
   <p class="caption">
     <code>validateOn</code> goes on <code>createForm</code> and governs value
@@ -260,26 +260,22 @@ const moments = [
     a server&rsquo;s issues already follow, applied to the schema&rsquo;s.
   </p>
 
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
+  <div class="overflow-x-auto">
+    <table>
+      <thead class="text-left">
         <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">validateOn</th>
-          <th class="py-2 pr-4 font-medium">A value edit asks at</th>
-          <th class="py-2 font-medium">What that means</th>
+          <th class="pr-4">validateOn</th>
+          <th class="pr-4">A value edit asks at</th>
+          <th>What that means</th>
         </tr>
       </thead>
       <tbody>
         {
           moments.map(([setting, asks, what]) => (
             <tr class="hairline">
-              <td class="py-3 pr-4 align-top font-mono text-xs whitespace-nowrap">
-                {setting}
-              </td>
-              <td class="py-3 pr-4 align-top font-mono text-xs">{asks}</td>
-              <td class="py-3 align-top leading-relaxed text-on-surface-variant">
-                {what}
-              </td>
+              <td class="pr-4 font-mono whitespace-nowrap">{setting}</td>
+              <td class="pr-4 font-mono">{asks}</td>
+              <td class="text-on-surface-variant">{what}</td>
             </tr>
           ))
         }
@@ -297,7 +293,7 @@ const moments = [
     watch the complaint go.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">Errors a server sent back</h2>
+  <h2>Errors a server sent back</h2>
 
   <p class="caption">
     <code>form.adoptIssues(issues)</code> is the <code>setError</code> of this
@@ -313,23 +309,23 @@ const moments = [
     into — a declined card — from wedging the form for good.
   </p>
 
-  <h2 class="mt-16 text-2xl font-bold">What it costs</h2>
-  <div class="mt-6 overflow-x-auto">
-    <table class="w-full text-sm">
-      <thead class="text-left text-on-surface-variant">
+  <h2>What it costs</h2>
+  <div class="overflow-x-auto">
+    <table>
+      <thead class="text-left">
         <tr class="hairline">
-          <th class="py-2 pr-4 font-medium">fields rendered</th>
-          <th class="py-2 pr-4 font-medium">validator passes</th>
-          <th class="py-2 font-medium">paths judged</th>
+          <th class="pr-4 num">fields rendered</th>
+          <th class="pr-4 num">validator passes</th>
+          <th class="num">paths judged</th>
         </tr>
       </thead>
-      <tbody class="tabular-nums">
+      <tbody>
         {
           cost.map(([fields, passes, judged]) => (
             <tr class="hairline">
-              <td class="py-3 pr-4 font-mono text-xs">{fields}</td>
-              <td class="py-3 pr-4 font-mono text-xs">{passes}</td>
-              <td class="py-3 font-mono text-xs">{judged}</td>
+              <td class="pr-4 num">{fields}</td>
+              <td class="pr-4 num measured">{passes}</td>
+              <td class="num measured">{judged}</td>
             </tr>
           ))
         }
