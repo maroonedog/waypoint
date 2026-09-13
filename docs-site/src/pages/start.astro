@@ -2,10 +2,19 @@
 // ===========================================================================
 // start.astro — from "this sounds good" to a file that compiles.
 //
-// The two code blocks are not samples. They are `?raw` imports of files that
-// this site's own build type-checks (`astro check && astro build`), so the
-// code on this page cannot drift from code that works — which is the failure
-// a hand-written starter always eventually has.
+// The two long code blocks are not samples. They are `?raw` imports of files
+// that this site's own build type-checks (`astro check && astro build`), so
+// the code on this page cannot drift from code that works — which is the
+// failure a hand-written starter always eventually has.
+//
+// WHAT THIS PAGE OWES THE READER, and did not pay. It used to show the
+// `declare module` block under a heading that said to write one, and never
+// said why anybody would, what it buys, whether the file has to be imported,
+// or what happens if it is skipped. A reader could copy it and could not
+// decide to. The four headings between the declaration and the form are that
+// debt: the reason, the import question, what changes at the leaf, and the
+// failure. They are the questions asked in that order by somebody actually
+// wiring this into an application for the first time.
 // ===========================================================================
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
@@ -26,6 +35,76 @@ npm install
 npm run verify     # builds the package, runs the tests and the type tests
 `;
 
+/** What one component gets out of the declaration, and what it still needs. */
+const atTheLeaf = `
+// Any component, at any depth. One import, and it is a type.
+import { useField, type FormPathTo } from "@maroonedog/waypoint/react";
+
+function Postcode({ at }: { at: FormPathTo<string> }) {
+  const field = useField(at);
+  // field.value    string | undefined — the type AT that path
+  // field.issues   what the schema said about it
+  // field.inputProps / labelProps / errorProps / descriptor
+  return <input {...field.inputProps} />;
+}
+
+<Postcode at="form:billing.postcode" />   // checked against the schema
+<Postcode at="form:billing.postcod"  />   // compile error, before it renders
+`;
+
+/**
+ * The message the compiler prints when nothing is registered.
+ *
+ * COPIED OUT OF `tsc`, not written here. It was produced by compiling exactly
+ * the call below against the package's source with `strict: true`; the only
+ * edit is the line wrapping, because the real thing is one line and this
+ * column is not that wide.
+ */
+const refusal = `
+useField("owner.email");
+
+// error TS2345: Argument of type '"owner.email"' is not assignable to
+// parameter of type '"No form type is registered. Add: declare module
+// \\"@maroonedog/waypoint\\" { interface WaypointForms { form: typeof
+// yourAdapter } } — then a path is spelled \\"form:owner.email\\"."'.
+`;
+
+/** Two forms in one application, and what changes. */
+const twoForms = `
+declare module "@maroonedog/waypoint" {
+  interface WaypointForms {
+    customer: typeof customerAdapter;
+    admin: typeof adminAdapter;
+  }
+}
+
+const form = useCreateForm(() => ({ adapter: adminAdapter, key: "admin", … }));
+
+// The prefix stops being optional, because "owner.email" is now ambiguous.
+<Text at="admin:owner.email" />
+<Text at="customer:owner.email" />
+
+// And a component can be narrowed to one form's paths.
+function AdminText({ at }: { at: FormPathTo<string, "admin"> }) { … }
+`;
+
+/** Everything a project needs in place before the first line. */
+const needs = [
+  [
+    "TypeScript",
+    "The paths are checked types, so this is not optional. The thirteen compile-time programs that gate this repository run under strict: true.",
+  ],
+  [
+    "A validator",
+    "zod ^4.2.0 for the shipped resolver. 4.2 is the floor because ~standard.jsonSchema arrives there: under it the resolver describes no fields, so the form renders with no type, no bounds and no aria.",
+  ],
+  [
+    "React >=18, or Vue >=3.5",
+    "Both peers, both optional. Nothing else in the package needs either.",
+  ],
+  ["Node >=20", "To build and test it. Not to run it."],
+];
+
 const entryPoints = [
   ["@maroonedog/waypoint/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
   ["@maroonedog/waypoint/vue", "useField · useRows · useFormStatus · FormProvider · <Field>", "The same, for Vue 3, against the same registry."],
@@ -40,34 +119,118 @@ const entryPoints = [
 
 <Base
   title="Start — waypoint"
-  description="Clone it, run one command, and write one file. The two code blocks on this page are raw imports of files this site's own build type-checks, so they cannot drift from code that works."
+  description="What you need, the one declaration that makes every path checked, what it buys at the leaf, what happens if you skip it, and the first form."
 >
   <h1>Start</h1>
 
   <p class="lead">
-    <strong>Nothing is published yet</strong>, so you
-    clone it and run one command. It is one package with eight entry
-    points, so there is one version to track and one install to make.
+    <strong>Nothing is published yet</strong>, so you clone it and run one
+    command. It is one package with eight entry points, so there is one
+    version to track and one install to make.
   </p>
 
   <Code code={install} label="shell: install" lang="sh" />
 
+  <h2>Before you start</h2>
+  <p>
+    Four things, and the second one has a floor that is worth knowing before
+    you hit it rather than after.
+  </p>
+
+  <div class="mt-[var(--gap-block)] overflow-x-auto">
+    <table>
+      <thead class="text-left">
+        <tr>
+          <th class="pr-4">What</th>
+          <th>Why, and what happens without it</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          needs.map(([what, why]) => (
+            <tr class="hairline">
+              <td class="pr-4 font-mono whitespace-nowrap">{what}</td>
+              <td class="text-on-surface-variant">{why}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
   <h2>Tell the types about your form, once</h2>
   <p>
-    One declaration, in one file, gives every component in the application
-    checked paths — and a component ten levels down imports nothing to get
-    them, because a module augmentation belongs to the compilation rather than
-    to the import graph.
+    You have a schema already. The problem this solves is the one that starts
+    the moment a form is more than one component: <strong>a leaf that wants a
+    field needs the form's type</strong>, and the usual ways to give it one all
+    cost something — pass the form object down, thread a generic parameter
+    through every component in between, or import the schema at the leaf and
+    couple it to that one form forever.
+  </p>
+  <p>
+    A module augmentation is a fourth. It belongs to the <em>compilation</em>
+    rather than to the import graph, so declaring it once puts the form's paths
+    in scope everywhere — in a component ten levels down that imports nothing,
+    receives nothing, and knows no schema.
   </p>
 
   <Code code={withoutBanner(registrySource)} label="file: src/demo/order-form.ts" />
 
   <p class="caption">
-    Skip it and the hooks are not unchecked — they are refused, and the
-    compiler error quotes the declaration you are missing.{" "}
-    <a class="link" href="/paths/"
-      >Why it is a registry and not a prop →</a
-    >
+    The name on the left of the colon — <code>form</code> here — is yours, and
+    it becomes the prefix every path on this page is written with. One form,
+    and the prefix is optional.
+  </p>
+
+  <h2>Does anything import that file?</h2>
+  <p>
+    <strong>The types: no.</strong> That is the whole point of the mechanism
+    and it is the part that surprises people. No component imports this file to
+    get checked paths; the declaration reaches every file in the same
+    TypeScript program. What decides whether it is <em>in</em> that program is
+    your <code>tsconfig.json</code> — if its <code>include</code> covers the
+    file, the augmentation applies, imported or not.
+  </p>
+  <p>
+    <strong>The adapter value: once.</strong> Something has to hand the running
+    form its description, so whichever component calls{" "}
+    <code>useCreateForm</code> imports the adapter this file exports. One
+    import, at the top of the tree, and no other file needs it.
+  </p>
+
+  <h2>What that buys, at the leaf</h2>
+  <p>
+    This is what the declaration is for, and it is worth reading as a
+    before-and-after rather than as a feature: the component below takes one
+    prop, imports one <em>type</em>, and is wrong at compile time if the
+    address is misspelt.
+  </p>
+
+  <Code code={atTheLeaf} label="file: any component, any depth" lang="tsx" />
+
+  <p class="caption">
+    The same component draws a field from any form that registers one, because
+    the address names its own form. That is what makes it a component rather
+    than a copy — <a class="link" href="/examples/#two-forms">two forms, one
+    component</a> on the Examples page is the case where it matters.
+  </p>
+
+  <h2>What happens if you skip it</h2>
+  <p>
+    Nothing silently. An application that registered nothing does not get
+    unchecked hooks back — <strong>it is refused</strong>, and the compiler
+    quotes the declaration that is missing. The same is true if the file falls
+    out of the program later: the failure is loud and it names the fix.
+  </p>
+
+  <Code code={refusal} label="type: what tsc prints" />
+
+  <p class="caption">
+    Held to by a compile-time program of its own —{" "}
+    <code>test/types-unregistered</code> pins every one of those refusals with{" "}
+    <code>@ts-expect-error</code>, so a change that made them compile would
+    fail the build.{" "}
+    <a class="link" href="/paths/">Why it is a registry and not a prop →</a>
   </p>
 
   <h2>Then the form is ordinary React</h2>
@@ -82,6 +245,23 @@ const entryPoints = [
     <strong>Both blocks above are the files themselves.</strong> They live in
     this site's source and are type-checked by its build, so the code on this
     page is code that compiles rather than code that was once written down.
+  </p>
+
+  <h2>When there is more than one form</h2>
+  <p>
+    Add a second key. Two things change and nothing else does: the prefix stops
+    being optional, because a bare <code>owner.email</code> is now ambiguous
+    and the compiler says so; and the form names itself where it is created, so
+    the runtime can check that the paths under a provider belong to it.
+  </p>
+
+  <Code code={twoForms} label="type: two keys" lang="tsx" />
+
+  <p class="caption">
+    Registration is global to the compilation, which is the cost of the
+    mechanism: two files declaring the same key merge rather than collide, and
+    a dependency that registers a form registers it for you. Pick keys the way
+    you would pick a global name.
   </p>
 
   <h2>Where each symbol comes from</h2>
@@ -126,13 +306,12 @@ const entryPoints = [
   <h2>Four you can type into now</h2>
   <p>
     The example applications run on this site rather than only on a port.
-    <a class="link" href="/showcase/">Showcase</a> is a
-    23-input trade application across six sections, drawn with the
-    application's own components; the
-    <a class="link" href="/examples/">Examples</a> page
-    carries three more — a server-error round trip, two forms sharing one
-    component, and a wizard — each of them the example program itself, imported
-    and mounted, not a copy.
+    <a class="link" href="/showcase/">Showcase</a> is a 23-input trade
+    application across six sections, drawn with the application's own
+    components; the
+    <a class="link" href="/examples/">Examples</a> page carries three more — a
+    server-error round trip, two forms sharing one component, and a wizard —
+    each of them the example program itself, imported and mounted, not a copy.
   </p>
 
   <p class="caption">
