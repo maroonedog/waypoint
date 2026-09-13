@@ -347,14 +347,17 @@ const TRY = [
   </p>
   <Code code={whole} label="ts: the whole idea" flush />
 
-  <p>
-    Two things make that work. The path is a <strong>type the compiler has
-    already checked</strong>: one registry declaration, no prop, no generic
-    argument, nothing imported at the leaf. And the cell it names is{" "}
-    <strong>already written</strong> — every cell is seeded at{" "}
-    <code>createForm</code>, so mounting is a subscription, with no register,
-    no unregister and no <code>shouldUnregister</code>.
-  </p>
+  <section>
+    <h2>What makes those ten lines work</h2>
+    <p>
+      Two things. The path is a <strong>type the compiler has already
+      checked</strong>: one registry declaration, no prop, no generic argument,
+      nothing imported at the leaf. And the cell it names is{" "}
+      <strong>already written</strong> — every cell is seeded at{" "}
+      <code>createForm</code>, so mounting is a subscription, with no register,
+      no unregister and no <code>shouldUnregister</code>.
+    </p>
+  </section>
 
   <!-- ================================================== the thesis -->
   <section>

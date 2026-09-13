@@ -311,18 +311,21 @@ const TRY = [
   </p>
   <Code code={whole} label="ts: the whole idea" flush />
 
-  <p>理由は2つです。</p>
+  <section>
+    <h2>この10行が成り立つ理由</h2>
+    <p>理由は2つです。</p>
 
-  <p>
-    まず、<strong>このパスはコンパイラが検査した型です</strong>。レジストリの宣言を1度
-    書けば、あとは props もジェネリクスも渡しませんし、末端で import するものもありません。
-  </p>
+    <p>
+      まず、<strong>このパスはコンパイラが検査した型です</strong>。レジストリの宣言を1度
+      書けば、あとは props もジェネリクスも渡しませんし、末端で import するものもありません。
+    </p>
 
-  <p>
-    そして、<strong>パスが指すセルはもう書かれています</strong>。セルは{" "}
-    <code>createForm</code> の時点で全部そろうので、コンポーネントがマウントしてやることは
-    購読だけ。register も unregister も <code>shouldUnregister</code> もありません。
-  </p>
+    <p>
+      そして、<strong>パスが指すセルはもう書かれています</strong>。セルは{" "}
+      <code>createForm</code> の時点で全部そろうので、コンポーネントがマウントしてやることは
+      購読だけ。register も unregister も <code>shouldUnregister</code> もありません。
+    </p>
+  </section>
 
   <!-- ================================================== the thesis -->
   <section>
