@@ -40,7 +40,7 @@ import { FormKeyContext } from "./form-key-context.js";
 import { formPathWithin } from "./parse-qualified-path.js";
 import { useFormHandle } from "./use-form.js";
 import type { RowsBinding } from "./use-rows.js";
-import type { FormDeclaredPath } from "./form-type-registry.js";
+import type { FormDeclaredPath } from "./waypoint-forms.js";
 
 export interface AutoFormProps {
   /**

@@ -53,7 +53,7 @@ import { summarizeIssues } from "../core/index.js";
 import { fieldControlAt, focusFieldControl } from "./find-field-control.js";
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
-import type { FormKey } from "./form-type-registry.js";
+import type { FormKey } from "./waypoint-forms.js";
 
 /** One row of a summary: what to say, and how to get there. */
 export interface ErrorSummaryEntry extends FieldIssueSummary {

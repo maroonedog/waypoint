@@ -31,7 +31,7 @@ import {
   useUncontrolledField,
   type AnyPath,
   type FormPath,
-  type FormTypeRegistry,
+  type WaypointForms,
 } from "@maroonedog/waypoint/react";
 
 const orderSchema = z.object({
@@ -49,12 +49,12 @@ const profileAdapter = zodFormResolver(profileSchema);
 
 // The application's one registration, which nothing below imports.
 declare module "@maroonedog/waypoint/react" {
-  interface FormTypeRegistry {
+  interface WaypointForms {
     form: typeof orderAdapter;
     profile: typeof profileAdapter;
   }
 }
-void (null as unknown as FormTypeRegistry);
+void (null as unknown as WaypointForms);
 
 declare const index: number;
 declare const spelled: string;

@@ -57,7 +57,7 @@ import type {
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
-} from "./form-type-registry.js";
+} from "./waypoint-forms.js";
 
 /** The same coercion buildInputProps applies, so both hooks agree on empty. */
 const displayValue = (value: unknown): string =>

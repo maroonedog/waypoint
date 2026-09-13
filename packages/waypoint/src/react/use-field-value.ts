@@ -15,7 +15,7 @@ import type {
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
-} from "./form-type-registry.js";
+} from "./waypoint-forms.js";
 
 export function useFieldValue<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>

@@ -11,7 +11,7 @@ import { orderSchema } from "./schema.js";
 const orderAdapter = zodFormResolver(orderSchema);
 
 declare module "@maroonedog/waypoint/react" {
-  interface FormTypeRegistry {
+  interface WaypointForms {
     form: typeof orderAdapter;
   }
 }

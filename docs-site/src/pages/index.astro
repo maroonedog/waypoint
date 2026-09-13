@@ -37,7 +37,7 @@ const orderAdapter = zodFormResolver(orderSchema);
 
 // 2. Its types, registered once for the whole application.
 declare module "@maroonedog/waypoint/react" {
-  interface FormTypeRegistry { form: typeof orderAdapter }
+  interface WaypointForms { form: typeof orderAdapter }
 }
 
 // 3. Any component, any depth. No props, no context type, no assertions.

@@ -1,5 +1,5 @@
 // ===========================================================================
-// form-type-registry.ts — which forms this application has, stated once.
+// waypoint-forms.ts — which forms this application has, stated once.
 //
 // One React context object serves every form in the application, so the
 // context cannot be generic and a path union cannot travel through it. The
@@ -8,10 +8,20 @@
 // ten levels down imports nothing, receives nothing, and is still checked.
 //
 //   declare module "@maroonedog/waypoint/react" {
-//     interface FormTypeRegistry {
+//     interface WaypointForms {
 //       form: typeof orderAdapter;
 //     }
 //   }
+//
+// THE NAME SAYS WHOSE IT IS, and it is the one exported name here that has to.
+// Every other type this entry exports arrives through an `import` line that
+// already names the package. This one is written by an application that
+// imports nothing, inside a `declare module` block — and it is what the
+// registration error quotes and what somebody greps for afterwards. A reader
+// shown only the inner line, in a diff or a snippet or a codebase part-way
+// through a migration with two form libraries in it, can tell from
+// `WaypointForms` which library is being spoken to. A name any form library
+// might plausibly have chosen leaves them to guess.
 //
 // A PATH CARRIES ITS FORM: `useField("admin:quotas.seats")`. The colon
 // separates the registered key from the path within that form, and that is
@@ -86,7 +96,7 @@ import type {
 } from "../contract/index.js";
 
 /** Augmented by the application. Empty here, on purpose. */
-export interface FormTypeRegistry {}
+export interface WaypointForms {}
 
 /**
  * What an unregistered lookup resolves to.
@@ -102,7 +112,7 @@ export interface FormTypeRegistry {}
  * where they are standing when they need it.
  */
 type NoRegistration =
-  'No form type is registered. Add: declare module "@maroonedog/waypoint/react" { interface FormTypeRegistry { form: typeof yourAdapter } } — then a path is spelled "form:owner.email".';
+  'No form type is registered. Add: declare module "@maroonedog/waypoint/react" { interface WaypointForms { form: typeof yourAdapter } } — then a path is spelled "form:owner.email".';
 
 /**
  * Every key the application registered.
@@ -111,12 +121,12 @@ type NoRegistration =
  * and a symbol cannot be. It also lets a key be passed straight to the runtime
  * seams that compare one, with nothing asserted on the way.
  */
-export type FormKey = [keyof FormTypeRegistry] extends [never]
+export type FormKey = [keyof WaypointForms] extends [never]
   ? NoRegistration
-  : keyof FormTypeRegistry & string;
+  : keyof WaypointForms & string;
 
-type AdapterFor<TKey> = TKey extends keyof FormTypeRegistry
-  ? FormTypeRegistry[TKey]
+type AdapterFor<TKey> = TKey extends keyof WaypointForms
+  ? WaypointForms[TKey]
   : never;
 
 // Naked parameters. Both so a union of adapters distributes instead of being
@@ -133,10 +143,10 @@ export type PathsFor<TKey> = [AdapterFor<TKey>] extends [never]
 export type ValuesFor<TKey> = ValuesOfAdapter<AdapterFor<TKey>>;
 
 /** Every path any registered form declares, with no form attached to it. */
-export type AnyPath = PathsFor<keyof FormTypeRegistry>;
+export type AnyPath = PathsFor<keyof WaypointForms>;
 
 /** Every registered form's value type. */
-export type AnyValues = ValuesFor<keyof FormTypeRegistry>;
+export type AnyValues = ValuesFor<keyof WaypointForms>;
 
 /**
  * The declared type at a path, over one form or over all of them.
@@ -164,10 +174,10 @@ type UnionToIntersection<U> = (
  * FIRST: intersecting nothing yields `unknown`, and an `unknown` key here
  * would put an unprefixed spelling of every path back into the union.
  */
-type SoleFormKey = [keyof FormTypeRegistry] extends [never]
+type SoleFormKey = [keyof WaypointForms] extends [never]
   ? never
-  : UnionToIntersection<keyof FormTypeRegistry> extends infer Only
-    ? Only extends keyof FormTypeRegistry
+  : UnionToIntersection<keyof WaypointForms> extends infer Only
+    ? Only extends keyof WaypointForms
       ? Only
       : never
     : never;
@@ -206,16 +216,16 @@ type WithoutFormKeyHead<P> = P extends `${infer Head}:${string}`
     : never
   : P;
 
-type QualifiedPlace<TKey> = TKey extends keyof FormTypeRegistry
+type QualifiedPlace<TKey> = TKey extends keyof WaypointForms
   ? `${TKey & string}:${PlacesOf<TKey>}`
   : never;
-type QualifiedColumn<TKey> = TKey extends keyof FormTypeRegistry
+type QualifiedColumn<TKey> = TKey extends keyof WaypointForms
   ? `${TKey & string}:${ColumnsOf<TKey>}`
   : never;
-type QualifiedList<TKey> = TKey extends keyof FormTypeRegistry
+type QualifiedList<TKey> = TKey extends keyof WaypointForms
   ? `${TKey & string}:${ListsOf<TKey>}`
   : never;
-type QualifiedRule<TKey> = TKey extends keyof FormTypeRegistry
+type QualifiedRule<TKey> = TKey extends keyof WaypointForms
   ? `${TKey & string}:${RulesOf<TKey>}`
   : never;
 
@@ -244,9 +254,9 @@ type QualifiedRule<TKey> = TKey extends keyof FormTypeRegistry
  * defeats the one thing a path union is for. The wrapper makes it a template
  * literal type, and those are elaborated.
  */
-export type FormPath = [keyof FormTypeRegistry] extends [never]
+export type FormPath = [keyof WaypointForms] extends [never]
   ? NoRegistration
-  : `${QualifiedPlace<keyof FormTypeRegistry> | WithoutFormKeyHead<PlacesOf<SoleFormKey>>}`;
+  : `${QualifiedPlace<keyof WaypointForms> | WithoutFormKeyHead<PlacesOf<SoleFormKey>>}`;
 
 /**
  * Any COLUMN any registered form has, qualified — every `[*]` independently
@@ -255,18 +265,18 @@ export type FormPath = [keyof FormTypeRegistry] extends [never]
  * This is what a wildcard read takes. `admin:items[*].sku` names every sku the
  * list holds, and `admin:shipments[0].lines[*].sku` names one shipment's.
  */
-export type FormColumnPath = [keyof FormTypeRegistry] extends [never]
+export type FormColumnPath = [keyof WaypointForms] extends [never]
   ? NoRegistration
-  : `${QualifiedColumn<keyof FormTypeRegistry> | WithoutFormKeyHead<ColumnsOf<SoleFormKey>>}`;
+  : `${QualifiedColumn<keyof WaypointForms> | WithoutFormKeyHead<ColumnsOf<SoleFormKey>>}`;
 
 /**
  * Any LIST any registered form has, qualified. A list is declared as
  * `items[*]`, so the lists are what is left when that suffix is removed, and a
  * list nested in a row is reached through its outer row's concrete index.
  */
-export type FormListPath = [keyof FormTypeRegistry] extends [never]
+export type FormListPath = [keyof WaypointForms] extends [never]
   ? NoRegistration
-  : `${QualifiedList<keyof FormTypeRegistry> | WithoutFormKeyHead<ListsOf<SoleFormKey>>}`;
+  : `${QualifiedList<keyof WaypointForms> | WithoutFormKeyHead<ListsOf<SoleFormKey>>}`;
 
 /**
  * Any DECLARED path any registered form has, qualified — the rule, with every
@@ -277,10 +287,10 @@ export type FormListPath = [keyof FormTypeRegistry] extends [never]
  * is what a caller picking declarations out of a form takes, where a place
  * union would refuse the only spelling that means "the list itself".
  */
-export type FormDeclaredPath = [keyof FormTypeRegistry] extends [never]
+export type FormDeclaredPath = [keyof WaypointForms] extends [never]
   ? NoRegistration
   : `${
-      | QualifiedRule<keyof FormTypeRegistry>
+      | QualifiedRule<keyof WaypointForms>
       | WithoutFormKeyHead<RulesOf<SoleFormKey>>}`;
 
 /**
@@ -292,7 +302,7 @@ export type FormDeclaredPath = [keyof FormTypeRegistry] extends [never]
  */
 export type FormKeyOfPath<Q extends string> =
   Q extends `${infer Head}:${string}`
-    ? Head extends keyof FormTypeRegistry
+    ? Head extends keyof WaypointForms
       ? Head
       : SoleFormKey
     : SoleFormKey;
@@ -300,7 +310,7 @@ export type FormKeyOfPath<Q extends string> =
 /** The path within that form: what `./core` is handed, and all it ever sees. */
 export type FormLocalPath<Q extends string> =
   Q extends `${infer Head}:${infer Rest}`
-    ? Head extends keyof FormTypeRegistry
+    ? Head extends keyof WaypointForms
       ? Rest
       : Q
     : Q;
@@ -325,7 +335,7 @@ export type ValueAtFormPath<Q extends string> = ValueOfPath<
  * The empty registry steps aside — see the header.
  */
 export type InhabitedFormPath<Q extends string> = [
-  keyof FormTypeRegistry,
+  keyof WaypointForms,
 ] extends [never]
   ? Q
   : [InhabitedPath<ValuesAtFormPath<Q>, FormLocalPath<Q>>] extends [never]
@@ -336,9 +346,9 @@ export type InhabitedFormPath<Q extends string> = [
  * The qualified places of the forms `TKey` names — every form's when it names
  * them all. What the two filters below are computed over.
  */
-type FormPathsOf<TKey> = [keyof FormTypeRegistry] extends [never]
+type FormPathsOf<TKey> = [keyof WaypointForms] extends [never]
   ? NoRegistration
-  : [TKey] extends [keyof FormTypeRegistry]
+  : [TKey] extends [keyof WaypointForms]
     ? `${
         | QualifiedPlace<TKey>
         | (TKey extends SoleFormKey ? WithoutFormKeyHead<PlacesOf<TKey>> : never)}`
@@ -367,7 +377,7 @@ type PathToValue<Q, TValue> = Q extends string
  * ask was whether the value is a `TValue` in ANY registered form, so a path
  * whose own form declares something else there still passed the filter.
  */
-export type FormPathTo<TValue, TKey = keyof FormTypeRegistry> = PathToValue<
+export type FormPathTo<TValue, TKey = keyof WaypointForms> = PathToValue<
   FormPathsOf<TKey>,
   TValue
 >;
@@ -395,7 +405,7 @@ type PathOver<Q, TLeaf extends string> = Q extends string
  */
 export type FormPathOver<
   TLeaf extends string,
-  TKey = keyof FormTypeRegistry,
+  TKey = keyof WaypointForms,
 > = PathOver<FormPathsOf<TKey>, TLeaf>;
 
 /**

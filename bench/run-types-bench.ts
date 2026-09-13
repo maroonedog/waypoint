@@ -102,7 +102,7 @@ const sawDeepInstantiation = result.rows.some((row) =>
 
 const report = `# Typed addressing, measured — compiler lane
 
-Typed addressing is what this library leads with: a \`FormTypeRegistry\`
+Typed addressing is what this library leads with: a \`WaypointForms\`
 augmentation, \`ConcretePath<P>\` for a place and \`PartlyBoundPath<P>\` for a
 column, a form's own name written into the path in front of them, and a leaf
 component that gets a compile-checked path with nothing passed down to it. This

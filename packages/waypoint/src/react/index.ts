@@ -55,14 +55,14 @@ export type {
   FormPath,
   FormPathOver,
   FormPathTo,
-  FormTypeRegistry,
+  WaypointForms,
   InhabitedFormPath,
   PathsFor,
   ValueAtFormPath,
   ValueOfPath,
   ValuesAtFormPath,
   ValuesFor,
-} from "./form-type-registry.js";
+} from "./waypoint-forms.js";
 export { FormProvider, type FormProviderProps } from "./form-provider.js";
 export { useCreateForm } from "./use-create-form.js";
 export { useForm, useFormHandle } from "./use-form.js";

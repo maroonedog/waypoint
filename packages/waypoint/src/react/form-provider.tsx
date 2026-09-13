@@ -46,7 +46,7 @@ import {
   WidgetRegistryContext,
 } from "./widget-registry-context.js";
 import type { WidgetRegistry } from "./widget-registry.types.js";
-import type { FormKey } from "./form-type-registry.js";
+import type { FormKey } from "./waypoint-forms.js";
 
 export interface FormProviderProps<T, TPath extends string> {
   readonly form: FormHandle<T, TPath>;

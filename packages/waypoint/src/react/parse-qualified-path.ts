@@ -20,7 +20,7 @@
 // registered forms here — only the one key the enclosing provider carries — so
 // "is this head registered?" is a question this side cannot ask, and a rule
 // built on it would leave the types and the runtime disagreeing about which
-// strings are qualified at all. form-type-registry.ts asks the same lexical
+// strings are qualified at all. waypoint-forms.ts asks the same lexical
 // question of the path union.
 //
 // A HEAD THAT NAMES ANOTHER FORM THROWS. It cannot route to that form instead:

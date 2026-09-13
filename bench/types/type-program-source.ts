@@ -14,7 +14,7 @@
 // `declare const adapter` rather than a resolver call, because a resolver
 // would drag zod's own inference into the number and the question here is what
 // the ADDRESSING costs. The registration is otherwise the one a reader of
-// `form-type-registry.ts` is shown, character for character.
+// `waypoint-forms.ts` is shown, character for character.
 //
 // The baseline is this same file with an empty function body. That matters
 // more than it looks: `FieldPath<Root>` sits in a type annotation, so the
@@ -106,7 +106,7 @@ ${shape.declarations}
 declare const adapter: FormAdapter<${shape.rootName}, FieldPath<${shape.rootName}>>;
 
 declare module "@maroonedog/waypoint/react" {
-  interface FormTypeRegistry {
+  interface WaypointForms {
     form: typeof adapter;
   }
 }

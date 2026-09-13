@@ -23,7 +23,7 @@
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
 import type { FieldRow } from "./field-row.types.js";
-import type { FormListPath } from "./form-type-registry.js";
+import type { FormListPath } from "./waypoint-forms.js";
 
 export interface RowsBinding<TPath extends string = string> {
   /** Where this list lives, qualified by the form it belongs to. */

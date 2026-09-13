@@ -26,7 +26,7 @@ import type {
   FormKey,
   PathsFor,
   ValuesFor,
-} from "./form-type-registry.js";
+} from "./waypoint-forms.js";
 
 /**
  * The enclosing handle, untyped, with the key checked when one was named.

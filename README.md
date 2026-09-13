@@ -3,7 +3,7 @@
 **A field's address exists before the component that draws it — as a type the
 compiler has already checked, and as runtime state that is already written.**
 
-One claim, two halves. The type is one `FormTypeRegistry` module augmentation:
+One claim, two halves. The type is one `WaypointForms` module augmentation:
 a leaf takes no prop, no generic argument and imports nothing from the registry,
 and an application that registered nothing is **refused**, with the
 declaration it is missing quoted back at it — unless a dependency registered
@@ -37,7 +37,7 @@ cd waypoint && npm install && npm run verify
 const orderAdapter = zodFormResolver(orderSchema);
 
 declare module "@maroonedog/waypoint/react" {
-  interface FormTypeRegistry { form: typeof orderAdapter }
+  interface WaypointForms { form: typeof orderAdapter }
 }
 ```
 

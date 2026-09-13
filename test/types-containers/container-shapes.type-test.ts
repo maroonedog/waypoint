@@ -34,7 +34,7 @@ import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import {
   useField,
   useFieldValues,
-  type FormTypeRegistry,
+  type WaypointForms,
 } from "@maroonedog/waypoint/react";
 
 /** Fails to compile unless both sides are the same type. */
@@ -51,11 +51,11 @@ const schema = z.object({
 const adapter = zodFormResolver(schema);
 
 declare module "@maroonedog/waypoint/react" {
-  interface FormTypeRegistry {
+  interface WaypointForms {
     containers: typeof adapter;
   }
 }
-void (null as unknown as FormTypeRegistry);
+void (null as unknown as WaypointForms);
 
 /**
  * Written out rather than left computed, so the union is pinned to literals.

@@ -37,7 +37,7 @@ import type {
   FormColumnPath,
   InhabitedFormPath,
   ValueAtFormPath,
-} from "./form-type-registry.js";
+} from "./waypoint-forms.js";
 
 const WILDCARD = "[*]";
 

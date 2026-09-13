@@ -36,7 +36,7 @@ import type { ConcretePath } from "../contract/index.js";
 import type { FormHandle } from "../core/index.js";
 import { FormKeyContext } from "./form-key-context.js";
 import { formPathWithin } from "./parse-qualified-path.js";
-import type { FormKey } from "./form-type-registry.js";
+import type { FormKey } from "./waypoint-forms.js";
 
 export function useParticipation<T, TPath extends string>(
   form: FormHandle<T, TPath>,

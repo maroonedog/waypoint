@@ -12,7 +12,7 @@
 import type { FormIssue } from "../contract/index.js";
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
-import type { FormPath, InhabitedFormPath } from "./form-type-registry.js";
+import type { FormPath, InhabitedFormPath } from "./waypoint-forms.js";
 
 export function useFieldIssues<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>
