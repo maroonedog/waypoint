@@ -26,15 +26,43 @@ signature the package emits, and the benchmark with its losses first.
 
 ## Motivation
 
-A form stops being one component almost immediately, and from that moment
-every leaf that wants a field needs the form's type. The usual ways of giving
-it one all cost something. Pass the form object down and every component in
-between carries it. Thread a generic and every signature on the way grows.
-Import the schema at the leaf and that component belongs to one form forever.
+A mis-addressed field is the quietest bug a form can have.
+`useField("billing.postcod")` renders an input, binds nothing, validates
+nothing and submits. Nothing throws, nothing is logged, and the field looks
+finished. You find out when an order arrives without a postcode.
 
-The schema has already said what the field is — its label, its bounds, its
-type — and the markup says it again by hand. The two then drift, and the copy
-in the markup is the one a person sees.
+**The bug is old. The stage it gets caught at is the part that has moved.**
+More of this code is now written by an agent that never opens the browser, and
+reviewed by reading a diff rather than by filling the form in. Runtime stopped
+being a stage anybody passes through on the way: by the time a blank input is
+visible, the only reader left who could notice it is a user. The compiler is
+the last stage that reads every line before anyone depends on it, so a wrong
+field has to be rejected there or not at all.
+
+Two ways a field goes wrong, and both are answered at compile time or at
+mount, never at a user:
+
+- **A path that does not exist.** The string is a type, so
+  `"billing.postcod"` is a compile error rather than a blank input — including
+  inside an array, beside an interpolated index, and in a component that
+  received no props and imported no schema.
+- **A field that exists and nothing drew.** Once a `<FormProvider>`'s subtree
+  has mounted, every declared place nothing asked for is named. That one is
+  not a type error and cannot be: whether a screen draws the whole form is a
+  decision, not a mistake — so it is reported, and
+  `createForm({ onFieldMismatch: "throw" })` turns it into a failure a test
+  can catch.
+
+The second is there for the same reason as the first. An agent that believes
+it wired a form up, and a review that reads the diff, both need the form
+itself to say which fields nobody connected.
+
+The older complaints are still true and are no longer the point. Every leaf
+that wants a field needs the form's type, and each way of giving it one costs
+something — pass the form object down, thread a generic, or import the schema
+at the leaf and marry that component to one form. The schema has also already
+said what the field is, and the markup says it again by hand, and the two
+drift.
 
 **Two things this was started to fix turned out not to be problems.** That a
 validator has no way to say what a field accepts stopped being true when
@@ -42,19 +70,15 @@ Standard Schema added a JSON Schema member. Validator-neutrality stopped being
 a differentiator when the ecosystem commoditised it: react-hook-form ships
 `standardSchemaResolver`, and TanStack Form took Standard Schema directly at
 v1 and retired its per-validator adapters. Both claims were deleted from this
-project rather than softened, and the pages that led on them were rewritten.
+project rather than softened.
 
-What is left is narrower. Where the form's type is in scope, react-hook-form
-and TanStack Form reject a typo too — the comparison table on the site marks
-the three rows of six where nothing separates the three of us. **The
-difference is what happens where it is not in scope**, which is most of a real
-component tree: a leaf with no props, no form object and no import still gets
-a checked path, and the cell behind it is already written before the component
-mounts.
+Where the form's type is in scope, react-hook-form and TanStack Form reject a
+typo too — the comparison table on the site marks the three rows of six where
+nothing separates the three of us. The difference is what happens where it is
+not in scope, which is most of a real component tree.
 
-Whether that is worth a dependency is a judgement, and this README is not in a
-position to make it: nothing here has been published, and nobody has run it in
-production.
+Whether that is worth a dependency is not this README's call: nothing here has
+been published, and nobody has run it in production.
 
 ## Install
 
