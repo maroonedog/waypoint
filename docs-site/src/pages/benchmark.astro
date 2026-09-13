@@ -40,18 +40,16 @@ import TimingTable from "../components/TimingTable.astro";
     <li class="border-t border-outline-variant py-4 text-sm">
       On the timing lane a keystroke at 201 fields measures{" "}
       <strong><span class="font-mono measured">0.57×</span> the hand-written
-      reference</strong>, and the harness
-      <strong> refuses to call it a win</strong> — its own calibration ladder
-      resolves nothing that far under the floor.
+      reference</strong>. The harness <strong>refuses to call it a win</strong>.
+      Its calibration ladder resolves nothing that far under the floor.
     </li>
     <li class="border-t border-outline-variant py-4 text-sm">
-      <strong>K5 is what coalescing is worth.</strong> Five characters into one
-      field with <em>one</em> settle at the end: at 201 fields both
-      waypoint subjects run <strong>1 validator pass, 201 paths judged</strong>,
-      and react-hook-form, Formik, TanStack Form and the hand-written reference
-      each run <strong>5 passes and 1005 paths judged</strong>. Draining after
-      every keystroke — which is what the other three scenarios do — is the one
-      arrangement in which coalescing can buy nothing.
+      <strong>K5 is what coalescing is worth.</strong> Five characters, one
+      settle at the end. At 201 fields both waypoint subjects run{" "}
+      <strong>1 validator pass, 201 paths judged</strong>; the other four each
+      run <strong>5 passes and 1005 paths judged</strong>. The other three
+      scenarios drain after every keystroke, which is the one arrangement where
+      coalescing can buy nothing.
     </li>
     <li class="border-t border-outline-variant py-4 text-sm">
       Every integer on the counts lane is gated. CI fails when one moves, in
@@ -60,39 +58,33 @@ import TimingTable from "../components/TimingTable.astro";
   </ol>
 
   <p class="caption">
-    What follows is why those numbers can be trusted, which is the longer half.
-    The question the lane asks is not how much a commit costs but whether one
-    happens: <code>useField</code> subscribes to the value cell, so a keystroke
-    is a render; <code>useUncontrolledField</code> subscribes imperatively and
-    writes the DOM node, which is what <code>register</code> does for
-    react-hook-form.
+    The lane asks whether a commit happens, not what one costs.{" "}
+    <code>useField</code> subscribes to the value cell, so a keystroke is a
+    render; <code>useUncontrolledField</code> subscribes imperatively and writes
+    the DOM node, which is what <code>register</code> does for react-hook-form.
   </p>
 
   <!-- ================================================== counts -->
   <h2>The counts lane, which is gated</h2>
-  <p>
-    These integers do not depend on the machine, which is the only reason a CI
-    gate can exist at all.
-  </p>
+  <p>These integers do not depend on the machine. That is why they can be gated.</p>
 
   <CountsTable />
 
   <p class="caption">
     <code>validatorPasses</code> and <code>paths judged</code> sit beside the
-    render counts, so a zero-commit row can never be read as free: the two
-    react-hook-form rows commit nothing for a keystroke — <code>register</code>{" "}
-    leaves the inputs uncontrolled — and still hand the whole 201-path root to
-    the schema. The <code>on-submit</code> row does not even do that, by
+    render counts, so a zero-commit row is never free. The two react-hook-form
+    rows commit nothing for a keystroke and still hand the whole 201-path root
+    to the schema. The <code>on-submit</code> row does not even do that, by
     documented design.
   </p>
 
   <p class="caption">
     The fiber column is{" "}
-    <strong class="text-on-surface">leaves + a constant</strong>, and the
-    constant is what differs: at 31, 61 and 201 fields the hand-written
-    reference reports 39, 69 and 209 — React cloning the sibling list of the
-    form it descended through, which every implementation that commits at all
-    pays. What waypoint adds on top is 3, at every size.
+    <strong class="text-on-surface">leaves + a constant</strong>. The constant
+    is what differs. At 31, 61 and 201 fields the hand-written reference
+    reports 39, 69 and 209: React cloning the sibling list it descended
+    through, which every implementation that commits pays. waypoint adds 3, at
+    every size.
   </p>
 
   <ScenarioTable />
@@ -100,11 +92,14 @@ import TimingTable from "../components/TimingTable.astro";
   <p class="caption">
     The middle column is where the deferred pass costs rather than saves: with{" "}
     <code>useField</code> the value lands in one task and the verdict in the
-    next, so React cannot batch them and commits twice. The last column is the
-    one the whole-root pass was built for — a rule reporting against a field
-    nobody touched costs the uncontrolled waypoint row one commit and one
-    schema pass, and costs the react-hook-form <code>deps</code> configuration
-    two passes and 402 paths judged.
+    next, so React cannot batch them and commits twice.
+  </p>
+
+  <p class="caption">
+    The last column is what the whole-root pass was built for. A rule reporting
+    against a field nobody touched costs the uncontrolled waypoint row one
+    commit and one schema pass. It costs the react-hook-form <code>deps</code>{" "}
+    configuration two passes and 402 paths judged.
   </p>
 
   <!-- ================================================== time -->
@@ -113,12 +108,16 @@ import TimingTable from "../components/TimingTable.astro";
   <TimingTable />
 
   <p class="caption">
-    Headless Chrome over CDP, every figure taken from the browser's own trace
-    rather than from page JavaScript, order alternating every pair, both members
-    of a pair inside one tracing session on two origins so that they are two
-    renderer processes. Before it compares anything it measures itself: a known
-    cost injected at seven sizes, and every subject run against a byte-identical
-    twin of itself at every size. A band that overlaps the twin's band prints{" "}
+    Headless Chrome over CDP. Every figure comes from the browser's own trace,
+    not from page JavaScript. Order alternates every pair, and both members of a
+    pair run in one tracing session on two origins, so they are two renderer
+    processes.
+  </p>
+
+  <p class="caption">
+    Before it compares anything it measures itself: a known cost injected at
+    seven sizes, and every subject run against a byte-identical twin of itself.
+    A band that overlaps the twin's prints{" "}
     <code class="verdict">indistinguishable</code>, never a win.
   </p>
 
@@ -140,13 +139,16 @@ import TimingTable from "../components/TimingTable.astro";
     <code>npm run bench:types</code> measures what the path types cost{" "}
     <code>tsc</code>, in the compiler's own accounting: the union built once per
     shape at <span class="font-mono measured">77–137</span> instantiations per
-    leaf, an accepted <code>useField</code>{" "}
-    at <span class="font-mono measured">275.0</span>, a refused one at{" "}
+    leaf, an accepted <code>useField</code> at{" "}
+    <span class="font-mono measured">275.0</span>, a refused one at{" "}
     <span class="font-mono measured">475,034</span>, and the depth where the
-    budget stops —{" "}
-    <strong class="text-on-surface">seven path segments are addressable and
-    eight are not</strong>. It is <strong class="text-on-surface">printed and
-    never gated</strong>, for a reason the time lane does not have:{" "}
+    budget stops.{" "}
+    <strong class="text-on-surface">Seven path segments are addressable and
+    eight are not.</strong>
+  </p>
+
+  <p class="caption">
+    <strong class="text-on-surface">Printed and never gated.</strong>{" "}
     <code>typescript</code> sits at a caret range, so a patch bump would rewrite
     every figure and the failure would point at <code>npm update</code> rather
     than at the change that made a type worse.

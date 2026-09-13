@@ -266,12 +266,12 @@ const TRY = [
   </p>
 
   <p>
-    One claim, two halves. It is a <strong>type the
-    compiler has already checked</strong> — one registry declaration, no prop,
-    no generic argument, nothing imported at the leaf — and it is{" "}
-    <strong>state already written</strong>: every cell
-    is seeded at <code>createForm</code>, so mounting is a subscription and
-    there is no register, no unregister and no <code>shouldUnregister</code>.
+    One claim, two halves. It is a <strong>type the compiler has already
+    checked</strong>: one registry declaration, no prop, no generic argument,
+    nothing imported at the leaf. And it is <strong>state already
+    written</strong>: every cell is seeded at <code>createForm</code>, so
+    mounting is a subscription — no register, no unregister, no{" "}
+    <code>shouldUnregister</code>.
   </p>
 
   <!-- ONE FILL ON THE WHOLE SITE, AND IT IS THIS ONE. The mark is a line
@@ -361,16 +361,20 @@ const TRY = [
     </p>
 
     <p class="note">
-      <strong>What it costs.</strong> One <code>declare module "@maroonedog/waypoint"</code>{" "}
-      block — on the ROOT entry rather than on a framework's, so one registry
-      serves every binding — that has to stay inside <code>tsconfig</code>'s <code>include</code> —
-      delete it and every call site stops compiling, which is the failure
-      direction you want. Two limits with it: register a second form and a
-      keyless <code>useField</code> is checked against the union of both until
-      you name the form key; and{" "}
-      <strong>seven path segments are addressable and
-      eight are not</strong>, so a correct leaf deeper than that is rejected
-      rather than accepted. What the union costs the compiler, where it stops,
+      <strong>What it costs.</strong> One{" "}
+      <code>declare module "@maroonedog/waypoint"</code> block, written against
+      the ROOT entry rather than a framework's, so one registry serves every
+      binding. It has to stay inside <code>tsconfig</code>'s{" "}
+      <code>include</code>: delete it and every call site stops compiling, which
+      is the failure direction you want.
+    </p>
+
+    <p class="note">
+      <strong>Two limits.</strong> Register a second form and a keyless{" "}
+      <code>useField</code> is checked against the union of both until you name
+      the form key. And <strong>seven path segments are addressable, eight are
+      not</strong> — a correct leaf deeper than that is rejected rather than
+      accepted. What the union costs the compiler, where it stops,
       and the escape hatch for a subtree you do not address are measured in{" "}
       <!-- Mono, because the link text is a path in the repository rather than
            the name of a document: it is a thing the reader could type. -->
@@ -385,12 +389,15 @@ const TRY = [
       <strong class="text-on-surface">The other half is that the cell the
       address names is already written.</strong> Every cell is seeded at{" "}
       <code>createForm</code> from the descriptor list, before any component
-      mounts, so a leaf appearing is a subscription and nothing else — no
-      register, no unregister, no <code>shouldUnregister</code>, no ref
-      callback, and a field in a portal, in a lazy chunk or behind a condition
-      is not a case. An address checked at compile time that named nothing until
-      a component mounted would only be half an address, which is why these two
-      are one claim rather than two features.
+      mounts. A leaf appearing is a subscription and nothing else: no register,
+      no unregister, no <code>shouldUnregister</code>, no ref callback. A field
+      in a portal, in a lazy chunk or behind a condition is not a special case.
+    </p>
+
+    <p class="mt-8">
+      An address checked at compile time that named nothing until a component
+      mounted would be half an address. That is why these are one claim rather
+      than two features.
     </p>
   </section>
 
@@ -429,8 +436,8 @@ const TRY = [
     <p class="caption">
       A rule reporting onto a field nobody touched is not scarce — every
       whole-record validator does it. What differs is the bill. At 201 fields
-      this costs one pass over 201 paths and 2 commits; the react-hook-form{" "}
-      <code>deps</code> configuration costs two passes over 402 paths; and{" "}
+      this costs one pass over 201 paths and 2 commits. The react-hook-form{" "}
+      <code>deps</code> configuration costs two passes over 402 paths.{" "}
       <code>react-hook-form-scoped</code> costs 0 commits by showing no message
       at all, which the benchmark scores <em>disagrees</em> rather than a win.
     </p>

@@ -125,16 +125,15 @@ const entryPoints = [
 
   <p class="lead">
     <strong>Nothing is published yet</strong>, so you clone it and run one
-    command. It is one package with eight entry points, so there is one
-    version to track and one install to make.
+    command. Eight entry points, one package: one version to track, one install
+    to make.
   </p>
 
   <Code code={install} label="shell: install" lang="sh" />
 
   <h2>Before you start</h2>
   <p>
-    Four things, and the second one has a floor that is worth knowing before
-    you hit it rather than after.
+    Four things. The second has a floor worth knowing before you hit it.
   </p>
 
   <div class="mt-[var(--gap-block)] overflow-x-auto">
@@ -160,18 +159,18 @@ const entryPoints = [
 
   <h2>Tell the types about your form, once</h2>
   <p>
-    You have a schema already. The problem this solves is the one that starts
-    the moment a form is more than one component: <strong>a leaf that wants a
-    field needs the form's type</strong>, and the usual ways to give it one all
-    cost something — pass the form object down, thread a generic parameter
-    through every component in between, or import the schema at the leaf and
-    couple it to that one form forever.
+    You have a schema already. The problem starts the moment a form is more
+    than one component: <strong>a leaf that wants a field needs the form's
+    type</strong>. Every usual way of giving it one costs something. Pass the
+    form object down and every component in between carries it. Thread a
+    generic and every signature on the way grows. Import the schema at the leaf
+    and that component belongs to one form forever.
   </p>
   <p>
-    A module augmentation is a fourth. It belongs to the <em>compilation</em>
+    A module augmentation is a fourth way. It belongs to the <em>compilation</em>
     rather than to the import graph, so declaring it once puts the form's paths
-    in scope everywhere — in a component ten levels down that imports nothing,
-    receives nothing, and knows no schema.
+    in scope everywhere — including a component ten levels down that imports
+    nothing and knows no schema.
   </p>
 
   <Code code={withoutBanner(registrySource)} label="file: src/demo/order-form.ts" />
@@ -200,10 +199,9 @@ const entryPoints = [
 
   <h2>What that buys, at the leaf</h2>
   <p>
-    This is what the declaration is for, and it is worth reading as a
-    before-and-after rather than as a feature: the component below takes one
-    prop, imports one <em>type</em>, and is wrong at compile time if the
-    address is misspelt.
+    Read this as a before-and-after rather than as a feature. The component
+    below takes one prop, imports one <em>type</em>, and is wrong at compile
+    time if the address is misspelt.
   </p>
 
   <Code code={atTheLeaf} label="file: any component, any depth" lang="tsx" />
@@ -249,10 +247,10 @@ const entryPoints = [
 
   <h2>When there is more than one form</h2>
   <p>
-    Add a second key. Two things change and nothing else does: the prefix stops
-    being optional, because a bare <code>owner.email</code> is now ambiguous
-    and the compiler says so; and the form names itself where it is created, so
-    the runtime can check that the paths under a provider belong to it.
+    Add a second key. Two things change and nothing else does. The prefix stops
+    being optional: a bare <code>owner.email</code> is ambiguous now, and the
+    compiler says so. And the form names itself where it is created, so the
+    runtime can check that the paths under a provider belong to it.
   </p>
 
   <Code code={twoForms} label="type: two keys" lang="tsx" />
@@ -305,25 +303,27 @@ const entryPoints = [
 
   <h2>Four you can type into now</h2>
   <p>
-    The example applications run on this site rather than only on a port.
+    The example applications run on this site, not only on a port.{" "}
     <a class="link" href="/showcase/">Showcase</a> is a 23-input trade
     application across six sections, drawn with the application's own
-    components; the
-    <a class="link" href="/examples/">Examples</a> page carries three more — a
-    server-error round trip, two forms sharing one component, and a wizard —
-    each of them the example program itself, imported and mounted, not a copy.
+    components. The <a class="link" href="/examples/">Examples</a> page carries
+    three more: a server-error round trip, two forms sharing one component, and
+    a wizard. Each is the example program itself, imported and mounted.
   </p>
 
   <p class="caption">
-    Two are commands, because they need libraries this site does not carry:{" "}
-    <code>npm run example:nested-arrays</code> writes the same nested shape
-    four times — waypoint, react-hook-form, Formik and TanStack Form, against
-    one schema, side by side — so the difference is how a field two levels
-    inside a list says which row it belongs to, and nothing else;{" "}
+    Two stay commands, because they need libraries this site does not carry.{" "}
+    <code>npm run example:nested-arrays</code> writes the same nested shape four
+    times — waypoint, react-hook-form, Formik, TanStack Form — against one
+    schema. The only difference is how a field two levels inside a list says
+    which row it belongs to.{" "}
     <code>npm run example:playground</code> counts renders per keystroke and
-    swaps the store underneath. Every example has its own README, and none of
-    them needs a build: the package resolves to its
-    <strong>source</strong>, so an edit inside <code>src/core</code> reloads
+    swaps the store underneath.
+  </p>
+
+  <p class="caption">
+    Every example has a README, and none needs a build: the package resolves to
+    its <strong>source</strong>, so an edit inside <code>src/core</code> reloads
     the page.
   </p>
 

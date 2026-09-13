@@ -141,10 +141,10 @@ import type * as z from "zod";
     <code>getZodConstraint</code>, <code>superValidate</code>,{" "}
     <code>toFieldConfig</code> and <code>ZodBridge</code> all do it, and
     Standard Schema now carries a JSON Schema member several validators
-    implement. The walk from the tree to the list is the part that is work —
-    and it is written once, against the format rather than against a vendor,
-    which is what makes this contract neutral by construction instead of by
-    writing the walk again per validator.
+    implement. The walk from the tree to the list is the work, and it is written
+    once, against the format rather than against a vendor. That is what makes
+    this contract neutral by construction rather than by rewriting the walk per
+    validator.
   </p>
 
   <h2>What a descriptor draws</h2>
@@ -156,10 +156,10 @@ import type * as z from "zod";
     per hook call — the shape is the point, not the spelling. Stage 2 is what
     the resolver returns and stage 3 is what{" "}
     <code>inputProps</code> carries; both were produced by running them, not
-    typed out. An attribute is emitted only when the schema declared the bound
-    — <code>bio</code> declared nothing, so its input carries nothing — and{" "}
-    <code>aria-invalid</code> only once the field actually has issues, because
-    stamping <code>aria-invalid="false"</code> on forty untouched inputs asserts
+    typed out. An attribute is emitted only when the schema declared the bound:{" "}
+    <code>bio</code> declared nothing, so its input carries nothing.{" "}
+    <code>aria-invalid</code> appears only once a field has issues. Stamping{" "}
+    <code>aria-invalid="false"</code> on forty untouched inputs asserts
     something about each of them that nothing has checked.
   </p>
 
@@ -186,11 +186,10 @@ import type * as z from "zod";
     <code>errorId</code>, <code>descriptionId</code>, <code>ariaInvalid</code>,{" "}
     <code>ariaDescribedBy</code> and <code>focusFirst</code>.{" "}
     <strong>Not done, and not scheduled:</strong> an error summary with focus
-    management on a failed submit, a WCAG map criterion
-    by criterion, a gated <code>axe</code> suite, and an audit by somebody who
-    does this for a living. Nothing here has met a real screen reader; the live
-    region caveat above is what the ARIA practices describe, not something
-    measured in this repository.
+    management on a failed submit, a WCAG map criterion by criterion, a gated{" "}
+    <code>axe</code> suite, and an audit by somebody who does this for a living.
+    Nothing here has met a real screen reader. The live-region caveat above is
+    what the ARIA practices describe, not something measured here.
   </p>
 
   <h2>Two members</h2>
@@ -199,24 +198,26 @@ import type * as z from "zod";
 
   <p class="caption">
     There is no registry, no vendor tag and no dispatch: a resolver is named at
-    the call site. And there is no <code>FormResolver</code> type. All three
-    resolvers happen to be unary today, so such a type would finally be
-    accurate — which is exactly why it still is not written: it would describe
-    what has been built rather than constrain what may be, and the next vendor
-    would widen it. What every vendor does agree to is the two members.
+    the call site. There is no <code>FormResolver</code> type either. All three
+    resolvers are unary today, so one would be accurate — and that is the
+    reason not to write it. It would describe what exists rather than constrain
+    what may be, and the next vendor would widen it. The two members are what
+    every vendor agrees to.
   </p>
 
   <h2>Neutral by construction</h2>
 
   <p>
     This used to be argued by shipping two resolvers, which proves only that two
-    can be written. Now the generic one takes{" "}
-    <strong>both</strong> its members from specifications this package does not
-    own, and names no vendor anywhere in its entry point —
-    so a validator that implements them works without a file being added here.{" "}
+    can be written. The generic one now takes <strong>both</strong> its members
+    from specifications this package does not own, and names no vendor in its
+    entry point. A validator that implements them works without a file being
+    added here.
+  </p>
+  <p>
     <code>draft-2020-12</code> is asked for first and <code>draft-07</code> on a
-    throw, because the spec tells a library to throw on a target it does not
-    support and both drafts are in wide use.
+    throw: the spec tells a library to throw on a target it does not support,
+    and both drafts are in wide use.
   </p>
 
   <Code code={neutral} label="the degradation, in the type system" />
@@ -225,12 +226,11 @@ import type * as z from "zod";
     <strong class="text-on-surface">A form that draws nothing now says so.</strong>{" "}
     A resolver with no descriptors still returns a working{" "}
     <code>validate</code>, so the form judges correctly, gates submit correctly
-    and renders nothing — and every symptom points at the renderer. The
-    compiler catches the case it can see, naming the missing member. The two it
-    cannot — a converter that threw, a document with nothing in it — each get
-    their own sentence on the console, because they are different bugs with
-    different fixes. Nothing throws: a form that validates and draws nothing is
-    the better failure.
+    and renders nothing. Every symptom points at the renderer. The compiler
+    catches the case it can see and names the missing member. The two it cannot
+    — a converter that threw, a document with nothing in it — get a sentence
+    each on the console, because they are different bugs. Nothing throws: a form
+    that validates and draws nothing is the better failure.
   </p>
 
   <h2>So why do two vendor resolvers remain?</h2>
@@ -240,15 +240,17 @@ import type * as z from "zod";
   <p class="caption">
     Because a spec member that does not exist cannot carry anything. Over every
     schema in the zod resolver's own test file, the generic walk reproduced the
-    old hand-written one <em>byte for byte</em> — including{" "}
-    <code>.describe()</code> and <code>.meta()</code> text, which survives into
-    JSON Schema <code>title</code> and <code>description</code> on its own, so
-    the 103-line walk that reached{" "}
-    <code>globalThis.__zod_globalRegistry</code> for it is deleted. The three
-    rows above are what is left, and each is UI that would otherwise change
-    under a version bump: a date picker becoming a text box, an option losing
-    its capital, <code>min="-9007199254740991"</code> appearing on a number
-    input. The other gap is <code>code</code>:{" "}
+    hand-written one <em>byte for byte</em>. That includes{" "}
+    <code>.describe()</code> and <code>.meta()</code> text, which reaches JSON
+    Schema <code>title</code> and <code>description</code> on its own, so the
+    103-line walk that read <code>globalThis.__zod_globalRegistry</code> is
+    deleted.
+  </p>
+  <p class="caption">
+    The three rows above are what is left. Each is UI that would otherwise
+    change under a version bump: a date picker becoming a text box, an option
+    losing its capital, <code>min="-9007199254740991"</code> on a number input.
+    The other gap is <code>code</code>:{" "}
     <code>StandardSchemaV1.Issue</code> has <code>message</code> and{" "}
     <code>path</code> and nothing else, so both vendor resolvers keep the{" "}
     <strong class="text-on-surface">verdict</strong> and take the{" "}
@@ -312,20 +314,21 @@ import type * as z from "zod";
   </div>
 
   <p class="caption">
-    Three resolvers ship and they now work alike: all of them flatten the same
-    tree — one with <code>$ref</code> and combinators in it — into one
-    descriptor per leaf, through the same walk. Nor is that route free. Run here
-    on zod 4.6.4, asking a schema containing <code>z.date()</code> for its JSON
-    Schema throws{" "}
+    All three resolvers work alike now: each flattens the same tree, <code>$ref</code>{" "}
+    and combinators included, into one descriptor per leaf through the same
+    walk.
+  </p>
+  <p class="caption">
+    That route is not free. Measured on zod 4.6.4: asking a schema containing{" "}
+    <code>z.date()</code> for its JSON Schema throws{" "}
     <code class="verdict">Date cannot be represented in JSON Schema</code> and
-    emits <strong class="text-on-surface">no property at all</strong> — the
-    whole document is lost to one field, and it is the most common non-text
-    widget in a real form. zod offers a way through, spelled{" "}
+    emits <strong class="text-on-surface">no property at all</strong>. One field
+    loses the whole document, and it is the most common non-text widget in a
+    real form. zod offers a way through, spelled{" "}
     <code>&#123; unrepresentable: "any" &#125;</code>, and{" "}
-    <code>zodFormResolver</code> passes it on every call; the generic resolver
-    forwards such an option but never invents one, because it is the vendor's
-    own vocabulary and an unknown library is entitled to reject a key it does
-    not know.{" "}
+    <code>zodFormResolver</code> passes it on every call. The generic resolver
+    forwards such an option but never invents one: it is the vendor's own
+    vocabulary, and an unknown library may reject a key it does not know.{" "}
     <a class="link" href="/start/"
       >What each entry point gives you →</a
     >

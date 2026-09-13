@@ -118,9 +118,9 @@ const COMMANDS = [
 
   <p class="caption">
     One round trip, and the two ways a complaint stops being true. The handler
-    returns nothing: what the server said goes to <code>adoptIssues</code>,
-    which is merged into every pass rather than written to a cell — so one list
-    feeds the field, the count and the submit verdict, and they cannot come to
+    returns nothing. What the server said goes to <code>adoptIssues</code>,
+    which merges it into every pass rather than writing it to a cell, so one
+    list feeds the field, the count and the submit verdict. They cannot come to
     disagree.
   </p>
 
@@ -131,10 +131,10 @@ const COMMANDS = [
     pressed, so the handler ran and the refusal arrived afterwards. Press again
     and it is refused before the handler runs at all. Now edit the handle: its
     message goes without anybody asking the server. Edit the card number and
-    the decline stays, because nothing you can type is <em>about</em>{" "}
-    <code>payment</code> — a path no input draws, which still blocks the submit
-    and still appears in the summary, with no label, because the descriptor
-    tree has never heard of it.
+    the decline stays: nothing you can type is <em>about</em>{" "}
+    <code>payment</code>. No input draws that path, and it still blocks the
+    submit and still appears in the summary — with no label, because the
+    descriptor tree has never heard of it.
   </p>
 
   <div><ServerErrorsExample client:load /></div>
@@ -179,9 +179,8 @@ const COMMANDS = [
     anywhere else. Leave step 2 empty and send it: the submit judges the whole
     root, so it is refused by name for a screen you were not looking at. The{" "}
     <code>partial</code> prop on the provider is why no coverage warning fires
-    for the two steps that are off screen; without it the runtime would name
-    their fields as undrawn, which is exactly what it should do when a field
-    really was forgotten.
+    for the two steps off screen. Without it the runtime would name their fields
+    as undrawn — which is what it should do when a field really was forgotten.
   </p>
 
   <div><WizardExample client:load /></div>
@@ -200,10 +199,9 @@ const COMMANDS = [
   <p class="caption">
     <strong class="text-on-surface">playground</strong> —{" "}
     <code>npm run example:playground</code>. The one that is not a
-    demonstration: a render counter on every field, and a store you can swap
-    between the shipped one and a zustand one, so a claim about what a
-    keystroke costs can be watched rather than read. Needs{" "}
-    <code>zustand</code>.
+    demonstration. A render counter on every field, and a store you can swap
+    between the shipped one and a zustand one, so a claim about what a keystroke
+    costs can be watched rather than read. Needs <code>zustand</code>.
   </p>
 
   <p class="caption">
@@ -211,10 +209,10 @@ const COMMANDS = [
     <code>npm run example:nested-arrays</code>. The same{" "}
     <code>shipments[] → address&#123;&#125; → lines[]</code> shape written four
     times — waypoint, react-hook-form, Formik, TanStack Form — against one
-    schema, with the same markup and the same behaviour. The line counts and
-    path-mention counts it shows are derived from each file at run time rather
-    than typed, and waypoint is not the shortest of the four, which is why line
-    count is not the claim. Needs <code>react-hook-form</code>,{" "}
+    schema, with the same markup and the same behaviour. Its line counts and
+    path-mention counts are derived from each file at run time rather than
+    typed. waypoint is not the shortest of the four, which is why line count is
+    not the claim. Needs <code>react-hook-form</code>,{" "}
     <code>@hookform/resolvers</code>, <code>formik</code> and{" "}
     <code>@tanstack/react-form</code>.
   </p>
@@ -269,11 +267,10 @@ const COMMANDS = [
 
   <p class="caption">
     The examples above are React. The <code>./vue</code> entry reads the same
-    registry — a Vue application writes the same{" "}
-    <code>declare module "@maroonedog/waypoint"</code> a React one does — and
-    the binding hands back the same four prop bags off the same descriptor.
-    There is no Vue example application yet; what exists is the entry and its
-    tests.
+    registry: a Vue application writes the same{" "}
+    <code>declare module "@maroonedog/waypoint"</code> a React one does, and the
+    binding hands back the same four prop bags off the same descriptor. There is
+    no Vue example application yet — only the entry and its tests.
   </p>
   <Code code={vueField} label="@maroonedog/waypoint/vue" lang="ts" flush />
 

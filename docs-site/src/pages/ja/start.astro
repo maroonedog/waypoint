@@ -193,9 +193,8 @@ const entryPoints = [
   </p>
   <p>
     <strong>adapter の値のほうは、1箇所だけ import します。</strong>実行時のフォームに
-    スキーマの記述を渡す必要があるので、<code>useCreateForm</code> を呼ぶコンポーネントが、
-    このファイルの export する adapter を受け取ります。ツリーの根元で1回だけで、ほかの
-    ファイルには要りません。
+    スキーマの記述を渡す必要があるためです。受け取るのは <code>useCreateForm</code> を呼ぶ
+    コンポーネントだけ。ツリーの根元で1回、ほかのファイルには要りません。
   </p>
 
   <h2>宣言すると、末端で何が変わるか</h2>
@@ -209,8 +208,8 @@ const entryPoints = [
 
   <p class="caption">
     このコンポーネントは、登録されているどのフォームのフィールドでも描けます。住所のほうが
-    自分の所属するフォームを名乗るからです。コピーを増やさずにコンポーネントとして使い回せる、
-    というのはこういうことで、それが効いてくる実例が{" "}
+    自分の所属するフォームを名乗るからです。コピーを増やさずに使い回せる、というのはこういう
+    ことです。実例が{" "}
     <a
       class="link"
       href="/examples/#two-forms"
@@ -231,9 +230,9 @@ const entryPoints = [
   <Code code={refusal} label="type: tsc が出すもの" />
 
   <p class="caption">
-    これ専用の型テストで固定してあります。<code>test/types-unregistered</code> が上の
-    拒否を1つずつ <code>@ts-expect-error</code> で押さえているので、通るようになる変更が
-    入ればビルドが落ちます。{" "}
+    これ専用の型テストで固定してあります。<code>test/types-unregistered</code> が上の拒否を
+    1つずつ <code>@ts-expect-error</code> で押さえています。通るようになる変更が入れば
+    ビルドが落ちます。{" "}
     <a class="link" href="/paths/" hreflang="en" lang="en"
       >なぜ props ではなくレジストリなのか（英語）→</a
     >
@@ -265,10 +264,9 @@ const entryPoints = [
   <Code code={twoForms} label="type: キーが2つ" lang="tsx" />
 
   <p class="caption">
-    登録はコンパイル単位で共有されます。これがこの仕組みの弱点でもあって、同じキーを
-    宣言したファイルが2つあっても衝突せずにマージされますし、フォームを登録している依存
-    パッケージがあれば、その登録もそのまま効きます。キーはグローバルな名前を決めるつもりで
-    選んでください。
+    登録はコンパイル単位で共有されます。これはこの仕組みの弱点でもあります。同じキーを宣言した
+    ファイルが2つあっても、衝突せずにマージされます。フォームを登録している依存パッケージが
+    あれば、その登録もそのまま効きます。キーはグローバルな名前を決めるつもりで選んでください。
   </p>
 
   <h2>どこから何を import するか</h2>
@@ -313,14 +311,17 @@ const entryPoints = [
   </p>
 
   <p class="caption">
-    残りの2本はコマンドのままです。このサイトが入れていないライブラリを使うためで、{" "}
-    <code>npm run example:nested-arrays</code> は同じ入れ子の形を waypoint・react-hook-form・
-    Formik・TanStack Form の4通りで、同じスキーマに対して並べて書いています。違いが出るのは
-    リストの2階層内側のフィールドが「自分がどの行のものか」をどう名乗るか、そこだけです。{" "}
-    <code>npm run example:playground</code> のほうは、1打鍵あたりのレンダー回数を数えながら
-    下のストアを差し替えます。どのサンプルにも README があり、ビルドは要りません。
-    パッケージが<strong>ソース</strong>に解決されるので、<code>src/core</code> を編集すれば
-    そのままページが再読み込みされます。
+    残りの2本はコマンドのままです。このサイトが入れていないライブラリを使うためです。{" "}
+    <code>npm run example:nested-arrays</code> は、同じ入れ子の形を waypoint・
+    react-hook-form・Formik・TanStack Form の4通りで並べて書いています。スキーマは同じで、
+    違うのはリストの2階層内側のフィールドが「自分がどの行のものか」をどう名乗るか、そこだけです。{" "}
+    <code>npm run example:playground</code> は、1打鍵あたりのレンダー回数を数えながら下の
+    ストアを差し替えます。
+  </p>
+
+  <p class="caption">
+    どのサンプルにも README があり、ビルドは要りません。パッケージが<strong>ソース</strong>に
+    解決されるので、<code>src/core</code> を編集すればページが再読み込みされます。
   </p>
 
   <section class="rounded-[3px] border border-outline-variant p-6">

@@ -116,8 +116,8 @@ const viewTypes = [
 
   <h2>Why a registry and not a prop</h2>
   <p>
-    Because the types cannot travel with the instance: one React context object
-    serves every form in an application, so the context cannot be generic and a
+    Because the types cannot travel with the instance. One React context object
+    serves every form in an application, so the context cannot be generic, and a
     path union cannot pass through it.
   </p>
 
@@ -132,7 +132,7 @@ const viewTypes = [
   <Code code={several} label="two forms, two keys" />
 
   <p class="caption">
-    With two registered, the unprefixed spellings leave the union — so an
+    With two registered, the unprefixed spellings leave the union. An
     application that grows a second form is told at every call site rather than
     at one. Every path-taking surface gets this for free, including the ones
     with no room for a key beside the path: a{" "}
@@ -256,9 +256,9 @@ const viewTypes = [
   </div>
 
   <p class="caption">
-    Every figure above is a delta over a floor the document also prints, and{" "}
-    <code>TS2589</code> was produced by no shape in the sweep — including a
-    self-referential root — which is what the budget exists for.{" "}
+    Every figure above is a delta over a floor the document also prints. No
+    shape in the sweep produced <code>TS2589</code>, a self-referential root
+    included, which is what the budget exists for.{" "}
     <a
       class="link"
       href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
@@ -300,7 +300,7 @@ const viewTypes = [
     throw</strong>. A mis-addressed field is inert, but it cannot let bad data
     through: the pass judges the whole root, so the verdict and the submit gate
     stay correct. The resemblance is searched for with the prefix off, because
-    a form's own vocabulary has none in it, and put back on afterwards — so
-    every path in the line can be pasted straight back into the source.
+    a form's own vocabulary has none in it, then put back on afterwards. Every
+    path in the line can be pasted straight back into the source.
   </p>
 </Base>

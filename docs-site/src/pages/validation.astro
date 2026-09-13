@@ -133,10 +133,11 @@ const moments = [
       >home page</a
     > runs exactly that schema, and the rule goes on reading shipping when its
     component is <em>not mounted</em>. The benchmark asks every subject for it
-    as scenario X1: waypoint pays one whole-root pass, the react-hook-form{" "}
-    <code>deps</code> configuration pays two passes and 402 paths judged, and{" "}
-    <code>react-hook-form-scoped</code> is scored <em class="verdict">disagrees</em> at all
-    three sizes because it showed no message at all.
+    as scenario X1. waypoint pays one whole-root pass. The react-hook-form{" "}
+    <code>deps</code> configuration pays two passes and 402 paths judged.{" "}
+    <code>react-hook-form-scoped</code> is scored{" "}
+    <em class="verdict">disagrees</em> at all three sizes, because it showed no
+    message at all.
   </p>
 
   <h2>A field nobody has rendered</h2>
@@ -200,13 +201,17 @@ const moments = [
   <p class="note">
     <strong>There is no debounce.</strong> One pass judges the whole root, so a
     delay on the pass would delay the required-field message along with the
-    network rule — which is not a smaller version of what other libraries ship
-    but a different and worse thing. Debounce inside the async rule, and take
-    the second argument to <code>validate</code>: it is an{" "}
-    <code>AbortSignal</code>, aborted the moment a newer pass starts, so a round
-    trip whose answer is already going to be discarded can stop rather than
-    finish. An adapter that declares only <code>root</code> is never handed one,
-    and no <code>AbortController</code> is constructed for it.
+    network rule. That is not a smaller version of what other libraries ship; it
+    is a different and worse thing.
+  </p>
+
+  <p class="caption">
+    Debounce inside the async rule, and take the second argument to{" "}
+    <code>validate</code>. It is an <code>AbortSignal</code>, aborted the moment
+    a newer pass starts, so a round trip whose answer will be discarded anyway
+    can stop rather than finish. An adapter that declares only{" "}
+    <code>root</code> is never handed one, and no <code>AbortController</code>{" "}
+    is constructed for it.
   </p>
 
   <h2>What asks for a pass, and what does not</h2>
@@ -286,27 +291,31 @@ const moments = [
   <p class="note">
     <strong>It is on the form and never on a field.</strong> One pass judges the
     whole root, so a field set to <code>"blur"</code> would still be re-judged
-    the moment any <em>other</em> field changed — there is no per-field pass to
-    gate, and a per-field knob here would be a promise this runtime cannot
-    keep. And after a <em>rejected</em> submit every setting judges on change
-    again: a person fixing the field the form has just complained about has to
-    watch the complaint go.
+    the moment any <em>other</em> field changed. There is no per-field pass to
+    gate, and a per-field knob would be a promise this runtime cannot keep.
+    After a <em>rejected</em> submit every setting judges on change again: a
+    person fixing the field the form just complained about has to watch the
+    complaint go.
   </p>
 
   <h2>Errors a server sent back</h2>
 
   <p class="caption">
     <code>form.adoptIssues(issues)</code> is the <code>setError</code> of this
-    library, and the name differs because the behaviour does: the runtime does
-    not merely display them, it owns them. They are merged onto every pass
-    before anything is written, so they reach their fields, are counted by{" "}
-    <code>errorCount</code> and appear in <code>blockedBy</code> — a hand-written
-    issue cell was shown, not counted, and did not block. They are dropped by a
-    write at the path, at an ancestor or at a descendant; by <code>reset</code>;
-    and by the end of the next <code>submit()</code>, which that attempt was
-    already refused by. One press is refused and told why; the next press asks
-    the server again, which is what keeps an issue on a path nobody can type
-    into — a declined card — from wedging the form for good.
+    library. The name differs because the behaviour does: the runtime owns them
+    rather than displaying them. They are merged onto every pass before anything
+    is written, so they reach their fields, are counted by{" "}
+    <code>errorCount</code> and appear in <code>blockedBy</code>. A hand-written
+    issue cell was shown, not counted, and did not block.
+  </p>
+
+  <p class="caption">
+    They are dropped by a write at the path, at an ancestor or at a descendant;
+    by <code>reset</code>; and by the end of the next <code>submit()</code>,
+    which that attempt was already refused by. One press is refused and told
+    why, and the next press asks the server again. That is what keeps an issue
+    on a path nobody can type into — a declined card — from wedging the form for
+    good.
   </p>
 
   <h2>What it costs</h2>
