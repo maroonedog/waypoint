@@ -289,9 +289,20 @@ FormValues<typeof adapter>     // the form's value type
 FormPaths<typeof adapter>      // the paths it declares
 `;
 
-const INDEX = [
-  ...hooks.map((one) => one.name),
-  ...components.map((one) => one.name),
+// The three Types headings carry ids of their own, because the layout's rail
+// script mints them for h2 only and these are h3. Each is named for the first
+// type it documents, so the index entry and the heading are the same word.
+const TYPE_NAMES = ["SubmitOutcome", "ConcretePath", "FormPath"] as const;
+
+// THE INDEX IS GROUPED, AND IT HOLDS EVERY SECTION. Flat, it ran fifteen
+// names together at 12px with nothing between the hooks and the components —
+// and it left the Types section out entirely, under a heading that says "On
+// this page". A reader who scans a list labelled that way and does not find
+// `FormPathTo` concludes it is not documented.
+const INDEX: readonly (readonly [string, readonly string[]])[] = [
+  ["Hooks", hooks.map((one) => one.name)],
+  ["Components", components.map((one) => one.name)],
+  ["Types", TYPE_NAMES],
 ];
 const slugOf = (name: string): string =>
   name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -321,17 +332,22 @@ const slugOf = (name: string): string =>
        lead is none of those. It is written as the sheet's own variable so it
        tracks this page's denser register instead of restating a number. -->
   <nav
-    class="mt-[var(--gap-block)] flex flex-wrap gap-x-4 gap-y-1.5"
-    aria-label="On this page"
+    class="mt-[var(--gap-block)] grid gap-2"
+    aria-label="Everything on this page"
   >
     {
-      INDEX.map((name) => (
-        <a
-          class="font-mono text-xs text-on-surface underline-offset-4 hover:underline"
-          href={`#${slugOf(name)}`}
-        >
-          {name}
-        </a>
+      INDEX.map(([group, names]) => (
+        <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
+          <span class="label w-24 shrink-0">{group}</span>
+          {names.map((name) => (
+            <a
+              class="link font-mono text-[0.8125rem]"
+              href={`#${slugOf(name)}`}
+            >
+              {name}
+            </a>
+          ))}
+        </div>
       ))
     }
   </nav>
@@ -351,15 +367,15 @@ const slugOf = (name: string): string =>
 
   <h2>Types</h2>
 
-  <h3>SubmitOutcome, SubmitHandler</h3>
+  <h3 id="SubmitOutcome">SubmitOutcome, SubmitHandler</h3>
   <p>
-    What <code>form.submit()</code> resolves to, and what it hands your handler.
+    What <code>form.submit()</code> resolves to, and what it hands your handler.{" "}
     <code>blockedBy</code> carries every blocking issue, including paths with no
     component on screen.
   </p>
   <Code code={submitTypes} />
 
-  <h3>ConcretePath, PartlyBoundPath, DeclaredOf, InhabitedPath</h3>
+  <h3 id="ConcretePath">ConcretePath, PartlyBoundPath, DeclaredOf, InhabitedPath</h3>
   <p>
     The types every signature above is written in. A descriptor is keyed by the
     rule and a value lives at a place; which one a surface takes follows from
@@ -367,9 +383,9 @@ const slugOf = (name: string): string =>
   </p>
   <Code code={pathTypes} />
 
-  <h3>The registry, and the view-layer paths</h3>
+  <h3 id="FormPath">The registry, and the view-layer paths</h3>
   <p>
-    <a class="underline decoration-outline underline-offset-4" href="/paths/"
+    <a class="link" href="/paths/"
       >How the registry works →</a
     >
   </p>

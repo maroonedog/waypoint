@@ -31,6 +31,11 @@ import aListSource from "../demo/proof/AList.tsx?raw";
 import uncontrolledSource from "../demo/proof/Uncontrolled.tsx?raw";
 import switchAStepOffSource from "../demo/proof/SwitchAStepOff.tsx?raw";
 
+// The one command that gets you the library, on the page where a reader
+// decides. It is four words because that is genuinely all there is: the same
+// block on /start/ adds the two that build and test it.
+const clone = `git clone https://github.com/maroonedog/waypoint`;
+
 const whole = `
 // 1. Any validator becomes a form description. One function, named by you.
 const orderAdapter = zodFormResolver(orderSchema);
@@ -119,12 +124,18 @@ items.insert(items.rows.length, { sku: "" });`,
 // "ours is checked and theirs is not" is false wherever the form's type is in
 // scope. The difference is what happens when it is not.
 //
-// THREE RANKS IN THE CELLS, and they are three different facts. A refusal is
-// `.verdict`, which is what that class is for: the compiler refusing the line.
-// A cell that starts `checked` takes the mark instead — nothing was
-// refused there, a place was named and it had a value in it. Everything else
-// stays quiet, "no error" included, because an absence of a judgement is not a
-// judgement and must not be drawn as one.
+// ONE MARK IN THE CELLS, AND IT IS ON THE ANSWER. A cell that says the
+// compiler refused the line, or that the path was checked, gets the mark: a
+// place was named and something answered for it. Everything else stays quiet,
+// "no error" included, because an absence of a judgement is not a judgement
+// and must not be drawn as one.
+//
+// IT USED TO BE THE VERDICT COLOUR ON "compile error", and that was backwards
+// in the one place it mattered. In this table a compile error is the OUTCOME
+// THE PAGE IS ARGUING FOR — the typo caught before it renders blank — so the
+// red meant for a refusal sat on waypoint's own column and on the two
+// libraries that also get it right, while the column that lets a typo through
+// was the only quiet one. A reader scanning four columns reads red as wrong.
 const LIBS = ["@maroonedog/waypoint", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
 
 const PATHS: readonly (readonly [string, readonly string[]])[] = [
@@ -331,9 +342,26 @@ const TRY = [
     >
     <a
       class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
+      href="/start/">Start</a
+    >
+    <a
+      class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
       href="https://github.com/maroonedog/waypoint">GitHub</a
     >
   </div>
+
+  <!-- HOW TO OBTAIN IT, ON THE PAGE WHERE THE DECISION IS MADE. Nothing is
+       published, so there is no install line to print and the honest route is
+       a clone — which was a page away, on /start/, reachable from a landing
+       page that at desktop width carried no in-site navigation at all. A
+       reader deciding whether to adopt an unpublished library needs to see
+       what obtaining it costs before they are asked to want it. -->
+  <p class="caption mt-6">
+    <strong>Nothing is published yet.</strong> There is no
+    npm install to print, no version to pin and nobody has run this in
+    production. What there is, is a clone:
+  </p>
+  <Code code={clone} label="shell: clone it" lang="sh" flush />
 
   <!-- ================================================== the thesis -->
   <section>
@@ -364,11 +392,9 @@ const TRY = [
                   <td
                     class:list={[
                       "pr-4",
-                      cell.startsWith("compile error")
-                        ? "verdict"
-                        : cell.startsWith("checked")
-                          ? "text-primary"
-                          : "text-on-surface-variant",
+                      cell.startsWith("compile error") || cell.startsWith("checked")
+                        ? "text-primary"
+                        : "text-on-surface-variant",
                     ]}
                   >
                     {cell}
@@ -402,7 +428,7 @@ const TRY = [
       <!-- Mono, because the link text is a path in the repository rather than
            the name of a document: it is a thing the reader could type. -->
       <a
-        class="font-mono text-primary underline underline-offset-4"
+        class="link font-mono"
         href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
         >docs/measurements-types.md</a
       >.
@@ -525,7 +551,7 @@ const TRY = [
                     ""
                   ) : (
                     <a
-                      class="text-primary underline underline-offset-4"
+                      class="link"
                       href={where}
                     >
                       →
@@ -561,7 +587,7 @@ const TRY = [
     </div>
     <p class="caption">
       Every hook and component, with its real signature, is on{" "}
-      <a class="text-primary underline underline-offset-4" href="/api/">API</a>.
+      <a class="link" href="/api/">API</a>.
     </p>
   </section>
 
@@ -615,7 +641,7 @@ const TRY = [
 
     <p class="caption">
       Every integer here is gated: CI fails when one of them moves.{" "}
-      <a class="text-primary underline underline-offset-4" href="/benchmark/"
+      <a class="link" href="/benchmark/"
         >What the benchmark can and cannot see →</a
       >
     </p>

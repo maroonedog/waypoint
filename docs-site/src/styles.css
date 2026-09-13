@@ -42,8 +42,8 @@
    specificity, so at 1400 and wider the later rule won — which was `lg`'s two
    columns. The third column never applied, and the right rail, auto-placed,
    wrapped to the second row of the FIRST column: "On this page" appeared under
-   the section index, on the left. Measured in the built stylesheet: the
-   1400px block at byte 24590, the lg rule after it.
+   the section index, on the left. Read out of the built stylesheet at the
+   time: the 1400px block was emitted before the `lg` one, so `lg` won.
 
    Named breakpoints are sorted by value, so this one emits after lg and xl.
    1400 rather than xl for the reason the layout comment gives: at xl the third
@@ -80,9 +80,14 @@
    reports about every declared path — see `missing()` in
    packages/waypoint/src/core/runtime/field-coverage.ts.
 
-   Every pair below was measured rather than eyeballed, and the ratio is
-   written next to it. Text pairs clear 4.5:1, boundaries and the focus ring
-   clear 3:1 (WCAG 2.4.11), on BOTH grounds in BOTH schemes.
+   Every pair below was measured rather than eyeballed, and the ratios are
+   here rather than promised. Against the page ground, light then dark:
+   ink 17.0 / 15.0, quiet ink 7.2 / 7.4, the mark 6.3 / 10.4, a verdict
+   6.9 / 9.2, a measured figure 6.1 / 10.7, the boundary line 3.4 / 3.3.
+   Against the recess: ink 16.1 / 15.7, quiet 6.8 / 7.7, the mark 6.0 / 10.9,
+   the line 3.2 / 3.5. Text clears 4.5:1 and boundaries and the focus ring
+   clear 3:1 (WCAG 1.4.11 Non-text Contrast), on both grounds in both schemes.
+   Re-measured across all ten built pages afterwards: no failing pair.
    =========================================================================== */
 :root {
   --wp-paper: #f9f9f7;
@@ -126,17 +131,18 @@
 /* ===========================================================================
    The utilities, re-pointed.
 
-   The pages are written in Material's utility names — `text-on-surface`
-   appears 47 times, `text-on-surface-variant` 88 — and rewriting every call
-   site would have been a very large diff that changed nothing a reader sees.
+   The pages are written in Material's utility names — 34 `text-on-surface`
+   and 44 `text-on-surface-variant` across docs-site/src — and rewriting every
+   call site would have been a large diff that changed nothing a reader sees.
    So the names stay and what they resolve to changes. `@theme inline` emits
    `var(--wp-…)` into the utility itself, which is what makes the scope below
    possible: the same class means Material inside the showcase and means this
    site everywhere else, resolved per element rather than per stylesheet.
 
-   Roles the docs never use — the error containers, `surface-highest`, the
-   secondary and tertiary pairs — are deliberately absent. They stay bound to
-   `--md-*` for the showcase, which is the only thing that asks for them.
+   Roles the docs never draw — the error containers, `surface-highest`, the
+   secondary pair — are deliberately left out and stay bound to `--md-*` for
+   the showcase, which is the only thing that asks for them. `tertiary` is
+   re-pointed because this site does have a use for it: a measured figure.
    =========================================================================== */
 @theme inline {
   --color-surface: var(--wp-paper);
@@ -160,18 +166,44 @@
   --font-sans: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* ONE RADIUS, AND IT IS SMALL. A cut into a page has a corner; a card has a
-     curve. Material's five-step shape scale stays bound for the showcase and
-     is not used by anything this site draws. */
+  /* ONE RADIUS FOR EVERY RECTANGLE, AND IT IS SMALL. A cut into a page has a
+     corner; a card has a curve. Every step of Tailwind's rectangle scale is
+     set to it, including the two that were missed the first time — a block
+     written `rounded` or `rounded-xs` came out at 4px beside its 3px
+     neighbours, which reads as a mistake rather than as a scale.
+
+     `rounded-full` is deliberately left alone: it is a shape, not a step, and
+     the one control that uses it is a toggle in a demo. Material's own scale
+     is restored inside `.md3-scope` with real rules, further down — these
+     keys are baked into the utilities at build time and cannot be reached by
+     redefining them on a class. */
+  --radius-xs: 3px;
   --radius-sm: 3px;
   --radius-md: 3px;
   --radius-lg: 3px;
   --radius-xl: 3px;
+  --radius-2xl: 3px;
+  --radius-3xl: 3px;
 }
 
-/* The guest gets its own colours back. Nothing is copied here: each token is
-   pointed at the Material role it stood in for, so the showcase on this page
-   and the showcase on its own port render off one file. */
+/* ===========================================================================
+   The guest gets its own colours back.
+
+   HALF OF THIS WORKS BY INDIRECTION AND HALF CANNOT, and the difference is
+   `@theme inline`. For a utility whose theme key is written as
+   `var(--wp-…)`, the utility emits that reference and it resolves per
+   element — so redefining the token here reaches it. For everything else the
+   VALUE is baked into the utility at build time, and redefining
+   `--color-primary-container` on this class reaches nothing at all.
+
+   That was not reasoned out, it was found: the first version of this block
+   redefined ten `--color-*` and `--radius-*` keys and every one of them was
+   dead. The showcase rendered its teal icon badge in the card's own colour on
+   all six cards, its selected chips indistinguishable from their ground, and
+   Material's 28px pill button as a 3px rectangle. The declarations below are
+   real rules for exactly the utilities the showcase uses and this site
+   re-pointed — checked against examples/showcase/src, not guessed.
+   =========================================================================== */
 .md3-scope {
   --wp-paper: var(--md-surface);
   --wp-sunk: var(--md-surface-container-low);
@@ -183,22 +215,55 @@
   --wp-verdict: var(--md-error);
   --wp-measure: var(--md-tertiary);
   font-family: Roboto, ui-sans-serif, system-ui, sans-serif;
+  /* `--font-mono` is re-pointed too, so the submitted-JSON panel matched this
+     site rather than the application it belongs to. */
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-/* The four roles the showcase uses that this site has no token for. They are
-   restored by name rather than by indirection, because nothing here stands in
-   for them. */
-.md3-scope {
-  --color-surface-lowest: var(--md-surface-container-lowest);
-  --color-surface-high: var(--md-surface-container-high);
-  --color-primary-container: var(--md-primary-container);
-  --color-on-primary-container: var(--md-on-primary-container);
-  --color-on-primary: var(--md-on-primary);
-  --color-secondary-container: var(--md-secondary-container);
-  --color-on-secondary-container: var(--md-on-secondary-container);
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 28px;
+
+.md3-scope .bg-primary-container {
+  background-color: var(--md-primary-container);
+}
+.md3-scope .text-on-primary-container {
+  color: var(--md-on-primary-container);
+}
+.md3-scope .bg-secondary-container {
+  background-color: var(--md-secondary-container);
+}
+.md3-scope .text-on-secondary-container {
+  color: var(--md-on-secondary-container);
+}
+.md3-scope .text-on-primary {
+  color: var(--md-on-primary);
+}
+.md3-scope .bg-surface-container {
+  background-color: var(--md-surface-container);
+}
+.md3-scope .bg-surface-high {
+  background-color: var(--md-surface-container-high);
+}
+/* Written with the opacity the call site uses, because a utility with a
+   modifier is a different class and this has to match it. */
+.md3-scope .bg-surface-high\/95 {
+  background-color: color-mix(in oklab, var(--md-surface-container-high) 95%, transparent);
+}
+.md3-scope .bg-surface-lowest\/60 {
+  background-color: color-mix(in oklab, var(--md-surface-container-lowest) 60%, transparent);
+}
+
+/* Material's shape scale. The site has one radius and the application it
+   hosts has five; flattening them turned a pill button into a rectangle. */
+.md3-scope .rounded-sm {
+  border-radius: 8px;
+}
+.md3-scope .rounded-md {
+  border-radius: 12px;
+}
+.md3-scope .rounded-lg,
+.md3-scope.rounded-lg {
+  border-radius: 16px;
+}
+.md3-scope .rounded-xl {
+  border-radius: 28px;
 }
 
 /* ===========================================================================
@@ -272,11 +337,15 @@ body {
 
   /* Inline code is a name inside a sentence. It gets the recess, not a border
      — a boxed word inside running text stops the line. */
+  /* 0.8125em, NOT 0.875: at the larger size an identifier was bigger in the
+     sentence quoting it than in the block defining it, which inverts the two.
+     A block sets at 13px, so this lands at 13.8 — near enough that a reader
+     recognises the same name, small enough that it stays inside the line. */
   :not(pre) > code {
     background: var(--wp-sunk);
     padding: 0.1em 0.3em;
     border-radius: 3px;
-    font-size: 0.875em;
+    font-size: 0.8125em;
   }
 
   /* A link is ink with a rule under it, not a colour. The mark is the dot, and
@@ -284,6 +353,21 @@ body {
      In `base` so that a `text-*` utility on a link still wins. */
   a {
     color: inherit;
+  }
+
+  /* THE ONE LINK STYLE, and it exists because the rule above was written and
+     then not kept: twenty-one links on the landing page alone were set in the
+     mark, which is the exact charge this palette makes against the one it
+     replaced. Ink, and a rule in the boundary colour — the same line the rest
+     of the site is drawn with, so a link is a piece of this design rather than
+     a colour dropped into it. In `base` for the same reason `a` is. */
+  a.link {
+    text-decoration: underline;
+    text-decoration-color: var(--wp-line);
+    text-underline-offset: 4px;
+  }
+  a.link:hover {
+    text-decoration-color: var(--wp-mark);
   }
 
   /* A code block is read rather than skimmed, and a long type signature must
@@ -294,9 +378,16 @@ body {
 }
 
 /* The one piece of structure Material has no token for: a rule that reads as a
-   division rather than as a border around something. */
-.hairline {
-  border-top: 1px solid var(--wp-line-faint);
+   division rather than as a border around something.
+
+   IN A LAYER, so that `first:border-t-0` can turn it off. Unlayered it beat
+   every utility whatever the selector, and the first entry on /api/ drew a
+   rule above it that the markup had explicitly asked not to draw — fifteen
+   entries, all separated, none of them opening cleanly. */
+@layer components {
+  .hairline {
+    border-top: 1px solid var(--wp-line-faint);
+  }
 }
 
 /* Astro renders headings inside prose we do not control the markup of, so the
@@ -359,6 +450,14 @@ main[data-register="finding"] :is(h2, h3) {
 main :is(p, li, figcaption) {
   max-width: 70ch;
 }
+/* EXCEPT INSIDE A GUEST. A measure is a decision about running text in this
+   column; an embedded application's paragraphs are its own, set in its own
+   face at its own size, and a cap counted in this page's characters narrowed
+   28 of them on /showcase/ alone. */
+.md3-scope :is(p, li, figcaption),
+.wp-example :is(p, li, figcaption) {
+  max-width: none;
+}
 main .lead {
   max-width: 54ch;
 }
@@ -378,6 +477,20 @@ main h1 {
   line-height: 1.2;
   max-width: 22ch;
 }
+
+/* THE LANDING PAGE'S HEADLINE IS THE PAGE. This library's whole claim is one
+   sentence, and at the size every other h1 on the site takes it was 1.76x the
+   body text under it and then immediately restated by a 19px lead — nothing
+   on the page was large, so nothing on the page was first. A page whose job
+   is to make one claim sets that claim like it means it. The frame says which
+   page this is: only the landing page is drawn bare. */
+main.is-landing h1 {
+  font-size: clamp(2.25rem, 5.2vw, 3.25rem);
+  line-height: 1.04;
+  letter-spacing: -0.021em;
+  max-width: 17ch;
+}
+
 main[data-register="finding"] h1 {
   font-family: var(--font-mono);
   font-size: 1.5rem;
@@ -421,8 +534,15 @@ main > h3 {
 }
 
 /* A heading owns what is under it. Last, so a subsection heading opening a
-   section binds to it instead of being held off by the subsection gap. */
-main :is(h2, h3) + * {
+   section binds to it instead of being held off by the subsection gap.
+
+   NARROWED THE SAME WAY THE HEADING RULE IS, and for the same reason: written
+   as `main :is(h2, h3) + *` it reached inside the embedded applications and
+   pushed the caption under every showcase card heading from 2px to 14px, and
+   opened a gap under every heading in the three plain examples. A page's own
+   headings are its direct children or its sections'; an island's are neither. */
+main > :is(h2, h3) + *,
+main > section > :is(h2, h3) + * {
   margin-top: var(--gap-heading);
 }
 
@@ -461,28 +581,47 @@ main :where(.code-block.is-flush) {
 /* The one paragraph a page opens with: larger than body, shorter measure, and
    set in the reading ink rather than the muted one — a lead is the first
    thing read, and the site had it in the same grey as its footnotes. */
+/* A STEP HAS TO BE BIG ENOUGH TO SEE. At 1.1875rem over a 1.0625rem body, in
+   the same face and the same ink, this was a two-pixel difference — which is
+   not a rank, it is a wobble. The lead is the sentence that carries a page
+   after its title, so it steps properly and takes a shorter measure to go
+   with the size. */
 .lead {
   margin-top: var(--gap-block);
+  font-size: 1.3125rem;
+  line-height: 1.5;
+  letter-spacing: -0.006em;
+  color: var(--wp-ink);
+}
+/* On the landing page the lead follows a headline that is already large, so
+   it steps DOWN from it rather than up from the body. */
+main.is-landing .lead {
   font-size: 1.1875rem;
   line-height: 1.6;
-  color: var(--wp-ink);
+  color: var(--wp-ink-quiet);
+  max-width: 50ch;
 }
 
 /* ===========================================================================
    The label, and its colon.
 
-   One micro-label with four jobs: a column header, a code block's strip, the
-   name over a returns table, a group name in the index. It used to be 11px
-   uppercase with letter-spacing — the stock developer-docs micro-label, and
-   worse than stock here, because the strings it sets are FILE NAMES: it
-   rendered `AField.tsx` as AFIELD.TSX, a name a reader could no longer type.
-   The transform is gone; the face does the work instead.
+   One micro-label, and every place a small name sits over something it names:
+   a code block's strip, a table's column headers, the demo strip in a proof,
+   the three group names in the index, the rail's own heading, the footer's
+   status line, and the "Where it stands" panels on / and /start/. Nine call
+   sites plus `main thead th`.
+
+   It used to be 11px uppercase with letter-spacing — the stock developer-docs
+   micro-label, and worse than stock here, because the strings it sets are
+   FILE NAMES: it rendered `AField.tsx` as AFIELD.TSX, a name a reader could
+   no longer type. The transform is gone; the face does the work instead.
 
    THE GRAMMAR IS `qualifier: value`, which is the punctuation this library
-   sells. `file: AField.tsx`, `shell: install`, `app: application-form`. The
-   qualifier is quiet, the colon is the mark, the value is ink — the same
-   three ranks a rendered address has. Anything written without a colon still
-   sets correctly; the grammar is rewarded, not required.
+   sells. `file: AField.tsx`, `shell: install`, `app: server-errors`,
+   `status: unpublished`. The qualifier is quiet, the colon is the mark, the
+   value is ink — the same three ranks a rendered address has. Anything
+   written without a colon still sets correctly; the grammar is rewarded, not
+   required.
    =========================================================================== */
 .label,
 main thead th {

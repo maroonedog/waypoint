@@ -101,11 +101,11 @@ const COMMANDS = [
 
   <p class="caption">
     The three below are the example programs themselves, imported and mounted —
-    not screenshots and not transcriptions. They are compiled by
+    not screenshots and not transcriptions. They are compiled by{" "}
     <code>npm run test:types</code> alongside the library, so one that stopped
     being what this page describes would fail the build. The biggest, a
     designed Material Design 3 screen, has a page of its own:{" "}
-    <a class="underline underline-offset-4" href="/showcase/">Showcase</a>.
+    <a class="link" href="/showcase/">Showcase</a>.
   </p>
 
   <p class="caption">
@@ -125,13 +125,13 @@ const COMMANDS = [
   </p>
 
   <p class="caption">
-    <strong class="text-on-surface">Things to try.</strong> Put <code>ada</code>
+    <strong class="text-on-surface">Things to try.</strong> Put <code>ada</code>{" "}
     in the handle and a card number ending in <code>0</code>, then press. The
     first press is <em>not</em> refused — nothing was wrong when it was
     pressed, so the handler ran and the refusal arrived afterwards. Press again
     and it is refused before the handler runs at all. Now edit the handle: its
     message goes without anybody asking the server. Edit the card number and
-    the decline stays, because nothing you can type is <em>about</em>
+    the decline stays, because nothing you can type is <em>about</em>{" "}
     <code>payment</code> — a path no input draws, which still blocks the submit
     and still appears in the summary, with no label, because the descriptor
     tree has never heard of it.
@@ -150,10 +150,10 @@ const COMMANDS = [
   </p>
 
   <p class="caption">
-    <strong class="text-on-surface">Things to try.</strong> Type into one
+    <strong class="text-on-surface">Things to try.</strong> Type into one{" "}
     <code>owner.email</code> and watch the other stay where it was. Then empty
     both and press <em>Go to the first problem</em> on each screen: they land
-    in different places, although both inputs really do carry
+    in different places, although both inputs really do carry{" "}
     <code>name="owner.email"</code> in the document. That is the one collision
     a qualified path does not solve — it happens in the DOM rather than in the
     types — and it is what <code>scopeProps</code> is for. The five spellings
@@ -177,7 +177,7 @@ const COMMANDS = [
     <strong class="text-on-surface">Things to try.</strong> Type something on
     step 1, go to step 3, come back — it is still there, and it was never
     anywhere else. Leave step 2 empty and send it: the submit judges the whole
-    root, so it is refused by name for a screen you were not looking at. The
+    root, so it is refused by name for a screen you were not looking at. The{" "}
     <code>partial</code> prop on the provider is why no coverage warning fires
     for the two steps that are off screen; without it the runtime would name
     their fields as undrawn, which is exactly what it should do when a field
@@ -198,24 +198,24 @@ const COMMANDS = [
   </p>
 
   <p class="caption">
-    <strong class="text-on-surface">playground</strong> —
+    <strong class="text-on-surface">playground</strong> —{" "}
     <code>npm run example:playground</code>. The one that is not a
     demonstration: a render counter on every field, and a store you can swap
     between the shipped one and a zustand one, so a claim about what a
-    keystroke costs can be watched rather than read. Needs
+    keystroke costs can be watched rather than read. Needs{" "}
     <code>zustand</code>.
   </p>
 
   <p class="caption">
-    <strong class="text-on-surface">nested-arrays</strong> —
-    <code>npm run example:nested-arrays</code>. The same
+    <strong class="text-on-surface">nested-arrays</strong> —{" "}
+    <code>npm run example:nested-arrays</code>. The same{" "}
     <code>shipments[] → address&#123;&#125; → lines[]</code> shape written four
     times — waypoint, react-hook-form, Formik, TanStack Form — against one
     schema, with the same markup and the same behaviour. The line counts and
     path-mention counts it shows are derived from each file at run time rather
     than typed, and waypoint is not the shortest of the four, which is why line
-    count is not the claim. Needs <code>react-hook-form</code>,
-    <code>@hookform/resolvers</code>, <code>formik</code> and
+    count is not the claim. Needs <code>react-hook-form</code>,{" "}
+    <code>@hookform/resolvers</code>, <code>formik</code> and{" "}
     <code>@tanstack/react-form</code>.
   </p>
 
@@ -253,7 +253,7 @@ const COMMANDS = [
                 {one.here === undefined ? (
                   "command only"
                 ) : (
-                  <a class="underline underline-offset-4" href={one.here}>
+                  <a class="link" href={one.here}>
                     on this site
                   </a>
                 )}
@@ -269,7 +269,7 @@ const COMMANDS = [
 
   <p class="caption">
     The examples above are React. The <code>./vue</code> entry reads the same
-    registry — a Vue application writes the same
+    registry — a Vue application writes the same{" "}
     <code>declare module "@maroonedog/waypoint"</code> a React one does — and
     the binding hands back the same four prop bags off the same descriptor.
     There is no Vue example application yet; what exists is the entry and its
@@ -278,16 +278,16 @@ const COMMANDS = [
   <Code code={vueField} label="@maroonedog/waypoint/vue" lang="ts" flush />
 
   <p class="caption">
-    It is a first cut and smaller than <code>./react</code>. It has
-    <code>useCreateForm</code>, <code>useForm</code>, <code>useField</code>,
-    <code>useRows</code>, <code>useFormStatus</code>, <code>useCell</code>,
-    <code>&lt;FormProvider&gt;</code>, <code>&lt;Field&gt;</code>,
+    It is a first cut and smaller than <code>./react</code>. It has{" "}
+    <code>useCreateForm</code>, <code>useForm</code>, <code>useField</code>,{" "}
+    <code>useRows</code>, <code>useFormStatus</code>, <code>useCell</code>,{" "}
+    <code>&lt;FormProvider&gt;</code>, <code>&lt;Field&gt;</code>,{" "}
     <code>&lt;FieldRows&gt;</code> and <code>decorateVNode</code> — the
     decorator ported, as a vnode rather than an element. What it does not have,
-    named in its own entry file so a grep for one of them finds this sentence:
-    <code>useUncontrolledField</code>, <code>useErrorSummary</code>,
-    <code>useFieldValue</code>, <code>useFieldValues</code>,
-    <code>useFieldIssues</code>, <code>useParticipation</code> and
+    named in its own entry file so a grep for one of them finds this sentence:{" "}
+    <code>useUncontrolledField</code>, <code>useErrorSummary</code>,{" "}
+    <code>useFieldValue</code>, <code>useFieldValues</code>,{" "}
+    <code>useFieldIssues</code>, <code>useParticipation</code> and{" "}
     <code>&lt;AutoForm&gt;</code>.
   </p>
 </Base>

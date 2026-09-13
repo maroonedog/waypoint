@@ -80,7 +80,7 @@ import TimingTable from "../components/TimingTable.astro";
   <p class="caption">
     <code>validatorPasses</code> and <code>paths judged</code> sit beside the
     render counts, so a zero-commit row can never be read as free: the two
-    react-hook-form rows commit nothing for a keystroke — <code>register</code>
+    react-hook-form rows commit nothing for a keystroke — <code>register</code>{" "}
     leaves the inputs uncontrolled — and still hand the whole 201-path root to
     the schema. The <code>on-submit</code> row does not even do that, by
     documented design.
@@ -98,7 +98,7 @@ import TimingTable from "../components/TimingTable.astro";
   <ScenarioTable />
 
   <p class="caption">
-    The middle column is where the deferred pass costs rather than saves: with
+    The middle column is where the deferred pass costs rather than saves: with{" "}
     <code>useField</code> the value lands in one task and the verdict in the
     next, so React cannot batch them and commits twice. The last column is the
     one the whole-root pass was built for — a rule reporting against a field
@@ -155,7 +155,7 @@ import TimingTable from "../components/TimingTable.astro";
   <p class="caption">
     The escape hatch is measured too, rather than asserted.{" "}
     <a
-      class="text-primary underline underline-offset-4"
+      class="link"
       href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
       >docs/measurements-types.md →</a
     >
