@@ -484,11 +484,21 @@ main h1 {
    on the page was large, so nothing on the page was first. A page whose job
    is to make one claim sets that claim like it means it. The frame says which
    page this is: only the landing page is drawn bare. */
+/* THE LANDING PAGE OPENS WITH THE NAME, and it is the mono that sets it — the
+   site's own rule is that anything a reader could type is a name, and
+   `waypoint` is what they would type. It used to open with the claim set as a
+   headline instead, on the reasoning that the name was already in the header
+   two centimetres above. That reasoning was wrong twice: a 14px wordmark in a
+   corner is chrome, not a title, and a three-line sentence at display size is
+   a paragraph pretending to be a headline. The claim is the line under it now,
+   which is where a subtitle goes. */
 main.is-landing h1 {
-  font-size: clamp(2.25rem, 5.2vw, 3.25rem);
-  line-height: 1.04;
-  letter-spacing: -0.021em;
-  max-width: 17ch;
+  font-family: var(--font-mono);
+  font-size: clamp(2.75rem, 9vw, 4.5rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  max-width: none;
 }
 
 main[data-register="finding"] h1 {
@@ -593,13 +603,23 @@ main :where(.code-block.is-flush) {
   letter-spacing: -0.006em;
   color: var(--wp-ink);
 }
-/* On the landing page the lead follows a headline that is already large, so
-   it steps DOWN from it rather than up from the body. */
+/* On the landing page the lead is the CLAIM, sitting under the name. It is the
+   second-biggest thing on the page because it is the second thing a reader
+   needs, and it is in the reading ink rather than the muted one: a thesis set
+   in the colour used for footnotes is a thesis nobody reads. */
 main.is-landing .lead {
-  font-size: 1.1875rem;
-  line-height: 1.6;
-  color: var(--wp-ink-quiet);
-  max-width: 50ch;
+  font-size: clamp(1.25rem, 2.6vw, 1.5rem);
+  line-height: 1.45;
+  color: var(--wp-ink);
+  max-width: 34ch;
+}
+
+/* A PARAGRAPH AFTER A LEAD HAD NO GAP AT ALL. The sheet spaces what follows a
+   heading and what follows a caption; a lead had only ever been followed by a
+   block with a margin of its own, so nothing covered this until the landing
+   page grew a paragraph under its claim and the two ran together. */
+.lead + p {
+  margin-top: var(--gap-block);
 }
 
 /* ===========================================================================
@@ -814,12 +834,10 @@ html[lang="ja"] main .caption {
 html[lang="ja"] main h1 {
   max-width: 18em;
 }
-html[lang="ja"] main.is-landing h1 {
-  max-width: 14em;
-  letter-spacing: -0.01em;
-}
+/* The landing headline is the package name in both languages, so it keeps the
+   Latin measure and tracking rather than the Japanese ones. */
 html[lang="ja"] main.is-landing .lead {
-  max-width: 26em;
+  max-width: 24em;
 }
 /* A table cell and a code label are as wide as what they hold, in either
    language. */
