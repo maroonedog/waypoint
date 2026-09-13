@@ -146,7 +146,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
           <slot />
         </main>
       ) : (
-        <div class="mx-auto grid max-w-[92rem] gap-x-10 px-4 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] min-[1400px]:grid-cols-[13rem_minmax(0,1fr)_13rem]">
+        <div class="mx-auto grid max-w-[92rem] gap-x-10 px-4 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] wide:grid-cols-[13rem_minmax(0,1fr)_13rem]">
           <nav
             class="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:py-10"
             aria-label="Documentation"
@@ -181,7 +181,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
           </main>
 
           <aside
-            class="hidden min-[1400px]:sticky min-[1400px]:top-14 min-[1400px]:block min-[1400px]:h-[calc(100vh-3.5rem)] min-[1400px]:overflow-y-auto min-[1400px]:py-10"
+            class="hidden wide:sticky wide:top-14 wide:block wide:h-[calc(100vh-3.5rem)] wide:overflow-y-auto wide:py-10"
             aria-label="On this page"
           >
             <p class="label">On this page</p>

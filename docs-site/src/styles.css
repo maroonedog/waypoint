@@ -7,6 +7,31 @@
    =========================================================================== */
 @import "tailwindcss";
 @source "../src";
+
+/* A NAMED BREAKPOINT, AND NOT `min-[1400px]`, because the arbitrary variant
+   was emitted BEFORE `lg` and lost to it.
+
+   Both wrote `grid-template-columns` on the same element with the same
+   specificity, so at 1400 and wider the later rule won — which was `lg`'s two
+   columns. The third column never applied, and the right rail, auto-placed,
+   wrapped to the second row of the FIRST column: "On this page" appeared under
+   the section index, on the left. Measured in the built stylesheet: the
+   1400px block at byte 24590, the lg rule after it.
+
+   Named breakpoints are sorted by value, so this one emits after lg and xl.
+   1400 rather than xl for the reason the layout comment gives: at xl the third
+   column took width off the text, which is the one thing a responsive layout
+   must never do. */
+@theme {
+  /* 87.5rem IS 1400px, AND THE UNIT IS THE WHOLE FIX. Tailwind's own
+     breakpoints are in rem, and it orders the media queries it emits by
+     comparing those values — across units it cannot, so a px breakpoint was
+     sorted ahead of every rem one. Measured in the built stylesheet with
+     `--breakpoint-wide: 1400px`: `@media (width>=1400px)` at byte 7104 and
+     `@media (width>=64rem)` at 7256, so lg came last and won, and the third
+     column never applied at any width. */
+  --breakpoint-wide: 87.5rem;
+}
 /* The showcase RUNS on this site, so its utilities have to be generated here.
    Without this line the screen arrives with its markup and none of its
    layout — which looks like a broken page rather than a missing @source. */
