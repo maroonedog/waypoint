@@ -19,12 +19,19 @@
 // `{ target: { value } }`. Narrowing it removes `nativeEvent.isComposing`,
 // which is the one thing an IME-aware caller needs.
 // ===========================================================================
-import type { ChangeEvent, RefObject } from "react";
+import type { ChangeEvent, ReactElement, RefObject } from "react";
 import type {
   FormFieldDescriptor,
   FormIssue,
   MaybeAsync,
 } from "../contract/index.js";
+
+/**
+ * Which of the four elements a bag belongs on. `decorate` takes it so that
+ * one function covers all four rather than four functions covering one each,
+ * and the default is the one a caller reaches for nine times in ten.
+ */
+export type FieldPart = "input" | "label" | "description" | "error";
 
 export type FieldChangeEvent = ChangeEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -117,7 +124,15 @@ export interface FieldBinding<TValue> {
   readonly path: string;
   readonly descriptor: FormFieldDescriptor | undefined;
   readonly value: TValue | undefined;
-  /** Never undefined; the empty list is interned, so it is reference-stable. */
+  /**
+   * What this field is willing to SAY right now — the last pass's verdict for
+   * this path, gated by `showIssues`. Never undefined; the empty list is
+   * interned, so it is reference-stable.
+   *
+   * It is not what blocks. A field waiting for its first blur publishes
+   * nothing here and still refuses the submit, and `errorCount` and
+   * `blockedBy` still count it.
+   */
   readonly issues: readonly FormIssue[];
   readonly isTouched: boolean;
   readonly isDirty: boolean;
@@ -129,6 +144,22 @@ export interface FieldBinding<TValue> {
   validate(): MaybeAsync<readonly FormIssue[]>;
   /** The issues this field would carry if its value were `candidate`. */
   issuesFor(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
+  /**
+   * The caller's own element, with this field's props merged into it.
+   *
+   * The four bags are still there and spreading them is still the shortest
+   * path. This is for the element that already HAS props: a spread silently
+   * drops whichever `onChange` comes second and truncates
+   * `aria-describedby` to one side, and neither failure shows up anywhere.
+   * Handlers and refs compose, `aria-describedby` joins, the field wins on
+   * identity and on what the schema declared, and everything else is left
+   * alone.
+   *
+   * `part` says which of the four elements this is; it defaults to the input.
+   * Decorating a description where the schema declared none hands the element
+   * back untouched, because there is no id for it to carry.
+   */
+  decorate(element: ReactElement, part?: FieldPart): ReactElement;
   readonly inputProps: FieldInputProps;
   readonly labelProps: FieldLabelProps;
   /** Undefined when the schema declared no description. */
@@ -160,6 +191,22 @@ export interface UncontrolledFieldBinding<TValue> {
   markTouched(): void;
   validate(): MaybeAsync<readonly FormIssue[]>;
   issuesFor(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
+  /**
+   * The caller's own element, with this field's props merged into it.
+   *
+   * The four bags are still there and spreading them is still the shortest
+   * path. This is for the element that already HAS props: a spread silently
+   * drops whichever `onChange` comes second and truncates
+   * `aria-describedby` to one side, and neither failure shows up anywhere.
+   * Handlers and refs compose, `aria-describedby` joins, the field wins on
+   * identity and on what the schema declared, and everything else is left
+   * alone.
+   *
+   * `part` says which of the four elements this is; it defaults to the input.
+   * Decorating a description where the schema declared none hands the element
+   * back untouched, because there is no id for it to carry.
+   */
+  decorate(element: ReactElement, part?: FieldPart): ReactElement;
   /** `ref`, the default and everything the descriptor declared, in one bag. */
   readonly inputProps: UncontrolledInputProps;
   readonly labelProps: FieldLabelProps;

@@ -75,6 +75,14 @@ export type {
   MissingFieldReason,
 } from "../core/index.js";
 export { describeMissingFields } from "./describe-missing-fields.js";
+export {
+  DEFAULT_ISSUE_VISIBILITY,
+  IssueVisibilityContext,
+} from "./issue-visibility-context.js";
+export { issuesAreVisible, type IssueVisibility } from "./issue-visibility.js";
+export { decorateElement } from "./decorate-element.js";
+export type { FieldOptions } from "./bind-field.js";
+export type { FieldPart } from "./field-binding.types.js";
 export { useField } from "./use-field.js";
 export { useUncontrolledField } from "./use-uncontrolled-field.js";
 export { useFieldValue } from "./use-field-value.js";

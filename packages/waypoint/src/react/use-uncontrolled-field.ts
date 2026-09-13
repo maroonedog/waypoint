@@ -35,7 +35,7 @@
 // the person did not pick — so the cell follows the node here and never leads
 // it, which is the only direction that was ever available.
 // ===========================================================================
-import { useCallback, useEffect, useId, useRef } from "react";
+import { useCallback, useContext, useEffect, useId, useRef } from "react";
 import type {
   UncontrolledChangeEvent,
   UncontrolledFieldBinding,
@@ -53,6 +53,11 @@ import {
 } from "./number-from-typing.js";
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
+import { decorateElement } from "./decorate-element.js";
+import { visibleIssues } from "./issue-visibility.js";
+import { IssueVisibilityContext } from "./issue-visibility-context.js";
+import type { FieldOptions } from "./bind-field.js";
+import type { FieldPart } from "./field-binding.types.js";
 import type {
   FormPath,
   InhabitedFormPath,
@@ -64,10 +69,12 @@ const displayValue = (value: unknown): string =>
   value === undefined || value === null ? "" : String(value);
 
 export function useUncontrolledField<Q extends FormPath>(
-  path: Q & InhabitedFormPath<Q>
+  path: Q & InhabitedFormPath<Q>,
+  options?: FieldOptions
 ): UncontrolledFieldBinding<ValueAtFormPath<Q>>;
 export function useUncontrolledField(
-  spelling: string
+  spelling: string,
+  options?: FieldOptions
 ): UncontrolledFieldBinding<never> {
   const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
@@ -78,9 +85,21 @@ export function useUncontrolledField(
 
   // The channels a message is drawn from. NOT the value: subscribing to that
   // is precisely what this hook exists not to do.
-  const issues = useCell(handle.sources.issues);
+  const produced = useCell(handle.sources.issues);
   const isTouched = useCell(handle.sources.touched);
   const isParticipating = useCell(handle.sources.participating);
+  const submitCount = useCell(form.submitCount);
+  const inherited = useContext(IssueVisibilityContext);
+  // `isDirty` is not subscribed here — see the header on what this binding
+  // refuses to subscribe to — so `"dirty"` is read off the cell rather than
+  // watched. A field asking for it re-renders when its issues or its touched
+  // flag move, which is every moment this list could change anyway.
+  const issues = visibleIssues(produced, {
+    visibility: options?.showIssues ?? inherited,
+    isTouched,
+    isDirty: handle.sources.dirty.read(),
+    submitCount,
+  });
 
   const node = useRef<HTMLInputElement | null>(null);
   const isCheckbox = handle.descriptor?.kind === "boolean";
@@ -168,6 +187,29 @@ export function useUncontrolledField(
     markTouched: () => handle.markTouched(),
     validate: () => handle.validate(),
     issuesFor: (candidate) => handle.issuesFor(candidate),
+    decorate: (element, part: FieldPart = "input") => {
+      const bag =
+        part === "label"
+          ? labelPropsFor(ids)
+          : part === "error"
+            ? errorPropsFor(ids)
+            : part === "description"
+              ? descriptionPropsFor(ids, handle.descriptor?.description)
+              : buildUncontrolledInputProps({
+                  path: handle.path,
+                  descriptor: handle.descriptor,
+                  issues,
+                  ids,
+                  ref: node,
+                  held,
+                  defaultValue: shown,
+                  onChange,
+                  onBlur,
+                });
+      return bag === undefined
+        ? element
+        : decorateElement(element, bag as unknown as Record<string, unknown>);
+    },
     inputProps: buildUncontrolledInputProps({
       path: handle.path,
       descriptor: handle.descriptor,

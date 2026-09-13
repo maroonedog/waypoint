@@ -19,9 +19,9 @@
     {
       "id": "@maroonedog/waypoint/react",
       "entry": "export * from \"@maroonedog/waypoint/react\";",
-      "minified": 29832,
-      "gzipped": 10541,
-      "budget": 11596
+      "minified": 31479,
+      "gzipped": 11159,
+      "budget": 12275
     },
     {
       "id": "@maroonedog/waypoint/resolver-standard",
@@ -61,16 +61,16 @@
     {
       "id": "react (a screen: useField, useRows, FormProvider, useCreateForm)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";",
-      "minified": 22736,
-      "gzipped": 8284,
-      "budget": 9113
+      "minified": 23881,
+      "gzipped": 8747,
+      "budget": 9622
     },
     {
       "id": "react (useField alone)",
       "entry": "export { useField } from \"@maroonedog/waypoint/react\";",
-      "minified": 3954,
-      "gzipped": 1581,
-      "budget": 1740
+      "minified": 5048,
+      "gzipped": 2056,
+      "budget": 2262
     },
     {
       "id": "core (createForm alone)",
@@ -89,9 +89,9 @@
     {
       "id": "a screen + resolver-zod (what an application installs)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";\nexport { zodFormResolver } from \"@maroonedog/waypoint/resolver-zod\";",
-      "minified": 29354,
-      "gzipped": 10521,
-      "budget": 11574
+      "minified": 30501,
+      "gzipped": 10982,
+      "budget": 12081
     }
   ]
 }

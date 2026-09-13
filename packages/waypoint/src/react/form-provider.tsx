@@ -47,6 +47,8 @@ import {
 } from "./widget-registry-context.js";
 import type { WidgetRegistry } from "./widget-registry.types.js";
 import { useCoverageReport } from "./use-coverage-report.js";
+import { IssueVisibilityContext } from "./issue-visibility-context.js";
+import type { IssueVisibility } from "./issue-visibility.js";
 import type { FormKey } from "./waypoint-forms.js";
 
 export interface FormProviderProps<T, TPath extends string> {
@@ -79,6 +81,21 @@ export interface FormProviderProps<T, TPath extends string> {
    * business addressing a field that does not exist than a whole one does.
    */
   readonly partial?: boolean;
+  /**
+   * When the fields below start showing what a pass found. Defaults to
+   * `"immediately"`, which is what this library has always done; `"touched"`
+   * waits for each field's first blur and `"dirty"` for its first edit.
+   *
+   * It is a default, not a rule: `useField(path, { showIssues })` overrides it
+   * for one call, because the component drawing a field is what knows whether
+   * that field should speak early.
+   *
+   * IT GOVERNS DISPLAY AND NOTHING ELSE. Passes run exactly as they did, and
+   * `errorCount`, `blockedBy` and the submit gate all still count a field
+   * that is not saying anything yet. A refused submit reveals every field
+   * whatever this says.
+   */
+  readonly showIssues?: IssueVisibility;
   /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */
   readonly widgets?: WidgetRegistry;
   readonly children: ReactNode;
@@ -115,15 +132,26 @@ export function FormProvider<T, TPath extends string>(
       {props.children}
     </WidgetRegistryContext.Provider>
   );
+  // Rendered only when this provider actually sets one, for the reason the
+  // key provider below gives: a fiber rendered unconditionally is a fiber
+  // every application pays for so that a few can use a feature.
+  const shown =
+    props.showIssues === undefined ? (
+      widgets
+    ) : (
+      <IssueVisibilityContext.Provider value={props.showIssues}>
+        {widgets}
+      </IssueVisibilityContext.Provider>
+    );
   return (
     <FormContext.Provider
       value={props.form as unknown as FormHandle<unknown, string>}
     >
       {formKey === inherited ? (
-        widgets
+        shown
       ) : (
         <FormKeyContext.Provider value={formKey}>
-          {widgets}
+          {shown}
         </FormKeyContext.Provider>
       )}
     </FormContext.Provider>

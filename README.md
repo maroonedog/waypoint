@@ -105,6 +105,45 @@ directions into errors, which is what a test wants rather than a console;
 and `form.coverage.missing()` is the same question as a plain query, at any
 moment, with nothing rendered.
 
+## When a field starts complaining
+
+`validateOn` decides when a PASS RUNS, and that is a fact about the form: one
+pass judges the whole root, so there is no per-field pass to gate. What it was
+also being asked to decide is when a FIELD SPEAKS, and it never could —
+measured on a two-field form with `validateOn: "blur"`, blurring `a`
+published `b`'s verdict too, and a field nobody had reached was marked
+`aria-invalid` because a different one lost focus.
+
+So the second question is asked where it is true, at the call:
+
+```tsx
+useField("form:email", { showIssues: "touched" })   // "immediately" | "touched" | "dirty"
+<FormProvider form={form} showIssues="touched">     // the default for a subtree
+```
+
+It governs **display and nothing else**. The pass runs as it always did, and
+`errorCount`, `blockedBy` and the submit gate all still count a field that is
+saying nothing — so a quiet field still refuses the submit, which is what
+`useErrorSummary()` is for. A refused submit reveals every field whatever it
+asked for.
+
+## Decorating your own element
+
+The four prop bags are offered and spreading them is still the shortest path.
+For an element that already has props of its own, spreading is a merge with two
+silent failures — whichever `onChange` is written second wins and the other
+never runs, and `aria-describedby` truncates to one side and stops being
+announced:
+
+```tsx
+const field = useField(at);
+return field.decorate(<input className="mine" onChange={track} />);
+```
+
+Handlers and refs compose, `aria-describedby` joins, the field wins on every
+key it sets, and everything else is left alone. `field.decorate(el, "label")`
+does the same for the other three elements.
+
 The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 `useFieldIssues`, `useFormStatus`, `useRows`, `useParticipation`,
 `useErrorSummary`, `<Field>`, `<FieldRows>`, `<AutoForm>`, `adoptIssues` and
@@ -125,8 +164,8 @@ The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 They are entry points rather than packages because they all install together
 anyway. What the split buys is **resolution**: `./core` loads in a worker with
 no React resolvable at all, and only `./react` names React in its built output.
-`useField` alone is 1.54 kB gzipped against 10.29 kB for the whole `./react` barrel,
-and a screen plus the zod resolver is 10.27 kB. `npm run size:check` gates every row.
+`useField` alone is 2.01 kB gzipped against 10.90 kB for the whole `./react` barrel,
+and a screen plus the zod resolver is 10.72 kB. `npm run size:check` gates every row.
 
 ## What it does not do
 

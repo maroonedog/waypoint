@@ -21,14 +21,20 @@
 // mean "trust me", and what it usually meant was a misspelt path rendering an
 // empty input that was never validated and said nothing.
 //
-// ONE ARGUMENT, because the path says which form it belongs to:
+// THE SECOND ARGUMENT IS THIS FIELD'S OWN BEHAVIOUR, and it is here because
+// this call is the contract between a component and a form. When a pass runs
+// is a fact about the form and stays in `FormOptions.validateOn`; when THIS
+// field starts speaking is a fact about this component, and two components
+// binding the same path may honestly want different answers.
+//
+// ONE PATH ARGUMENT, because the path says which form it belongs to:
 // `useField("admin:quotas.seats")`. There is no second spelling that takes the
 // form beside the path — one call shape, so the value type is read out of the
 // form the path itself names rather than out of every registered form at once.
 // An application with a single registered form writes no prefix.
 // ===========================================================================
 import type { FieldBinding } from "./field-binding.types.js";
-import { useFieldBinding } from "./bind-field.js";
+import { useFieldBinding, type FieldOptions } from "./bind-field.js";
 import type {
   FormPath,
   InhabitedFormPath,
@@ -36,10 +42,14 @@ import type {
 } from "./waypoint-forms.js";
 
 export function useField<Q extends FormPath>(
-  path: Q & InhabitedFormPath<Q>
+  path: Q & InhabitedFormPath<Q>,
+  options?: FieldOptions
 ): FieldBinding<ValueAtFormPath<Q>>;
-export function useField(spelling: string): FieldBinding<never> {
-  const bound = useFieldBinding(spelling);
+export function useField(
+  spelling: string,
+  options?: FieldOptions
+): FieldBinding<never> {
+  const bound = useFieldBinding(spelling, options);
   bound.form.coverage.addressed(bound.path);
   return bound.binding;
 }
