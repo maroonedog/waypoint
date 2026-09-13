@@ -1,0 +1,243 @@
+---
+// ===========================================================================
+// examples.astro — the six runnable applications, and what each one is for.
+//
+// The site argues; these run. Every page before this one makes a claim a
+// reader has to take on the page's word, and the claims that are hardest to
+// take that way are exactly the ones with an example behind them: that a leaf
+// needs nothing but an address, that a server's complaint blocks a submit, that
+// a wizard does not need per-step state. So this page's job is not to teach
+// the API a second time — it is to say which command shows which claim being
+// true, and what to type once the page is open.
+//
+// EVERY SNIPPET IS LIFTED FROM A FILE THAT RUNS, not written for the page. The
+// examples are compiled by `npm run test:types` along with the library, so a
+// snippet that stopped being true would fail the build rather than sit here
+// looking plausible.
+// ===========================================================================
+import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
+
+const serverErrors = `
+await form.submit(async (root) => {
+  const answer = await createAccount(root);
+  if (!answer.ok) form.adoptIssues(answer.issues);   // inside the handler
+});
+`.trim();
+
+const sharedLeaf = `
+// shared-fields.tsx imports neither schema, neither adapter and no handle.
+function Text({ at, label }: { at: FormPathTo<string>; label: string }) {
+  const field = useField(at);
+  return (
+    <label>
+      <span>{label}</span>
+      <input {...field.inputProps} />
+      <span {...field.errorProps}>{field.issues[0]?.message}</span>
+    </label>
+  );
+}
+
+<Text at="customer:owner.email" label="Email" />
+<Text at="admin:owner.email"    label="Owner email" />
+`.trim();
+
+const wizardProvider = `
+// This subtree draws one step on purpose, and says so. Without it the
+// coverage report names the fields of every step not on screen.
+<FormProvider form={form} partial>
+`.trim();
+
+const vueField = `
+import { FormProvider, useField } from "@maroonedog/waypoint/vue";
+
+const Field = {
+  setup() {
+    const field = useField("form:owner.name");
+    return () =>
+      h("div", null, [
+        h("label", field.labelProps, field.descriptor?.label),
+        h("input", field.inputProps),
+        h("p", field.errorProps, field.issues[0]?.message ?? ""),
+      ]);
+  },
+};
+`.trim();
+
+/** Name, port, command, and the one sentence that says why it exists. */
+const EXAMPLES = [
+  {
+    name: "showcase",
+    port: 5179,
+    about:
+      "A designed screen — six sections, Material Design 3, Tailwind. It is the one example that draws an interface rather than making a point, and it is there to answer what a real form written against this runtime looks like.",
+    shows: [
+      "one address section placed twice, told where by one prop",
+      "a long closed enum drawn from the schema's own choice list",
+      "an array with a cross-field total, and a rule that reports against a field other than the one that moved",
+      "a toggle that stops a subtree blocking without losing its values",
+    ],
+  },
+  {
+    name: "server-errors",
+    port: 5182,
+    about:
+      "One round trip, and the two ways a complaint stops being true. The handler returns nothing: what the server said goes to adoptIssues, which is merged into every pass rather than written to a cell.",
+    shows: [
+      "a rejection on a declared field, dropped by editing that field",
+      "a rejection on a path no descriptor declares and no input draws — it still refuses the submit, is still counted, and only the next press clears it",
+      "why a message held in component state would be shown but not counted",
+    ],
+  },
+  {
+    name: "two-forms",
+    port: 5183,
+    about:
+      "Both forms declare owner.email and mean different things by it. The same component draws both, imports neither schema, and takes one prop.",
+    shows: [
+      "a qualified path saying which form it belongs to",
+      "src/refusals.tsx, where five spellings that must not compile are held to it with @ts-expect-error",
+      "the one collision a qualified path does not solve: two inputs really do carry name=\"owner.email\", which is what scopeProps is for",
+    ],
+  },
+  {
+    name: "wizard",
+    port: 5184,
+    about:
+      "One form across three screens. Nothing is lifted, merged or stored per step, because every declared path was written before any component existed.",
+    shows: [
+      "values on a step nobody opened, already there",
+      "partial on the provider, and why it is not useParticipation",
+      "a submit that judges the whole root, so an empty step two refuses the booking by name",
+    ],
+  },
+  {
+    name: "playground",
+    port: 5178,
+    about:
+      "The one that is not a demonstration. A render counter on every field and a store you can swap between the shipped one and a zustand one, so a claim about what a keystroke costs can be watched rather than read.",
+    shows: [
+      "how many times each component rendered, on the page, per keystroke",
+      "the store contract taking a different implementation with nothing else changing",
+      "the same form under both, side by side",
+    ],
+  },
+  {
+    name: "nested-arrays",
+    port: 5181,
+    about:
+      "The same shipments[] → address{} → lines[] shape written four times — waypoint, react-hook-form, Formik, TanStack Form — against one schema with the same markup and the same behaviour.",
+    shows: [
+      "how a field two levels inside a list says which row it belongs to, four ways",
+      "line counts and path-mention counts derived from each file at run time, never typed",
+      "that waypoint is not the shortest of the four, which is why line count is not the claim",
+    ],
+  },
+];
+---
+
+<Base
+  title="Examples — waypoint"
+  description="Six runnable applications: a designed screen, a server-error round trip, two forms on one page, a wizard, a render-count playground, and the same nested shape written in four libraries."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">Examples</h1>
+
+  <p class="lead">
+    Six applications that run. Each one exists to make a claim on this site
+    checkable by pressing a button rather than by believing a page.
+  </p>
+
+  <p class="caption">
+    None of them needs a build: every example resolves the package to its
+    <strong class="text-on-surface">source</strong>, so editing the runtime
+    reloads the page. All six are compiled by <code>npm run test:types</code>
+    alongside the library, so an example that stopped compiling would fail the
+    build along with it.
+  </p>
+
+  <!-- A table rather than a code block: `Code` takes ts or tsx, and a list of
+       npm scripts highlighted as TypeScript is a block pretending to be
+       something it is not. -->
+  <div class="mt-6 overflow-x-auto rounded-md bg-surface-container p-4">
+    <table class="w-full text-sm">
+      <tbody>
+        {
+          EXAMPLES.map((one) => (
+            <tr class="hairline">
+              <td class="py-2 pr-6 font-mono text-xs whitespace-nowrap">
+                npm run example:{one.name}
+              </td>
+              <td class="py-2 font-mono text-xs text-on-surface-variant">
+                localhost:{one.port}
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  {
+    EXAMPLES.map((one) => (
+      <section>
+        <h2 class="mt-16 text-2xl font-bold">{one.name}</h2>
+        <p class="caption">{one.about}</p>
+        <ul class="mt-4 list-disc space-y-2 pl-5 text-on-surface-variant">
+          {one.shows.map((line) => (
+            <li>{line}</li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+
+  <h2 class="mt-16 text-2xl font-bold">The three lines worth reading first</h2>
+
+  <p class="caption">
+    <strong class="text-on-surface">server-errors.</strong> The handler returns
+    nothing. Whatever the server said goes to <code>adoptIssues</code>, which is
+    a merge input to every pass — so one list feeds the field cells, the count
+    and the submit verdict, and they cannot come to disagree.
+  </p>
+  <Code code={serverErrors} label="examples/server-errors" lang="tsx" flush />
+
+  <p class="caption">
+    <strong class="text-on-surface">two-forms.</strong> One component, two
+    forms, one prop. It imports neither schema, and the address it is handed
+    names the form it belongs to — which is what makes one prop enough.
+  </p>
+  <Code code={sharedLeaf} label="examples/two-forms" lang="tsx" flush />
+
+  <p class="caption">
+    <strong class="text-on-surface">wizard.</strong> A step is a screen that
+    draws part of a form on purpose. The runtime cannot tell that from a field
+    somebody forgot, so the screen says which it is.
+  </p>
+  <Code code={wizardProvider} label="examples/wizard" lang="tsx" flush />
+
+  <h2 class="mt-16 text-2xl font-bold">Vue</h2>
+
+  <p class="caption">
+    The examples above are React. The <code>./vue</code> entry reads the same
+    registry — a Vue application writes the same
+    <code>declare module "@maroonedog/waypoint"</code> a React one does — and
+    the binding hands back the same four prop bags off the same descriptor.
+    There is no Vue example application yet; what exists is the entry and its
+    tests.
+  </p>
+  <Code code={vueField} label="@maroonedog/waypoint/vue" lang="ts" flush />
+
+  <p class="caption">
+    It is a first cut and smaller than <code>./react</code>. It has
+    <code>useCreateForm</code>, <code>useForm</code>, <code>useField</code>,
+    <code>useRows</code>, <code>useFormStatus</code>, <code>useCell</code>,
+    <code>&lt;FormProvider&gt;</code>, <code>&lt;Field&gt;</code>,
+    <code>&lt;FieldRows&gt;</code> and <code>decorateVNode</code> — the
+    decorator ported, as a vnode rather than an element. What it does not have,
+    named in its own entry file so a grep for one of them finds this sentence:
+    <code>useUncontrolledField</code>, <code>useErrorSummary</code>,
+    <code>useFieldValue</code>, <code>useFieldValues</code>,
+    <code>useFieldIssues</code>, <code>useParticipation</code> and
+    <code>&lt;AutoForm&gt;</code>.
+  </p>
+</Base>
