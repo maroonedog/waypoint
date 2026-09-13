@@ -127,6 +127,37 @@ saying nothing — so a quiet field still refuses the submit, which is what
 `useErrorSummary()` is for. A refused submit reveals every field whatever it
 asked for.
 
+## Your wording, over the validator's
+
+The library owns no message. What it owns is the point one can be substituted
+at, and the material to build one from — so a sentence is written once and
+interpolates the bound the schema declared rather than matching the vendor's
+English:
+
+```tsx
+<FormProvider form={form} messageFor={(issue, descriptor) =>
+  issue.code === "too_small" && descriptor?.kind === "string"
+    ? `${descriptor.label} must be at least ${descriptor.constraints?.minLength} characters`
+    : undefined            // keeps what the validator said
+}>
+```
+
+`useField(path, { messageFor })` overrides it for one call. Returning
+`undefined` is what makes a partial table safe: a missing translation leaves a
+real message standing, because an empty `role="alert"` announces nothing and
+reads as a field with no problem.
+
+It reaches **every hook that hands out a message** — the bindings,
+`useFieldIssues` and `useErrorSummary` — because a field saying your sentence
+beside a summary saying the validator's is one screen with two answers. That
+is the opposite of `showIssues`, which is per control and deliberately does
+not reach the summary.
+
+**`code` comes from a vendor resolver only.** `StandardSchemaV1.Issue` has
+`message` and `path` and nothing else, so `resolver-standard` carries none —
+asserted in the tests. A table keyed on the message string breaks the day the
+vendor rewords, so an application that wants its own wording wants
+`resolver-zod` or `resolver-luq`.
 ## Decorating your own element
 
 The four prop bags are offered and spreading them is still the shortest path.
@@ -164,8 +195,8 @@ The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 They are entry points rather than packages because they all install together
 anyway. What the split buys is **resolution**: `./core` loads in a worker with
 no React resolvable at all, and only `./react` names React in its built output.
-`useField` alone is 2.01 kB gzipped against 10.90 kB for the whole `./react` barrel,
-and a screen plus the zod resolver is 10.72 kB. `npm run size:check` gates every row.
+`useField` alone is 2.11 kB gzipped against 11.13 kB for the whole `./react` barrel,
+and a screen plus the zod resolver is 10.86 kB. `npm run size:check` gates every row.
 
 ## What it does not do
 

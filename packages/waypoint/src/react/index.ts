@@ -80,6 +80,8 @@ export {
   IssueVisibilityContext,
 } from "./issue-visibility-context.js";
 export { issuesAreVisible, type IssueVisibility } from "./issue-visibility.js";
+export { wordedIssues, type FormMessageFor } from "./form-message.js";
+export { FormMessageContext } from "./form-message-context.js";
 export { decorateElement } from "./decorate-element.js";
 export type { FieldOptions } from "./bind-field.js";
 export type { FieldPart } from "./field-binding.types.js";

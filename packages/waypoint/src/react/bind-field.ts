@@ -52,6 +52,8 @@ import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
 import { visibleIssues, type IssueVisibility } from "./issue-visibility.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
+import { wordedIssues, type FormMessageFor } from "./form-message.js";
+import { FormMessageContext } from "./form-message-context.js";
 
 export interface FieldOptions {
   /**
@@ -64,6 +66,17 @@ export interface FieldOptions {
    * field is not yet saying.
    */
   readonly showIssues?: IssueVisibility;
+  /**
+   * This application's wording for an issue, over the validator's. Omit it and
+   * the enclosing `<FormProvider messageFor>` decides; omit that too and the
+   * validator's own text stands.
+   *
+   * Returning undefined keeps what the validator said, so a partial table is
+   * safe: a missing translation leaves a real message rather than blanking the
+   * error. The issue's `code` is the key worth matching on, and it arrives
+   * from a vendor resolver only — the spec has no such member.
+   */
+  readonly messageFor?: FormMessageFor;
 }
 
 export interface BoundField {
@@ -81,6 +94,7 @@ export function useFieldBinding(
   const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
   const inherited = useContext(IssueVisibilityContext);
+  const inheritedMessage = useContext(FormMessageContext);
 
   const held = useCell(handle.sources.value);
   const produced = useCell(handle.sources.issues);
@@ -89,12 +103,16 @@ export function useFieldBinding(
   const isParticipating = useCell(handle.sources.participating);
   const submitCount = useCell(form.submitCount);
 
-  const issues = visibleIssues(produced, {
-    visibility: options?.showIssues ?? inherited,
-    isTouched,
-    isDirty,
-    submitCount,
-  });
+  const issues = wordedIssues(
+    visibleIssues(produced, {
+      visibility: options?.showIssues ?? inherited,
+      isTouched,
+      isDirty,
+      submitCount,
+    }),
+    options?.messageFor ?? inheritedMessage,
+    handle.descriptor
+  );
 
   const writeValue = useCallback(
     (next: unknown) => handle.setValue(next as never),

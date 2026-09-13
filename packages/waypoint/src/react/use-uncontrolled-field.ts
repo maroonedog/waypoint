@@ -56,6 +56,8 @@ import { useFormForPath } from "./use-form-for-path.js";
 import { decorateElement } from "./decorate-element.js";
 import { visibleIssues } from "./issue-visibility.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
+import { wordedIssues } from "./form-message.js";
+import { FormMessageContext } from "./form-message-context.js";
 import type { FieldOptions } from "./bind-field.js";
 import type { FieldPart } from "./field-binding.types.js";
 import type {
@@ -90,16 +92,21 @@ export function useUncontrolledField(
   const isParticipating = useCell(handle.sources.participating);
   const submitCount = useCell(form.submitCount);
   const inherited = useContext(IssueVisibilityContext);
+  const inheritedMessage = useContext(FormMessageContext);
   // `isDirty` is not subscribed here — see the header on what this binding
   // refuses to subscribe to — so `"dirty"` is read off the cell rather than
   // watched. A field asking for it re-renders when its issues or its touched
   // flag move, which is every moment this list could change anyway.
-  const issues = visibleIssues(produced, {
-    visibility: options?.showIssues ?? inherited,
-    isTouched,
-    isDirty: handle.sources.dirty.read(),
-    submitCount,
-  });
+  const issues = wordedIssues(
+    visibleIssues(produced, {
+      visibility: options?.showIssues ?? inherited,
+      isTouched,
+      isDirty: handle.sources.dirty.read(),
+      submitCount,
+    }),
+    options?.messageFor ?? inheritedMessage,
+    handle.descriptor
+  );
 
   const node = useRef<HTMLInputElement | null>(null);
   const isCheckbox = handle.descriptor?.kind === "boolean";

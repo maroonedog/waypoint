@@ -17,10 +17,19 @@
 // decided to keep to itself. So on a screen set to `"touched"`, `useField`
 // stays quiet and this reports, which is the same asymmetry `errorCount` and
 // `blockedBy` already have.
+//
+// IT IS GATED BY `messageFor`, and that is the same line drawn the other way.
+// Visibility is per control; WORDING is per application, and two wordings for
+// one issue on one screen — a field saying the application's sentence and the
+// summary beside it saying the validator's — is the defect. So every hook that
+// hands out a message applies it, this one included.
 // ===========================================================================
+import { useContext } from "react";
 import type { FormIssue } from "../contract/index.js";
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
+import { wordedIssues } from "./form-message.js";
+import { FormMessageContext } from "./form-message-context.js";
 import type { FormPath, InhabitedFormPath } from "./waypoint-forms.js";
 
 export function useFieldIssues<Q extends FormPath>(
@@ -28,5 +37,11 @@ export function useFieldIssues<Q extends FormPath>(
 ): readonly FormIssue[];
 export function useFieldIssues(spelling: string): readonly FormIssue[] {
   const { form, path } = useFormForPath(spelling);
-  return useCell(form.field(path).sources.issues);
+  const handle = form.field(path);
+  const messageFor = useContext(FormMessageContext);
+  return wordedIssues(
+    useCell(handle.sources.issues),
+    messageFor,
+    handle.descriptor
+  );
 }

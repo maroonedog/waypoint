@@ -49,6 +49,8 @@ import type { WidgetRegistry } from "./widget-registry.types.js";
 import { useCoverageReport } from "./use-coverage-report.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
 import type { IssueVisibility } from "./issue-visibility.js";
+import { FormMessageContext } from "./form-message-context.js";
+import type { FormMessageFor } from "./form-message.js";
 import type { FormKey } from "./waypoint-forms.js";
 
 export interface FormProviderProps<T, TPath extends string> {
@@ -96,6 +98,23 @@ export interface FormProviderProps<T, TPath extends string> {
    * whatever this says.
    */
   readonly showIssues?: IssueVisibility;
+  /**
+   * This application's wording for an issue, over the validator's, for every
+   * hook beneath that hands out a message — the fields and the summary.
+   *
+   * Returning undefined keeps what the validator said, so a partial table is
+   * safe: a missing translation must leave a real message standing rather
+   * than blanking an error, because an empty live region announces nothing
+   * and reads as a field with no problem.
+   *
+   * The issue's `code` is the key worth matching on and it comes from a
+   * VENDOR resolver only — `StandardSchemaV1.Issue` has `message` and `path`
+   * and nothing else, so the generic resolver carries no code and a table
+   * keyed on the message string breaks when the vendor rewords. The
+   * descriptor is the second argument for the same reason: the declared
+   * bound is there to interpolate, rather than parsed back out of English.
+   */
+  readonly messageFor?: FormMessageFor;
   /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */
   readonly widgets?: WidgetRegistry;
   readonly children: ReactNode;
@@ -143,15 +162,23 @@ export function FormProvider<T, TPath extends string>(
         {widgets}
       </IssueVisibilityContext.Provider>
     );
+  const worded =
+    props.messageFor === undefined ? (
+      shown
+    ) : (
+      <FormMessageContext.Provider value={props.messageFor}>
+        {shown}
+      </FormMessageContext.Provider>
+    );
   return (
     <FormContext.Provider
       value={props.form as unknown as FormHandle<unknown, string>}
     >
       {formKey === inherited ? (
-        shown
+        worded
       ) : (
         <FormKeyContext.Provider value={formKey}>
-          {shown}
+          {worded}
         </FormKeyContext.Provider>
       )}
     </FormContext.Provider>

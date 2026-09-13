@@ -33,7 +33,10 @@ const hooks = [
       "One field: its value, its issues, its flags, and the writers for them. Subscribes to five cells, so a keystroke re-renders this component and nothing else. The path is a PLACE — one field is one value, so items[*].sku has no answer here and does not compile; that question is useFieldValues.",
     signature: `function useField<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>,
-  options?: { showIssues?: "immediately" | "touched" | "dirty" }
+  options?: {
+    showIssues?: "immediately" | "touched" | "dirty";
+    messageFor?: (issue, descriptor) => string | undefined;
+  }
 ): FieldBinding<ValueAtFormPath<Q>>`,
     example: `const field = useField("form:owner.name");
 
@@ -67,7 +70,10 @@ const hooks = [
       "The same field, subscribed imperatively: the listener writes the DOM node instead of re-rendering, so typing reaches React not at all. It cannot transform a value as it is typed — masking and formatting need useField.",
     signature: `function useUncontrolledField<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>,
-  options?: { showIssues?: "immediately" | "touched" | "dirty" }
+  options?: {
+    showIssues?: "immediately" | "touched" | "dirty";
+    messageFor?: (issue, descriptor) => string | undefined;
+  }
 ): UncontrolledFieldBinding<ValueAtFormPath<Q>>`,
     example: `const field = useUncontrolledField("form:owner.name");
 
@@ -107,7 +113,7 @@ const inRow = useFieldValues("form:shipments[0].lines[*].sku");  // one row's co
   {
     name: "useFieldIssues()",
     summary:
-      "One field's issues and nothing else, so typing in an input never re-renders the summary beside it. Not gated by showIssues: that policy lives in the bindings, because it is about whether one input is ready to complain to the person typing in it. A summary reading this reports what is true whatever an input kept to itself, the same way errorCount does.",
+      "One field's issues and nothing else, so typing in an input never re-renders the summary beside it. Not gated by showIssues: that policy lives in the bindings, because it is about whether one input is ready to complain to the person typing in it. A summary reading this reports what is true whatever an input kept to itself, the same way errorCount does. It IS gated by messageFor, which is the same line drawn the other way: wording is per application, so two sentences for one issue on one screen is the defect.",
     signature: `function useFieldIssues<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>
 ): readonly FormIssue[]`,
@@ -196,7 +202,7 @@ const components = [
     summary:
       "Puts one handle in reach of a subtree. formKey says which registered form this is, and a qualified path below is compared against it; omit it and the key the form was created with is used, so the name is written once. Give both and they must agree — a disagreement throws where it is rendered, because it makes every path beneath read a form nobody meant. Once the subtree has mounted it is also asked whether every declared field reached a component; partial says this screen draws part of the form on purpose and skips that question, leaving the rest.",
     signature: `<FormProvider form={form} formKey?="order" widgets?={registry}
-              showIssues?="touched" partial?>`,
+              showIssues?="touched" messageFor?={fn} partial?>`,
   },
   {
     name: "<Field>",

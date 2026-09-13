@@ -47,9 +47,12 @@
 // or nowhere at all on the first failed submit. It re-reads the source
 // instead, which is current the moment the pass commits.
 // ===========================================================================
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useContext, useMemo, useRef } from "react";
+import type { FormFieldDescriptor } from "../contract/index.js";
 import type { FieldIssueSummary } from "../core/index.js";
-import { summarizeIssues } from "../core/index.js";
+import { declaredPathOf, summarizeIssues } from "../core/index.js";
+import { wordedIssues } from "./form-message.js";
+import { FormMessageContext } from "./form-message-context.js";
 import { fieldControlAt, focusFieldControl } from "./find-field-control.js";
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
@@ -123,6 +126,21 @@ export interface ErrorSummary {
 export function useErrorSummary(formKey?: FormKey): ErrorSummary {
   const form = useFormHandle(formKey);
   const blocking = useCell(form.blockedBy);
+  const messageFor = useContext(FormMessageContext);
+
+  /**
+   * The descriptor a concrete path came from, for a wording function to read
+   * a declared bound out of. Undefined for a path no descriptor declares — an
+   * adopted issue on a payment, say — which is the case with no bounds to
+   * interpolate anyway.
+   */
+  const describes = useCallback(
+    (path: string): FormFieldDescriptor | undefined => {
+      const declared = declaredPathOf(path);
+      return form.descriptors.find((one) => one.path === declared);
+    },
+    [form]
+  );
 
   const scope = useRef<HTMLElement | null>(null);
   const region = useRef<HTMLElement | null>(null);
@@ -138,10 +156,14 @@ export function useErrorSummary(formKey?: FormKey): ErrorSummary {
       summarizeIssues({ tree: form.tree, issues: blocking }).map(
         (summary): ErrorSummaryEntry => ({
           ...summary,
+          // The application's wording, if it declared one. A summary that
+          // quoted the validator while the field beside it quoted the
+          // application would be one screen with two sentences for one issue.
+          issues: wordedIssues(summary.issues, messageFor, describes(summary.path)),
           focus: () => focusFieldControl(scope.current, summary.path),
         })
       ),
-    [form, blocking]
+    [form, blocking, messageFor]
   );
 
   const focusFirst = useCallback((): boolean => {
