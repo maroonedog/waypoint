@@ -1,0 +1,122 @@
+/* The unstyled examples share this, so each one is about its own subject and
+   none of them is about CSS. The showcase is the example that draws a designed
+   interface; these three deliberately do not compete with it. */
+
+:root {
+  --ink: #16211f;
+  --soft: #5a6a67;
+  --line: #d8d5cd;
+  --paper: #f7f5f0;
+  --card: #fffdf9;
+  --accent: #00695c;
+  --bad: #9a3b2b;
+  --bad-bg: #f8e9e5;
+  --good: #2f6f5e;
+  --good-bg: #e4efeb;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+main { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+
+header { border-bottom: 1px solid var(--line); background: var(--card); }
+header > div { max-width: 46rem; margin: 0 auto; padding: 1.5rem 1.25rem; }
+h1 { margin: 0 0 .35rem; font-size: 1.4rem; font-weight: 600; }
+header p { margin: 0; color: var(--soft); font-size: .93rem; max-width: 40rem; }
+
+h2 { margin: 0 0 .75rem; font-size: 1.05rem; font-weight: 600; }
+
+section {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.field { display: flex; flex-direction: column; gap: .25rem; margin-bottom: 1rem; }
+.field > span:first-child { font-size: .85rem; font-weight: 600; }
+.field input, .field select {
+  font: inherit;
+  padding: .5rem .6rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: #fff;
+  color: inherit;
+}
+.field input:focus-visible, .field select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.field input[aria-invalid="true"] { border-color: var(--bad); }
+.field .hint { font-size: .8rem; color: var(--soft); }
+.field .msg { font-size: .82rem; color: var(--bad); min-height: 1.2em; }
+
+button {
+  font: inherit;
+  font-weight: 600;
+  padding: .5rem .9rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+button.quiet { background: transparent; color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+
+.row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.spread { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
+
+.note { font-size: .88rem; color: var(--soft); margin: 0 0 .8rem; }
+
+.alert {
+  background: var(--bad-bg);
+  color: var(--bad);
+  border-radius: 5px;
+  padding: .65rem .8rem;
+  font-size: .88rem;
+  margin: 0 0 .9rem;
+}
+.ok {
+  background: var(--good-bg);
+  color: var(--good);
+  border-radius: 5px;
+  padding: .65rem .8rem;
+  font-size: .88rem;
+  margin: 0 0 .9rem;
+}
+
+ul.plain { margin: 0; padding-left: 1.1rem; }
+ul.plain li { margin: .2rem 0; }
+
+code, .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .86em;
+}
+
+.log {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .8rem;
+  line-height: 1.7;
+  background: #11201d;
+  color: #d7e8e3;
+  border-radius: 6px;
+  padding: .8rem 1rem;
+  max-height: 16rem;
+  overflow: auto;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.steps { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.steps button { border-color: var(--line); background: #fff; color: var(--soft); }
+.steps button[aria-current="step"] { border-color: var(--accent); color: var(--accent); }

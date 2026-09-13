@@ -170,20 +170,34 @@ npm run bench:self-audit    # the runtime against its own design document
 ## Examples
 
 ```bash
-npm run example:showcase        # 23 inputs across six sections
+npm run example:showcase        # a designed screen, six sections
+npm run example:server-errors   # what a server says, and what drops it
+npm run example:two-forms       # two forms on one page, one set of inputs
+npm run example:wizard          # one form, three screens
 npm run example:nested-arrays   # the same shape in four libraries, side by side
 npm run docs:dev                # the documentation site
 ```
 
-`nested-arrays` writes one `shipments[] → address{} → lines[]` shape four times
-— waypoint, react-hook-form, Formik, TanStack Form — against one schema with
-the same markup and the same behaviour, so the only difference left is how a
-field two levels inside a list says which row it belongs to. Neither example
-needs a build: both resolve the package to its **source**.
+- **server-errors** — the submit handler's round trip. One rejection lands on a
+  field and is dropped by editing it; the other lands on a path no descriptor
+  declares and no input draws, still refuses the submit, and is dropped only by
+  the next press.
+- **two-forms** — both forms declare `owner.email`. The same component draws
+  both, imports neither schema, and takes one prop: an address that names its
+  own form. `src/refusals.tsx` holds the compiler to the five spellings that
+  must not compile.
+- **wizard** — one form across three screens, with `partial` on the provider
+  and the whole root judged at submit, so a step nobody opened still refuses it.
+- **nested-arrays** — one `shipments[] → address{} → lines[]` shape written
+  four times against one schema with the same markup and the same behaviour, so
+  the only difference left is how a field two levels inside a list says which
+  row it belongs to.
+
+No example needs a build: they resolve the package to its **source**.
 
 ## Where it stands
 
-278 tests and eight compile-time programs, one of which exists only to prove that
+291 tests and eleven compile-time programs, one of which exists only to prove that
 an application registering nothing is refused rather than quietly unchecked —
 so long as nothing it depends on registered a form of its own.
 **Nothing has ever been published, and nobody has run this in production.**
