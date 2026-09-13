@@ -20,6 +20,8 @@ import type { CellSource } from "./cell-source.js";
 import type { RowsHandle } from "./create-rows-handle.js";
 import type { DescriptorNode } from "../descriptors/descriptor-tree.types.js";
 import type { SubmitHandler, SubmitOutcome } from "./submit-form.js";
+import type { FieldCoverage } from "./field-coverage.js";
+import type { FieldMismatchReaction } from "./report-unaddressable.js";
 
 /** The channels a field publishes, each subscribed to separately. */
 export interface FieldSources<TValue> {
@@ -91,6 +93,23 @@ export interface FormOptions<T, TPath extends string> {
    * be a promise the runtime cannot keep.
    */
   readonly validateOn?: FormValidationMoment;
+  /**
+   * What happens when the form and the components disagree about which fields
+   * exist. Defaults to `"warn"`.
+   *
+   * TWO DISAGREEMENTS, ONE SETTING, because they are one mistake seen from
+   * either end. A component addressing a path this form does not declare draws
+   * an input nothing judges; a declared place no component addresses is a
+   * value nobody can enter, and a required one refuses every submit while
+   * pointing at an input that is not on the screen. Both are silent, and a
+   * setting that covered one of them would leave the writer to find the other.
+   *
+   * `"throw"` is for the reader who would rather be stopped than informed — a
+   * test, a CI run, anyone drawing a schema they did not write. Under it the
+   * first disagreement ends the call that made it, and the second is raised
+   * from `<FormProvider>` once its subtree has mounted.
+   */
+  readonly onFieldMismatch?: FieldMismatchReaction;
 }
 
 export interface FormHandle<T, TPath extends string = string> {
@@ -104,6 +123,20 @@ export interface FormHandle<T, TPath extends string = string> {
   /** The containers the descriptors imply, in declaration order. */
   readonly tree: readonly DescriptorNode[];
   readonly store: FormCellStore;
+  /**
+   * Which declared places a component took responsibility for, and which it
+   * did not. `coverage.missing()` is the question `<FormProvider>` asks once
+   * its subtree has mounted, and it is a plain query with no timing of its
+   * own — a test can ask it after rendering, and a submit handler can ask it
+   * before trusting the root it was handed.
+   */
+  readonly coverage: FieldCoverage;
+  /**
+   * What this form does about a disagreement between its paths and its
+   * components. Published because the answer is decided where the form is
+   * created and acted on in two layers.
+   */
+  readonly onFieldMismatch: FieldMismatchReaction;
   /**
    * How many issues blocked a submit AS OF THE LAST PASS; a dormant subtree is
    * excluded.

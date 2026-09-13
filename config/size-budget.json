@@ -12,16 +12,16 @@
     {
       "id": "@maroonedog/waypoint/core",
       "entry": "export * from \"@maroonedog/waypoint/core\";",
-      "minified": 20222,
-      "gzipped": 7266,
-      "budget": 7993
+      "minified": 20853,
+      "gzipped": 7505,
+      "budget": 8256
     },
     {
       "id": "@maroonedog/waypoint/react",
       "entry": "export * from \"@maroonedog/waypoint/react\";",
-      "minified": 27672,
-      "gzipped": 9759,
-      "budget": 10735
+      "minified": 29832,
+      "gzipped": 10541,
+      "budget": 11596
     },
     {
       "id": "@maroonedog/waypoint/resolver-standard",
@@ -61,37 +61,37 @@
     {
       "id": "react (a screen: useField, useRows, FormProvider, useCreateForm)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";",
-      "minified": 20759,
-      "gzipped": 7527,
-      "budget": 8280
+      "minified": 22736,
+      "gzipped": 8284,
+      "budget": 9113
     },
     {
       "id": "react (useField alone)",
       "entry": "export { useField } from \"@maroonedog/waypoint/react\";",
-      "minified": 3849,
-      "gzipped": 1537,
-      "budget": 1691
+      "minified": 3954,
+      "gzipped": 1581,
+      "budget": 1740
     },
     {
       "id": "core (createForm alone)",
       "entry": "export { createForm } from \"@maroonedog/waypoint/core\";",
-      "minified": 16171,
-      "gzipped": 5963,
-      "budget": 6560
+      "minified": 16753,
+      "gzipped": 6179,
+      "budget": 6797
     },
     {
       "id": "core (assertFormStoreContract alone)",
       "entry": "export { assertFormStoreContract } from \"@maroonedog/waypoint/core\";",
       "minified": 1900,
-      "gzipped": 614,
-      "budget": 676
+      "gzipped": 613,
+      "budget": 675
     },
     {
       "id": "a screen + resolver-zod (what an application installs)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";\nexport { zodFormResolver } from \"@maroonedog/waypoint/resolver-zod\";",
-      "minified": 27376,
-      "gzipped": 9776,
-      "budget": 10754
+      "minified": 29354,
+      "gzipped": 10521,
+      "budget": 11574
     }
   ]
 }

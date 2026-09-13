@@ -37,7 +37,7 @@
 // ===========================================================================
 import { useContext, type ReactElement, type ReactNode } from "react";
 import type { FieldBinding } from "./field-binding.types.js";
-import { useField } from "./use-field.js";
+import { useFieldBinding } from "./bind-field.js";
 import { WidgetRegistryContext } from "./widget-registry-context.js";
 import { resolveWidget } from "./resolve-widget.js";
 import type {
@@ -66,17 +66,34 @@ export interface FieldProps<Q extends FormPath> {
 }
 
 export function Field<Q extends FormPath>(props: FieldProps<Q>): ReactElement {
-  // The type argument is written rather than inferred. `props.path` is already
-  // `Q & InhabitedFormPath<Q>`, and inferring from it would make Q that
+  // The binding arrives untyped and is given its type here. `useField` writes
+  // its type argument rather than inferring one, because `props.path` is
+  // already `Q & InhabitedFormPath<Q>` and inferring from it would make Q that
   // intersection and then narrow it a second time — which the compiler cannot
-  // see is the same question asked twice, so it refuses its own output.
-  const binding = useField<Q>(props.path);
+  // see is the same question asked twice, so it refuses its own output. This
+  // takes the same route by a shorter road: the unqualified hook is handed a
+  // string, and what comes back is named once.
+  const bound = useFieldBinding(props.path);
+  const binding = bound.binding as unknown as FieldBinding<ValueAtFormPath<Q>>;
   const registry = useContext(WidgetRegistryContext);
 
+  // WHO TOOK RESPONSIBILITY, decided here rather than in the hook, because
+  // this is the layer where asking for a field and drawing one come apart. A
+  // children function draws whatever it likes and that is the caller's
+  // business; a registry lookup that finds nothing draws nothing, and a form
+  // whose registry is empty would otherwise report every field as handled
+  // while putting none of them on the screen — which is the exact shape of
+  // the mistake worth catching, everything wired and the page blank.
   if (props.children !== undefined) {
+    bound.form.coverage.addressed(bound.path);
     return <>{props.children(binding)}</>;
   }
   const shown = binding as FieldBinding<unknown>;
   const widget = resolveWidget(registry, shown, props.as);
-  return <>{widget === undefined ? null : widget({ field: shown })}</>;
+  if (widget === undefined) {
+    bound.form.coverage.undrawn(bound.path);
+    return <></>;
+  }
+  bound.form.coverage.addressed(bound.path);
+  return <>{widget({ field: shown })}</>;
 }

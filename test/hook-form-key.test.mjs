@@ -53,7 +53,7 @@ test("naming a form that is not the enclosing one throws and says which", async 
     return null;
   }
   const { escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm(), formKey: "checkout" }, h(Screen))
+    h(FormProvider, { form: orderForm(), formKey: "checkout", partial: true }, h(Screen))
   );
   assert.ok(escaped !== null, "expected a mismatched key to throw");
   assert.match(escaped.message, /"order"/);
@@ -66,7 +66,7 @@ test("naming the enclosing form is accepted", async () => {
     return h("span", { id: "v" }, String(postcode));
   }
   const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm(), formKey: "order" }, h(Screen))
+    h(FormProvider, { form: orderForm(), formKey: "order", partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(text(container, "v"), "100-0001");
@@ -89,7 +89,7 @@ test("a form named where it was created needs no second name", async () => {
     return h("span", { id: "v" }, String(useFieldValue("order:billing.postcode")));
   }
   const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form }, h(Screen))
+    h(FormProvider, { form, partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(text(container, "v"), "100-0001");
@@ -104,7 +104,7 @@ test("naming no form accepts whichever provider is there", async () => {
     return h("span", { id: "v" }, String(postcode));
   }
   const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm(), formKey: "anything" }, h(Screen))
+    h(FormProvider, { form: orderForm(), formKey: "anything", partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(text(container, "v"), "100-0001");
@@ -134,7 +134,7 @@ test("a colon inside a record key is part of the path, not a form name", async (
     return h("span", { id: "v" }, String(useFieldValue("byId.a:b.amount")));
   }
   const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form }, h(Screen))
+    h(FormProvider, { form, partial: true }, h(Screen))
   );
   assert.equal(escaped, null, "the first `.` comes first, so there is no head");
   assert.equal(text(container, "v"), "42");
@@ -148,7 +148,7 @@ test("a colon inside a record key is part of the path, not a form name", async (
 // qualified path exists to catch had been arranged one level above the paths.
 test("a provider whose formKey contradicts the form's own key is refused", async () => {
   const { escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm("order"), formKey: "checkout" }, null)
+    h(FormProvider, { form: orderForm("order"), formKey: "checkout", partial: true }, null)
   );
   assert.match(String(escaped), /names itself "order"/);
 });

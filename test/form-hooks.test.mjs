@@ -14,6 +14,13 @@
 // form has? Warn, stay silent, or — for `items[*]`, where guessing would
 // address a row nobody asked for — throw.
 //
+// EVERY PROVIDER HERE IS `partial`, and that is not boilerplate. Each screen
+// below binds the one or two paths its question is about, out of a form that
+// declares more — which is the OTHER direction of the same mistake, and it has
+// its own report and its own file. Without the prop that report would land in
+// `warned` beside the one under test, and every assertion here would be
+// reading two answers at once.
+//
 // MOST PATHS HERE CARRY NO FORM IN FRONT OF THEM, and that is the arm under
 // test. An application with one registered form writes its paths bare, so bare
 // is a spelling that has to keep working, and this is where it is held; what
@@ -59,7 +66,7 @@ test("a declared path works exactly as the untyped hook does", async () => {
     return h("span", { id: "v" }, String(postcode.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(warned, "");
@@ -79,7 +86,7 @@ test("a misspelt path warns and leaves the rest of the form standing", async () 
     );
   }
   const { container, root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
 
   assert.equal(escaped, null, "a typo must not take the form down");
@@ -97,7 +104,7 @@ test("the warning names the paths it might have meant", async () => {
     return null;
   }
   const { root, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.match(warned, /Did you mean/);
   assert.match(warned, /billing\.postcode/);
@@ -111,7 +118,7 @@ test("the same path is warned about once, not once per render", async () => {
   }
   const form = orderForm();
   const { root, warnings } = await mountCatching(
-    h(FormProvider, { form }, h(Screen))
+    h(FormProvider, { form, partial: true }, h(Screen))
   );
   await act(async () => form.field("billing.postcode").setValue("x"));
   assert.equal(warnings.length, 1);
@@ -126,7 +133,7 @@ test("hooks rendered under a DIFFERENT form's provider warn", async () => {
     return null;
   }
   const { root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: otherForm() }, h(Screen))
+    h(FormProvider, { form: otherForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.match(warned, /not a field this form has/);
@@ -146,8 +153,8 @@ test("two forms on one screen stay independent", async () => {
     h(
       React.Fragment,
       null,
-      h(FormProvider, { form: a }, h(Show, { id: "a" })),
-      h(FormProvider, { form: b }, h(Show, { id: "b" }))
+      h(FormProvider, { form: a, partial: true }, h(Show, { id: "a" })),
+      h(FormProvider, { form: b, partial: true }, h(Show, { id: "b" }))
     )
   );
   assert.equal(escaped, null);
@@ -163,7 +170,7 @@ test("a component needs nothing wrapped around it", async () => {
     return h("span", { id: "v" }, String(postcode.value));
   }
   const { container, root, escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(text(container, "v"), "100-0001");
@@ -178,7 +185,7 @@ test("a rule where a place is needed throws, and names the column reading", asyn
     return null;
   }
   const { escaped } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.ok(escaped !== null, "expected the rule-as-place to throw");
   assert.match(escaped.message, /is a rule, not a place/);
@@ -194,7 +201,7 @@ test("a concrete index is addressable, and reads that row", async () => {
     return h("span", { id: "v" }, String(sku.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(warned, "", "a real row is not a mistake");
@@ -209,7 +216,7 @@ test("a computed row index is addressable too", async () => {
     return h("span", { id: "v" }, String(sku.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(warned, "");
@@ -231,7 +238,7 @@ test("the check is the store's, so every hook gets it", async () => {
     return h("span", { id: "v" }, String(typo.value));
   }
   const { container, root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.match(warned, /billing.postcod/);
@@ -251,7 +258,7 @@ test("a container is addressable, and must not warn", async () => {
     return null;
   }
   const { root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.equal(warned, "", "a container is not a mistake");
@@ -266,7 +273,7 @@ test("a row that does not exist yet is addressable", async () => {
     return null;
   }
   const { root, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.equal(warned, "");
   root.unmount();
@@ -303,7 +310,7 @@ test("a qualified typo is quoted the way it was written", async () => {
     return null;
   }
   const { root, escaped, warned } = await mountCatching(
-    h(FormProvider, { form: namedOrderForm() }, h(Screen))
+    h(FormProvider, { form: namedOrderForm(), partial: true }, h(Screen))
   );
   assert.equal(escaped, null);
   assert.match(warned, /"order:billing\.postcod"/);
@@ -321,7 +328,7 @@ test("the suggestions are qualified too, so they can be pasted back", async () =
     return null;
   }
   const { root, warned } = await mountCatching(
-    h(FormProvider, { form: namedOrderForm() }, h(Screen))
+    h(FormProvider, { form: namedOrderForm(), partial: true }, h(Screen))
   );
   assert.match(warned, /Did you mean/);
   assert.match(warned, /order:billing\.city/);
@@ -338,7 +345,7 @@ test("an unnamed form leaves the prefix off, which is the spelling it accepts", 
     return null;
   }
   const { root, warned } = await mountCatching(
-    h(FormProvider, { form: orderForm() }, h(Screen))
+    h(FormProvider, { form: orderForm(), partial: true }, h(Screen))
   );
   assert.match(warned, /"billing\.citty"/);
   assert.match(warned, /Did you mean: [^?]*\bbilling\.city\b/);

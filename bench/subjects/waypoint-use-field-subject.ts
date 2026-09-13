@@ -63,7 +63,12 @@ export const waypointUseFieldSubject: Subject = {
     root.render(
       h(
         FormProvider,
-        { form },
+        // The zero-path shape mounts a whole form and draws none of it, to
+        // price the wiring on its own. That is also the one arrangement the
+        // coverage report exists to complain about, and complaining about a
+        // measurement fixture would put a diagnostic no application runs
+        // inside the window being timed. The full shapes are not exempted.
+        { form, partial: context.paths.length === 0 },
         h(SharedSkeleton, { Leaf, paths: context.paths })
       )
     );

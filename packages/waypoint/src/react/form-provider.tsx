@@ -46,6 +46,7 @@ import {
   WidgetRegistryContext,
 } from "./widget-registry-context.js";
 import type { WidgetRegistry } from "./widget-registry.types.js";
+import { useCoverageReport } from "./use-coverage-report.js";
 import type { FormKey } from "./waypoint-forms.js";
 
 export interface FormProviderProps<T, TPath extends string> {
@@ -61,6 +62,23 @@ export interface FormProviderProps<T, TPath extends string> {
    * one below: whether this name and the form's own agree.
    */
   readonly formKey?: FormKey;
+  /**
+   * This subtree draws PART of the form on purpose — a wizard step, a tab, an
+   * `<AutoForm only={…}>` screen — so it is not asked whether every declared
+   * field reached the page.
+   *
+   * The question is asked once, when this subtree has mounted, and at that
+   * moment "the next step" and "the field somebody forgot" look identical from
+   * inside the runtime. Only the screen knows which it is, which is why the
+   * answer is a prop here rather than a setting on the form: the form does not
+   * change because one of its screens is partial, and a wizard's other steps
+   * still want the question asked.
+   *
+   * It silences THAT question and no other. A path this form does not declare
+   * is still reported from underneath, because a partial screen has no more
+   * business addressing a field that does not exist than a whole one does.
+   */
+  readonly partial?: boolean;
   /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */
   readonly widgets?: WidgetRegistry;
   readonly children: ReactNode;
@@ -82,6 +100,16 @@ export function FormProvider<T, TPath extends string>(
     );
   }
   const formKey = props.formKey ?? props.form.key ?? DEFAULT_FORM_KEY;
+  // Asked here because this is the component that knows where the subtree
+  // ends, and answered after it has mounted — see use-coverage-report.ts. The
+  // key is passed rather than read from the form, for the same reason the
+  // paths below use it: it is the name under which this subtree's paths were
+  // spelled, so it is the name the message should quote them with.
+  useCoverageReport(
+    props.form as unknown as FormHandle<unknown, string>,
+    props.formKey ?? props.form.key,
+    props.partial === true
+  );
   const widgets = (
     <WidgetRegistryContext.Provider value={props.widgets ?? EMPTY_REGISTRY}>
       {props.children}

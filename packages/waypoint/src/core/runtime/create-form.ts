@@ -46,7 +46,8 @@ import { declaredPathOf } from "../path/declared-path-of.js";
 import { buildDescriptorTree } from "../descriptors/build-descriptor-tree.js";
 import { createDescriptorIndex } from "../descriptors/descriptor-index.js";
 import { createAddressablePaths } from "../descriptors/addressable-paths.js";
-import { warnUnaddressable } from "./warn-unaddressable.js";
+import { reportUnaddressable } from "./report-unaddressable.js";
+import { createFieldCoverage } from "./field-coverage.js";
 import { seedFormCells } from "../descriptors/seed-form-cells.js";
 import { seedRootValue } from "../descriptors/seed-root-value.js";
 import { createRowIdMinter } from "./row-index.js";
@@ -84,6 +85,12 @@ export function createForm<T, TPath extends string = string>(
   const tree = buildDescriptorTree(descriptors);
   const minter = createRowIdMinter();
   const participation = createParticipationIndex();
+  const onFieldMismatch = options.onFieldMismatch ?? "warn";
+  const coverage = createFieldCoverage({
+    descriptors,
+    readRoot: () => store.read(ROOT_CELL),
+    isParticipating: participation.isParticipating,
+  });
 
   const openCells = createOpenValueCells();
   const sources = createFormCellSources(store, openCells);
@@ -171,6 +178,8 @@ export function createForm<T, TPath extends string = string>(
     descriptors,
     tree,
     store,
+    coverage,
+    onFieldMismatch,
     errorCount: sources.of(errorCountCell, 0),
     blockedBy: sources.of(blockingIssuesCell, NO_ISSUES),
     submitting: sources.of(submittingCell, false),
@@ -183,7 +192,7 @@ export function createForm<T, TPath extends string = string>(
       // to ask. Every hook, every component and every non-React caller comes
       // through here, and none of them keeps its own idea of what exists.
       if (!addressable.has(path))
-        warnUnaddressable(path, addressable, options.key);
+        reportUnaddressable(path, addressable, options.key, onFieldMismatch);
       return handles.of(path, () =>
         createFieldHandle({
           store,
@@ -209,7 +218,12 @@ export function createForm<T, TPath extends string = string>(
       // the ROOT that no descriptor covers: nothing is drawn, nothing is
       // judged, and until this line nothing was said about it either.
       if (!addressable.has(arrayPath))
-        warnUnaddressable(arrayPath, addressable, options.key);
+        reportUnaddressable(
+          arrayPath,
+          addressable,
+          options.key,
+          onFieldMismatch
+        );
       const existing = rowsByPath.get(arrayPath);
       if (existing !== undefined) return existing;
       const created = createRowsHandle({

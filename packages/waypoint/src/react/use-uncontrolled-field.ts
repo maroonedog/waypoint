@@ -71,6 +71,10 @@ export function useUncontrolledField(
 ): UncontrolledFieldBinding<never> {
   const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
+  // Same claim as the controlled hook makes, for the same reason: whoever
+  // called this is going to put the place on the screen. Not drawing the
+  // value is what this hook is for; not drawing the FIELD is not.
+  form.coverage.addressed(handle.path);
 
   // The channels a message is drawn from. NOT the value: subscribing to that
   // is precisely what this hook exists not to do.

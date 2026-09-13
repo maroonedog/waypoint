@@ -21,7 +21,8 @@ const hooks = [
     example: `const form = useCreateForm(() => ({
   adapter: orderAdapter,
   defaultValues,
-  validateOn: "blur",   // "change" (the default) | "blur" | "submit"
+  validateOn: "blur",         // "change" (the default) | "blur" | "submit"
+  onFieldMismatch: "throw",   // "warn" (the default) | "throw" | "ignore"
 }));
 
 <FormProvider form={form}>…</FormProvider>`,
@@ -189,8 +190,8 @@ const components = [
   {
     name: "<FormProvider>",
     summary:
-      "Puts one handle in reach of a subtree. formKey says which registered form this is, and a qualified path below is compared against it; omit it and the key the form was created with is used, so the name is written once. Give both and they must agree — a disagreement throws where it is rendered, because it makes every path beneath read a form nobody meant.",
-    signature: `<FormProvider form={form} formKey?="order" widgets?={registry}>`,
+      "Puts one handle in reach of a subtree. formKey says which registered form this is, and a qualified path below is compared against it; omit it and the key the form was created with is used, so the name is written once. Give both and they must agree — a disagreement throws where it is rendered, because it makes every path beneath read a form nobody meant. Once the subtree has mounted it is also asked whether every declared field reached a component; partial says this screen draws part of the form on purpose and skips that question, leaving the rest.",
+    signature: `<FormProvider form={form} formKey?="order" widgets?={registry} partial?>`,
   },
   {
     name: "<Field>",

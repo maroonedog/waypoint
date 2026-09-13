@@ -31,7 +31,17 @@ export { seedRootValue } from "./descriptors/seed-root-value.js";
 export { NO_ISSUES } from "./runtime/interned-defaults.js";
 export type { CellSource } from "./runtime/cell-source.js";
 export { createForm } from "./runtime/create-form.js";
-export { forgetUnaddressableWarnings } from "./runtime/warn-unaddressable.js";
+export {
+  forgetUnaddressableWarnings,
+  warnOnHostConsole,
+  type FieldMismatchReaction,
+} from "./runtime/report-unaddressable.js";
+export {
+  createFieldCoverage,
+  type FieldCoverage,
+  type MissingField,
+  type MissingFieldReason,
+} from "./runtime/field-coverage.js";
 export type {
   FieldHandle,
   FieldSources,

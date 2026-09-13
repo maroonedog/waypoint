@@ -84,6 +84,27 @@ useField(`form:items[${i}].sku`);   // a computed index is fine
 useField(`form:items[${s}].sku`);   // compile error: s is a string
 ```
 
+## Both directions of "that field does not exist"
+
+A path no form declares has always been reported. The other direction is
+reported too: once a `<FormProvider>`'s subtree has mounted, every declared
+place that nothing drew is named.
+
+```
+[waypoint] 2 declared field(s) nothing has drawn (checked when this <FormProvider> finished mounting).
+  nothing asked for: "form:billing.city" (City)
+  asked for, no widget: "form:plan" (Plan)
+```
+
+That is not a missing input. The cell exists, the default was seeded and the
+validator judges it, so a required one refuses every submit while the error
+summary names a control nobody can see — and the reader goes looking for the
+bug in the submit button. `createForm({ onFieldMismatch: "throw" })` turns both
+directions into errors, which is what a test wants rather than a console;
+`<FormProvider partial>` says this screen draws part of the form on purpose;
+and `form.coverage.missing()` is the same question as a plain query, at any
+moment, with nothing rendered.
+
 The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 `useFieldIssues`, `useFormStatus`, `useRows`, `useParticipation`,
 `useErrorSummary`, `<Field>`, `<FieldRows>`, `<AutoForm>`, `adoptIssues` and
@@ -104,8 +125,8 @@ The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 They are entry points rather than packages because they all install together
 anyway. What the split buys is **resolution**: `./core` loads in a worker with
 no React resolvable at all, and only `./react` names React in its built output.
-`useField` alone is 1.50 kB gzipped against 9.53 kB for the whole `./react` barrel,
-and a screen plus the zod resolver is 9.55 kB. `npm run size:check` gates every row.
+`useField` alone is 1.54 kB gzipped against 10.29 kB for the whole `./react` barrel,
+and a screen plus the zod resolver is 10.27 kB. `npm run size:check` gates every row.
 
 ## What it does not do
 
@@ -134,9 +155,9 @@ author argued. **Nothing here has met a screen reader or an auditor.**
 reference, three of react-hook-form, two of Formik, one of TanStack Form — through
 one transcript, one zod schema it owns and instruments, one DOM it hashes.
 
-**waypoint is behind on all three scenarios, at every size**, and the report
+**waypoint is behind on all four scenarios, at every size**, and the report
 prints the rows it loses before its own table. Who beats it is the part worth
-reading: on two of the three, the winning row wins by **not showing the
+reading: on two of the four, the winning row wins by **not showing the
 message**. The counts lane is gated in CI because commits and changed fibers do
 not depend on the machine; the time lane is printed and never gated.
 
