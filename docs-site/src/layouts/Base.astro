@@ -44,6 +44,7 @@ const SECTIONS = [
     group: "Getting started",
     items: [
       { href: "/", label: "Overview" },
+      { href: "/showcase/", label: "Showcase" },
       { href: "/start/", label: "Start" },
     ],
   },
@@ -87,8 +88,11 @@ const flat = SECTIONS.flatMap((section) => section.items);
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Roboto and the icon face are the showcase's, and the showcase runs on
+         /showcase/. Noto Sans JP stood here from when this site was written in
+         Japanese and nothing on it has needed the face since. -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&family=Roboto:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
   </head>

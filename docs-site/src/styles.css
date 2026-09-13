@@ -7,6 +7,10 @@
    =========================================================================== */
 @import "tailwindcss";
 @source "../src";
+/* The showcase RUNS on this site, so its utilities have to be generated here.
+   Without this line the screen arrives with its markup and none of its
+   layout — which looks like a broken page rather than a missing @source. */
+@source "../../examples/showcase/src";
 @import "../../examples/showcase/src/md3-tokens.css";
 
 /* A code block is read rather than skimmed, and a long type signature must

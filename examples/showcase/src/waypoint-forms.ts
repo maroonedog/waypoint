@@ -12,6 +12,6 @@ export const applicationAdapter = zodFormResolver(applicationSchema);
 
 declare module "@maroonedog/waypoint" {
   interface WaypointForms {
-    form: typeof applicationAdapter;
+    application: typeof applicationAdapter;
   }
 }

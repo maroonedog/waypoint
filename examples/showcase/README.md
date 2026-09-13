@@ -16,10 +16,10 @@ page with no build step in between.
 | In the screen | In the library |
 |---|---|
 | Every field is a `<Field>` with a children function | Layer 3. The widgets here are the application's, and none of them ships with the library |
-| `AddressFields` is written once and placed twice | `at="form:billing"` and `at="form:shipping"` — one prop, and it is a location rather than a value; the address names its own form, so nothing has to be threaded beside it |
-| "Same as billing" hides the shipping address | `useParticipation(form, "form:shipping", …)` — the values stay in the store and stop counting toward what blocks a submit |
+| `AddressFields` is written once and placed twice | `at="application:billing"` and `at="application:shipping"` — one prop, and it is a location rather than a value; the address names its own form, so nothing has to be threaded beside it |
+| "Same as billing" hides the shipping address | `useParticipation(form, "application:shipping", …)` — the values stay in the store and stop counting toward what blocks a submit |
 | The order table adds, removes and renumbers rows | `<FieldRows>` hands each row its `row.path`, qualified by its form; row ids are React keys, cell keys stay concrete indices |
-| The over-the-limit message on the order table | An array-level issue at `items`, read with `useFieldIssues("form:items")` — a path with no descriptor |
+| The over-the-limit message on the order table | An array-level issue at `items`, read with `useFieldIssues("application:items")` — a path with no descriptor |
 | The required marker and `minlength` on each input | `field.descriptor` — the schema said it, the widget drew it, nobody wrote it twice |
 | The submit bar counts what blocks | `useFormStatus()` — four cells, four subscriptions |
 | Submitting reports what stopped it | `form.submit()` returns `blockedBy`, including paths with no component on screen |
@@ -37,3 +37,16 @@ take a `FieldBinding`, which is the same thing a children function receives.
 One note worth keeping: a Material Symbols ligature does not form inside a
 flex container, so the round icon badge and the glyph cannot be the same
 element.
+
+## Why its key is `application` and not `form`
+
+It runs twice: on its own, and embedded on the documentation site at
+`/showcase/`. That site's own demos already register `form`, and a registry
+augmentation belongs to the whole **compilation** — so two files declaring one
+key merge, silently, and whichever the checker reaches last wins. Two names is
+what lets both run in one program, which is what qualified paths are for.
+
+The form names itself where it is created (`createForm({ key: "application" })`)
+rather than at the provider. Saying it twice is two places that can disagree,
+and the disagreement lands one level above the paths it breaks — the runtime
+throws on it, which is how this was found.

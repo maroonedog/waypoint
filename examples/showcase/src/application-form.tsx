@@ -26,22 +26,22 @@ function ApplicantSection(): ReactElement {
       title="Who to contact"
       caption="How we reach you about this account"
     >
-      <Field path="form:applicant.lastName">
+      <Field path="application:applicant.lastName">
         {(field) => <MdTextField field={field} label="Last name" />}
       </Field>
-      <Field path="form:applicant.firstName">
+      <Field path="application:applicant.firstName">
         {(field) => <MdTextField field={field} label="First name" />}
       </Field>
-      <Field path="form:applicant.birthDate">
+      <Field path="application:applicant.birthDate">
         {(field) => <MdTextField field={field} label="Date of birth" type="date" />}
       </Field>
-      <Field path="form:applicant.phone">
+      <Field path="application:applicant.phone">
         {(field) => (
           <MdTextField field={field} label="Phone" leading="call" hint="e.g. (212) 555-0184" />
         )}
       </Field>
       <div className="sm:col-span-2">
-        <Field path="form:applicant.email">
+        <Field path="application:applicant.email">
           {(field) => (
             <MdTextField field={field} label="Email" type="email" leading="mail" />
           )}
@@ -55,20 +55,20 @@ function CompanySection(): ReactElement {
   return (
     <SectionCard icon="apartment" title="The company">
       <div className="sm:col-span-2">
-        <Field path="form:company.name">
+        <Field path="application:company.name">
           {(field) => <MdTextField field={field} label="Company name" />}
         </Field>
       </div>
-      <Field path="form:company.department">
+      <Field path="application:company.department">
         {(field) => <MdTextField field={field} label="Department" hint="optional" />}
       </Field>
-      <Field path="form:company.title">
+      <Field path="application:company.title">
         {(field) => <MdTextField field={field} label="Job title" hint="optional" />}
       </Field>
-      <Field path="form:company.employees">
+      <Field path="application:company.employees">
         {(field) => <MdNumberField field={field} label="Employees" suffix="people" />}
       </Field>
-      <Field path="form:company.registration">
+      <Field path="application:company.registration">
         {(field) => (
           <MdTextField field={field} label="Registration no." hint="e.g. NY-004512" />
         )}
@@ -79,14 +79,14 @@ function CompanySection(): ReactElement {
 
 function AddressSections(): ReactElement {
   const form = useForm();
-  const sameAsBilling = useFieldValue("form:sameAsBilling") === true;
+  const sameAsBilling = useFieldValue("application:sameAsBilling") === true;
   // The values stay in the store either way; what stops is the verdict
   // counting toward whether the form can be submitted.
-  useParticipation(form, "form:shipping", !sameAsBilling);
+  useParticipation(form, "application:shipping", !sameAsBilling);
   return (
     <>
       <SectionCard icon="receipt_long" title="Billing address">
-        <AddressFields at="form:billing" />
+        <AddressFields at="application:billing" />
       </SectionCard>
 
       <SectionCard
@@ -99,7 +99,7 @@ function AddressSections(): ReactElement {
         }
         actions={
           <div className="w-40">
-            <Field path="form:sameAsBilling">
+            <Field path="application:sameAsBilling">
               {(field) => (
                 <MdCheckboxField field={field} label="Same as billing" />
               )}
@@ -109,7 +109,7 @@ function AddressSections(): ReactElement {
       >
         {/* The values stay in the store either way; what stops is the verdict
             counting toward whether the form can be submitted. */}
-        {sameAsBilling ? null : <AddressFields at="form:shipping" />}
+        {sameAsBilling ? null : <AddressFields at="application:shipping" />}
       </SectionCard>
     </>
   );
@@ -119,7 +119,7 @@ function TermsSection(): ReactElement {
   return (
     <SectionCard icon="gavel" title="Payment and terms">
       <div className="sm:col-span-2">
-        <Field path="form:payment">
+        <Field path="application:payment">
           {(field) => (
             <MdChoiceChips
               field={field}
@@ -134,7 +134,7 @@ function TermsSection(): ReactElement {
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field path="form:note">
+        <Field path="application:note">
           {(field) => (
             <MdTextField
               field={field}
@@ -146,7 +146,7 @@ function TermsSection(): ReactElement {
         </Field>
       </div>
       <div className="sm:col-span-2">
-        <Field path="form:agreed">
+        <Field path="application:agreed">
           {(field) => (
             <MdCheckboxField
               field={field}
@@ -220,6 +220,11 @@ export function ApplicationForm({
 }): ReactElement {
   const form = useCreateForm(() => ({
     adapter: applicationAdapter,
+    // The form names ITSELF, rather than the provider naming it: two places
+    // to say one thing are two that can disagree, and the disagreement is
+    // arranged one level above the paths it would break. Said here, every
+    // `application:` path below is checked against it.
+    key: "application",
     defaultValues: structuredClone(EMPTY_APPLICATION),
   }));
 

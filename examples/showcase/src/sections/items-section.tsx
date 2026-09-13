@@ -10,7 +10,7 @@ import { SectionCard } from "../md/section-card.js";
  * describes fields and a container is not one. Reading them is one hook.
  */
 function OrderTotalNotice(): ReactElement | null {
-  const issues = useFieldIssues("form:items");
+  const issues = useFieldIssues("application:items");
   if (issues.length === 0) return null;
   return (
     <p className="mb-4 flex items-start gap-2 rounded-sm bg-error-container px-4 py-3 text-sm text-on-error-container sm:col-span-2">
@@ -24,7 +24,7 @@ function OrderTotalNotice(): ReactElement | null {
 
 export function ItemsSection(): ReactElement {
   return (
-    <FieldRows path="form:items">
+    <FieldRows path="application:items">
       {({ rows, insert, remove }) => (
         <SectionCard
           icon="list_alt"

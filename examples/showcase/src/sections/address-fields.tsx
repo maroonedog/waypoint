@@ -13,7 +13,7 @@ import { MdSelectField } from "../md/select-field.js";
  * the registered form — so the paths it builds by interpolation stay checked,
  * and a place that is missing one of these five fields will not compile.
  *
- * Each of those places names its form: `form:billing`, `form:shipping`. That
+ * Each of those places names its form: `application:billing`, `application:shipping`. That
  * is what makes ONE prop enough — the section belongs to the design system
  * rather than to a form, and a path that carries its own form is a whole
  * instruction rather than half of one.

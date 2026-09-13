@@ -1,0 +1,78 @@
+---
+// ===========================================================================
+// showcase.astro — the example, running, for somebody who cannot run it.
+//
+// The Examples page listed six commands, which is useful to a reader who has
+// the repository and useless to the one this site is for. A documentation site
+// that describes a form library and shows no form is asking to be taken on
+// trust twice: once for the prose, and once for the claim that the prose
+// describes something real.
+//
+// So the biggest example is ON this page rather than beside it, built from the
+// same files the command serves — and the same files `npm run test:types`
+// compiles, so it cannot quietly stop being what the page says it is.
+//
+// `client:load` rather than `client:visible`, and the reason is what the page
+// is. A reader who opened /showcase/ came for the form; deferring the only
+// thing on the page until they scroll buys nothing and costs the one thing
+// that matters — measured here, the island sat at 728x2211 spanning the
+// viewport with its `ssr` attribute still set, so the inputs rendered with
+// every attribute off the schema and nothing was listening to them. A form
+// that looks complete and ignores typing is worse than one that is late.
+// ===========================================================================
+import Base from "../layouts/Base.astro";
+import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
+---
+
+<Base
+  title="Showcase — waypoint"
+  description="A real form running on this page: six sections, every label, bound and aria attribute off the schema, and a submit that names what blocked it."
+>
+  <h1 class="text-3xl font-bold sm:text-4xl">Showcase</h1>
+
+  <p class="lead">
+    A trade account application — six sections, an address written once and
+    placed twice, an order table with a cross-field ceiling, and a submit that
+    tells you what stopped it. It is running on this page.
+  </p>
+
+  <p class="caption">
+    Every label, every bound, every <code>type</code> and every aria attribute
+    below came off the zod schema. The widgets are the application's — this
+    library ships none — and what they were handed is one binding each.
+  </p>
+
+  <p class="caption">
+    <strong class="text-on-surface">Things to try.</strong> Send it empty: the
+    bar names the paths that blocked it, including ones you have to scroll to.
+    Tick <em>Same as billing</em>: the shipping fields go, their values stay,
+    and they stop counting toward the block. Put two of the same address in and
+    the complaint lands on the shipping postcode — a rule reporting against a
+    field you did not touch. Push the order total over the ceiling and the
+    message arrives at <code>items</code>, a path with no input of its own.
+  </p>
+
+  <div class="mt-8">
+    <ShowcaseScreen client:load />
+  </div>
+
+  <h2 class="mt-16 text-2xl font-bold">The same thing, locally</h2>
+
+  <p class="caption">
+    The screen above imports <code>examples/showcase</code> directly, so it is
+    the example rather than a copy of it. To run it on its own — with the
+    package resolving to source, so editing the runtime reloads the page —
+    <code>npm run example:showcase</code>, then localhost:5179. The other five
+    are on the <a class="underline underline-offset-4" href="/examples/">Examples</a>
+    page.
+  </p>
+
+  <p class="caption">
+    One detail worth knowing if you read its source: the showcase registers
+    itself as <code>application</code>, not <code>form</code>. This site's own
+    demos already register <code>form</code>, and a registry augmentation
+    belongs to the whole compilation — so two files declaring one key merge,
+    silently, and whichever the checker reaches last wins. Two names is what
+    lets both run here, and it is what qualified paths are for.
+  </p>
+</Base>
