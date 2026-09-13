@@ -611,7 +611,9 @@ main.is-landing .lead {
   font-size: clamp(1.25rem, 2.6vw, 1.5rem);
   line-height: 1.45;
   color: var(--wp-ink);
-  max-width: 34ch;
+  /* 44 and not 34: the claim carries a code span the width of a whole call,
+     and at the shorter measure the line broke after the first word. */
+  max-width: 44ch;
 }
 
 /* A PARAGRAPH AFTER A LEAD HAD NO GAP AT ALL. The sheet spaces what follows a

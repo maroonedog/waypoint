@@ -1,16 +1,20 @@
 # <img src="docs-site/public/favicon.svg" width="26" height="26" alt="" align="top"> waypoint
 
-**A field's address exists before the component that draws it — as a type the
-compiler has already checked, and as runtime state that is already written.**
+**Write `useField("form:billing.postcode")` in any component, at any depth.**
+**The compiler checks the string, and nothing had to be passed down to get there.**
 
-One claim, two halves. The type is one `WaypointForms` module augmentation:
-a leaf takes no prop, no generic argument and imports nothing from the registry,
-and an application that registered nothing is **refused**, with the
-declaration it is missing quoted back at it — unless a dependency registered
-one, in which case it inherits that one's paths instead. Registration is global
-to the compilation and nothing namespaces it yet. The state is written at `createForm` from the descriptor list, before
-any component exists — so mounting is a subscription, and there is no register,
-no unregister and no `shouldUnregister`.
+Two things make that true.
+
+The path is a type. One `WaypointForms` module augmentation declares it, and a
+leaf then takes no prop, no generic argument and imports nothing from the
+registry. An application that registered nothing is **refused**, with the
+declaration it is missing quoted back at it. Two caveats: a dependency that
+registers a form registers it for you, and registration is global to the
+compilation with nothing namespacing it yet.
+
+The cell it names is already written. Every cell is seeded at `createForm`
+from the descriptor list, before any component exists, so mounting is a
+subscription — no register, no unregister, no `shouldUnregister`.
 
 📖 **The documentation site is the documentation.** It is in `docs-site/` and is
 **not served anywhere yet** — no domain has been chosen and GitHub Pages will

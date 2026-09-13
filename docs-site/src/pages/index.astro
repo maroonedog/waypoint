@@ -250,8 +250,8 @@ const TRY = [
 ---
 
 <Base
-  title="waypoint — a field's address exists before the component does"
-  description="A field's address is a compile-checked type before the leaf that draws it exists, and the cell it names is already written. One registry declaration, no props, no generic arguments, and no register or unregister at mount."
+  title="waypoint — type-checked field paths for React and Vue forms"
+  description="Write useField('form:billing.postcode') in any component, at any depth. The compiler checks the string against your schema, and the cell it names is already written — one registry declaration, no props, no generic arguments, no register at mount."
   bare
 >
   <!-- THE NAME, AND THEN THE CLAIM UNDER IT. It used to open with the claim
@@ -261,17 +261,25 @@ const TRY = [
        to remember in 14px in a corner. -->
   <h1>waypoint</h1>
 
+  <!-- THE TAGLINE SHOWS THE CALL. It used to read "A field's address exists
+       before the component that draws it", which is the argument this page
+       makes and not a sentence a stranger can act on: "address" is this
+       library's own word for a path, and nothing in the line says what you
+       write or what you get. A reader who has built a form knows what the
+       call below costs them today. -->
   <p class="lead">
-    A field's address exists before the component that draws it.
+    Write <code>useField("form:billing.postcode")</code> in any component, at
+    any depth. The compiler checks the string, and nothing had to be passed
+    down to get there.
   </p>
 
   <p>
-    One claim, two halves. It is a <strong>type the compiler has already
-    checked</strong>: one registry declaration, no prop, no generic argument,
-    nothing imported at the leaf. And it is <strong>state already
-    written</strong>: every cell is seeded at <code>createForm</code>, so
-    mounting is a subscription — no register, no unregister, no{" "}
-    <code>shouldUnregister</code>.
+    Two things make that true. The path is a <strong>type the compiler has
+    already checked</strong>: one registry declaration, no prop, no generic
+    argument, nothing imported at the leaf. And the cell it names is{" "}
+    <strong>already written</strong> — every cell is seeded at{" "}
+    <code>createForm</code>, so mounting is a subscription, with no register,
+    no unregister and no <code>shouldUnregister</code>.
   </p>
 
   <!-- ONE FILL ON THE WHOLE SITE, AND IT IS THIS ONE. The mark is a line
