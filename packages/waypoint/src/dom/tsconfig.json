@@ -1,0 +1,13 @@
+{
+  "//": "The `src/dom` layer: what the bindings share and no framework owns. It needs the DOM lib because a field's props are DOM attributes and `inputTypeFor` returns DOM input type names, which is the one thing `./core` cannot widen to without giving up its own claim. It needs no JSX factory, and `types: []` keeps @types/react out of ambient scope — but `types` does not stop an explicit `import ... from \"react\"`, so the rule that this layer names no framework is checked by test/framework-free-layers.test.mjs, not by tsc. It is not an entry point: nothing in `exports` reaches it, and `./react` re-exports every public name that moved here.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "types": [],
+    "rootDir": ".",
+    "outDir": "../../dist/dom",
+    "tsBuildInfoFile": "../../.tsbuildinfo/dom.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../contract" }, { "path": "../core" }]
+}

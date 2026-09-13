@@ -1,6 +1,9 @@
 // ===========================================================================
 // field-row.types.ts — one row, as a list renders it.
 //
+// A FILE NO FRAMEWORK OWNS. A row is a key, an index and an address: the key
+// is for whatever reconciles the list, and the other two are the form's.
+//
 // The row carries its own ADDRESS. That is the whole mechanism now: a nested
 // component is handed `row.path` and builds the paths it wants from it, so
 // nothing ambient has to rewrite what it asks for.
@@ -27,7 +30,7 @@
 // ===========================================================================
 
 export interface FieldRow<TPath extends string = string> {
-  /** Opaque, stable for the life of the row: the React key and never an address. */
+  /** Opaque, stable for the life of the row: the list key and never an address. */
   readonly key: string;
   readonly index: number;
   /**

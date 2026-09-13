@@ -39,7 +39,7 @@ import { useContext, type ReactElement, type ReactNode } from "react";
 import type { FieldBinding } from "./field-binding.types.js";
 import { useFieldBinding } from "./bind-field.js";
 import { WidgetRegistryContext } from "./widget-registry-context.js";
-import { resolveWidget } from "./resolve-widget.js";
+import { resolveWidget } from "../dom/resolve-widget.js";
 import type {
   FormPath,
   InhabitedFormPath,

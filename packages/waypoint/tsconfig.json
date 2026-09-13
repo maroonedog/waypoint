@@ -1,9 +1,10 @@
 {
-  "//": "The build, as one command. Seven referenced projects, one per entry point, and `tsc -b` works out the order from the references rather than from a chain of `&&` in package.json that a reader has to trust. `files: []` because this config compiles nothing itself — it only says what the package is made of.",
+  "//": "The build, as one command. Eight referenced projects: seven entry points, plus `./src/dom`, which is not one — nothing in the `exports` map reaches it and `./react` re-exports every public name it holds. `tsc -b` works out the order from the references rather than from a chain of `&&` in package.json that a reader has to trust. `files: []` because this config compiles nothing itself — it only says what the package is made of.",
   "files": [],
   "references": [
     { "path": "./src/contract" },
     { "path": "./src/core" },
+    { "path": "./src/dom" },
     { "path": "./src/react" },
     { "path": "./src/resolver-standard" },
     { "path": "./src/resolver-zod" },

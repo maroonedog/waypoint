@@ -30,7 +30,7 @@
     },
     {
       "id": "visibility-gate",
-      "file": "react/issue-visibility.js",
+      "file": "dom/issue-visibility.js",
       "find": "    if (input.visibility === \"touched\")\n        return input.isTouched;",
       "replace": "    if (input.visibility === \"touched\")\n        return true;",
       "test": "test/issue-visibility.test.mjs",
@@ -39,7 +39,7 @@
     },
     {
       "id": "visibility-submit-reveal",
-      "file": "react/issue-visibility.js",
+      "file": "dom/issue-visibility.js",
       "find": "    if (input.submitCount > 0)\n        return true;",
       "replace": "    if (false)\n        return true;",
       "test": "test/issue-visibility.test.mjs",
@@ -48,7 +48,7 @@
     },
     {
       "id": "message-empty-string",
-      "file": "react/form-message.js",
+      "file": "dom/form-message.js",
       "find": "if (text === undefined || text === \"\" || text === issue.message)",
       "replace": "if (text === undefined || text === issue.message)",
       "test": "test/binding-combinations.test.mjs",
@@ -57,7 +57,7 @@
     },
     {
       "id": "message-identity",
-      "file": "react/form-message.js",
+      "file": "dom/form-message.js",
       "find": "    return moved ? next : issues;",
       "replace": "    return next;",
       "test": "test/message-for.test.mjs",

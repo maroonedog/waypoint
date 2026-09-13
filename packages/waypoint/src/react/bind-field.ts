@@ -40,23 +40,23 @@
 import { useCallback, useContext, useId, type ReactElement } from "react";
 import type { FormHandle } from "../core/index.js";
 import type { FieldBinding, FieldPart } from "./field-binding.types.js";
-import { buildInputProps } from "./build-input-props.js";
+import { buildInputProps } from "../dom/build-input-props.js";
 import { decorateElement } from "./decorate-element.js";
 import {
   descriptionPropsFor,
   errorPropsFor,
   fieldElementIds,
   labelPropsFor,
-} from "./field-element-ids.js";
+} from "../dom/field-element-ids.js";
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
-import { visibleIssues, type IssueVisibility } from "./issue-visibility.js";
+import { visibleIssues, type IssueVisibility } from "../dom/issue-visibility.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
 import {
   wordedIssues,
   type AnyFormMessageFor,
   type FormMessageFor,
-} from "./form-message.js";
+} from "../dom/form-message.js";
 import { FormMessageContext } from "./form-message-context.js";
 
 export interface FieldOptions<TCode extends string = string> {

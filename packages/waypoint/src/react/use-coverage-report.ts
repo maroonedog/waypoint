@@ -25,7 +25,7 @@
 import { useEffect } from "react";
 import type { FormHandle } from "../core/index.js";
 import { warnOnHostConsole } from "../core/index.js";
-import { describeMissingFields } from "./describe-missing-fields.js";
+import { describeMissingFields } from "../dom/describe-missing-fields.js";
 
 const alreadyWarned = new WeakSet<object>();
 

@@ -35,7 +35,7 @@ import { useContext, useEffect } from "react";
 import type { ConcretePath } from "../contract/index.js";
 import type { FormHandle } from "../core/index.js";
 import { FormKeyContext } from "./form-key-context.js";
-import { formPathWithin } from "./parse-qualified-path.js";
+import { formPathWithin } from "../dom/parse-qualified-path.js";
 import type { FormKey } from "../contract/index.js";
 
 export function useParticipation<T, TPath extends string>(

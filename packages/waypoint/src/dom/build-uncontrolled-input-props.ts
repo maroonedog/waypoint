@@ -1,7 +1,12 @@
 // ===========================================================================
 // build-uncontrolled-input-props.ts — the same bag, for a node-held value.
 //
-// `useUncontrolledField` is the binding the benchmark tells people to reach
+// A FILE NO FRAMEWORK OWNS. Its one framework type was `RefObject`, and
+// React's `RefObject<T>` is `{ current: T }` and nothing else — see the header
+// of ./field-binding.types.ts — so the ref position is `FieldRefObject<T>` and
+// a React binding's own `useRef` result still satisfies it.
+//
+// The uncontrolled binding is the one the benchmark tells people to reach
 // for, and it used to return no props at all: a caller who took the advice had
 // to spell `name`, `required`, `min`, `max`, `minLength`, `maxLength`, `step`
 // and `pattern` out of `descriptor.constraints` by hand, so the fastest
@@ -10,7 +15,7 @@
 // where it has to.
 //
 // Where it has to is the value: `ref` and a default instead of `value`, so the
-// node owns what is in the box and React is never woken to redraw it. That is
+// node owns what is in the box and nothing is woken to redraw it. That is
 // also why a boolean gets `defaultChecked` rather than `defaultValue` —
 // `defaultValue="true"` on a checkbox sets the string value of a box that is
 // still unticked, which is the quiet wrong answer rather than a loud one.
@@ -22,9 +27,9 @@
 // already the arrangement where the node owns the value, which is how a file
 // input works whether or not anybody asked, so it needs no third shape here.
 // ===========================================================================
-import type { RefObject } from "react";
 import type { FormFieldDescriptor, FormIssue } from "../contract/index.js";
 import type {
+  FieldRefObject,
   UncontrolledChangeEvent,
   UncontrolledInputProps,
 } from "./field-binding.types.js";
@@ -36,7 +41,7 @@ export interface UncontrolledInputPropsRequest {
   readonly descriptor: FormFieldDescriptor | undefined;
   readonly issues: readonly FormIssue[];
   readonly ids: FieldElementIds;
-  readonly ref: RefObject<HTMLInputElement | null>;
+  readonly ref: FieldRefObject<HTMLInputElement | null>;
   /** Read from the cell at render, never subscribed to. */
   readonly held: unknown;
   /** The same string the binding's own `defaultValue` carries, so the two

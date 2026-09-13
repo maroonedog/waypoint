@@ -1,6 +1,10 @@
 // ===========================================================================
 // form-message.ts — the application's wording, over the validator's.
 //
+// A FILE NO FRAMEWORK OWNS. Substituting a sentence is a function from an
+// issue and a descriptor to another issue, and it is applied wherever a
+// message is handed out.
+//
 // THE LIBRARY OWNS NO MESSAGE AND STILL DOES NOT. What it owns is the point at
 // which one can be substituted, and the material to build one from: an issue
 // carries `path`, `message`, and — from a vendor resolver — `code`; the

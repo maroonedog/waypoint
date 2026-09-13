@@ -28,7 +28,7 @@ import { useContext } from "react";
 import type { FormIssue } from "../contract/index.js";
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
-import { wordedIssues } from "./form-message.js";
+import { wordedIssues } from "../dom/form-message.js";
 import { FormMessageContext } from "./form-message-context.js";
 import type { FormPath, InhabitedFormPath } from "../contract/index.js";
 

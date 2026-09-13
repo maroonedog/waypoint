@@ -1,6 +1,9 @@
 // ===========================================================================
 // parse-qualified-path.ts — the colon, split in one place.
 //
+// A FILE NO FRAMEWORK OWNS. Both halves are string work, and every binding
+// that lets a caller address a second form has to do it the same way.
+//
 // A qualified path names a form and a place in it: `admin:quotas.seats`. The
 // hooks that address a field take one, and this is where the two halves come
 // apart — the ones that address a FORM take a key instead, and `useCell` and

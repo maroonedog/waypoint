@@ -2,8 +2,11 @@
 // find-field-control.ts — the element a path is typed into, found in the
 // document rather than derived.
 //
+// A FILE NO FRAMEWORK OWNS. It is a query against the document, which is the
+// one thing every browser binding already shares.
+//
 // WHY IT IS NOT DERIVED, which is the question this file exists to answer. A
-// field's `id` is minted from `useId()` inside the `useField` CALL, and
+// field's `id` is minted from a scope the binding supplies per call, and
 // field-element-ids.ts explains at length why it has to be: a path is unique
 // within one form and nothing more, and rendering one path twice — legal here,
 // and sometimes the point — would otherwise put two elements in the document

@@ -37,7 +37,7 @@ import { bindDeclaredPath, type DescriptorNode } from "../core/index.js";
 import { Field } from "./field.js";
 import { FieldRows } from "./field-rows.js";
 import { FormKeyContext } from "./form-key-context.js";
-import { formPathWithin } from "./parse-qualified-path.js";
+import { formPathWithin } from "../dom/parse-qualified-path.js";
 import { useFormHandle } from "./use-form.js";
 import type { RowsBinding } from "./use-rows.js";
 import type { FormDeclaredPath } from "../contract/index.js";

@@ -40,23 +40,23 @@ import type {
   UncontrolledChangeEvent,
   UncontrolledFieldBinding,
 } from "./field-binding.types.js";
-import { buildUncontrolledInputProps } from "./build-uncontrolled-input-props.js";
+import { buildUncontrolledInputProps } from "../dom/build-uncontrolled-input-props.js";
 import {
   descriptionPropsFor,
   errorPropsFor,
   fieldElementIds,
   labelPropsFor,
-} from "./field-element-ids.js";
+} from "../dom/field-element-ids.js";
 import {
   numberOrTextWhileTyping,
   numberWhenTypingStops,
-} from "./number-from-typing.js";
+} from "../dom/number-from-typing.js";
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
 import { decorateElement } from "./decorate-element.js";
-import { visibleIssues } from "./issue-visibility.js";
+import { visibleIssues } from "../dom/issue-visibility.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
-import { wordedIssues, type AnyFormMessageFor } from "./form-message.js";
+import { wordedIssues, type AnyFormMessageFor } from "../dom/form-message.js";
 import { FormMessageContext } from "./form-message-context.js";
 import type { FieldOptions } from "./bind-field.js";
 import type { FieldPart } from "./field-binding.types.js";

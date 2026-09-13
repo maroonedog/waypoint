@@ -2,6 +2,10 @@
 // field-element-ids.ts — the ids a labelled field's elements address each
 // other by, derived once, plus the three prop bags that carry them.
 //
+// A FILE NO FRAMEWORK OWNS. It takes the id scope as a string and returns
+// strings, so the rule that a label, a help line and a message all point at
+// one input is stated once for every binding there will be.
+//
 // A label, a help line and an error message all have to point at the SAME
 // input, and in ordinary markup they are written by three different hands.
 // Deriving the ids three times is exactly how they stop agreeing, so they are
@@ -17,10 +21,12 @@
 // here is addressed by path rather than by tree position: rendering
 // `owner.name` in two components is legal and is sometimes the point.
 //
-// So the id is scoped by a value React guarantees unique per hook call, which
-// is what `useId` is for. A module-level counter of our own was the obvious
-// alternative and was rejected: it produces a different number on the server
-// than in the browser, so every hydrated form would log a mismatch.
+// So the id is SCOPED, and the scope arrives as an argument. What a binding
+// passes is the binding's business — React's `useId` is what the React one
+// passes — and this file has no way to obtain one, which is the point. A
+// module-level counter of our own was the obvious alternative and was
+// rejected: it produces a different number on the server than in the browser,
+// so every hydrated form would log a mismatch.
 //
 // The path stays in the id anyway. It costs nothing at run time and it is the
 // difference between reading an accessibility tree and reading `«r7»-«r8»`.

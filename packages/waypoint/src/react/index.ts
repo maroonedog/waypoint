@@ -18,19 +18,27 @@
 // Everything client-only in this entry is reached through this file, so one
 // directive covers the entry and no other file needs one.
 //
+// SOME OF WHAT IT EXPORTS NOW LIVES IN `../dom`, which is not an entry point:
+// nothing in the `exports` map reaches it, and every public name it holds is
+// re-exported here under the spelling it always had. A caller imports from
+// `@maroonedog/waypoint/react` exactly as before.
+//
 // IT SURVIVES THE BUILD, which is the part that is usually assumed. There is
 // no bundler in the publish path — the build is `tsc -b` — and tsc 5.9.3 under
 // this repository's options emits the directive as line 1 of
 // `dist/react/index.js`, above the imports and absent from the `.d.ts`. Run
 // `npm run build` and read the first line if you doubt it.
 //
-// WHAT IT COSTS, stated rather than discovered later. Five exports below call
-// no hook — `buildInputProps`, `buildUncontrolledInputProps`, `inputTypeFor`,
-// `fieldElementIds` and `resolveWidget` — and behind a client boundary those
-// become client references rather than callable functions for a Server
-// Component importing them. They are NOT moved to `./core` to dodge that:
+// WHAT IT COSTS, stated rather than discovered later, AND WHAT THE MOVE DID
+// NOT PAY. Five exports below call no hook — `buildInputProps`,
+// `buildUncontrolledInputProps`, `inputTypeFor`, `fieldElementIds` and
+// `resolveWidget`. Their source now sits in `../dom`, but they are still
+// re-exported from behind this directive, so a Server Component importing one
+// of them gets a client reference exactly as it did before. Moving the files
+// created the OPTION of a `./dom` entry without the directive; it did not take
+// it, and nothing in the `exports` map changed. They are still NOT in `./core`:
 // `inputTypeFor` returns DOM input type names and `./core`'s claim is that it
-// names no DOM, so the move would trade a real boundary for a false one.
+// names no DOM, so that move would trade a real boundary for a false one.
 //
 // The other cost is one warning for a non-Next consumer who bundles the built
 // package, and nothing else. Measured here against the built
@@ -84,17 +92,17 @@ export type {
   MissingField,
   MissingFieldReason,
 } from "../core/index.js";
-export { describeMissingFields } from "./describe-missing-fields.js";
+export { describeMissingFields } from "../dom/describe-missing-fields.js";
 export {
   DEFAULT_ISSUE_VISIBILITY,
   IssueVisibilityContext,
 } from "./issue-visibility-context.js";
-export { issuesAreVisible, type IssueVisibility } from "./issue-visibility.js";
+export { issuesAreVisible, type IssueVisibility } from "../dom/issue-visibility.js";
 export {
   wordedIssues,
   type AnyFormMessageFor,
   type FormMessageFor,
-} from "./form-message.js";
+} from "../dom/form-message.js";
 export { FormMessageContext } from "./form-message-context.js";
 export { decorateElement } from "./decorate-element.js";
 export type { FieldOptions } from "./bind-field.js";
@@ -112,10 +120,10 @@ export {
   type ErrorSummaryRegionProps,
   type ErrorSummaryScopeProps,
 } from "./use-error-summary.js";
-export { fieldControlAt, focusFieldControl } from "./find-field-control.js";
+export { fieldControlAt, focusFieldControl } from "../dom/find-field-control.js";
 export type { FieldIssueSummary } from "../core/index.js";
 export { Field, type FieldProps } from "./field.js";
-export type { FieldRow } from "./field-row.types.js";
+export type { FieldRow } from "../dom/field-row.types.js";
 export { useParticipation } from "./use-participation.js";
 export { useRows, type RowsBinding } from "./use-rows.js";
 export { FieldRows, type FieldRowsProps } from "./field-rows.js";
@@ -124,16 +132,16 @@ export {
   EMPTY_REGISTRY,
   WidgetRegistryContext,
 } from "./widget-registry-context.js";
-export { resolveWidget } from "./resolve-widget.js";
+export { resolveWidget } from "../dom/resolve-widget.js";
 export type {
   FormWidget,
   WidgetProps,
   WidgetRegistry,
 } from "./widget-registry.types.js";
-export { buildInputProps } from "./build-input-props.js";
-export { buildUncontrolledInputProps } from "./build-uncontrolled-input-props.js";
-export { inputTypeFor } from "./input-attributes.js";
-export { fieldElementIds, type FieldElementIds } from "./field-element-ids.js";
+export { buildInputProps } from "../dom/build-input-props.js";
+export { buildUncontrolledInputProps } from "../dom/build-uncontrolled-input-props.js";
+export { inputTypeFor } from "../dom/input-attributes.js";
+export { fieldElementIds, type FieldElementIds } from "../dom/field-element-ids.js";
 export type {
   FieldBinding,
   FieldChangeEvent,

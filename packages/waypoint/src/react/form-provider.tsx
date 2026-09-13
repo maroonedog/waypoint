@@ -48,9 +48,9 @@ import {
 import type { WidgetRegistry } from "./widget-registry.types.js";
 import { useCoverageReport } from "./use-coverage-report.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
-import type { IssueVisibility } from "./issue-visibility.js";
+import type { IssueVisibility } from "../dom/issue-visibility.js";
 import { FormMessageContext } from "./form-message-context.js";
-import type { AnyFormMessageFor, FormMessageFor } from "./form-message.js";
+import type { AnyFormMessageFor, FormMessageFor } from "../dom/form-message.js";
 import type { AnyCode, FormKey } from "../contract/index.js";
 
 export interface FormProviderProps<T, TPath extends string> {

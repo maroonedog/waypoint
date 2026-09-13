@@ -1,5 +1,5 @@
 {
-  "//": "The `./react` entry: the only one that needs the DOM and a JSX factory, and the only one whose built output names `react` at all. Keeping that widening in one project is what stops it reaching `./core`.",
+  "//": "The `./react` entry: the only one that needs a JSX factory, and the only one whose built output names `react` at all. `../dom` widens to the DOM too, because a field's props are DOM attributes; what stays here is what React owns. Keeping both widenings out of `./core` is what its own `lib` line is for.",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM"],
@@ -9,5 +9,9 @@
     "tsBuildInfoFile": "../../.tsbuildinfo/react.tsbuildinfo"
   },
   "include": ["."],
-  "references": [{ "path": "../contract" }, { "path": "../core" }]
+  "references": [
+    { "path": "../contract" },
+    { "path": "../core" },
+    { "path": "../dom" }
+  ]
 }

@@ -1,8 +1,12 @@
 // ===========================================================================
-// input-attributes.ts — the half of a field's props that both bindings emit.
+// input-attributes.ts — the half of a field's props that every binding emits.
 //
-// `useField` and `useUncontrolledField` differ in exactly one thing: where the
-// value lives. Everything else on the element — its id, its name, the type the
+// A FILE NO FRAMEWORK OWNS. What a field accepts is what the schema declared
+// and what HTML spells it as; neither of those is a framework's fact, so this
+// is stated once and each binding spreads it.
+//
+// The controlled and uncontrolled bindings differ in exactly one thing: where
+// the value lives. Everything else on the element — its id, its name, the type the
 // descriptor implies, the bounds the schema declared, and what a screen reader
 // is told — is the same fact stated twice, and it WAS stated twice: an
 // uncontrolled caller had to re-derive `min`, `max`, `minLength`, `maxLength`,

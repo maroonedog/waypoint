@@ -1,6 +1,9 @@
 // ===========================================================================
 // describe-missing-fields.ts — the sentence a hole in a form deserves.
 //
+// A FILE NO FRAMEWORK OWNS. It takes the report `./core` produced and returns
+// lines of text. Which sentence a reason deserves is a fact about the reason.
+//
 // THE PROVIDER IS THE MOMENT, NOT THE SCOPE, and the first line says so. The
 // ledger belongs to the form, so a form drawn across two providers is asked
 // twice about the same places and the earlier one is asked before the later

@@ -1,6 +1,9 @@
 // ===========================================================================
 // number-from-typing.ts — what a number field's cell holds mid-word.
 //
+// A FILE NO FRAMEWORK OWNS. What `"1."` should mean while somebody is still
+// typing it is a question about the DOM's string and the schema's kind.
+//
 // A number input hands back a string and the schema declared a number, so
 // something has to convert, and the naive `Number(raw)` is why the showcase
 // used to bypass `inputProps` for numbers entirely: it writes NaN for "-" and

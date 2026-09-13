@@ -22,7 +22,7 @@
 // ===========================================================================
 import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
-import type { FieldRow } from "./field-row.types.js";
+import type { FieldRow } from "../dom/field-row.types.js";
 import type { FormListPath } from "../contract/index.js";
 
 export interface RowsBinding<TPath extends string = string> {

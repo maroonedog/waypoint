@@ -18,7 +18,7 @@
 // before any of this existed: an application that sets nothing sees no change.
 // ===========================================================================
 import { createContext } from "react";
-import type { IssueVisibility } from "./issue-visibility.js";
+import type { IssueVisibility } from "../dom/issue-visibility.js";
 
 export const DEFAULT_ISSUE_VISIBILITY: IssueVisibility = "immediately";
 

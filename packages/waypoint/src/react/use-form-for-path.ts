@@ -16,7 +16,7 @@
 import { useContext } from "react";
 import type { FormHandle } from "../core/index.js";
 import { FormKeyContext } from "./form-key-context.js";
-import { formPathWithin } from "./parse-qualified-path.js";
+import { formPathWithin } from "../dom/parse-qualified-path.js";
 import { useFormHandle } from "./use-form.js";
 
 export interface FormAndPath {

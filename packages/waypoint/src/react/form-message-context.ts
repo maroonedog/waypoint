@@ -14,7 +14,7 @@
 // declares no wording allocates nothing and keeps the interned empty list.
 // ===========================================================================
 import { createContext } from "react";
-import type { AnyFormMessageFor } from "./form-message.js";
+import type { AnyFormMessageFor } from "../dom/form-message.js";
 
 /**
  * Held at the widest shape. What a provider was GIVEN is checked against the

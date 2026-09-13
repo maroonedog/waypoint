@@ -1,6 +1,10 @@
 // ===========================================================================
 // issue-visibility.ts — when a field starts saying what the pass already knows.
 //
+// A FILE NO FRAMEWORK OWNS. The gate reads four things — the policy, touched,
+// dirty, and how many submits have been refused — and none of the four is a
+// fact about what drew the form.
+//
 // TWO AXES THAT WERE ONE KNOB. `FormOptions.validateOn` decides when a PASS
 // RUNS, and it is a fact about the form: one pass judges the whole root, so a
 // field set to "blur" would be judged the moment any other field changed and
