@@ -78,41 +78,62 @@ const snippets = [
 // was the only quiet one. A reader scanning four columns reads red as wrong.
 const LIBS = ["@maroonedog/waypoint", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
 
-const PATHS: readonly (readonly [string, readonly string[]])[] = [
-  [
-    "Typo deep in a static path",
-    ["compile error", "compile error", "compile error", "no error"],
-  ],
-  [
-    "Typo beside interpolated map indices",
-    ["compile error", "compile error", "compile error", "no error"],
-  ],
-  [
-    "Typo reading that field's error message",
-    ["compile error", "compile error, on the errors object", "compile error", "no error"],
-  ],
-  [
-    "Correct path, component two levels down, no props and no form object",
-    [
+/**
+ * A row, and whether it distinguishes anything.
+ *
+ * `same` MARKS THE ROWS WHERE THIS LIBRARY IS NOT DIFFERENT, and it exists
+ * because the table without it reads as a scorecard: six rows, one column
+ * winning all six. Three of the six are rows where waypoint, react-hook-form
+ * and TanStack Form all reject the line, and saying so in the table is worth
+ * more than saying it in a caption underneath — a reader who scans the grid
+ * and does not read the prose should still come away with the true shape,
+ * which is that the difference is one thing and not six.
+ */
+interface PathRow {
+  readonly theCase: string;
+  readonly cells: readonly string[];
+  /** waypoint, react-hook-form and TanStack Form all give the same verdict. */
+  readonly same?: true;
+}
+
+const PATHS: readonly PathRow[] = [
+  {
+    theCase: "Typo deep in a static path",
+    cells: ["compile error", "compile error", "compile error", "no error"],
+    same: true,
+  },
+  {
+    theCase: "Typo beside interpolated map indices",
+    cells: ["compile error", "compile error", "compile error", "no error"],
+    same: true,
+  },
+  {
+    theCase: "Typo reading that field's error message",
+    cells: ["compile error", "compile error, on the errors object", "compile error", "no error"],
+    same: true,
+  },
+  {
+    theCase: "Correct path, component two levels down, no props and no form object",
+    cells: [
       "checked; value typed string | undefined",
       "no error — and neither is not.a.real.path.at.all",
       "no path compiles there at all",
       "no error — every string compiles",
     ],
-  ],
-  [
-    "Typo in that same props-free component",
-    ["compile error", "no error", "n/a — nothing compiles there", "no error"],
-  ],
-  [
-    "…after re-declaring or threading the form type by hand",
-    [
+  },
+  {
+    theCase: "Typo in that same props-free component",
+    cells: ["compile error", "no error", "n/a — nothing compiles there", "no error"],
+  },
+  {
+    theCase: "…after re-declaring or threading the form type by hand",
+    cells: [
       "nothing to declare; it was already checked",
       "compile error, via useFormContext<Order>()",
       "compile error, via a typed form prop",
       "no error — the path stays unchecked",
     ],
-  ],
+  },
 ];
 
 // The pair table: each entry is a component, its own source, and the two
@@ -328,9 +349,34 @@ const TRY = [
       <code>shipments[0].lines[0].skuu</code>.
     </p>
 
-    <!-- `mt-6` stays: this wrapper follows a `.lead`, and the sheet spaces what
-         follows a heading and what follows a caption, not what follows a lead. -->
-    <div class="mt-6 overflow-x-auto">
+    <!-- THE CAVEAT GOES ABOVE THE TABLE. Under it, a reader who scans the grid
+         and moves on has already formed the impression the grid gives, and the
+         grid gives a scorecard: four named libraries, one of them winning
+         every row. The two things that make it not a scorecard — that three of
+         the six rows show no difference, and that anybody can run it and
+         disagree — have to arrive first.
+
+         This is a stronger invitation than a comparison table can usually
+         make: every cell is tsc's verdict on one schema, so it is falsifiable
+         by typing, not a judgement to be argued with. -->
+    <p class="caption mt-6">
+      <strong class="text-on-surface">Three of these six rows show no
+      difference</strong> between waypoint, react-hook-form and TanStack Form —
+      they are marked. The difference is one thing, not six: what happens where
+      the form's type is not in scope.
+    </p>
+
+    <p class="caption">
+      Every cell is <code>tsc</code>'s own verdict on one shared schema, not a
+      reading of anybody's documentation, so it can be checked by compiling
+      rather than argued with. If a row is wrong or out of date — these are
+      pinned versions, and any of them may have moved —{" "}
+      <a class="link" href="https://github.com/maroonedog/waypoint/issues"
+        >open an issue with the code that disagrees</a
+      > and it will be corrected.
+    </p>
+
+    <div class="mt-[var(--gap-block)] overflow-x-auto">
       <table>
         <thead class="text-left">
           <tr>
@@ -340,9 +386,16 @@ const TRY = [
         </thead>
         <tbody>
           {
-            PATHS.map(([theCase, cells]) => (
+            PATHS.map(({ theCase, cells, same }) => (
               <tr class="hairline">
-                <td class="pr-4 font-medium">{theCase}</td>
+                <td class="pr-4 font-medium">
+                  {theCase}
+                  {same && (
+                    <span class="ml-2 font-normal whitespace-nowrap text-on-surface-variant">
+                      (no difference)
+                    </span>
+                  )}
+                </td>
                 {cells.map((cell) => (
                   <td
                     class:list={[
@@ -363,9 +416,10 @@ const TRY = [
     </div>
 
     <p class="caption">
-      One shared schema — <code>shipments[*].lines[*].sku</code> — compiled in
-      all four. An interpolated <code>{"${i}"}</code> is not a differentiator:
-      it is a real member of react-hook-form's and TanStack's path unions too.
+      One shared schema, <code>shipments[*].lines[*].sku</code>, compiled in all
+      four. An interpolated <code>{"${i}"}</code> is a real member of
+      react-hook-form's and TanStack's path unions too, which is why the second
+      row is one of the three that separate nothing.
     </p>
 
     <p class="note">
