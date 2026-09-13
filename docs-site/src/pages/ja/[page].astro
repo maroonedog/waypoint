@@ -24,18 +24,18 @@ const { route, title, about } = Astro.props as Untranslated;
 
 <Base
   title={`${title} — waypoint`}
-  description={`${title}のページは英語のみです。何が書かれているかの要約と、原文への案内。`}
+  description={`${title}のページは英語だけです。何が書いてあるかの要約と、原文への案内。`}
 >
   <h1>{title}</h1>
 
   <p class="lead">
-    このページはまだ日本語になっていません。<strong>英語版が原文です。</strong>
+    このページはまだ日本語になっていません。<strong>原文は英語版です。</strong>
   </p>
 
   {about.map((line) => <p>{line}</p>)}
 
   <p class="note">
-    <strong>読むなら英語版です。</strong>{" "}
+    <strong>読むなら英語版へどうぞ。</strong>{" "}
     <a class="link" href={route} hreflang="en" lang="en">{title}（英語）→</a>
   </p>
 
@@ -43,7 +43,7 @@ const { route, title, about } = Astro.props as Untranslated;
     日本語になっているのは<a class="link" href="/ja/">概要</a>と<a
       class="link"
       href="/ja/start/">はじめる</a
-    >の2ページです。使うかどうかを判断するのに要るのはこの2つで、残りは判断したあとに引くページなので、この順で訳しています。
-    このサイトの共通言語は英語で、日本語はその上に重ねる層です。両方が食い違ったときは英語が正です。
+    >の2ページです。使うかどうかを決めるのに要るのはこの2つで、ほかは決めたあとに引くページなので、この順で訳しています。
+    このサイトの共通語は英語で、日本語はその上に重ねた層です。両方が食い違っていたら英語のほうが正です。
   </p>
 </Base>

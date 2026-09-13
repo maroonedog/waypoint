@@ -2,22 +2,24 @@
 // ===========================================================================
 // ja/start.astro — /start/ の日本語版。
 //
-// 原文は ../start.astro で、食い違ったときは英語が正です。これはこのサイトの
-// 方針そのもので、ページ下部にもそう書いてあります。
+// 原文は ../start.astro。食い違ったときは英語が正です。
 //
-// TRANSLATED, NOT TRANSPOSED. 英語の一文ずつに日本語の一文を当てるのではなく、
-// 同じことを日本語で言い直しています。文の切り方も見出しも変わっている箇所が
-// ありますが、主張・数字・コード・ファイル名は一つも変えていません。
+// 英語を一文ずつ日本語に置き換えるのではなく、段落ごとに意味を取って日本語で
+// 書き直しています。最初の版はそれをやらずに構文ごと運んでしまい、「主張は1つ、
+// 半分が2つ」「その代償。」のような、英語の同格断片とダッシュ挿入句をそのまま
+// 持ち込んだ翻訳調になりました。日本語にその装置は無いので、運ぶと不自然に
+// なるだけです。文の切り方と語順は日本語のもので、主張・数値・コード・
+// ライブラリ名・ファイルパスは英語版と同じです。
 //
-// コードブロックは `?raw` インポートで、英語版とまったく同じファイルを読んで
-// います。訳文がコードから離れることは構造的に起こりません。
+// コードブロックは英語版とまったく同じファイルの `?raw` インポートなので、
+// 訳文の側でコードが古くなることは起こりません。
 // ===========================================================================
 import Base from "../../layouts/Base.astro";
 import Code from "../../components/Code.astro";
 import registrySource from "../../demo/order-form.ts?raw";
 import starterSource from "../../demo/StarterForm.tsx?raw";
 
-/** ファイル冒頭のバナーコメントを落とす。あれは社内文書でサンプルではない。 */
+/** ファイル冒頭のバナーコメントを落とす。あれは社内向けの文章でサンプルではない。 */
 const withoutBanner = (source: string): string => {
   const lines = source.split("\n");
   const last = lines.findLastIndex((line) => line.startsWith("// ====="));
@@ -32,27 +34,27 @@ npm run verify     # ビルド・テスト・型テストをまとめて走ら�
 `;
 
 const atTheLeaf = `
-// どのコンポーネントでも、どの深さでも。import は1つ、しかも型。
+// どのコンポーネントでも、どんな深さでも。import は1つ、しかも型だけ。
 import { useField, type FormPathTo } from "@maroonedog/waypoint/react";
 
 function Postcode({ at }: { at: FormPathTo<string> }) {
   const field = useField(at);
   // field.value    string | undefined ― そのパスにある値の型
-  // field.issues   スキーマがそれについて言ったこと
+  // field.issues   スキーマがそのフィールドについて言ったこと
   // field.inputProps / labelProps / errorProps / descriptor
   return <input {...field.inputProps} />;
 }
 
-<Postcode at="form:billing.postcode" />   // スキーマに対して検査される
+<Postcode at="form:billing.postcode" />   // スキーマに照らして検査される
 <Postcode at="form:billing.postcod"  />   // 描画される前にコンパイルエラー
 `;
 
 /**
  * 登録がないときにコンパイラが出すメッセージ。
  *
- * 実際に `tsc` から取ったもので、ここで書いたものではない。同じ呼び出しを
+ * ここで書いたものではなく、実際に `tsc` から取ってきたもの。同じ呼び出しを
  * `strict: true` でパッケージのソースに対してコンパイルして採取した。手を
- * 入れたのは改行位置だけ ― 本物は1行で、この段はそこまで広くない。
+ * 入れたのは改行位置だけで、本物は1行。
  */
 const refusal = `
 useField("owner.email");
@@ -73,66 +75,68 @@ declare module "@maroonedog/waypoint" {
 
 const form = useCreateForm(() => ({ adapter: adminAdapter, key: "admin", … }));
 
-// "owner.email" は曖昧になったので、プレフィックスが必須になる。
+// "owner.email" だけでは、どちらのフォームか決まらなくなる。
 <Text at="admin:owner.email" />
 <Text at="customer:owner.email" />
 
-// コンポーネントを片方のフォームのパスだけに絞ることもできる。
+// 片方のフォームのパスだけを受け取るコンポーネントも書ける。
 function AdminText({ at }: { at: FormPathTo<string, "admin"> }) { … }
 `;
 
 const needs = [
   [
     "TypeScript",
-    "パスは検査される型なので、これは任意ではありません。このリポジトリをゲートしている13本のコンパイル時プログラムは strict: true で走っています。",
+    "パスは型として検査されるので、TypeScript は前提です。このリポジトリの型テスト13本は、すべて strict: true で動かしています。",
   ],
   [
     "バリデータ",
-    "同梱のリゾルバを使うなら zod ^4.2.0。4.2 が下限なのは ~standard.jsonSchema がそこで入るからです。それ未満だとリゾルバはフィールドを1つも記述しないので、type も範囲も aria も無いフォームが描画されます。",
+    "同梱のリゾルバを使うなら zod の 4.2.0 以上。~standard.jsonSchema が入ったのが 4.2 だからで、これより古いとリゾルバがフィールドを1つも読み取れません。type も入力範囲も aria 属性も付かないフォームができあがります。",
   ],
   [
-    "React >=18、または Vue >=3.5",
-    "どちらも peer で、どちらも optional。パッケージの他の部分はどちらも必要としません。",
+    "React 18 以上、または Vue 3.5 以上",
+    "どちらも optional な peer 依存です。これ以外の部分は、どちらにも依存していません。",
   ],
-  ["Node >=20", "ビルドとテストに必要です。実行には要りません。"],
+  ["Node 20 以上", "ビルドとテストに使います。実行には要りません。"],
 ];
 
 const entryPoints = [
   ["@maroonedog/waypoint/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "画面が import するもの。"],
-  ["@maroonedog/waypoint/vue", "useField · useRows · useFormStatus · FormProvider · <Field>", "同じものの Vue 3 版。同じレジストリを読む。"],
+  ["@maroonedog/waypoint/vue", "useField · useRows · useFormStatus · FormProvider · <Field>", "同じものの Vue 3 版。読むレジストリも同じ。"],
   ["@maroonedog/waypoint", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "コントラクトとパスの型。依存なし。"],
-  ["@maroonedog/waypoint/resolver-standard", "standardFormResolver", "Standard Schema と その JSON Schema を話すバリデータ全般。ベンダー名を持たない。"],
-  ["@maroonedog/waypoint/resolver-zod", "zodFormResolver", "上記に加えて、zod の JSON Schema が zod について運んでいない3つの事実。"],
-  ["@maroonedog/waypoint/resolver-luq", "luqFormResolver", "上記に加えて、仕様にメンバーが無い luq の issue code。"],
-  ["@maroonedog/waypoint/core", "createForm · createCellStore · assertFormStoreContract", "ランタイム。React なし。"],
+  ["@maroonedog/waypoint/resolver-standard", "standardFormResolver", "Standard Schema とその JSON Schema に対応したバリデータなら何でも。特定のベンダーの名前は出てこない。"],
+  ["@maroonedog/waypoint/resolver-zod", "zodFormResolver", "上に加えて、zod の JSON Schema には現れない zod 固有の事実を3つ拾う。"],
+  ["@maroonedog/waypoint/resolver-luq", "luqFormResolver", "上に加えて、仕様に置き場所のない luq の issue code を拾う。"],
+  ["@maroonedog/waypoint/core", "createForm · createCellStore · assertFormStoreContract", "ランタイム本体。React は入っていない。"],
   ["@maroonedog/waypoint/store-zustand", "createZustandCellStore", "ストアを差し替える実例。"],
 ];
 ---
 
 <Base
   title="はじめる — waypoint"
-  description="必要なもの、すべてのパスを検査済みにする1つの宣言、それが末端で何を買うのか、書かなかったらどうなるのか、そして最初のフォーム。"
+  description="用意するもの、パスを型で守るための1行の宣言、それを書くと末端で何が変わるか、書かなかったときに何が起きるか、そして最初のフォーム。"
 >
   <h1>はじめる</h1>
 
   <p class="lead">
-    <strong>まだ何も公開されていません。</strong>clone して、コマンドを1つ走らせます。
-    エントリポイントは8つありますが1パッケージなので、追うバージョンは1つ、インストールも1回です。
+    <strong>まだ公開していない</strong>ので、入手するには clone します。あとはコマンドを
+    1つ走らせれば終わりです。エントリポイントは8つに分かれていますが、パッケージとしては
+    1つなので、追いかけるバージョンもインストールも1回で済みます。
   </p>
 
   <Code code={install} label="shell: install" lang="sh" />
 
-  <h2>始める前に</h2>
+  <h2>用意するもの</h2>
   <p>
-    4つあります。2つめには下限があって、ぶつかってから知るより先に知っておく価値があります。
+    4つあります。このうち zod のバージョンには下限があるので、あとで引っかからないよう、
+    先に見ておいてください。
   </p>
 
   <div class="mt-[var(--gap-block)] overflow-x-auto">
     <table>
       <thead class="text-left">
         <tr>
-          <th class="pr-4">何が</th>
-          <th>なぜ、無いとどうなるか</th>
+          <th class="pr-4">必要なもの</th>
+          <th>理由と、無いときに起きること</th>
         </tr>
       </thead>
       <tbody>
@@ -148,112 +152,130 @@ const entryPoints = [
     </table>
   </div>
 
-  <h2>フォームのことを、型に1度だけ教える</h2>
+  <h2>フォームの型は、1度だけ宣言する</h2>
   <p>
-    スキーマはもう持っているはずです。ここで解こうとしている問題は、フォームが
-    1コンポーネントを超えた瞬間に始まるものです ―{" "}
-    <strong>フィールドを欲しがった末端は、フォームの型を必要とする</strong>。
-    渡し方はいくつかありますが、どれも代償があります。form オブジェクトを下ろしていく。
-    途中の全コンポーネントにジェネリクスを通す。あるいは末端でスキーマを import して、
-    そのコンポーネントをそのフォームに永久に結びつける。
+    スキーマはもう手元にあるはずです。ここで片付けたいのは、フォームが1つの
+    コンポーネントに収まらなくなった瞬間に出てくる問題です。<strong
+      >フィールドを1つ描きたいだけの末端が、フォーム全体の型を知らないと何も書けない</strong
+    >。
   </p>
   <p>
-    module augmentation は4つめの道です。これは import グラフではなく
-    <em>コンパイル単位</em>に属するので、1度宣言すればフォームのパスがどこでもスコープに入ります ―
-    10階層下の、何も import せず、何も受け取らず、スキーマを知らないコンポーネントの中にも。
+    渡す手段はいくつかありますが、どれにも代償があります。form オブジェクトを props で
+    下ろしていけば、途中のコンポーネントが全部それを中継することになります。ジェネリクスを
+    通せば、通り道の型注釈がすべて増えます。末端で直接スキーマを import すれば、その
+    コンポーネントは二度と別のフォームに使えなくなります。
+  </p>
+  <p>
+    module augmentation はそのどれとも違います。<em>import グラフではなくコンパイル単位</em>に
+    属するので、1度書けばプロジェクト全体でフォームのパスが型として通ります。10階層下の、
+    何も受け取らず何も import していないコンポーネントの中でも同じです。
   </p>
 
   <Code code={withoutBanner(registrySource)} label="file: src/demo/order-form.ts" />
 
   <p class="caption">
-    コロンの左の名前 ― ここでは <code>form</code> ― はあなたが決めるもので、
-    このページのすべてのパスに付くプレフィックスになります。フォームが1つなら、プレフィックスは省略できます。
+    コロンの左に来る名前（ここでは <code>form</code>）は自分で決めます。これが、この
+    ページに出てくるパスすべての接頭辞になります。登録したフォームが1つだけなら、
+    接頭辞は省略できます。
   </p>
 
-  <h2>あのファイルを import するのか</h2>
+  <h2>このファイルを import する必要はあるのか</h2>
   <p>
-    <strong>型については、しません。</strong>そこがこの仕組みの肝で、いちばん驚かれる部分です。
-    検査済みのパスを得るためにこのファイルを import するコンポーネントは1つもありません。
-    宣言は同じ TypeScript プログラム内の全ファイルに届きます。そのプログラムに<em>入るか</em>を決めるのは
-    <code>tsconfig.json</code> です ― <code>include</code> がそのファイルを覆っていれば、
-    import されていようがいまいが augmentation は適用されます。
+    <strong>型に関しては、要りません。</strong>ここがこの仕組みの中心で、いちばん
+    意外に思われるところでもあります。パスの型を使うために、このファイルを import する
+    コンポーネントは1つもありません。宣言は、同じ TypeScript プログラムに属している
+    ファイル全体に効きます。
   </p>
   <p>
-    <strong>adapter の値は、1度だけ。</strong>動いているフォームに記述を手渡す誰かは必要なので、
-    <code>useCreateForm</code> を呼ぶコンポーネントがこのファイルの export する adapter を import します。
-    木のてっぺんで1回、他のファイルには要りません。
+    では何が「同じプログラムかどうか」を決めるのかというと、<code>tsconfig.json</code> です。
+    <code>include</code> がこのファイルを含んでいれば、どこからも import されていなくても
+    宣言は効きます。
+  </p>
+  <p>
+    <strong>adapter の値のほうは、1箇所だけ import します。</strong>実行時のフォームに
+    スキーマの記述を渡す必要があるので、<code>useCreateForm</code> を呼ぶコンポーネントが、
+    このファイルの export する adapter を受け取ります。ツリーの根元で1回だけで、ほかの
+    ファイルには要りません。
   </p>
 
-  <h2>それが末端で何を買うのか</h2>
+  <h2>宣言すると、末端で何が変わるか</h2>
   <p>
-    これが宣言の目的です。機能としてではなく、before / after として読む価値があります ―
-    下のコンポーネントは prop を1つ取り、<em>型</em>を1つ import し、
-    住所のスペルが違えばコンパイル時に間違いになります。
+    これが宣言の目的です。機能の一覧としてではなく、書く前と書いたあとの差として
+    読んでください。下のコンポーネントは props を1つ取り、import するのは<em>型</em>が
+    1つだけで、住所のつづりを間違えればコンパイルの時点で落ちます。
   </p>
 
   <Code code={atTheLeaf} label="file: 任意のコンポーネント、任意の深さ" lang="tsx" />
 
   <p class="caption">
-    同じコンポーネントが、フォームを登録しているどのフォームのフィールドでも描けます。
-    住所が自分のフォームを名乗るからです。それがコピーではなくコンポーネントであることの中身で、
-    効いてくる実例が<a class="link" href="/examples/#two-forms" hreflang="en" lang="en"
-      >two forms, one component</a
+    このコンポーネントは、登録されているどのフォームのフィールドでも描けます。住所のほうが
+    自分の所属するフォームを名乗るからです。コピーを増やさずにコンポーネントとして使い回せる、
+    というのはこういうことで、それが効いてくる実例が{" "}
+    <a
+      class="link"
+      href="/examples/#two-forms"
+      hreflang="en"
+      lang="en">two forms, one component</a
     >（サンプルのページ、英語）です。
   </p>
 
-  <h2>書かなかったらどうなるか</h2>
+  <h2>宣言を書かなかったとき</h2>
   <p>
-    黙って素通りはしません。何も登録していないアプリケーションに、検査されないフックが返ってくることはありません ―
-    <strong>拒否されます。</strong>そしてコンパイラが、足りない宣言を引用して返します。
-    ファイルが後からプログラムの外に落ちた場合も同じで、失敗は大きな音を立て、直し方を名指しします。
+    黙って通ることはありません。宣言のないアプリケーションでフックが「検査なし」に
+    退化することはなく、<strong>そもそも受け付けられません</strong>。しかもコンパイラの
+    エラーメッセージが、書くべき宣言をそのまま引用してくれます。ファイルがあとから
+    <code>tsconfig</code> の対象から外れた場合も同じで、静かに壊れるのではなく、はっきり
+    落ちて直し方を示します。
   </p>
 
   <Code code={refusal} label="type: tsc が出すもの" />
 
   <p class="caption">
-    これ専用のコンパイル時プログラムで押さえてあります ―{" "}
-    <code>test/types-unregistered</code> が上の拒否を1つずつ
-    <code>@ts-expect-error</code> で固定しているので、通るようになる変更はビルドを落とします。{" "}
+    これ専用の型テストで固定してあります。<code>test/types-unregistered</code> が上の
+    拒否を1つずつ <code>@ts-expect-error</code> で押さえているので、通るようになる変更が
+    入ればビルドが落ちます。{" "}
     <a class="link" href="/paths/" hreflang="en" lang="en"
-      >なぜ prop ではなくレジストリなのか（英語）→</a
+      >なぜ props ではなくレジストリなのか（英語）→</a
     >
   </p>
 
-  <h2>あとはただの React</h2>
+  <h2>あとは普通の React</h2>
   <p>
-    持ち上げる state もなく、通して回すフォームオブジェクトもなく、第二の DSL もありません。
-    コンポーネントは欲しいパスを名乗り、そのバインディングを受け取ります。
+    持ち上げる state も、引き回すフォームオブジェクトも、覚え直す DSL もありません。
+    コンポーネントは欲しいパスを書いて、そのバインディングを受け取るだけです。
   </p>
 
   <Code code={withoutBanner(starterSource)} label="file: src/demo/StarterForm.tsx" lang="tsx" />
 
   <p class="note">
-    <strong>上の2つのブロックはファイルそのものです。</strong>
-    このサイトのソースの中にあり、サイトのビルドが型検査しています。だからこのページのコードは
-    「かつて書き写されたコード」ではなく「コンパイルが通るコード」です。
+    <strong>上の2つのブロックは、ファイルそのものです。</strong>このサイトのソースに
+    実在していて、サイトのビルドが型検査しています。書き写されたコードではなく、
+    コンパイルが通っているコードです。
   </p>
 
   <h2>フォームが2つ以上になったら</h2>
   <p>
-    キーを増やすだけです。変わることは2つ、他は変わりません。まず、プレフィックスが省略できなくなります ―
-    裸の <code>owner.email</code> は曖昧になり、コンパイラがそう言います。
-    そして、フォームが生成される場所で自分の名前を名乗るようになります。
-    プロバイダ配下のパスがそのフォームのものかを、ランタイムが照合できるようにするためです。
+    キーを増やすだけです。変わるのは2点だけで、ほかは何も変わりません。1つは、接頭辞を
+    省略できなくなること。<code>owner.email</code> だけではどちらのフォームか決まらなくなり、
+    コンパイラがそう言います。もう1つは、フォームが生成される場所で自分の名前を名乗るように
+    なること。プロバイダの下にあるパスが本当にそのフォームのものか、実行時に照合できるように
+    するためです。
   </p>
 
   <Code code={twoForms} label="type: キーが2つ" lang="tsx" />
 
   <p class="caption">
-    登録はコンパイル単位でグローバルです。それがこの仕組みの代償で、同じキーを宣言した2つのファイルは
-    衝突せずにマージされますし、フォームを登録している依存パッケージがあれば、それはあなたの登録にもなります。
-    キーはグローバルな名前を選ぶつもりで選んでください。
+    登録はコンパイル単位で共有されます。これがこの仕組みの弱点でもあって、同じキーを
+    宣言したファイルが2つあっても衝突せずにマージされますし、フォームを登録している依存
+    パッケージがあれば、その登録もそのまま効きます。キーはグローバルな名前を決めるつもりで
+    選んでください。
   </p>
 
-  <h2>どの記号がどこから来るのか</h2>
+  <h2>どこから何を import するか</h2>
   <p>
-    エントリポイントは8つ。画面は{" "}
-    <code>@maroonedog/waypoint/react</code> から import し、フォームを登録する1行はルートを名乗ります ―
-    <code>@maroonedog/waypoint</code>。
+    エントリポイントは8つです。画面が使うのは{" "}
+    <code>@maroonedog/waypoint/react</code>、フォームを登録する1行が指すのはルートの{" "}
+    <code>@maroonedog/waypoint</code> です。
   </p>
 
   <div class="mt-[var(--gap-block)] overflow-x-auto">
@@ -262,7 +284,7 @@ const entryPoints = [
         <tr>
           <th class="pr-4">エントリポイント</th>
           <th class="pr-4">そこから import するもの</th>
-          <th>何のためのものか</th>
+          <th>用途</th>
         </tr>
       </thead>
       <tbody>
@@ -279,38 +301,41 @@ const entryPoints = [
     </table>
   </div>
 
-  <h2>いま打ち込めるもの4つ</h2>
+  <h2>いますぐ触れるサンプルが4つ</h2>
   <p>
-    サンプルアプリケーションは、ポートの上だけでなくこのサイト上で動きます。{" "}
+    サンプルアプリケーションは、ローカルのポートだけでなくこのサイト上でも動いています。{" "}
     <a class="link" href="/showcase/" hreflang="en" lang="en">Showcase</a>{" "}
-    は6セクション・23入力の取引口座申込フォームで、アプリケーション自身のコンポーネントで描かれています。{" "}
-    <a class="link" href="/examples/" hreflang="en" lang="en">Examples</a>{" "}
-    のページにさらに3本 ― サーバエラーの往復、1つのコンポーネントを共有する2つのフォーム、ウィザード ―
-    どれもサンプルプログラムそのものを import してマウントしたもので、コピーではありません。
+    は6セクション・23入力の取引口座申込フォームで、アプリケーション側のコンポーネントで
+    描かれています。<a class="link" href="/examples/" hreflang="en" lang="en">Examples</a>{" "}
+    のページにはさらに3本あります。サーバエラーの往復、1つのコンポーネントを共有する2つの
+    フォーム、そしてウィザードです。どれもサンプルのプログラムをそのまま import して
+    マウントしたもので、コピーではありません。
   </p>
 
   <p class="caption">
-    2本はコマンドのままです。このサイトが持っていないライブラリを必要とするためで、{" "}
-    <code>npm run example:nested-arrays</code> は同じ入れ子の形を4回 ―
-    waypoint、react-hook-form、Formik、TanStack Form ― 同じスキーマに対して並べて書きます。
-    違いはリストの2階層内側のフィールドがどう「自分の行」を名乗るかだけです。{" "}
-    <code>npm run example:playground</code> は1打鍵あたりのレンダー回数を数え、下のストアを差し替えます。
-    どのサンプルにも README があり、どれもビルドを必要としません。パッケージが
-    <strong>ソース</strong>に解決されるので、<code>src/core</code> を編集すればページがリロードされます。
+    残りの2本はコマンドのままです。このサイトが入れていないライブラリを使うためで、{" "}
+    <code>npm run example:nested-arrays</code> は同じ入れ子の形を waypoint・react-hook-form・
+    Formik・TanStack Form の4通りで、同じスキーマに対して並べて書いています。違いが出るのは
+    リストの2階層内側のフィールドが「自分がどの行のものか」をどう名乗るか、そこだけです。{" "}
+    <code>npm run example:playground</code> のほうは、1打鍵あたりのレンダー回数を数えながら
+    下のストアを差し替えます。どのサンプルにも README があり、ビルドは要りません。
+    パッケージが<strong>ソース</strong>に解決されるので、<code>src/core</code> を編集すれば
+    そのままページが再読み込みされます。
   </p>
 
   <section class="rounded-[3px] border border-outline-variant p-6">
     <p class="label">現在地</p>
     <p class="mt-3">
-      353本のテスト、<code>test:types</code> が走らせる13本のコンパイル時プログラム、
-      そしてそのすべてを使う画面が1つ。<strong>一度も公開されたことがなく ―
-      publish ワークフローは手動起動のみで、一度も実行されていません ―
-      本番で動かした人もいません。</strong>
+      テストが353本、<code>test:types</code> が走らせるコンパイル時プログラムが13本、
+      そしてそのすべてを使う画面が1つあります。<strong>ただし一度も公開されていません。
+      publish のワークフローは手動起動のみで、まだ一度も実行されていませんし、本番で
+      使った人もいません。</strong>
     </p>
   </section>
 
   <p class="caption">
-    このページは<a class="link" href="/start/" hreflang="en" lang="en">英語版</a>の翻訳です。
-    このサイトの共通言語は英語で、日本語はその上に重ねる層です。両方が食い違ったときは英語が正です。
+    このページは<a class="link" href="/start/" hreflang="en" lang="en">英語版</a>を訳した
+    ものです。このサイトの共通語は英語で、日本語はその上に重ねた層です。両方が食い違って
+    いたら英語のほうが正です。
   </p>
 </Base>
