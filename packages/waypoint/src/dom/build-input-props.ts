@@ -56,7 +56,7 @@ import { sharedInputAttributes } from "./input-attributes.js";
 import {
   numberOrTextWhileTyping,
   numberWhenTypingStops,
-} from "../dom/number-from-typing.js";
+} from "./number-from-typing.js";
 
 export interface InputPropsRequest {
   readonly path: string;

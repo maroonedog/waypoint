@@ -30,9 +30,10 @@
 // `npm run build` and read the first line if you doubt it.
 //
 // WHAT IT COSTS, stated rather than discovered later, AND WHAT THE MOVE DID
-// NOT PAY. Five exports below call no hook — `buildInputProps`,
-// `buildUncontrolledInputProps`, `inputTypeFor`, `fieldElementIds` and
-// `resolveWidget`. Their source now sits in `../dom`, but they are still
+// NOT PAY. Several exports below call no hook — the prop-bag builders, the
+// element ids, the widget lookup, the control lookup, the visibility and
+// wording rules, and two constants. Their source now sits in `../dom`, but
+// they are still
 // re-exported from behind this directive, so a Server Component importing one
 // of them gets a client reference exactly as it did before. Moving the files
 // created the OPTION of a `./dom` entry without the directive; it did not take

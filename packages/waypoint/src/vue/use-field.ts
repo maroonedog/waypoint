@@ -35,6 +35,22 @@ import type {
   ValueAtFormPath,
 } from "../contract/index.js";
 
+/**
+ * A GETTER GETS ITS OWN OVERLOAD, and it is not a convenience.
+ *
+ * `MaybeRefOrGetter<T>` is `T | Ref<T> | (() => T)`, and inference against that
+ * union found `Q` from a literal and from a ref and did NOT find it from a
+ * function's return type: it fell back to the constraint, so the binding came
+ * back typed with every value the form holds and `setValue` on a number field
+ * accepted a string. The path SPELLING stayed checked, which is what made it
+ * quiet — the only thing that stopped being checked was the one a reader would
+ * not notice. Naming the getter shape on its own gives `Q` a position it is
+ * inferred from. `test/types-vue` holds all three spellings to one standard.
+ */
+export function useField<Q extends FormPath>(
+  path: () => Q & InhabitedFormPath<Q>,
+  options?: FieldOptions<CodesAtFormPath<Q>>
+): FieldBinding<ValueAtFormPath<Q>>;
 export function useField<Q extends FormPath>(
   path: MaybeRefOrGetter<Q & InhabitedFormPath<Q>>,
   options?: FieldOptions<CodesAtFormPath<Q>>

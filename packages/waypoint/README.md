@@ -7,9 +7,16 @@ compiler has already checked, and as runtime state that is already written.**
 npm install @maroonedog/waypoint
 ```
 
-ESM only. Node 20+. `react` and `zod` are optional peers: install React if you
-import `/react`, install zod if you import `/resolver-zod`, and install neither
-to use the runtime on its own.
+ESM only. Node 20+. `react`, `vue` and `zod` are optional peers: install the
+framework whose entry you import, install zod if you import `/resolver-zod`,
+and install none of them to use the runtime on its own.
+
+**zod 4.2.0 is the floor, and the reason is measured.** The resolver reads
+`~standard.jsonSchema`, the Standard Schema JSON Schema companion, and zod
+ships it from 4.2.0: on 4.1.12 that property is `undefined`, on 4.2.0 it is an
+object. Under a zod that does not have it, `zodFormResolver` describes no
+fields at all — the form renders inputs with no type, no bounds and no aria,
+and the only signal is one console line. The peer range used to admit that.
 
 ## The one file nobody guesses
 

@@ -9,7 +9,7 @@
     "build": "tsc -b packages/waypoint/tsconfig.json",
     "test": "node --test test/*.test.mjs",
     "axe:record": "node --test test/accessibility-axe.test.mjs",
-    "test:types": "tsc -p test/types/tsconfig.json && tsc -p test/types-containers/tsconfig.json && tsc -p test/types-unregistered/tsconfig.json && tsc -p test/types-codes/tsconfig.json && tsc -p test/types-source/tsconfig.json && tsc -p bench/tsconfig.json && tsc -p examples/nested-arrays/tsconfig.check.json && tsc -p examples/playground/tsconfig.check.json && tsc -p examples/showcase/tsconfig.check.json && tsc -p examples/server-errors/tsconfig.check.json && tsc -p examples/two-forms/tsconfig.check.json && tsc -p examples/wizard/tsconfig.check.json",
+    "test:types": "tsc -p test/types/tsconfig.json && tsc -p test/types-containers/tsconfig.json && tsc -p test/types-unregistered/tsconfig.json && tsc -p test/types-codes/tsconfig.json && tsc -p test/types-vue/tsconfig.json && tsc -p test/types-source/tsconfig.json && tsc -p bench/tsconfig.json && tsc -p examples/nested-arrays/tsconfig.check.json && tsc -p examples/playground/tsconfig.check.json && tsc -p examples/showcase/tsconfig.check.json && tsc -p examples/server-errors/tsconfig.check.json && tsc -p examples/two-forms/tsconfig.check.json && tsc -p examples/wizard/tsconfig.check.json",
     "verify": "npm run build && npm run test && npm run test:types",
     "bench:forms": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts",
     "bench:forms:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-forms-bench.ts --check",
@@ -49,7 +49,7 @@
     "typescript": "^5.9.0",
     "vite": "^7.3.6",
     "vue": "^3.5.42",
-    "zod": "^4.0.14",
+    "zod": "^4.2.0",
     "zustand": "^5.0.9"
   }
 }
