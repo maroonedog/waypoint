@@ -294,15 +294,6 @@ const TRY = [
     down to get there.
   </p>
 
-  <p>
-    Two things make that true. The path is a <strong>type the compiler has
-    already checked</strong>: one registry declaration, no prop, no generic
-    argument, nothing imported at the leaf. And the cell it names is{" "}
-    <strong>already written</strong> — every cell is seeded at{" "}
-    <code>createForm</code>, so mounting is a subscription, with no register,
-    no unregister and no <code>shouldUnregister</code>.
-  </p>
-
   <!-- ONE FILL ON THE WHOLE SITE, AND IT IS THIS ONE. The mark is a line
        everywhere else; the single control a reader is meant to press is the one
        place it becomes a ground, and it means nothing if a second control
@@ -338,6 +329,32 @@ const TRY = [
     production. What there is, is a clone:
   </p>
   <Code code={clone} label="shell: clone it" lang="sh" flush />
+
+  <!-- THE CODE COMES BEFORE THE ARGUMENT, and this was in the wrong order for
+       a while: the hero ran name, tagline, eighty words on why it works, and
+       only then the controls. That is not what a reader of a library's front
+       page is there for, and it is not what the libraries they already know do
+       — zod opens with a tagline, a line saying what it is, and a code block;
+       hono with a tagline and its runtimes. Name, one line, somewhere to
+       press, and then the thing itself.
+
+       The ten lines below used to be a section of their own, five screens
+       down, under "All of that, in ten lines". A reader who had scrolled that
+       far did not need them any more. -->
+  <p class="caption mt-8">
+    <strong class="text-on-surface">The whole of it, in ten lines.</strong>{" "}
+    A resolver call, a registry declaration, and a component reading a field.
+  </p>
+  <Code code={whole} label="ts: the whole idea" flush />
+
+  <p>
+    Two things make that work. The path is a <strong>type the compiler has
+    already checked</strong>: one registry declaration, no prop, no generic
+    argument, nothing imported at the leaf. And the cell it names is{" "}
+    <strong>already written</strong> — every cell is seeded at{" "}
+    <code>createForm</code>, so mounting is a subscription, with no register,
+    no unregister and no <code>shouldUnregister</code>.
+  </p>
 
   <!-- ================================================== the thesis -->
   <section>
@@ -522,12 +539,6 @@ const TRY = [
       store narrating itself — a recording store passed to{" "}
       <code>createForm</code>, which is the ordinary way to substitute one.
     </p>
-  </section>
-
-  <!-- ================================================== the whole idea -->
-  <section>
-    <h2>All of that, in ten lines</h2>
-    <Code code={whole} label="the whole idea" />
   </section>
 
   <!-- ================================================== what you can build -->

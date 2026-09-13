@@ -275,19 +275,6 @@ const TRY = [
     検査しています。しかも、そこまで何も渡していません。
   </p>
 
-  <p>理由は2つです。</p>
-
-  <p>
-    まず、<strong>このパスはコンパイラが検査した型です</strong>。レジストリの宣言を1度
-    書けば、あとは props もジェネリクスも渡しませんし、末端で import するものもありません。
-  </p>
-
-  <p>
-    そして、<strong>パスが指すセルはもう書かれています</strong>。セルは{" "}
-    <code>createForm</code> の時点で全部そろうので、コンポーネントがマウントしてやることは
-    購読だけ。register も unregister も <code>shouldUnregister</code> もありません。
-  </p>
-
   <div class="mt-7 flex flex-wrap gap-3">
     <a
       class="rounded-[3px] bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
@@ -308,6 +295,34 @@ const TRY = [
     ありませんし、固定できるバージョンもなく、本番で使った人もいません。あるのは clone だけです。
   </p>
   <Code code={clone} label="shell: clone it" lang="sh" flush />
+
+  <!-- 理屈より先にコードを出します。しばらく順番が逆で、名前・タグラインのあとに
+       「なぜ動くか」を80語ぶん置いて、そのあとにボタンでした。ライブラリの表紙に
+       来た人が読みに来たものではありませんし、その人が知っている他のライブラリも
+       そうしていません（zod はタグライン、何であるかの1行、そしてコード。hono は
+       タグラインと対応ランタイム）。名前、1行、押す場所、それから現物。
+
+       下の10行はもともと5画面ほど下に「ここまでの全部が、10行で収まる」という
+       独立したセクションで置いてありました。そこまでスクロールした人には、もう
+       要らないものです。 -->
+  <p class="caption mt-8">
+    <strong class="text-on-surface">全部で10行です。</strong>{" "}
+    リゾルバの呼び出しが1行、レジストリの宣言、そしてフィールドを読むコンポーネント。
+  </p>
+  <Code code={whole} label="ts: the whole idea" flush />
+
+  <p>理由は2つです。</p>
+
+  <p>
+    まず、<strong>このパスはコンパイラが検査した型です</strong>。レジストリの宣言を1度
+    書けば、あとは props もジェネリクスも渡しませんし、末端で import するものもありません。
+  </p>
+
+  <p>
+    そして、<strong>パスが指すセルはもう書かれています</strong>。セルは{" "}
+    <code>createForm</code> の時点で全部そろうので、コンポーネントがマウントしてやることは
+    購読だけ。register も unregister も <code>shouldUnregister</code> もありません。
+  </p>
 
   <!-- ================================================== the thesis -->
   <section>
@@ -474,12 +489,6 @@ const TRY = [
       自分の書き込みを実況しているもので、記録するストアを <code>createForm</code> に渡して
       いるだけです。ストアを差し替える普通のやり方そのもの。
     </p>
-  </section>
-
-  <!-- ================================================== the whole idea -->
-  <section>
-    <h2>ここまでの全部が、10行で収まる</h2>
-    <Code code={whole} label="the whole idea" />
   </section>
 
   <!-- ================================================== what you can build -->
