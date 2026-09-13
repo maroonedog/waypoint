@@ -24,6 +24,38 @@ tape printing every cell the runtime writes, the two-spec contract, how a path
 gets its type and what it costs the compiler, every hook and component with the
 signature the package emits, and the benchmark with its losses first.
 
+## Motivation
+
+A form stops being one component almost immediately, and from that moment
+every leaf that wants a field needs the form's type. The usual ways of giving
+it one all cost something. Pass the form object down and every component in
+between carries it. Thread a generic and every signature on the way grows.
+Import the schema at the leaf and that component belongs to one form forever.
+
+The schema has already said what the field is — its label, its bounds, its
+type — and the markup says it again by hand. The two then drift, and the copy
+in the markup is the one a person sees.
+
+**Two things this was started to fix turned out not to be problems.** That a
+validator has no way to say what a field accepts stopped being true when
+Standard Schema added a JSON Schema member. Validator-neutrality stopped being
+a differentiator when the ecosystem commoditised it: react-hook-form ships
+`standardSchemaResolver`, and TanStack Form took Standard Schema directly at
+v1 and retired its per-validator adapters. Both claims were deleted from this
+project rather than softened, and the pages that led on them were rewritten.
+
+What is left is narrower. Where the form's type is in scope, react-hook-form
+and TanStack Form reject a typo too — the comparison table on the site marks
+the three rows of six where nothing separates the three of us. **The
+difference is what happens where it is not in scope**, which is most of a real
+component tree: a leaf with no props, no form object and no import still gets
+a checked path, and the cell behind it is already written before the component
+mounts.
+
+Whether that is worth a dependency is a judgement, and this README is not in a
+position to make it: nothing here has been published, and nobody has run it in
+production.
+
 ## Install
 
 Nothing is published. The publish workflow is manual-dispatch only and has
