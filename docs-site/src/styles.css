@@ -227,6 +227,25 @@ main thead th {
 }
 
 /* ===========================================================================
+   The section the reader is in.
+
+   Keyed to `aria-current` and to nothing else. The rail's script sets one
+   attribute, so what a screen reader announces and what an eye sees are the
+   same fact — a class toggled alongside the attribute would be a second copy
+   of it, and two copies of one fact are two chances to disagree.
+
+   `location` rather than `page`: the left nav marks which page this is, and
+   this marks how far into it the reader has got. Two different claims, so two
+   different marks — a lit segment of the list's own rule here, the nav's
+   filled pill there.
+   =========================================================================== */
+#on-this-page a[aria-current] {
+  border-left-color: var(--md-primary);
+  color: var(--md-on-surface);
+  font-weight: 500;
+}
+
+/* ===========================================================================
    Reference tables.
 
    The densest thing on the site, set until now at body leading. A table is

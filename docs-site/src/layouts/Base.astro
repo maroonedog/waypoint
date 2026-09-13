@@ -184,8 +184,24 @@ const flat = SECTIONS.flatMap((section) => section.items);
             class="hidden wide:sticky wide:top-14 wide:block wide:h-[calc(100vh-3.5rem)] wide:overflow-y-auto wide:py-10"
             aria-label="On this page"
           >
-            <p class="label">On this page</p>
-            <ul id="on-this-page" class="mt-2 grid gap-1"></ul>
+            {/* A LINE DOWN THE LIST, and one segment of it lit. The rail said
+                which sections a page has and never which one the reader was
+                in, which is the half of "on this page" that is about the
+                reader. The line is what the marker is measured against: an
+                accent bar with nothing behind it reads as decoration, and the
+                same bar interrupting a rule reads as a position. The label is
+                indented to the links rather than the links out to it, so the
+                rule starts under the words it belongs to. */}
+            {/* 3.5 and not 3: the links clear the list's rule AND their own
+                2px bar, so 12px of padding leaves the label two pixels to the
+                left of every word under it. Measured, not eyeballed — label
+                text at x=1205, link text at x=1207. */}
+            <p class="label pl-3.5">On this page</p>
+            <ul
+              id="on-this-page"
+              class="mt-2 grid gap-1 border-l border-outline-variant"
+            >
+            </ul>
           </aside>
         </div>
       )
@@ -216,7 +232,19 @@ const flat = SECTIONS.flatMap((section) => section.items);
           (function () {
             var rail = document.getElementById("on-this-page");
             if (!rail) return;
-            var headings = document.querySelectorAll("main h2");
+            // AN ISLAND'S HEADINGS ARE NOT THIS PAGE'S SECTIONS. The example
+            // applications run on /examples/ and /showcase/ now, and each one
+            // brings its own `h2` — "Open an account", "Send it" — so the rail
+            // was offering twelve entries for a page with six sections, half
+            // of them naming the inside of a form. An island is somebody
+            // else's document mounted here; where it starts is a section of
+            // this page, and what it says inside is not.
+            var headings = Array.prototype.filter.call(
+              document.querySelectorAll("main h2"),
+              function (h) {
+                return !h.closest("astro-island");
+              }
+            );
             if (headings.length < 2) {
               rail.parentElement.hidden = true;
               return;
@@ -232,11 +260,115 @@ const flat = SECTIONS.flatMap((section) => section.items);
               var link = document.createElement("a");
               link.href = "#" + heading.id;
               link.textContent = heading.textContent;
+              // `-ml-px` so the lit 2px bar covers the list's own 1px rule
+              // rather than sitting beside it and widening the line. What the
+              // lit state looks like is in styles.css, keyed to
+              // `aria-current` — the script sets one attribute, so the marker
+              // a screen reader announces and the marker an eye sees cannot
+              // come to disagree.
               link.className =
-                "block text-[0.8125rem] leading-snug text-on-surface-variant hover:text-on-surface";
+                "-ml-px block border-l-2 border-transparent pl-3 text-[0.8125rem] leading-snug text-on-surface-variant hover:text-on-surface";
               item.appendChild(link);
               rail.appendChild(item);
             });
+
+            // ==============================================================
+            // Which section the reader is in.
+            //
+            // NOT AN IntersectionObserver, and the reason is this site's own
+            // pages. An observer answers "which headings are on screen", and
+            // a section taller than the viewport has none — /examples/ has
+            // three of those, each a running form — so the marker would go
+            // out exactly where the reader spends the most time.
+            //
+            // A line across the viewport answers the question that was
+            // actually asked: the current section is the last one whose
+            // heading has passed it. 96px puts the line just under the sticky
+            // header and just past `scroll-margin-top`, so a heading arriving
+            // from a click on this rail is already the current one.
+            //
+            // NOTHING IS MARKED ABOVE THE FIRST HEADING. A page opens with a
+            // title and a lead, which belong to no section, and marking the
+            // first one there would be the rail claiming to know something it
+            // does not.
+            // ==============================================================
+            var links = rail.querySelectorAll("a");
+            var LINE = 96;
+            var marked = -1;
+
+            function currentIndex() {
+              var doc = document.documentElement;
+              // The last section can be shorter than the gap under the line,
+              // so its heading never crosses: at the bottom of the document
+              // it is the current one by arithmetic rather than by scrolling.
+              if (window.innerHeight + window.scrollY >= doc.scrollHeight - 2) {
+                return headings.length - 1;
+              }
+              var found = -1;
+              for (var k = 0; k < headings.length; k++) {
+                if (headings[k].getBoundingClientRect().top > LINE) break;
+                found = k;
+              }
+              return found;
+            }
+
+            function keepInRail(link) {
+              var box = rail.parentElement;
+              if (box.scrollHeight <= box.clientHeight) return;
+              var l = link.getBoundingClientRect();
+              var b = box.getBoundingClientRect();
+              if (l.top < b.top) box.scrollTop += l.top - b.top;
+              else if (l.bottom > b.bottom) box.scrollTop += l.bottom - b.bottom;
+            }
+
+            function mark() {
+              var next = currentIndex();
+              if (next === marked) return;
+              if (marked >= 0) links[marked].removeAttribute("aria-current");
+              marked = next;
+              if (marked < 0) return;
+              links[marked].setAttribute("aria-current", "location");
+              keepInRail(links[marked]);
+            }
+
+            // Coalesced onto a frame, because the handler measures every
+            // heading and a scroll fires far more often than the page is
+            // painted. THIS IS THE PATH FOR THINGS THAT REPEAT, and only for
+            // those: a hidden tab never paints, so a frame it asks for never
+            // arrives — measured in a hidden pane, where `requestAnimationFrame`
+            // did not fire once in 600ms. Anything that has to be right by the
+            // time the reader looks calls `mark` itself, below.
+            var pending = false;
+            function request() {
+              if (pending) return;
+              pending = true;
+              requestAnimationFrame(function () {
+                pending = false;
+                mark();
+              });
+            }
+
+            mark();
+            addEventListener("scroll", request, { passive: true });
+            addEventListener("resize", request);
+
+            // The once-each moments, marked without waiting for a frame. A
+            // page opened in a background tab does its fragment jump while it
+            // is hidden and is never scrolled before it is looked at, so the
+            // frame that would have marked it is the one that never came.
+            addEventListener("load", mark);
+            addEventListener("hashchange", mark);
+            addEventListener("visibilitychange", mark);
+
+            // NOT EVERY MOVE IS A SCROLL. The islands on /examples/ hydrate
+            // after this script runs, the page grows by thousands of pixels,
+            // and the browser re-anchors a fragment on top of that — a
+            // position the reader never scrolled to, so no scroll event
+            // announces it. The body's own box is what changed, so that is
+            // what to watch.
+            if (typeof ResizeObserver === "function") {
+              new ResizeObserver(request).observe(document.body);
+            }
           })();
         </script>
       )
