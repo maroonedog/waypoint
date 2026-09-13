@@ -8,7 +8,7 @@ import {
   useForm,
   useFormStatus,
 } from "@maroonedog/waypoint/react";
-import { applicationAdapter } from "./form-registry.js";
+import { applicationAdapter } from "./waypoint-forms.js";
 import { EMPTY_APPLICATION } from "./schema.js";
 import { AddressFields } from "./sections/address-fields.js";
 import { ItemsSection } from "./sections/items-section.js";

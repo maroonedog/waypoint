@@ -18,7 +18,7 @@ your own source, and every hook in the application is checked — including
 components that import nothing from it.
 
 ```ts
-// src/form-registry.ts
+// src/waypoint-forms.ts
 import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { orderSchema } from "./order-schema.js";
 

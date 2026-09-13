@@ -1,5 +1,5 @@
 // ===========================================================================
-// form-registry.ts — this application's form, declared once.
+// waypoint-forms.ts — this application's form, declared once.
 //
 // Nothing imports this for its types. A module augmentation belongs to the
 // COMPILATION rather than to the import graph, so every component in this

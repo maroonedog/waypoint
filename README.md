@@ -33,7 +33,7 @@ cd waypoint && npm install && npm run verify
 ## One screen of it
 
 ```ts
-// src/form-registry.ts — one declaration, one time, for the whole application.
+// src/waypoint-forms.ts — one declaration, one time, for the whole application.
 const orderAdapter = zodFormResolver(orderSchema);
 
 declare module "@maroonedog/waypoint/react" {

@@ -16,13 +16,13 @@
 // down.
 //
 // Every path here is CHECKED, including the ones built by interpolation. The
-// types come from the registry in form-registry.ts, which this file does not
+// types come from the registry in waypoint-forms.ts, which this file does not
 // import: `row.path` is typed as a place in its own list, so `${row.path}.sku`
 // comes out as a path the registry recognises and a typo does not compile.
 // ===========================================================================
 import { FormProvider, useCreateForm, useField, useRows } from "@maroonedog/waypoint/react";
 import type { FormPathTo } from "@maroonedog/waypoint/react";
-import { orderAdapter } from "./form-registry.js";
+import { orderAdapter } from "./waypoint-forms.js";
 import { defaults, blankLine, blankShipment } from "./schema.js";
 import { Panel, Row } from "./ui.js";
 

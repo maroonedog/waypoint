@@ -11,7 +11,7 @@ import Code from "../components/Code.astro";
 import TypeAndInstance from "../components/TypeAndInstance.astro";
 
 const registration = `
-// src/form-registry.ts — one file, one declaration, one time.
+// src/waypoint-forms.ts — one file, one declaration, one time.
 const orderAdapter = zodFormResolver(orderSchema);
 
 declare module "@maroonedog/waypoint/react" {
@@ -101,7 +101,7 @@ const viewTypes = [
 
   <h2 class="mt-16 text-2xl font-bold">One declaration, once</h2>
 
-  <Code code={registration} label="src/form-registry.ts" />
+  <Code code={registration} label="src/waypoint-forms.ts" />
   <Code code={usage} label="any component, any depth" lang="tsx" />
 
   <p class="caption">
