@@ -22,6 +22,14 @@
 // error — an empty `role="alert"` announces nothing and looks like a field
 // with no problem.
 //
+// AND SO DOES AN EMPTY STRING, for that same reason rather than as a
+// convenience. `table[code] ?? undefined` is one shape a miss takes and
+// `table[code] ?? ""` is another, and the second one produced a field marked
+// `aria-invalid` with nothing beside it to read — the failure the paragraph
+// above exists to prevent, reached by the other road. It is also the rule this
+// package already applies to a VENDOR that returns no text: an issue with an
+// empty message has one written for it rather than being shown blank.
+//
 // IT IS NOT `showIssues`, and the line between them is worth stating because
 // they arrive by the same route. Visibility is per CONTROL — is this input
 // ready to complain to the person typing in it — so it is applied in the
@@ -69,7 +77,9 @@ export function wordedIssues(
   let moved = false;
   const next = issues.map((issue) => {
     const text = messageFor(issue, descriptor);
-    if (text === undefined || text === issue.message) return issue;
+    if (text === undefined || text === "" || text === issue.message) {
+      return issue;
+    }
     moved = true;
     return { ...issue, message: text };
   });
