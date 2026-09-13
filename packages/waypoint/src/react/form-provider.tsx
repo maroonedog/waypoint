@@ -50,8 +50,8 @@ import { useCoverageReport } from "./use-coverage-report.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
 import type { IssueVisibility } from "./issue-visibility.js";
 import { FormMessageContext } from "./form-message-context.js";
-import type { FormMessageFor } from "./form-message.js";
-import type { FormKey } from "./waypoint-forms.js";
+import type { AnyFormMessageFor, FormMessageFor } from "./form-message.js";
+import type { AnyCode, FormKey } from "./waypoint-forms.js";
 
 export interface FormProviderProps<T, TPath extends string> {
   readonly form: FormHandle<T, TPath>;
@@ -114,7 +114,7 @@ export interface FormProviderProps<T, TPath extends string> {
    * descriptor is the second argument for the same reason: the declared
    * bound is there to interpolate, rather than parsed back out of English.
    */
-  readonly messageFor?: FormMessageFor;
+  readonly messageFor?: FormMessageFor<AnyCode>;
   /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */
   readonly widgets?: WidgetRegistry;
   readonly children: ReactNode;
@@ -166,7 +166,9 @@ export function FormProvider<T, TPath extends string>(
     props.messageFor === undefined ? (
       shown
     ) : (
-      <FormMessageContext.Provider value={props.messageFor}>
+      <FormMessageContext.Provider
+        value={props.messageFor as AnyFormMessageFor}
+      >
         {shown}
       </FormMessageContext.Provider>
     );

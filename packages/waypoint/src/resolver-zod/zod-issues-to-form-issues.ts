@@ -21,6 +21,7 @@
 // zod's severity is always an error — it has no warning level — so severity is
 // omitted rather than filled in with a value zod never expressed.
 // ===========================================================================
+import type * as z from "zod";
 import type { FormIssue } from "../contract/index.js";
 import {
   formatIssuePath,
@@ -34,10 +35,20 @@ interface ZodIssueShape {
   readonly path?: unknown;
 }
 
-/** The verdict, with zod's code kept on every issue that carries one. */
+/**
+ * The verdict, with zod's code kept on every issue that carries one.
+ *
+ * THE CODE IS ASSERTED TO BE ZOD'S, and the assertion is the narrow one this
+ * file is in a position to make: the issues came from zod's own verdict, so a
+ * string in that member is one of zod's codes by construction. What is read
+ * STRUCTURALLY is the shape — `code?: unknown` — because the runtime value is
+ * whatever the installed zod produced, and a version whose codes the declared
+ * union does not list would otherwise be a compile error in this package
+ * rather than an unfamiliar string in an application's own table.
+ */
 export function zodResultToFormIssues(
   result: StandardResult
-): readonly FormIssue[] {
+): readonly FormIssue<z.core.$ZodIssueCode>[] {
   const issues = result.issues;
   if (issues === undefined) return [];
   return (issues as readonly ZodIssueShape[]).map((issue) => {
@@ -45,7 +56,7 @@ export function zodResultToFormIssues(
     const message =
       typeof issue.message === "string" ? issue.message : "This value is not acceptable.";
     return typeof issue.code === "string"
-      ? { path, message, code: issue.code }
+      ? { path, message, code: issue.code as z.core.$ZodIssueCode }
       : { path, message };
   });
 }

@@ -133,6 +133,9 @@ type AdapterFor<TKey> = TKey extends keyof WaypointForms
 // inferred against as one type, and so `never` stays `never` — see above.
 type PathsOfAdapter<A> = A extends FormAdapter<unknown, infer P> ? P : never;
 type ValuesOfAdapter<A> = A extends FormAdapter<infer T, string> ? T : never;
+type CodesOfAdapter<A> = A extends FormAdapter<unknown, string, infer C>
+  ? C
+  : never;
 
 /** The paths one registered form declares. */
 export type PathsFor<TKey> = [AdapterFor<TKey>] extends [never]
@@ -141,6 +144,25 @@ export type PathsFor<TKey> = [AdapterFor<TKey>] extends [never]
 
 /** The value type one registered form was built for. */
 export type ValuesFor<TKey> = ValuesOfAdapter<AdapterFor<TKey>>;
+
+/**
+ * The issue codes one registered form's validator can produce.
+ *
+ * `never` FOR TWO DIFFERENT REASONS, and a caller sees the same thing either
+ * way — which is correct in both. A form registered against
+ * `standardFormResolver` declares `never` because the spec's issue has no
+ * code member at all; a key that is not registered resolves to `never`
+ * because there is no adapter to ask. In both cases a wording function
+ * matching on `issue.code` is matching something that cannot arrive, and the
+ * compiler says so rather than the branch being silently dead.
+ */
+export type CodesFor<TKey> = CodesOfAdapter<AdapterFor<TKey>>;
+
+/** Every code any registered form can produce. */
+export type AnyCode = CodesFor<keyof WaypointForms>;
+
+/** The codes the form a qualified path names can produce. */
+export type CodesAtFormPath<Q extends string> = CodesFor<FormKeyOfPath<Q>>;
 
 /** Every path any registered form declares, with no form attached to it. */
 export type AnyPath = PathsFor<keyof WaypointForms>;

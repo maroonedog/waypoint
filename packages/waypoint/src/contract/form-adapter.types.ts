@@ -69,7 +69,11 @@ import type { MaybeAsync } from "./maybe-async.types.js";
 import type { ValidationSignal } from "./validation-signal.types.js";
 
 /** What one validator's schema offers a form runtime. */
-export interface FormAdapter<T, TPath extends string = string> {
+export interface FormAdapter<
+  T,
+  TPath extends string = string,
+  TCode extends string = string,
+> {
   /** The declared fields, in declaration order. */
   readonly fields: readonly FormFieldDescriptor[];
   /**
@@ -94,7 +98,7 @@ export interface FormAdapter<T, TPath extends string = string> {
   validate(
     root: unknown,
     signal?: ValidationSignal
-  ): MaybeAsync<readonly FormIssue[]>;
+  ): MaybeAsync<readonly FormIssue<TCode>[]>;
 }
 
 /** The value type an adapter carries. */

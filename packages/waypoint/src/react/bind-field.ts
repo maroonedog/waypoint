@@ -52,10 +52,14 @@ import { useCell } from "./use-cell.js";
 import { useFormForPath } from "./use-form-for-path.js";
 import { visibleIssues, type IssueVisibility } from "./issue-visibility.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
-import { wordedIssues, type FormMessageFor } from "./form-message.js";
+import {
+  wordedIssues,
+  type AnyFormMessageFor,
+  type FormMessageFor,
+} from "./form-message.js";
 import { FormMessageContext } from "./form-message-context.js";
 
-export interface FieldOptions {
+export interface FieldOptions<TCode extends string = string> {
   /**
    * When this field starts showing what the last pass found. Omit it and the
    * enclosing `<FormProvider showIssues>` decides; omit that too and it is
@@ -76,7 +80,7 @@ export interface FieldOptions {
    * error. The issue's `code` is the key worth matching on, and it arrives
    * from a vendor resolver only — the spec has no such member.
    */
-  readonly messageFor?: FormMessageFor;
+  readonly messageFor?: FormMessageFor<TCode>;
 }
 
 export interface BoundField {
@@ -89,7 +93,7 @@ export interface BoundField {
 
 export function useFieldBinding(
   spelling: string,
-  options?: FieldOptions
+  options?: FieldOptions<never>
 ): BoundField {
   const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
@@ -110,7 +114,11 @@ export function useFieldBinding(
       isDirty,
       submitCount,
     }),
-    options?.messageFor ?? inheritedMessage,
+    // Widened once: this function was declared for THIS form's codes, and
+    // these are this form's issues. See form-message.ts.
+    (options?.messageFor ?? inheritedMessage) as
+      | AnyFormMessageFor
+      | undefined,
     handle.descriptor
   );
 

@@ -35,7 +35,7 @@ const hooks = [
   path: Q & InhabitedFormPath<Q>,
   options?: {
     showIssues?: "immediately" | "touched" | "dirty";
-    messageFor?: (issue, descriptor) => string | undefined;
+    messageFor?: FormMessageFor<CodesAtFormPath<Q>>;
   }
 ): FieldBinding<ValueAtFormPath<Q>>`,
     example: `const field = useField("form:owner.name");
@@ -72,7 +72,7 @@ const hooks = [
   path: Q & InhabitedFormPath<Q>,
   options?: {
     showIssues?: "immediately" | "touched" | "dirty";
-    messageFor?: (issue, descriptor) => string | undefined;
+    messageFor?: FormMessageFor<CodesAtFormPath<Q>>;
   }
 ): UncontrolledFieldBinding<ValueAtFormPath<Q>>`,
     example: `const field = useUncontrolledField("form:owner.name");

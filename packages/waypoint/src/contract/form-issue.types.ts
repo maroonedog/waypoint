@@ -13,10 +13,22 @@
 
 export type FormIssueSeverity = "error" | "warning";
 
-/** One issue, addressed at the concrete path it belongs to. */
-export interface FormIssue {
+/**
+ * One issue, addressed at the concrete path it belongs to.
+ *
+ * `TCode` IS WHAT THE VENDOR CAN NAME. It defaults to `string`, so nothing
+ * that does not care has to say anything; a resolver that knows its vendor's
+ * codes states them, and a wording function keyed on `issue.code` is then
+ * checked and can be made exhaustive. `resolver-standard` states `never`,
+ * which is not pedantry: the spec's issue has `message` and `path` and
+ * nothing else, so a caller matching a code against the generic resolver is
+ * matching something that never arrives — and `never` is how the compiler
+ * says so instead of the code being `undefined` at run time and the branch
+ * silently never taken.
+ */
+export interface FormIssue<TCode extends string = string> {
   readonly path: string;
   readonly message: string;
-  readonly code?: string;
+  readonly code?: TCode;
   readonly severity?: FormIssueSeverity;
 }

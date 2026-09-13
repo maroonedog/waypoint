@@ -36,6 +36,7 @@
 import type { FieldBinding } from "./field-binding.types.js";
 import { useFieldBinding, type FieldOptions } from "./bind-field.js";
 import type {
+  CodesAtFormPath,
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
@@ -43,11 +44,11 @@ import type {
 
 export function useField<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>,
-  options?: FieldOptions
+  options?: FieldOptions<CodesAtFormPath<Q>>
 ): FieldBinding<ValueAtFormPath<Q>>;
 export function useField(
   spelling: string,
-  options?: FieldOptions
+  options?: FieldOptions<never>
 ): FieldBinding<never> {
   const bound = useFieldBinding(spelling, options);
   bound.form.coverage.addressed(bound.path);

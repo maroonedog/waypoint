@@ -56,11 +56,12 @@ import { useFormForPath } from "./use-form-for-path.js";
 import { decorateElement } from "./decorate-element.js";
 import { visibleIssues } from "./issue-visibility.js";
 import { IssueVisibilityContext } from "./issue-visibility-context.js";
-import { wordedIssues } from "./form-message.js";
+import { wordedIssues, type AnyFormMessageFor } from "./form-message.js";
 import { FormMessageContext } from "./form-message-context.js";
 import type { FieldOptions } from "./bind-field.js";
 import type { FieldPart } from "./field-binding.types.js";
 import type {
+  CodesAtFormPath,
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
@@ -72,11 +73,11 @@ const displayValue = (value: unknown): string =>
 
 export function useUncontrolledField<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>,
-  options?: FieldOptions
+  options?: FieldOptions<CodesAtFormPath<Q>>
 ): UncontrolledFieldBinding<ValueAtFormPath<Q>>;
 export function useUncontrolledField(
   spelling: string,
-  options?: FieldOptions
+  options?: FieldOptions<never>
 ): UncontrolledFieldBinding<never> {
   const { form, path } = useFormForPath(spelling);
   const handle = form.field(path);
@@ -104,7 +105,10 @@ export function useUncontrolledField(
       isDirty: handle.sources.dirty.read(),
       submitCount,
     }),
-    options?.messageFor ?? inheritedMessage,
+    // Widened once; see form-message.ts.
+    (options?.messageFor ?? inheritedMessage) as
+      | AnyFormMessageFor
+      | undefined,
     handle.descriptor
   );
 

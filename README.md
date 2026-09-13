@@ -158,6 +158,29 @@ not reach the summary.
 asserted in the tests. A table keyed on the message string breaks the day the
 vendor rewords, so an application that wants its own wording wants
 `resolver-zod` or `resolver-luq`.
+**`issue.code` is a union, and which union comes from the registry.** The
+adapter carries the codes its validator can produce, so `messageFor` is
+checked against the form the path names — a renamed code fails the build
+instead of falling through to a branch nobody takes:
+
+```tsx
+useField("form:owner.name", {
+  messageFor: (issue) =>
+    issue.code === "too_smal"   // compile error: zod has no such code
+      ? "typo"
+      : undefined,
+});
+```
+
+`resolver-zod` states zod's own `$ZodIssueCode`; `resolver-standard` states
+**`never`**, because the spec's issue has no code member — so matching a code
+against the generic resolver is a compile error rather than a dead branch.
+`resolver-luq` states `string`: luq has codes and does not publish a union of
+them.
+
+It costs a fixed **+2,619 instantiations** per compilation and **+32 per
+registered form**, constant at every depth — `npm run bench:types` prints it,
+`docs/measurements-types.md` records it.
 ## Decorating your own element
 
 The four prop bags are offered and spreading them is still the shortest path.

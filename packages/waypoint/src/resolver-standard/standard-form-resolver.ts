@@ -99,7 +99,7 @@ interface PossiblyDescribingProps extends StandardValidatorProps<unknown> {
 export function standardFormResolver<S extends StandardSchemaWithJSON>(
   schema: S,
   options?: StandardFormOptions
-): FormAdapter<StandardInput<S>, StandardPaths<StandardInput<S>>>;
+): FormAdapter<StandardInput<S>, StandardPaths<StandardInput<S>>, never>;
 /**
  * Builds a form adapter from a validator that judges but does not describe,
  * with the fields supplied by the caller.
@@ -107,15 +107,15 @@ export function standardFormResolver<S extends StandardSchemaWithJSON>(
 export function standardFormResolver<S extends StandardSchemaV1>(
   schema: S,
   options: StandardFormOptions & DeclaredFormFields
-): FormAdapter<StandardInput<S>, StandardPaths<StandardInput<S>>>;
+): FormAdapter<StandardInput<S>, StandardPaths<StandardInput<S>>, never>;
 export function standardFormResolver(
   schema: StandardSchemaV1,
   options: StandardFormOptions & Partial<DeclaredFormFields> = {}
-): FormAdapter<unknown, string> {
+): FormAdapter<unknown, string, never> {
   const properties = schema["~standard"];
   return {
     fields: options.fields ?? describeStandardFields(properties, options),
-    validate(root: unknown): MaybeAsync<readonly FormIssue[]> {
+    validate(root: unknown): MaybeAsync<readonly FormIssue<never>[]> {
       return mapStandardVerdict(
         properties.validate(root),
         standardResultToFormIssues

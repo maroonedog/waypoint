@@ -52,8 +52,8 @@ can put them back.
 
 | program | instantiations | types | Check time | Memory used |
 |---|---|---|---|---|
-| `empty` — lib.d.ts and nothing else | 0 | 85 | 0.00s | 76 MB |
-| `packages-only` — both packages imported, no shape | 7,985 | 5,722 | 0.52s | 99 MB |
+| `empty` — lib.d.ts and nothing else | 0 | 85 | 0.00s | 78 MB |
+| `packages-only` — both packages imported, no shape | 10,604 | 6,770 | 0.65s | 96 MB |
 
 `empty` is what every TypeScript program in the world pays. `packages-only` is
 the `.` and `./react` entries type-checking their own source: an application
@@ -80,28 +80,28 @@ the same program — the two rows reading identically is the control.
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `depth-1-distinct` | 3 | all 3 | 1 | +419 | 140 | 0.45s | +130 | +388 | 129.3 |
-| `depth-1-shared` | 3 | all 3 | 1 | +419 | 140 | 0.46s | +130 | +388 | 129.3 |
-| `depth-2-distinct` | 9 | all 9 | 4 | +1,218 | 135 | 0.51s | +180 | +1,444 | 160.4 |
-| `depth-2-shared` | 9 | all 9 | 2 | +1,084 | 120 | 0.46s | +180 | +1,444 | 160.4 |
-| `depth-3-distinct` | 27 | all 27 | 13 | +3,658 | 135 | 0.54s | +230 | +5,008 | 185.5 |
-| `depth-3-shared` | 27 | all 27 | 3 | +2,856 | 106 | 0.50s | +230 | +4,840 | 179.3 |
-| `depth-4-distinct` | 81 | all 81 | 40 | +11,021 | 136 | 0.50s | +280 | +16,888 | 208.5 |
-| `depth-4-shared` | 81 | all 81 | 4 | +7,949 | 98 | 0.47s | +280 | +16,048 | 198.1 |
-| `depth-5-distinct` | 243 | all 243 | 121 | +33,153 | 136 | 0.55s | +330 | +56,092 | 230.8 |
-| `depth-5-shared` | 243 | all 243 | 5 | +23,005 | 95 | 0.61s | +330 | +53,068 | 218.4 |
-| `depth-6-distinct` | 729 | all 729 | 364 | +99,592 | 137 | 0.75s | +380 | +184,396 | 252.9 |
-| `depth-6-shared` | 729 | all 729 | 6 | +67,950 | 93 | 0.67s | +380 | +174,652 | 239.6 |
-| `depth-7-distinct` | 2187 | all 2187 | 1093 | +298,922 | 137 | 1.00s | +430 | +601,384 | 275.0 |
-| `depth-7-shared` | 2187 | all 2187 | 7 | +202,532 | 93 | 0.79s | +430 | +571,312 | 261.2 |
-| `depth-8-distinct` | 6561 | **0** | 3280 | +301,106 | n/a — none is | 1.03s | +475,034 | +527,514 | 80.4 |
-| `depth-8-shared` | 6561 | **0** | 8 | +202,532 | n/a — none is | 0.75s | +444,962 | +497,442 | 75.8 |
+| `depth-1-distinct` | 3 | all 3 | 1 | +451 | 150 | 0.72s | +130 | +388 | 129.3 |
+| `depth-1-shared` | 3 | all 3 | 1 | +451 | 150 | 0.58s | +130 | +388 | 129.3 |
+| `depth-2-distinct` | 9 | all 9 | 4 | +1,250 | 139 | 0.54s | +180 | +1,444 | 160.4 |
+| `depth-2-shared` | 9 | all 9 | 2 | +1,116 | 124 | 0.62s | +180 | +1,444 | 160.4 |
+| `depth-3-distinct` | 27 | all 27 | 13 | +3,690 | 137 | 0.64s | +230 | +5,008 | 185.5 |
+| `depth-3-shared` | 27 | all 27 | 3 | +2,888 | 107 | 0.54s | +230 | +4,840 | 179.3 |
+| `depth-4-distinct` | 81 | all 81 | 40 | +11,053 | 136 | 0.61s | +280 | +16,888 | 208.5 |
+| `depth-4-shared` | 81 | all 81 | 4 | +7,981 | 99 | 0.57s | +280 | +16,048 | 198.1 |
+| `depth-5-distinct` | 243 | all 243 | 121 | +33,185 | 137 | 0.60s | +330 | +56,092 | 230.8 |
+| `depth-5-shared` | 243 | all 243 | 5 | +23,037 | 95 | 0.54s | +330 | +53,068 | 218.4 |
+| `depth-6-distinct` | 729 | all 729 | 364 | +99,624 | 137 | 0.67s | +380 | +184,396 | 252.9 |
+| `depth-6-shared` | 729 | all 729 | 6 | +67,982 | 93 | 0.73s | +380 | +174,652 | 239.6 |
+| `depth-7-distinct` | 2187 | all 2187 | 1093 | +298,954 | 137 | 1.94s | +430 | +601,384 | 275.0 |
+| `depth-7-shared` | 2187 | all 2187 | 7 | +202,564 | 93 | 0.80s | +430 | +571,312 | 261.2 |
+| `depth-8-distinct` | 6561 | **0** | 3280 | +301,138 | n/a — none is | 1.17s | +475,034 | +527,514 | 80.4 |
+| `depth-8-shared` | 6561 | **0** | 8 | +202,564 | n/a — none is | 0.80s | +444,962 | +497,442 | 75.8 |
 
-**The growth is linear in leaves, not exponential in depth.** Depth is only where the leaves come from. Per addressable leaf the union costs 140 instantiations at depth 1 against 137 at depth 7 — a factor of 1.0 across a shape 729 times larger.
+**The growth is linear in leaves, not exponential in depth.** Depth is only where the leaves come from. Per addressable leaf the union costs 150 instantiations at depth 1 against 137 at depth 7 — a factor of 0.9 across a shape 729 times larger.
 Distinct subtrees cost 1.48× shared ones at depth 7 and 1.44× at depth 5, which
 is the size of the error a probe makes by reusing one interface per level.
 
-**Then it stops.** `depth-8-distinct` builds its union in 301,106 instantiations against `depth-7-distinct`'s 298,922 — 2,184 more, 0.7%, while the shared arm does not move at all (202,532 at both depths). The budget stopped the
+**Then it stops.** `depth-8-distinct` builds its union in 301,138 instantiations against `depth-7-distinct`'s 298,954 — 2,184 more, 0.7%, while the shared arm does not move at all (202,564 at both depths). The budget stopped the
 compiler before the eighth segment, so the union stopped growing with it — and none of that
 shape's 6,561 leaves got into it either. §7 is what that costs instead.
 
@@ -113,11 +113,11 @@ That is a fact about mistyped paths in an editor, not about correct code.
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `width-30` | 30 | all 30 | 1 | +2,471 | 82 | 0.50s | +130 | +3,871 | 129.0 |
-| `width-100` | 100 | all 100 | 1 | +7,791 | 78 | 0.56s | +130 | +12,901 | 129.0 |
-| `width-300` | 300 | all 300 | 1 | +22,991 | 77 | 0.57s | +130 | +38,701 | 129.0 |
+| `width-30` | 30 | all 30 | 1 | +2,503 | 83 | 0.45s | +130 | +3,871 | 129.0 |
+| `width-100` | 100 | all 100 | 1 | +7,823 | 78 | 0.48s | +130 | +12,901 | 129.0 |
+| `width-300` | 300 | all 300 | 1 | +23,023 | 77 | 0.81s | +130 | +38,701 | 129.0 |
 
-Flat and linear: 82, 78 and
+Flat and linear: 83, 78 and
 77 instantiations per leaf across a tenfold range. Width is
 not where this gets expensive.
 
@@ -134,10 +134,10 @@ it there would be measuring a compile error. `record-member` carries a
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `array-declared` | 10 | all 10 | 5 | +3,347 | 335 | 0.53s | +159 | +2,226 | 222.6 |
-| `array-concrete` | 10 | all 10 | 5 | +3,347 | 335 | 0.48s | +159 | +2,165 | 216.5 |
-| `record-member` | 5 | all 5 | 2 | +764 | 153 | 0.49s | +133 | +805 | 161.0 |
-| `self-referential` | 10 | **7** | 1 | +1,605 | 229 | 0.41s | +130 | +2,959 | 295.9 |
+| `array-declared` | 10 | all 10 | 5 | +3,350 | 335 | 0.53s | +159 | +2,226 | 222.6 |
+| `array-concrete` | 10 | all 10 | 5 | +3,350 | 335 | 0.55s | +159 | +2,165 | 216.5 |
+| `record-member` | 5 | all 5 | 2 | +793 | 159 | 0.49s | +133 | +805 | 161.0 |
+| `self-referential` | 10 | **7** | 1 | +1,637 | 234 | 0.47s | +130 | +2,959 | 295.9 |
 
 The two array rows are the same root compiled twice, and their
 `building the union` figures came back identical — so the difference between
@@ -194,8 +194,8 @@ so the value keeps its shape, but the interface extends `ReadonlyMap` — one of
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `depth-6-distinct` | 729 | all 729 | 364 | +99,592 | 137 | 0.75s | +380 | +184,396 | 252.9 |
-| `opaque-2-of-3` | 245 | all 245 | 364 | +35,508 | 145 | 0.54s | +380 | +61,724 | 251.9 |
+| `depth-6-distinct` | 729 | all 729 | 364 | +99,624 | 137 | 0.67s | +380 | +184,396 | 252.9 |
+| `opaque-2-of-3` | 245 | all 245 | 364 | +35,540 | 145 | 0.55s | +380 | +61,724 | 251.9 |
 
 The two rows declare the same
 364 interfaces and carry the same
@@ -204,7 +204,7 @@ data, which is the point of putting them side by side: nothing was deleted. The
 the opaque rows keep the rest of their leaves under `m1` and `m2` where no path
 reaches them.
 
-The union drops from 99,592 instantiations to 35,508 — a 64% saving — and the per-leaf
+The union drops from 99,624 instantiations to 35,540 — a 64% saving — and the per-leaf
 figure barely moves (137 against 145), which is what says the
 saving is exactly the paths given up rather than a discount on the rest. `m1`
 and `m2` themselves stay nameable, with nothing under them: a component can
@@ -221,11 +221,11 @@ measurement rather than an assumption: the same program, 3 separate
 
 | compile | instantiations | types | Check time | Memory used | wall clock |
 |---|---|---|---|---|---|
-| 1 | 97,230 | 8,236 | 0.59s | 109 MB | 1219 ms |
-| 2 | 97,230 | 8,236 | 0.58s | 110 MB | 1224 ms |
-| 3 | 97,230 | 8,236 | 0.58s | 110 MB | 1235 ms |
+| 1 | 99,881 | 9,296 | 0.69s | 108 MB | 1373 ms |
+| 2 | 99,881 | 9,296 | 0.63s | 112 MB | 1308 ms |
+| 3 | 99,881 | 9,296 | 0.63s | 109 MB | 1304 ms |
 
-Instantiations came back identical all 3 times. Check time spread 1.7% over that same identical work, which is why the time columns in this document are context and never an argument.
+Instantiations came back identical all 3 times. Check time spread 9.5% over that same identical work, which is why the time columns in this document are context and never an argument.
 
 **A gate was still not added, and the reason is the compiler rather than the
 machine.** `typescript` is a devDependency at a caret range. The figures here
@@ -245,7 +245,7 @@ gate can be added — one budget file beside this harness, the shape of
 
 ## §7 — Where this becomes unacceptable, and what a user does
 
-**Not depth, and not the per-call cost.** Depth stops mattering at the budget — the §2 figures are 298,922 at depth 7 and 301,106 at depth 8 — and a call costs 129.0 instantiations at width 300 and 275.0 at depth 7. A thousand
+**Not depth, and not the per-call cost.** Depth stops mattering at the budget — the §2 figures are 298,954 at depth 7 and 301,138 at depth 8 — and a call costs 129.0 instantiations at width 300 and 275.0 at depth 7. A thousand
 components addressing one large form is not where this goes wrong.
 
 **What goes wrong at depth is that the fields stop being addressable.** Every one of `depth-8-distinct`'s 6,561 leaves is refused. A form nested past 7 segments does not
@@ -272,8 +272,8 @@ In the order to try them:
    hatch: anything assignable to it ends a path, so a member whose interface
    extends one of its arms leaves the union along with everything under it,
    while keeping its own members and its own type. §5 is the measurement —
-   99,592 instantiations down to
-   35,508 for two of three subtrees, which is
+   99,624 instantiations down to
+   35,540 for two of three subtrees, which is
    what the paths given up were costing.
 4. **Register an adapter typed `string`.** `ConcretePath<string>` is
    `string`, so the union collapses entirely and the form goes back to
@@ -281,7 +281,7 @@ In the order to try them:
    already what a schema built at run time does.
 
 **And one case where the union is not the check.** A `Record<string, T>` member
-is cheap to build — the `record-member` row is 764 instantiations — because
+is cheap to build — the `record-member` row is 793 instantiations — because
 `Extract<keyof Record<string, Entry>, string>` is `string`, so the union grows a
 TEMPLATE member rather than literal ones. That template is a SUPERTYPE of
 everything beneath it, so the union absorbs the record's whole subtree and
@@ -318,7 +318,7 @@ union. `test/types-containers/container-shapes.type-test.ts` pins both halves.
 | @types/react | 19.3.0 |
 | machine | AMD Ryzen 7 5825U with Radeon Graphics, 16 cores, 15.3 GB, win32 10.0.26200 |
 | programs compiled | 77 |
-| run took | 2.1 minutes |
+| run took | 2.3 minutes |
 
 **Machine-dependent in the time and memory columns, compiler-dependent in every
 column.** Check time and Memory used move with the machine; instantiations and

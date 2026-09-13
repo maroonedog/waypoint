@@ -44,14 +44,25 @@ import type { FormFieldDescriptor, FormIssue } from "../contract/index.js";
  * server adopted onto `payment`, for one — which is exactly when there are no
  * bounds to interpolate and the validator's own text is all there is.
  */
-export type FormMessageFor = (
-  issue: FormIssue,
+export type FormMessageFor<TCode extends string = string> = (
+  issue: FormIssue<TCode>,
   descriptor: FormFieldDescriptor | undefined
 ) => string | undefined;
 
+/**
+ * THE WIDEST SHAPE, AND THE ONE CAST THIS DESIGN NEEDS. A function declared for
+ * one form's codes does not accept an issue typed with every code — a
+ * parameter is contravariant, and that refusal is correct in general. It is
+ * not correct HERE, and the reason is the one thing the types cannot see: the
+ * function was declared against the form whose issues it is being applied to.
+ * So each place that hands one in widens it, once, beside that sentence, and
+ * nothing below this line pretends to know a code.
+ */
+export type AnyFormMessageFor = FormMessageFor<string>;
+
 export function wordedIssues(
   issues: readonly FormIssue[],
-  messageFor: FormMessageFor | undefined,
+  messageFor: AnyFormMessageFor | undefined,
   descriptor: FormFieldDescriptor | undefined
 ): readonly FormIssue[] {
   if (messageFor === undefined || issues.length === 0) return issues;

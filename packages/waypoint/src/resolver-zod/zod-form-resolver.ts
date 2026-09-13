@@ -117,7 +117,7 @@ function refineZodField(
  */
 export function zodFormResolver<S extends z.ZodObject>(
   schema: S
-): FormAdapter<z.infer<S>, FieldPath<z.infer<S>>> {
+): FormAdapter<z.infer<S>, FieldPath<z.infer<S>>, z.core.$ZodIssueCode> {
   const described = standardFormResolver(schema, {
     libraryOptions: ZOD_LIBRARY_OPTIONS,
   });
@@ -135,7 +135,9 @@ export function zodFormResolver<S extends z.ZodObject>(
     // called, rather than the `safeParse` this resolver used to call: it is
     // the spec'd entry point, it returns the same issues, and it is the one
     // that survives an async refinement instead of throwing on it.
-    validate(root: unknown): MaybeAsync<readonly FormIssue[]> {
+    validate(
+      root: unknown
+    ): MaybeAsync<readonly FormIssue<z.core.$ZodIssueCode>[]> {
       return mapStandardVerdict(
         schema["~standard"].validate(root),
         zodResultToFormIssues

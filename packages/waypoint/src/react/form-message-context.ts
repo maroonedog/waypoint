@@ -14,8 +14,15 @@
 // declares no wording allocates nothing and keeps the interned empty list.
 // ===========================================================================
 import { createContext } from "react";
-import type { FormMessageFor } from "./form-message.js";
+import type { AnyFormMessageFor } from "./form-message.js";
 
-export const FormMessageContext = createContext<FormMessageFor | undefined>(
+/**
+ * Held at the widest shape. What a provider was GIVEN is checked against the
+ * registered forms' codes at the prop; what travels is a function this file
+ * makes no claim about, because a context object serves every form in the
+ * application and cannot be generic in one of them — the same reason
+ * form-context.ts drops the value type on the way in.
+ */
+export const FormMessageContext = createContext<AnyFormMessageFor | undefined>(
   undefined
 );

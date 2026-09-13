@@ -27,7 +27,7 @@ const UNSTATED_MESSAGE = "This value is not acceptable.";
 
 export function standardIssuesToFormIssues(
   issues: readonly StandardIssue[]
-): readonly FormIssue[] {
+): readonly FormIssue<never>[] {
   return issues.map((issue) => ({
     path: formatIssuePath(issue.path),
     message:
@@ -44,7 +44,7 @@ export function standardIssuesToFormIssues(
  */
 export function standardResultToFormIssues(
   result: StandardResult
-): readonly FormIssue[] {
+): readonly FormIssue<never>[] {
   const issues = result.issues;
   return issues === undefined ? [] : standardIssuesToFormIssues(issues);
 }
@@ -64,10 +64,10 @@ export function standardResultToFormIssues(
  * judges synchronously stays synchronous end to end, which is the whole reason
  * `MaybeAsync` is a union and not a promise.
  */
-export function mapStandardVerdict(
+export function mapStandardVerdict<TCode extends string>(
   outcome: StandardResult | Promise<StandardResult>,
-  toFormIssues: (result: StandardResult) => readonly FormIssue[]
-): MaybeAsync<readonly FormIssue[]> {
+  toFormIssues: (result: StandardResult) => readonly FormIssue<TCode>[]
+): MaybeAsync<readonly FormIssue<TCode>[]> {
   return isPending(outcome)
     ? outcome.then(toFormIssues)
     : toFormIssues(outcome);
