@@ -26,7 +26,8 @@
     "size:check": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-size-bench.ts --check",
     "example:server-errors": "vite --config examples/server-errors/vite.config.ts examples/server-errors",
     "example:two-forms": "vite --config examples/two-forms/vite.config.ts examples/two-forms",
-    "example:wizard": "vite --config examples/wizard/vite.config.ts examples/wizard"
+    "example:wizard": "vite --config examples/wizard/vite.config.ts examples/wizard",
+    "mutation": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-mutations.ts"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",

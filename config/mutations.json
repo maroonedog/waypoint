@@ -1,0 +1,122 @@
+{
+  "//": "Each entry removes one behaviour and names the test that must notice. See bench/run-mutations.ts for why these are applied to dist/ and not to src/.",
+  "mutations": [
+    {
+      "id": "decorate-handlers",
+      "file": "react/decorate-element.js",
+      "find": "        else if (isHandler(key)) {\n            merged[key] = callBoth(ours, already);",
+      "replace": "        else if (false) {\n            merged[key] = callBoth(ours, already);",
+      "test": "test/decorate.test.mjs",
+      "catches": "both onChange handlers run, and the cell is written first",
+      "why": "A lost handler is silent: whichever side wins looks correct in the DOM and the other never runs."
+    },
+    {
+      "id": "decorate-describedby",
+      "file": "react/decorate-element.js",
+      "find": "        else if (key === \"aria-describedby\") {",
+      "replace": "        else if (false) {",
+      "test": "test/decorate.test.mjs",
+      "catches": "aria-describedby joins rather than replacing",
+      "why": "A truncated describedby list stops being announced and shows nothing on screen."
+    },
+    {
+      "id": "decorate-field-wins",
+      "file": "react/decorate-element.js",
+      "find": "        else {\n            merged[key] = ours;\n        }",
+      "replace": "        else {\n            merged[key] = already;\n        }",
+      "test": "test/decorate.test.mjs",
+      "catches": "the field wins on identity, whatever the caller asked for",
+      "why": "A caller's id silently breaks the label and the error association."
+    },
+    {
+      "id": "visibility-gate",
+      "file": "react/issue-visibility.js",
+      "find": "    if (input.visibility === \"touched\")\n        return input.isTouched;",
+      "replace": "    if (input.visibility === \"touched\")\n        return true;",
+      "test": "test/issue-visibility.test.mjs",
+      "catches": "\"touched\" keeps a field quiet until its own first blur",
+      "why": "The gate opening early is the defect the option exists to prevent."
+    },
+    {
+      "id": "visibility-submit-reveal",
+      "file": "react/issue-visibility.js",
+      "find": "    if (input.submitCount > 0)\n        return true;",
+      "replace": "    if (false)\n        return true;",
+      "test": "test/issue-visibility.test.mjs",
+      "catches": "a refused submit reveals every field, whatever it asked for",
+      "why": "Pressing the button and being told nothing is the one outcome no policy may produce."
+    },
+    {
+      "id": "message-empty-string",
+      "file": "react/form-message.js",
+      "find": "if (text === undefined || text === \"\" || text === issue.message)",
+      "replace": "if (text === undefined || text === issue.message)",
+      "test": "test/binding-combinations.test.mjs",
+      "catches": "an empty sentence keeps the validator's rather than blanking the error",
+      "why": "A blank message under aria-invalid is a field marked wrong with nothing to read."
+    },
+    {
+      "id": "message-identity",
+      "file": "react/form-message.js",
+      "find": "    return moved ? next : issues;",
+      "replace": "    return next;",
+      "test": "test/message-for.test.mjs",
+      "catches": "a function that rewords nothing hands back the very same array",
+      "why": "A fresh array every render wakes every dependency array watching the issues."
+    },
+    {
+      "id": "revalidate-complaint",
+      "file": "core/runtime/create-form.js",
+      "find": "        if ((store.read(issuesCell(path))?.length ?? 0) > 0)\n            return true;",
+      "replace": "        if (false)\n            return true;",
+      "test": "test/revalidate-on-fix.test.mjs",
+      "catches": "under blur, fixing the field that complained clears it without a blur",
+      "why": "A complaint outliving the value it was about argues with a reader who already did what it asked."
+    },
+    {
+      "id": "revalidate-ancestors",
+      "file": "core/runtime/create-form.js",
+      "find": "        for (const ancestor of ancestorPathsOf(path)) {",
+      "replace": "        for (const ancestor of []) {",
+      "test": "test/revalidate-on-fix.test.mjs",
+      "catches": "the ancestor clause: a keystroke below a complaint asks for the pass",
+      "why": "An edit inside a row has to clear a verdict about the row."
+    },
+    {
+      "id": "coverage-undrawn",
+      "file": "core/runtime/field-coverage.js",
+      "find": "        undrawn(path) {\n            if (!drawn.has(path))\n                blank.add(path);",
+      "replace": "        undrawn(path) {\n            if (false)\n                blank.add(path);",
+      "test": "test/field-coverage.test.mjs",
+      "catches": "a field asked for and never drawn is reported apart from one nobody asked for",
+      "why": "Everything wired and the page blank is the case the two reasons exist to tell apart."
+    },
+    {
+      "id": "coverage-dormant",
+      "file": "core/runtime/field-coverage.js",
+      "find": "                    if (!isParticipating(path))",
+      "replace": "                    if (false)",
+      "test": "test/field-coverage.test.mjs",
+      "catches": "a subtree switched off is not missing",
+      "why": "A report that names deliberately dormant fields is one that gets switched off."
+    },
+    {
+      "id": "adopted-forget-around",
+      "file": "core/runtime/adopted-issues.js",
+      "find": "        forgetAround(written) {\n            if (byPath.size === 0)\n                return false;",
+      "replace": "        forgetAround(written) {\n            if (true)\n                return false;",
+      "test": "test/adopted-issues.test.mjs",
+      "catches": "*",
+      "why": "A server's complaint that no edit can clear is one a reader cannot get past."
+    },
+    {
+      "id": "adopted-merge",
+      "file": "core/runtime/adopted-issues.js",
+      "find": "            return produced.concat(...byPath.values());",
+      "replace": "            return produced;",
+      "test": "test/adopted-issues.test.mjs",
+      "catches": "*",
+      "why": "An adopted issue that is shown but not counted is a form that displays \"declined\" and submits anyway."
+    }
+  ]
+}

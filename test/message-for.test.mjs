@@ -150,6 +150,28 @@ test("with no function set, the list is the very same array", async () => {
   root.unmount();
 });
 
+test("a function that rewords nothing hands back the very same array", async () => {
+  // The sibling above takes the early return: with no function set,
+  // `wordedIssues` never reaches the comparison. This one goes through it —
+  // a function IS set and every answer is undefined — which is the path the
+  // identity claim is actually about, and the one a table with a miss in it
+  // takes on every render.
+  const form = build();
+  const seen = [];
+  function Screen() {
+    const field = useField("name", { messageFor: () => undefined });
+    seen.push(field.issues);
+    return h("span", { id: "a" }, field.issues[0]?.message ?? "");
+  }
+  const { root } = await mountJudged(h(FormProvider, { form }, h(Screen)), form);
+  assert.equal(
+    seen.at(-1),
+    form.field("name").sources.issues.read(),
+    "nothing moved, so nothing was allocated and no dependency array is woken"
+  );
+  root.unmount();
+});
+
 test("code is carried by the vendor resolver and not by the generic one", async () => {
   const viaZod = await zodFormResolver(SCHEMA).validate({ name: "" });
   const viaSpec = await standardFormResolver(SCHEMA).validate({ name: "" });

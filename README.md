@@ -258,7 +258,19 @@ not depend on the machine; the time lane is printed and never gated.
 npm run bench:forms         # counts, in jsdom
 npm run bench:types         # what the path types cost the compiler
 npm run bench:self-audit    # the runtime against its own design document
+npm run mutation            # every pinned behaviour, taken away once
 ```
+
+`npm run mutation` is the one that checks the tests rather than the code. It
+holds a recorded list of behaviours this suite argues for, removes each one
+from the built output, and asserts that the NAMED test fails — so a paragraph
+explaining why something matters is checked against a test that would notice
+if it stopped. It is a list and not a sweep on purpose: a mutation score says
+how much is covered, and the question here is which test covers what.
+
+It has already earned itself. An identity claim about `messageFor` was pinned
+by a test that took an earlier return and never reached the line it was about;
+the behaviour could be deleted with the suite green.
 
 ## Examples
 
