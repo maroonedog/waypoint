@@ -1,9 +1,36 @@
 /* ===========================================================================
    styles.css — the documentation site's stylesheet.
 
-   The Material Design 3 roles come from the showcase's token file rather than
-   from a copy: the site and the screen it documents are meant to look like the
-   same thing, and two colour ramps drift the moment one of them is touched.
+   THE SITE IS DRAWN IN LINES, NOT FILLS. That is the whole design, and it
+   comes from the mark: an outlined place (public/favicon.svg) that exists
+   before the value that arrives in it. A library whose claim is that the
+   address is there before the component has no business describing itself in
+   filled cards with a shadow under each one. So there are no shadows here, in
+   either scheme; a surface is CUT INTO the page rather than raised off it;
+   and the three line weights below carry the hierarchy that a card, a radius
+   and an elevation used to.
+
+   WHAT THIS REPLACED, and why. The site had no palette of its own: every
+   colour came wholesale from the showcase's Material Design 3 token file, so
+   a documentation site wore an application's design system as an identity —
+   one teal doing eight jobs, one radius and one elevation on every block,
+   seven of twenty-seven roles dead, and a body typeface nobody had chosen
+   (`--font-sans` named "Noto Sans JP", which no page has loaded since the
+   site stopped being written in Japanese: every page has been rendering in
+   the reader's OS font by accident, while three weights of Roboto downloaded
+   and painted nothing).
+
+   THE HOST IS NEUTRAL ON PURPOSE. This page hosts two guests with palettes of
+   their own — the Material showcase on /showcase/, and the three plain
+   examples on /examples/ — and a host with a loud ground makes both of them
+   look like mistakes. The ground here is quiet so that what is embedded in it
+   reads as embedded.
+
+   HOW THE SHOWCASE KEEPS ITS OWN COLOURS. The Tailwind colour utilities are
+   re-pointed at this site's tokens, and `.md3-scope` points them back. One
+   indirection, declared once, in the block that says so below — the showcase
+   is a Material Design 3 application and must go on looking like one, on this
+   site and on its own port, off one token file.
    =========================================================================== */
 @import "tailwindcss";
 @source "../src";
@@ -38,16 +65,211 @@
 @source "../../examples/showcase/src";
 @import "../../examples/showcase/src/md3-tokens.css";
 
+/* ===========================================================================
+   The palette.
+
+   Nine tokens, and every one has a job it does not share. The old palette's
+   defect was not its hues, it was that `--md-primary` was the site's link
+   colour, its button fill, its rail marker, its nav pill, its focus ring and
+   its logo, so nothing it touched meant anything in particular.
+
+   THREE OF THEM ARE LINE WEIGHTS, because lines carry this design:
+   `--wp-line-faint` is a division, `--wp-line` is a boundary something asked
+   for, and `--wp-mark` is a place with a value in it. Empty, drawn, filled.
+   That is the mark's own idea and it is also, exactly, what the runtime
+   reports about every declared path — see `missing()` in
+   packages/waypoint/src/core/runtime/field-coverage.ts.
+
+   Every pair below was measured rather than eyeballed, and the ratio is
+   written next to it. Text pairs clear 4.5:1, boundaries and the focus ring
+   clear 3:1 (WCAG 2.4.11), on BOTH grounds in BOTH schemes.
+   =========================================================================== */
+:root {
+  --wp-paper: #f9f9f7;
+  --wp-sunk: #efefec;
+  --wp-line-faint: #d8dad6;
+  --wp-line: #7b8a85;
+  --wp-ink: #141816;
+  --wp-ink-quiet: #4d5653;
+  --wp-mark: #00695c;
+  --wp-verdict: #a5251d;
+  --wp-measure: #7a5900;
+  color-scheme: light;
+}
+
+/* No toggle, and that is a decision rather than an omission: the Material
+   tokens this site shares with a running application declare their dark ramp
+   inside this very media query, so a manual switch would take the chrome dark
+   and leave the embedded showcase light. The reader's own setting is the one
+   thing both files already agree on. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --wp-paper: #111312;
+    --wp-sunk: #0b0d0c;
+    --wp-line-faint: #2a2e2c;
+    --wp-line: #5d6b67;
+    --wp-ink: #e4e7e5;
+    --wp-ink-quiet: #9ba5a1;
+    --wp-mark: #6fd3bf;
+    --wp-verdict: #ff9b90;
+    --wp-measure: #e6bf6a;
+    color-scheme: dark;
+  }
+}
+
+/* ===========================================================================
+   The utilities, re-pointed.
+
+   The pages are written in Material's utility names — `text-on-surface`
+   appears 47 times, `text-on-surface-variant` 88 — and rewriting every call
+   site would have been a very large diff that changed nothing a reader sees.
+   So the names stay and what they resolve to changes. `@theme inline` emits
+   `var(--wp-…)` into the utility itself, which is what makes the scope below
+   possible: the same class means Material inside the showcase and means this
+   site everywhere else, resolved per element rather than per stylesheet.
+
+   Roles the docs never use — the error containers, `surface-highest`, the
+   secondary and tertiary pairs — are deliberately absent. They stay bound to
+   `--md-*` for the showcase, which is the only thing that asks for them.
+   =========================================================================== */
+@theme inline {
+  --color-surface: var(--wp-paper);
+  --color-on-surface: var(--wp-ink);
+  --color-on-surface-variant: var(--wp-ink-quiet);
+  --color-surface-lowest: var(--wp-paper);
+  --color-surface-low: var(--wp-sunk);
+  --color-surface-container: var(--wp-sunk);
+  --color-surface-high: var(--wp-sunk);
+  --color-outline: var(--wp-line);
+  --color-outline-variant: var(--wp-line-faint);
+  --color-primary: var(--wp-mark);
+  --color-on-primary: var(--wp-paper);
+  --color-primary-container: var(--wp-sunk);
+  --color-on-primary-container: var(--wp-ink);
+  --color-secondary-container: var(--wp-sunk);
+  --color-on-secondary-container: var(--wp-ink);
+  --color-tertiary: var(--wp-measure);
+  --color-error: var(--wp-verdict);
+
+  --font-sans: "Source Serif 4", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "DM Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ONE RADIUS, AND IT IS SMALL. A cut into a page has a corner; a card has a
+     curve. Material's five-step shape scale stays bound for the showcase and
+     is not used by anything this site draws. */
+  --radius-sm: 3px;
+  --radius-md: 3px;
+  --radius-lg: 3px;
+  --radius-xl: 3px;
+}
+
+/* The guest gets its own colours back. Nothing is copied here: each token is
+   pointed at the Material role it stood in for, so the showcase on this page
+   and the showcase on its own port render off one file. */
+.md3-scope {
+  --wp-paper: var(--md-surface);
+  --wp-sunk: var(--md-surface-container-low);
+  --wp-line-faint: var(--md-outline-variant);
+  --wp-line: var(--md-outline);
+  --wp-ink: var(--md-on-surface);
+  --wp-ink-quiet: var(--md-on-surface-variant);
+  --wp-mark: var(--md-primary);
+  --wp-verdict: var(--md-error);
+  --wp-measure: var(--md-tertiary);
+  font-family: Roboto, ui-sans-serif, system-ui, sans-serif;
+}
+/* The four roles the showcase uses that this site has no token for. They are
+   restored by name rather than by indirection, because nothing here stands in
+   for them. */
+.md3-scope {
+  --color-surface-lowest: var(--md-surface-container-lowest);
+  --color-surface-high: var(--md-surface-container-high);
+  --color-primary-container: var(--md-primary-container);
+  --color-on-primary-container: var(--md-on-primary-container);
+  --color-on-primary: var(--md-on-primary);
+  --color-secondary-container: var(--md-secondary-container);
+  --color-on-secondary-container: var(--md-on-secondary-container);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 28px;
+}
+
+/* md3-tokens.css sets these on `body` for the standalone application. On this
+   site the page is not that application. */
+body {
+  background: var(--wp-paper);
+  color: var(--wp-ink);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+}
+
+/* A ring the same weight as the boundaries it lands on, at the one value that
+   clears 3:1 on both grounds. */
+:focus-visible {
+  outline: 2px solid var(--wp-line);
+  outline-offset: 2px;
+}
+
+/* ===========================================================================
+   Serif for what is argued, mono for what is addressed.
+
+   The rule is worth writing down because it decides every call site: a name
+   the reader could type — a path, a hook, a file, a flag, a measured figure —
+   is set in the mono; a sentence making a case for something is set in the
+   serif. This library's product IS a string literal, `form:owner.email`, so
+   the face that draws names is not decoration here.
+
+   Source Serif 4 rather than a grotesque because this site is an argument
+   before it is a manual: eight of its ten pages are prose that has to be read
+   in order. DM Mono rather than the two monos every developer site already
+   wears, and for one reason that is about this library — its colon is a true
+   two-dot mark on the x-height axis rather than a pair of dropped periods,
+   and the colon is the character the addressing scheme turns on.
+
+   The faces are requested in Base.astro. Only /showcase/ asks for Roboto and
+   the icon face, because only /showcase/ draws Material.
+   =========================================================================== */
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+  font-feature-settings: normal;
+}
+
+/* Inline code is a name inside a sentence. It gets the recess, not a border —
+   a boxed word inside running text stops the line. */
+:not(pre) > code {
+  background: var(--wp-sunk);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+  font-size: 0.875em;
+}
+
+a {
+  color: inherit;
+}
+
 /* A code block is read rather than skimmed, and a long type signature must
    never widen the page to reach it. */
 pre {
   overflow-x: auto;
 }
 
-/* The one piece of structure MD3 has no token for: a rule that reads as a
+/* The one piece of structure Material has no token for: a rule that reads as a
    division rather than as a border around something. */
 .hairline {
-  border-top: 1px solid var(--md-outline-variant);
+  border-top: 1px solid var(--wp-line-faint);
 }
 
 /* Astro renders headings inside prose we do not control the markup of, so the
@@ -56,21 +278,62 @@ pre {
   scroll-margin-top: 5rem;
 }
 
-/* The column is wide so that code, diagrams and reference tables have room.
+/* ===========================================================================
+   Two registers.
+
+   The site has two readers and it already half-knew it — a bare frame for the
+   landing page, a documentation shell for everything else. The other half is
+   this: somebody deciding reads once, top to bottom, and needs air; somebody
+   who already decided returns to /api/ or /benchmark/ for ONE fact and needs
+   density and a name they can find.
+
+   So `<main>` carries a register, and the register retunes the rhythm the
+   whole stylesheet already runs on plus the face its headings are set in.
+   Two declarations, five variables. It is deliberately not a second design:
+   the palette, the rules and the measures do not move, so the two kinds of
+   page look like one site that knows which kind it is.
+   =========================================================================== */
+:root {
+  --gap-caption: 0.5rem;
+  --gap-heading: 0.875rem;
+  --gap-block: 1.5rem;
+  --gap-subsection: 2.5rem;
+  --gap-section: 4rem;
+}
+
+main[data-register="finding"] {
+  --gap-heading: 0.625rem;
+  --gap-block: 1rem;
+  --gap-subsection: 1.75rem;
+  --gap-section: 2.75rem;
+}
+/* An entry in a reference is a NAME before it is a heading, and it is looked
+   for rather than read. */
+main[data-register="finding"] :is(h2, h3) {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* ===========================================================================
+   The measure.
+
+   The column is wide so that code, diagrams and reference tables have room.
    Running text must not use all of it: a line of seventy-odd characters is
    read, and a line of a hundred and twenty is scanned and lost. The cap is on
    the text itself rather than on the column, so the two can differ.
 
-   Three measures, because there are now three sizes of running text and a
-   measure counts characters: the lead is set larger and needs fewer of them,
-   a caption is set smaller and has to stay narrower than the block it hangs
-   off or it stops reading as subordinate to it. A label strip is not running
-   text — it is the width of the block it names. */
+   Three measures, because there are three sizes of running text and a measure
+   counts characters: the lead is set larger and needs fewer of them, a caption
+   is set smaller and has to stay narrower than the block it hangs off or it
+   stops reading as subordinate to it. A label strip is not running text — it
+   is the width of the block it names.
+   =========================================================================== */
 main :is(p, li, figcaption) {
-  max-width: 72ch;
+  max-width: 70ch;
 }
 main .lead {
-  max-width: 58ch;
+  max-width: 54ch;
 }
 main .caption {
   max-width: 62ch;
@@ -84,58 +347,43 @@ main .code-label {
    line has to be tracked across by the eye. The unit is ch, so each level
    caps against its own size. */
 main h1 {
+  font-size: 1.875rem;
+  line-height: 1.2;
   max-width: 22ch;
+}
+main[data-register="finding"] h1 {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  max-width: none;
 }
 
 /* ===========================================================================
    Section separation.
 
    A single column with eight headings in it needs the headings to LOOK like
-   eight things. They were the same weight and colour as the body they sat
-   above, with only white space between them — which reads as one document
-   with emphasis in it rather than as a stack of sections.
-
-   A rule, and the heading sitting on it. Not a box and not a number: a box
-   would make a section look like a callout, and numbering claims an order
+   eight things. A rule, and the heading sitting on it — not a box, which would
+   make a section look like a callout, and not a number, which claims an order
    these sections do not have.
+
+   `main > h2, main > section > h2` RATHER THAN `main h2`, and the narrowing is
+   the point: with the example applications now running on /examples/ and
+   /showcase/, `main h2` reached inside them and drew a section divider across
+   the middle of somebody else's form. A page's own sections are its direct
+   children or the direct children of its sections; an island's headings are
+   neither. This also retires a `section[class*="border"]` exception that was
+   carried here for a while and matched nothing.
    =========================================================================== */
-main h2 {
+main > h2,
+main > section > h2 {
+  font-size: 1.375rem;
+  line-height: 1.3;
   padding-top: 1.25rem;
-  border-top: 1px solid var(--md-outline-variant);
-}
-/* An h2 that opens a bordered card is already separated by the card. */
-main :is(.note, section[class*="border"]) h2 {
-  padding-top: 0;
-  border-top: 0;
-}
-main h2 {
+  border-top: 1px solid var(--wp-line);
   max-width: none;
 }
-/* The measure belongs to the words, not to the rule the words sit on. */
-main h2 > span,
-main h2 {
-  text-wrap: balance;
-}
-
-/* ===========================================================================
-   Rhythm.
-
-   Five gaps, no two the same: a caption against its block, a heading against
-   its evidence, one block from the next, a subsection, a section. The pages
-   spell these as utilities and there are only two values among them — 64px at
-   a heading, 12 to 24px everywhere else — which is why a page reads as one
-   column instead of six sections.
-
-   Unlayered element rules, so they win over the mt-* utilities in Tailwind's
-   utilities layer whatever the specificity. The mt-16 and mt-3 left on the
-   pages are inert and can come off in the page pass.
-   =========================================================================== */
-:root {
-  --gap-caption: 0.5rem;
-  --gap-heading: 0.875rem;
-  --gap-block: 1.5rem;
-  --gap-subsection: 2.5rem;
-  --gap-section: 4rem;
+main > h3,
+main > section > h3 {
+  font-size: 1.125rem;
 }
 
 main > :is(h2, section) {
@@ -168,14 +416,13 @@ main :where(.code-block.is-flush) {
    Small type belonging to the block above it: the qualification, the
    provenance line, the thing the evidence cannot say about itself. Attached
    by proximity — the smallest gap on the site above it, an ordinary one
-   below. A caption spaced evenly between two blocks belongs to neither, which
-   is what the site has now.
+   below. A caption spaced evenly between two blocks belongs to neither.
    =========================================================================== */
 .caption {
   margin-top: var(--gap-caption);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   line-height: 1.6;
-  color: var(--md-on-surface-variant);
+  color: var(--wp-ink-quiet);
 }
 .caption + .caption {
   margin-top: 0.25rem;
@@ -185,75 +432,146 @@ main :where(.code-block.is-flush) {
 }
 
 /* The one paragraph a page opens with: larger than body, shorter measure, and
-   still the muted role so the <strong> inside it is where the eye lands. */
+   set in the reading ink rather than the muted one — a lead is the first
+   thing read, and the site had it in the same grey as its footnotes. */
 .lead {
   margin-top: var(--gap-block);
-  font-size: 1.125rem;
-  line-height: 1.7;
-  color: var(--md-on-surface-variant);
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: var(--wp-ink);
 }
 
-/* One micro-label: a column header, a code block's strip, the name over a
-   returns table. Told apart by case and tracking rather than by weight or a
-   filled band — a heavy row at the top of a dense table reads as data. */
+/* ===========================================================================
+   The label, and its colon.
+
+   One micro-label with four jobs: a column header, a code block's strip, the
+   name over a returns table, a group name in the index. It used to be 11px
+   uppercase with letter-spacing — the stock developer-docs micro-label, and
+   worse than stock here, because the strings it sets are FILE NAMES: it
+   rendered `AField.tsx` as AFIELD.TSX, a name a reader could no longer type.
+   The transform is gone; the face does the work instead.
+
+   THE GRAMMAR IS `qualifier: value`, which is the punctuation this library
+   sells. `file: AField.tsx`, `shell: install`, `app: application-form`. The
+   qualifier is quiet, the colon is the mark, the value is ink — the same
+   three ranks a rendered address has. Anything written without a colon still
+   sets correctly; the grammar is rewarded, not required.
+   =========================================================================== */
+.label,
+main thead th {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--wp-ink-quiet);
+}
+.label > .qualifies {
+  color: var(--wp-ink-quiet);
+}
+.label > .colon {
+  color: var(--wp-mark);
+}
+.label > .named {
+  color: var(--wp-ink);
+}
+
 /* ===========================================================================
    Note.
 
    A qualification the reader must not skim past — the one a section cannot
    make in passing. An accent edge rather than a full border: a box outlined on
    four sides reads as a component, and this is a paragraph with a raised
-   voice.
+   voice. The edge is the boundary line, not the mark: a note is not a place
+   with a value in it.
    =========================================================================== */
 .note {
   margin-top: var(--gap-block);
-  border-left: 3px solid var(--md-primary);
-  background: var(--md-surface-container-low);
-  border-radius: 0 0.5rem 0.5rem 0;
-  padding: 1rem 1.25rem;
-  font-size: 0.875rem;
-  line-height: 1.65;
+  border-left: 2px solid var(--wp-line);
+  background: var(--wp-sunk);
+  border-radius: 0 3px 3px 0;
+  padding: 0.9rem 1.15rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
 }
 .note > :first-child {
   margin-top: 0;
 }
 
-.label,
-main thead th {
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--md-on-surface-variant);
+/* ===========================================================================
+   The place you are in.
+
+   TWO MARKERS, TWO CLAIMS, and they must not look like one thing. The index
+   on the left says which PAGE this is; the rail on the right says how far
+   into it the reader has got.
+
+   The index uses the mark's own geometry, and it is the only place on the
+   site that does. A diamond in the gutter: hollow when the pointer is on a
+   link, filled when the link is the page you are on. That is the library's
+   sentence — the place is there before the value arrives in it — said once,
+   about one control, instead of a filled pill that says nothing and could sit
+   on any site. One glyph, one job: it is rare, which is what lets the
+   difference between empty and filled read at all.
+   =========================================================================== */
+.index-link {
+  position: relative;
+  display: block;
+  padding: 0.15rem 0 0.15rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--wp-ink-quiet);
+}
+.index-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.62em;
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  border: 1px solid transparent;
+  background: none;
+}
+.index-link:hover,
+.index-link:focus-visible {
+  color: var(--wp-ink);
+}
+.index-link:hover::before,
+.index-link:focus-visible::before {
+  border-color: var(--wp-line);
+}
+.index-link[aria-current="page"] {
+  color: var(--wp-ink);
+}
+.index-link[aria-current="page"]::before {
+  border-color: var(--wp-mark);
+  background: var(--wp-mark);
 }
 
-/* ===========================================================================
-   The section the reader is in.
+/* The rail's marker is keyed to `aria-current` and to nothing else. The
+   script sets one attribute, so what a screen reader announces and what an
+   eye sees are the same fact — a class toggled alongside the attribute would
+   be a second copy of it, and two copies of one fact are two chances to
+   disagree.
 
-   Keyed to `aria-current` and to nothing else. The rail's script sets one
-   attribute, so what a screen reader announces and what an eye sees are the
-   same fact — a class toggled alongside the attribute would be a second copy
-   of it, and two copies of one fact are two chances to disagree.
-
-   `location` rather than `page`: the left nav marks which page this is, and
-   this marks how far into it the reader has got. Two different claims, so two
-   different marks — a lit segment of the list's own rule here, the nav's
-   filled pill there.
-   =========================================================================== */
+   `location` rather than `page`, and a lit segment of the list's own rule
+   rather than the index's diamond, because it is the other claim. */
 #on-this-page a[aria-current] {
-  border-left-color: var(--md-primary);
-  color: var(--md-on-surface);
-  font-weight: 500;
+  border-left-color: var(--wp-mark);
+  color: var(--wp-ink);
 }
 
 /* ===========================================================================
    Reference tables.
 
-   The densest thing on the site, set until now at body leading. A table is
-   read across a row and down a column, never in sentences: the type steps
-   down to the caption size, the leading to 1.5, and row padding becomes one
-   number in one place rather than py-2 / py-2.5 / py-3 across seven
-   components. Figures line up because half these columns are integers meant
-   to be compared down the column.
+   The densest thing on the site. A table is read across a row and down a
+   column, never in sentences: the type steps down, the leading to 1.5, and
+   row padding is one number in one place rather than py-2 / py-2.5 / py-3
+   across seven components.
+
+   FIGURES ARE RIGHT-ALIGNED, and that rather than the numerals is what keeps
+   a column of measured microseconds comparable down its length — tabular
+   figures line the digits up, alignment is what puts the units under the
+   units.
    =========================================================================== */
 main table {
   width: 100%;
@@ -266,8 +584,22 @@ main :is(th, td) {
   vertical-align: top;
 }
 /* The header is a different kind of row and has to look like one: the rule
-   under it is the page's ink, the rules between rows are the faint one. */
+   under it is the boundary line, the rules between rows are the faint one. */
 main thead th {
   padding-bottom: 0.4rem;
-  border-bottom: 1px solid var(--md-on-surface-variant);
+  border-bottom: 1px solid var(--wp-line);
+}
+main .num {
+  font-family: var(--font-mono);
+  text-align: right;
+}
+/* A figure the project measured, and only that. Never a count in a sentence,
+   never a version, never a date. */
+main .measured {
+  color: var(--wp-measure);
+}
+/* A judgement the library made: an issue, a refused submit, a struck-through
+   capability. */
+main .verdict {
+  color: var(--wp-verdict);
 }

@@ -36,6 +36,30 @@ interface Props {
 const { title, description, bare = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 
+// TWO REGISTERS, AND THE LIST LIVES HERE RATHER THAN IN A PROP. A page that
+// is returned to for one fact is set denser and heads its entries in the mono
+// — see the register block in styles.css. Which pages those are is one fact
+// about the site, and one fact belongs in one place: a prop would put it in
+// ten files that can come to disagree with each other.
+const FINDING = ["/api/", "/benchmark/"];
+
+// Material Design 3 arrives on exactly one page, because exactly one page
+// mounts the showcase. Roboto and the icon face are ITS typefaces: requested
+// here they were downloaded by all ten pages and painted on one. Three files
+// on nine pages, for nothing.
+const MATERIAL = ["/showcase/"];
+
+const register = FINDING.includes(Astro.url.pathname) ? "finding" : "reading";
+const material = MATERIAL.includes(Astro.url.pathname);
+
+// The docs faces, requested as one stylesheet. Source Serif 4 for what is
+// argued, DM Mono for what is addressed — the rule is written down in
+// styles.css because it decides every call site.
+const FACES =
+  "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap";
+const MATERIAL_FACES =
+  "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&family=Roboto:wght@400;500;700&display=swap";
+
 // Grouped, because seven flat links is a list and three groups of two or
 // three is a structure. The labels say what a reader wants, not what the
 // pages are about.
@@ -88,13 +112,8 @@ const flat = SECTIONS.flatMap((section) => section.items);
     <link rel="sitemap" href="/sitemap-index.xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Roboto and the icon face are the showcase's, and the showcase runs on
-         /showcase/. Noto Sans JP stood here from when this site was written in
-         Japanese and nothing on it has needed the face since. -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&family=Roboto:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href={FACES} rel="stylesheet" />
+    {material && <link href={MATERIAL_FACES} rel="stylesheet" />}
   </head>
 
   <body class="bg-surface text-on-surface">
@@ -104,25 +123,48 @@ const flat = SECTIONS.flatMap((section) => section.items);
       <div
         class="mx-auto flex max-w-[92rem] items-center gap-6 px-4 py-3 sm:px-6"
       >
-        <!-- The mark carries `alt=""` on purpose: the link already says
-             "waypoint", and a second accessible name on one link is one more
-             thing a screen reader reads out for no gain. -->
+        <!-- THE MARK IS DRAWN HERE RATHER THAN LINKED, and the difference is
+             the theme: `favicon.svg` hard-codes two hexes, which is correct
+             for a browser tab — a tab icon has no page to take its colours
+             from — and wrong on a page that has two schemes. Inline, the
+             stroke and the dot are `currentColor` and the tile is dropped:
+             the rounded tile exists so the mark survives browser chrome, and
+             on a page with its own ground it is a sticker.
+
+             `aria-hidden` on purpose: the link already says "waypoint", and a
+             second accessible name on one link is one more thing a screen
+             reader reads out for no gain. -->
         <a
           href="/"
-          class="flex shrink-0 items-center gap-2 text-sm font-medium tracking-wide text-primary"
-          ><img src="/favicon.svg" alt="" width="20" height="20" />waypoint</a
+          class="flex shrink-0 items-center gap-2 font-mono text-sm font-medium text-on-surface"
         >
+          <svg
+            aria-hidden="true"
+            width="17"
+            height="17"
+            viewBox="0 0 32 32"
+            fill="none"
+          >
+            <path
+              d="M16 4 28 16 16 28 4 16Z"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linejoin="round"></path>
+            <circle cx="16" cy="16" r="3.2" fill="currentColor"></circle>
+          </svg>waypoint
+        </a>
         <!-- Below lg the index is not on the page, so the sections live here
              and wrap rather than scroll: a link you have to scroll to is a
              link nobody finds. -->
         <nav
-          class="flex flex-1 flex-wrap gap-x-4 gap-y-1 text-sm lg:hidden"
+          class="flex flex-1 flex-wrap gap-x-4 gap-y-1 font-mono text-[0.8125rem] lg:hidden"
           aria-label="Sections"
         >
           {
             flat.slice(1).map((item) => (
               <a
                 href={item.href}
+                aria-current={here === item.href ? "page" : undefined}
                 class:list={[
                   "underline-offset-4 hover:underline",
                   here === item.href ? "text-on-surface" : "text-on-surface-variant",
@@ -134,7 +176,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
           }
         </nav>
         <a
-          class="ml-auto hidden text-sm text-on-surface-variant underline-offset-4 hover:underline lg:block"
+          class="ml-auto hidden font-mono text-[0.8125rem] text-on-surface-variant underline-offset-4 hover:underline lg:block"
           href="https://github.com/maroonedog/waypoint">GitHub</a
         >
       </div>
@@ -142,7 +184,10 @@ const flat = SECTIONS.flatMap((section) => section.items);
 
     {
       bare ? (
-        <main class="mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-24">
+        <main
+          data-register={register}
+          class="mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-24"
+        >
           <slot />
         </main>
       ) : (
@@ -157,15 +202,16 @@ const flat = SECTIONS.flatMap((section) => section.items);
                 <ul class="mt-2 grid gap-0.5">
                   {section.items.map((item) => (
                     <li>
+                      {/* The one place the mark's geometry is used. Hollow on
+                          hover, filled on the page you are on — the place is
+                          drawn before the value arrives in it, which is the
+                          sentence this library is. It replaces a filled pill
+                          that said nothing and could have sat on any site.
+                          See `.index-link` in styles.css. */}
                       <a
                         href={item.href}
                         aria-current={here === item.href ? "page" : undefined}
-                        class:list={[
-                          "-ml-3 block rounded-md px-3 py-1 text-[0.8125rem]",
-                          here === item.href
-                            ? "bg-secondary-container font-medium text-on-secondary-container"
-                            : "text-on-surface-variant hover:text-on-surface",
-                        ]}
+                        class="index-link"
                       >
                         {item.label}
                       </a>
@@ -176,7 +222,10 @@ const flat = SECTIONS.flatMap((section) => section.items);
             ))}
           </nav>
 
-          <main class="min-w-0 max-w-[54rem] pt-16 pb-20 lg:pt-10">
+          <main
+            data-register={register}
+            class="min-w-0 max-w-[54rem] pt-16 pb-20 lg:pt-10"
+          >
             <slot />
           </main>
 
@@ -213,12 +262,30 @@ const flat = SECTIONS.flatMap((section) => section.items);
         bare ? "mx-auto max-w-5xl" : "mx-auto max-w-[92rem] lg:pl-[14.5rem]",
       ]}
     >
-      <div class="hairline pt-8">
+      <!-- THE STATUS LINE IS THE POINT OF THIS FOOTER. Most library footers
+           carry a version and a download count; this one has neither to carry,
+           and saying so in the chrome of every page is more useful to a reader
+           deciding than another link would be. It is set in the site's own
+           label grammar — `qualifier: value`, the punctuation the library
+           sells — so the footer demonstrates it rather than describing it. -->
+      <div
+        class="hairline flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 pt-8"
+      >
         <p class="caption">
           MIT licensed. Two resolvers ship — zod and{" "}
-          <a class="text-primary underline underline-offset-4" href="https://luq.dev">luq</a> —
-          and they reach the contract by different roads: one is walked
+          <a class="underline decoration-outline underline-offset-4" href="https://luq.dev"
+            >luq</a
+          > — and they reach the contract by different roads: one is walked
           directly, the other is asked for a JSON Schema.
+        </p>
+        <p class="label shrink-0">
+          <span class="qualifies">status</span><span class="colon">:</span>{" "}
+          <span class="named">unpublished</span>
+          <span class="px-2 text-outline">·</span>
+          <a
+            class="named underline decoration-outline underline-offset-4"
+            href="https://github.com/maroonedog/waypoint">GitHub</a
+          >
         </p>
       </div>
     </footer>
@@ -267,7 +334,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
               // a screen reader announces and the marker an eye sees cannot
               // come to disagree.
               link.className =
-                "-ml-px block border-l-2 border-transparent pl-3 text-[0.8125rem] leading-snug text-on-surface-variant hover:text-on-surface";
+                "-ml-px block border-l-2 border-transparent pl-3 font-mono text-[0.75rem] leading-snug text-on-surface-variant hover:text-on-surface";
               item.appendChild(link);
               rail.appendChild(item);
             });

@@ -1,11 +1,26 @@
 ---
 // ===========================================================================
-// Code.astro — a code block on its own surface.
+// Code.astro — a code block cut into the page.
 //
 // Astro ships Shiki, so the highlighting is done at build time and the page
 // carries no syntax-highlighting JavaScript. The theme follows the reader's
 // colour scheme rather than being pinned to one, because a dark block on a
 // light page is the thing people complain about.
+//
+// WHAT CHANGED, and why it mattered more than anything else on the site. This
+// block is what a reader of a library's documentation actually looks at, and
+// it was the one region of the page whose colours the site did not own: the
+// GitHub themes brought their own grey ground, so a code block sat on the page
+// as a foreign rectangle rather than as a recess in it. Now the ground and the
+// frame are the site's — `--wp-sunk` behind a `--wp-line` boundary, the same
+// 1px line every other edge on the site is drawn with — and Shiki is left to
+// colour the tokens and nothing else.
+//
+// THE LABEL IS A QUALIFIED NAME. `file: AField.tsx`, `shell: install`,
+// `app: application-form` — the qualifier quiet, the colon in the mark, the
+// name in ink. It is the punctuation the library sells, so the chrome writes
+// what the product writes. A label with no colon still sets correctly; the
+// grammar is rewarded, not required.
 // ===========================================================================
 import { Code as Shiki } from "astro:components";
 
@@ -24,55 +39,83 @@ interface Props {
    * section can be a heading and a block of code: the sentence above that
    * only said what the code was becomes the strip. Anything longer than a few
    * words was never a label and belongs under the block as a caption.
+   *
+   * Written as `qualifier: name` it is typeset in three ranks; written as a
+   * bare string it is typeset as the name alone.
    */
   readonly label?: string;
 }
 
 const { code, lang = "ts", flush = false, label } = Astro.props;
+
+// Split on the FIRST colon only: `shell: npm run example:wizard` qualifies
+// with "shell" and names the rest, which is the reading a reader gives it.
+const cut = label === undefined ? -1 : label.indexOf(":");
+const qualifies = cut > 0 ? label!.slice(0, cut) : undefined;
+const named = cut > 0 ? label!.slice(cut + 1).trim() : label;
 ---
 
-<figure class:list={["code-block overflow-hidden rounded-lg", flush && "is-flush"]}>
-  {label !== undefined && <figcaption class="label code-label">{label}</figcaption>}
+<figure class:list={["code-block", flush && "is-flush"]}>
+  {
+    label !== undefined && (
+      <figcaption class="label code-label">
+        {qualifies !== undefined && (
+          <>
+            <span class="qualifies">{qualifies}</span>
+            <span class="colon">:</span>{" "}
+          </>
+        )}
+        <span class="named">{named}</span>
+      </figcaption>
+    )
+  }
   <Shiki
     code={code.trim()}
     lang={lang}
-    themes={{ light: "github-light", dark: "github-dark-dimmed" }}
+    themes={{ light: "vitesse-light", dark: "vitesse-dark" }}
     defaultColor={false}
   />
 </figure>
 
 <style is:global>
+  /* THE BLOCK IS A RECESS, NOT A CARD: a 1px boundary and a ground one step
+     under the page, with no shadow and the site's one radius. */
+  .code-block {
+    overflow: hidden;
+    border: 1px solid var(--wp-line);
+    border-radius: 3px;
+    background: var(--wp-sunk);
+  }
+
   /* Shiki writes both themes as custom properties; this picks one without a
-     second stylesheet and without any script. */
+     second stylesheet and without any script.
+
+     THE BACKGROUND IS DELIBERATELY NOT TAKEN FROM THE THEME. `--shiki-*-bg`
+     is the theme author's ground, and taking it put a second palette on the
+     page — the one region whose colour the site did not choose. Tokens are
+     Shiki's business; the surface under them is the site's. */
   .astro-code,
   .astro-code span {
     color: var(--shiki-light);
-    background-color: var(--shiki-light-bg);
   }
   @media (prefers-color-scheme: dark) {
     .astro-code,
     .astro-code span {
       color: var(--shiki-dark);
-      background-color: var(--shiki-dark-bg);
     }
   }
   .astro-code {
-    padding: 1.25rem;
-    font-size: 0.875rem;
-    line-height: 1.7;
-    border-radius: 0.5rem;
+    background: transparent !important;
+    padding: 1.1rem 1.25rem;
+    font-size: 0.8125rem;
+    line-height: 1.75;
   }
 
-  /* The strip is part of the block, not a line above it: one rounded
-     container, a square join, and a surface a step off the page so it reads
-     as attached to the code rather than floating over it. Its type is
-     .label — a column header, a returns label and this are one role. */
+  /* The strip is part of the block, not a line above it: one container, a
+     rule between the two halves rather than a second surface, so the name
+     reads as attached to the code rather than floating over it. */
   .code-label {
-    padding: 0.5rem 1.25rem;
-    background: var(--md-surface-container);
-  }
-  .code-block:has(.code-label) .astro-code {
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+    padding: 0.45rem 1.25rem;
+    border-bottom: 1px solid var(--wp-line-faint);
   }
 </style>

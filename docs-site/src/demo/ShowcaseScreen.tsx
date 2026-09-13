@@ -27,7 +27,14 @@ export default function ShowcaseScreen(): ReactElement {
   const [submitted, setSubmitted] = useState<unknown>(undefined);
 
   return (
-    <div className="rounded-lg border border-outline-variant bg-surface-low p-4 sm:p-6">
+    // `md3-scope` IS WHAT KEEPS THIS A MATERIAL SCREEN. The documentation site
+    // re-points Tailwind's colour utilities at its own tokens, and this class
+    // points them back — so `bg-surface-high` inside here means what it means
+    // in the application, and the same class outside here means what it means
+    // on this site. One indirection, declared once in styles.css, so the
+    // screen on this page and the screen on its own port render off one token
+    // file rather than off two copies that drift.
+    <div className="md3-scope rounded-lg border border-outline-variant bg-surface-low p-4 sm:p-6">
       {submitted === undefined ? null : (
         <div className="mb-4 rounded-lg bg-primary-container p-5 text-on-primary-container">
           <h3 className="mb-2 flex items-center gap-2 text-base font-medium">
