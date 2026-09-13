@@ -15,7 +15,7 @@
 // ===========================================================================
 import type { FormAdapter } from "@maroonedog/waypoint";
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: FormAdapter<unknown, string>;
   }

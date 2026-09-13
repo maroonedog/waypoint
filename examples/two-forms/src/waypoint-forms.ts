@@ -17,7 +17,7 @@ import { adminSchema, customerSchema } from "./schema.js";
 const customerAdapter = zodFormResolver(customerSchema);
 const adminAdapter = zodFormResolver(adminSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     customer: typeof customerAdapter;
     admin: typeof adminAdapter;

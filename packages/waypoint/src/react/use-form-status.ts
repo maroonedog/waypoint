@@ -16,7 +16,7 @@
 // ===========================================================================
 import { useCell } from "./use-cell.js";
 import { useFormHandle } from "./use-form.js";
-import type { FormKey } from "./waypoint-forms.js";
+import type { FormKey } from "../contract/index.js";
 
 export interface FormStatus {
   /** Issues that currently block a submit; a dormant subtree is excluded. */

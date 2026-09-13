@@ -27,3 +27,43 @@ export type {
   PollableAbortSignal,
   ValidationSignal,
 } from "./validation-signal.types.js";
+// ---------------------------------------------------------------------------
+// The registry, and the path types an application reads out of it.
+//
+// IT LIVES IN THE ROOT ENTRY AND NOT IN `./react`, and the move is what lets a
+// second framework exist at all. An augmentation names a MODULE, so declaring
+// it on `@maroonedog/waypoint/react` made the registry React's: a Vue binding
+// would have had to own a second one, and a design-system component taking
+// `FormPathTo<string>` would read a different interface depending on which
+// framework compiled it. One application, two registries, and a shared leaf
+// that cannot be shared.
+//
+// The root entry is where `FormAdapter` is declared, and the registry is a map
+// of names to adapters — so this is the entry it was always about. `./react`
+// re-exports every name below, because a React file reaching for a path type
+// should not have to know where the declaration sits.
+// ---------------------------------------------------------------------------
+export type {
+  AnyCode,
+  AnyPath,
+  AnyValues,
+  ArrayPath,
+  CodesAtFormPath,
+  CodesFor,
+  FormColumnPath,
+  FormDeclaredPath,
+  FormKey,
+  FormKeyOfPath,
+  FormListPath,
+  FormLocalPath,
+  FormPath,
+  FormPathOver,
+  FormPathTo,
+  InhabitedFormPath,
+  PathsFor,
+  ValueAtFormPath,
+  ValueOfPath,
+  ValuesAtFormPath,
+  ValuesFor,
+  WaypointForms,
+} from "./waypoint-forms.js";

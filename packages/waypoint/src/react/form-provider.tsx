@@ -51,7 +51,7 @@ import { IssueVisibilityContext } from "./issue-visibility-context.js";
 import type { IssueVisibility } from "./issue-visibility.js";
 import { FormMessageContext } from "./form-message-context.js";
 import type { AnyFormMessageFor, FormMessageFor } from "./form-message.js";
-import type { AnyCode, FormKey } from "./waypoint-forms.js";
+import type { AnyCode, FormKey } from "../contract/index.js";
 
 export interface FormProviderProps<T, TPath extends string> {
   readonly form: FormHandle<T, TPath>;

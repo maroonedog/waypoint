@@ -15,7 +15,7 @@ import type {
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
-} from "./waypoint-forms.js";
+} from "../contract/index.js";
 
 export function useFieldValue<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>

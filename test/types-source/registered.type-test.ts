@@ -34,7 +34,7 @@ const orderAdapter = zodFormResolver(
   })
 );
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof orderAdapter;
   }

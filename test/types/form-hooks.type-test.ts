@@ -48,7 +48,7 @@ const orderAdapter = zodFormResolver(orderSchema);
 const profileAdapter = zodFormResolver(profileSchema);
 
 // The application's one registration, which nothing below imports.
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof orderAdapter;
     profile: typeof profileAdapter;

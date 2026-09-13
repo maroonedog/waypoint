@@ -44,7 +44,7 @@ import type {
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
-} from "./waypoint-forms.js";
+} from "../contract/index.js";
 
 export interface FieldProps<Q extends FormPath> {
   /**

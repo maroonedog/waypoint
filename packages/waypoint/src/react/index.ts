@@ -42,30 +42,37 @@
 // ===========================================================================
 export { FormContext } from "./form-context.js";
 export { DEFAULT_FORM_KEY, FormKeyContext } from "./form-key-context.js";
+// RE-EXPORTED, NOT DECLARED. The registry and the path types read out of it
+// live in the root entry, because an augmentation names a MODULE and one
+// declared here would have been React's — a second framework's bindings
+// would have needed a registry of their own, and a component taking
+// `FormPathTo<string>` would read a different interface depending on which
+// one compiled it. These names are here so a React file does not have to
+// know that; `declare module` goes on `@maroonedog/waypoint`.
 export type {
+  AnyCode,
   AnyPath,
   AnyValues,
   ArrayPath,
+  CodesAtFormPath,
+  CodesFor,
   FormColumnPath,
   FormDeclaredPath,
   FormKey,
   FormKeyOfPath,
   FormListPath,
   FormLocalPath,
-  AnyCode,
-  CodesAtFormPath,
-  CodesFor,
   FormPath,
   FormPathOver,
   FormPathTo,
-  WaypointForms,
   InhabitedFormPath,
   PathsFor,
   ValueAtFormPath,
   ValueOfPath,
   ValuesAtFormPath,
   ValuesFor,
-} from "./waypoint-forms.js";
+  WaypointForms,
+} from "../contract/index.js";
 export { FormProvider, type FormProviderProps } from "./form-provider.js";
 export { useCreateForm } from "./use-create-form.js";
 export { useForm, useFormHandle } from "./use-form.js";

@@ -36,7 +36,7 @@ cd waypoint && npm install && npm run verify
 // src/waypoint-forms.ts — one declaration, one time, for the whole application.
 const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms { form: typeof orderAdapter }
 }
 ```
@@ -207,12 +207,12 @@ The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 
 | Entry | What it is |
 |---|---|
-| `@maroonedog/waypoint` | The contract and the path types. One runtime export, `isPending`. |
+| `@maroonedog/waypoint` | The contract, the **registry** and the path types read out of it. One runtime export, `isPending`. |
 | `@maroonedog/waypoint/resolver-standard` | Describes and judges **any** validator implementing Standard Schema and its JSON Schema companion. No vendor named in it. |
 | `@maroonedog/waypoint/resolver-zod` | The above, plus the three facts zod's own JSON Schema does not carry about zod. |
 | `@maroonedog/waypoint/resolver-luq` | The above, plus [luq](https://luq.dev)'s issue codes and severities, which the spec has no member for. |
 | `@maroonedog/waypoint/core` | The runtime. No React, no validator, no DOM. |
-| `@maroonedog/waypoint/react` | React bindings. |
+| `@maroonedog/waypoint/react` | React bindings. It re-exports the path types, and declares none of them. |
 | `@maroonedog/waypoint/store-zustand` | A zustand store, as a shipped instance of the store contract `./core` exports. |
 
 They are entry points rather than packages because they all install together

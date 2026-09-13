@@ -9,7 +9,7 @@ import { bookingSchema } from "./schema.js";
 
 const bookingAdapter = zodFormResolver(bookingSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof bookingAdapter;
   }

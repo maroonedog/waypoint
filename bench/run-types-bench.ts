@@ -118,7 +118,7 @@ gated**. §6 is the measurement behind that decision.
 temporary directory and compiles it with \`tsc --extendedDiagnostics --noEmit\`.
 Each program holds a root type of the stated shape, a
 \`FormAdapter<Root, FieldPath<Root>>\`, the
-\`declare module "@maroonedog/waypoint/react"\`
+\`declare module "@maroonedog/waypoint"\`
 augmentation that registers it, and one addressing call per leaf — \`useField\`
 for a place and \`useFieldValues\` for a rule, which is how the library itself
 divides them. Every call is written QUALIFIED — \`useField("form:a.b")\` — which

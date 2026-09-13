@@ -50,7 +50,7 @@ const schema = z.object({
 
 const adapter = zodFormResolver(schema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     containers: typeof adapter;
   }

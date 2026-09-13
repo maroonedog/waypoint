@@ -31,7 +31,7 @@ const SCHEMA = z
 const ADAPTER = zodFormResolver(SCHEMA);
 
 // The one declaration that types every path below. Nothing imports it.
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof ADAPTER;
   }

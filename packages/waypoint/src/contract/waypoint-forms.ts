@@ -7,7 +7,7 @@
 // once in its own source, and every hook reads them from here — so a component
 // ten levels down imports nothing, receives nothing, and is still checked.
 //
-//   declare module "@maroonedog/waypoint/react" {
+//   declare module "@maroonedog/waypoint" {
 //     interface WaypointForms {
 //       form: typeof orderAdapter;
 //     }
@@ -86,14 +86,16 @@
 // empty, which is why this branch is here rather than in `InhabitedPath`,
 // which knows nothing about forms.
 // ===========================================================================
+// Siblings, directly. This file now lives beside them, and reaching for the
+// barrel it is itself exported from would be a cycle.
 import type {
   ConcretePath,
   DeclaredOf,
-  FormAdapter,
-  InhabitedPath,
   PartlyBoundPath,
-  ValueAtPath,
-} from "../contract/index.js";
+} from "./addressable-path.types.js";
+import type { FormAdapter } from "./form-adapter.types.js";
+import type { InhabitedPath } from "./inhabited-path.types.js";
+import type { ValueAtPath } from "./value-at-path.types.js";
 
 /** Augmented by the application. Empty here, on purpose. */
 export interface WaypointForms {}
@@ -112,7 +114,7 @@ export interface WaypointForms {}
  * where they are standing when they need it.
  */
 type NoRegistration =
-  'No form type is registered. Add: declare module "@maroonedog/waypoint/react" { interface WaypointForms { form: typeof yourAdapter } } — then a path is spelled "form:owner.email".';
+  'No form type is registered. Add: declare module "@maroonedog/waypoint" { interface WaypointForms { form: typeof yourAdapter } } — then a path is spelled "form:owner.email".';
 
 /**
  * Every key the application registered.

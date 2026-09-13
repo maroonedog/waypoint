@@ -105,7 +105,7 @@ ${shape.declarations}
 
 declare const adapter: FormAdapter<${shape.rootName}, FieldPath<${shape.rootName}>>;
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof adapter;
   }

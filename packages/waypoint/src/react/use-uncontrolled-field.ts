@@ -65,7 +65,7 @@ import type {
   FormPath,
   InhabitedFormPath,
   ValueAtFormPath,
-} from "./waypoint-forms.js";
+} from "../contract/index.js";
 
 /** The same coercion buildInputProps applies, so both hooks agree on empty. */
 const displayValue = (value: unknown): string =>

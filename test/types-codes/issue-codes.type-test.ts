@@ -35,7 +35,7 @@ const plainSchema = z.object({ nickname: z.string().min(2) });
 const orderAdapter = zodFormResolver(orderSchema);
 const plainAdapter = standardFormResolver(plainSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     coded: typeof orderAdapter;
     uncoded: typeof plainAdapter;

@@ -36,7 +36,7 @@ const whole = `
 const orderAdapter = zodFormResolver(orderSchema);
 
 // 2. Its types, registered once for the whole application.
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms { form: typeof orderAdapter }
 }
 
@@ -369,8 +369,9 @@ const TRY = [
     </p>
 
     <p class="note">
-      <strong>What it costs.</strong> One <code>declare module "@maroonedog/waypoint/react"</code>{" "}
-      block that has to stay inside <code>tsconfig</code>'s <code>include</code> —
+      <strong>What it costs.</strong> One <code>declare module "@maroonedog/waypoint"</code>{" "}
+      block — on the ROOT entry rather than on a framework's, so one registry
+      serves every binding — that has to stay inside <code>tsconfig</code>'s <code>include</code> —
       delete it and every call site stops compiling, which is the failure
       direction you want. Two limits with it: register a second form and a
       keyless <code>useField</code> is checked against the union of both until

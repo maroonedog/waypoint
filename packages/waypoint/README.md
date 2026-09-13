@@ -24,7 +24,7 @@ import { orderSchema } from "./order-schema.js";
 
 export const orderAdapter = zodFormResolver(orderSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof orderAdapter;
   }
@@ -43,7 +43,7 @@ at all, and `./react` is the only entry whose built output names React.
 
 | Entry | What you import from it |
 |---|---|
-| `@maroonedog/waypoint` | The contract and the path types: `FormAdapter`, `FormIssue`, `FieldPath`, `ConcretePath`, `PartlyBoundPath`, `InhabitedPath`. One runtime export, `isPending`. |
+| `@maroonedog/waypoint` | The contract, the registry and the path types: `FormAdapter`, `FormIssue`, `WaypointForms`, `FormPath`, `FormPathTo`, `FieldPath`, `ConcretePath`. **`declare module` goes here.** One runtime export, `isPending`. |
 | `@maroonedog/waypoint/core` | The runtime: `createForm`, `createCellStore`, `assertFormStoreContract`. No React, no validator, no DOM. |
 | `@maroonedog/waypoint/react` | `useField`, `useRows`, `useFormStatus`, `FormProvider`, `<Field>`, `<AutoForm>`. |
 | `@maroonedog/waypoint/resolver-standard` | `standardFormResolver` — any validator that implements Standard Schema and its JSON Schema companion. Names no vendor. |

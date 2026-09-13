@@ -16,7 +16,7 @@ gated**. §6 is the measurement behind that decision.
 temporary directory and compiles it with `tsc --extendedDiagnostics --noEmit`.
 Each program holds a root type of the stated shape, a
 `FormAdapter<Root, FieldPath<Root>>`, the
-`declare module "@maroonedog/waypoint/react"`
+`declare module "@maroonedog/waypoint"`
 augmentation that registers it, and one addressing call per leaf — `useField`
 for a place and `useFieldValues` for a rule, which is how the library itself
 divides them. Every call is written QUALIFIED — `useField("form:a.b")` — which
@@ -52,8 +52,8 @@ can put them back.
 
 | program | instantiations | types | Check time | Memory used |
 |---|---|---|---|---|
-| `empty` — lib.d.ts and nothing else | 0 | 85 | 0.00s | 78 MB |
-| `packages-only` — both packages imported, no shape | 10,604 | 6,770 | 0.65s | 96 MB |
+| `empty` — lib.d.ts and nothing else | 0 | 85 | 0.00s | 77 MB |
+| `packages-only` — both packages imported, no shape | 10,604 | 6,770 | 0.56s | 103 MB |
 
 `empty` is what every TypeScript program in the world pays. `packages-only` is
 the `.` and `./react` entries type-checking their own source: an application
@@ -80,22 +80,22 @@ the same program — the two rows reading identically is the control.
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `depth-1-distinct` | 3 | all 3 | 1 | +451 | 150 | 0.72s | +130 | +388 | 129.3 |
-| `depth-1-shared` | 3 | all 3 | 1 | +451 | 150 | 0.58s | +130 | +388 | 129.3 |
-| `depth-2-distinct` | 9 | all 9 | 4 | +1,250 | 139 | 0.54s | +180 | +1,444 | 160.4 |
-| `depth-2-shared` | 9 | all 9 | 2 | +1,116 | 124 | 0.62s | +180 | +1,444 | 160.4 |
-| `depth-3-distinct` | 27 | all 27 | 13 | +3,690 | 137 | 0.64s | +230 | +5,008 | 185.5 |
-| `depth-3-shared` | 27 | all 27 | 3 | +2,888 | 107 | 0.54s | +230 | +4,840 | 179.3 |
-| `depth-4-distinct` | 81 | all 81 | 40 | +11,053 | 136 | 0.61s | +280 | +16,888 | 208.5 |
-| `depth-4-shared` | 81 | all 81 | 4 | +7,981 | 99 | 0.57s | +280 | +16,048 | 198.1 |
-| `depth-5-distinct` | 243 | all 243 | 121 | +33,185 | 137 | 0.60s | +330 | +56,092 | 230.8 |
-| `depth-5-shared` | 243 | all 243 | 5 | +23,037 | 95 | 0.54s | +330 | +53,068 | 218.4 |
-| `depth-6-distinct` | 729 | all 729 | 364 | +99,624 | 137 | 0.67s | +380 | +184,396 | 252.9 |
-| `depth-6-shared` | 729 | all 729 | 6 | +67,982 | 93 | 0.73s | +380 | +174,652 | 239.6 |
-| `depth-7-distinct` | 2187 | all 2187 | 1093 | +298,954 | 137 | 1.94s | +430 | +601,384 | 275.0 |
-| `depth-7-shared` | 2187 | all 2187 | 7 | +202,564 | 93 | 0.80s | +430 | +571,312 | 261.2 |
-| `depth-8-distinct` | 6561 | **0** | 3280 | +301,138 | n/a — none is | 1.17s | +475,034 | +527,514 | 80.4 |
-| `depth-8-shared` | 6561 | **0** | 8 | +202,564 | n/a — none is | 0.80s | +444,962 | +497,442 | 75.8 |
+| `depth-1-distinct` | 3 | all 3 | 1 | +451 | 150 | 0.56s | +130 | +388 | 129.3 |
+| `depth-1-shared` | 3 | all 3 | 1 | +451 | 150 | 0.56s | +130 | +388 | 129.3 |
+| `depth-2-distinct` | 9 | all 9 | 4 | +1,250 | 139 | 0.72s | +180 | +1,444 | 160.4 |
+| `depth-2-shared` | 9 | all 9 | 2 | +1,116 | 124 | 0.55s | +180 | +1,444 | 160.4 |
+| `depth-3-distinct` | 27 | all 27 | 13 | +3,690 | 137 | 0.65s | +230 | +5,008 | 185.5 |
+| `depth-3-shared` | 27 | all 27 | 3 | +2,888 | 107 | 0.71s | +230 | +4,840 | 179.3 |
+| `depth-4-distinct` | 81 | all 81 | 40 | +11,053 | 136 | 0.55s | +280 | +16,888 | 208.5 |
+| `depth-4-shared` | 81 | all 81 | 4 | +7,981 | 99 | 0.65s | +280 | +16,048 | 198.1 |
+| `depth-5-distinct` | 243 | all 243 | 121 | +33,185 | 137 | 0.64s | +330 | +56,092 | 230.8 |
+| `depth-5-shared` | 243 | all 243 | 5 | +23,037 | 95 | 0.61s | +330 | +53,068 | 218.4 |
+| `depth-6-distinct` | 729 | all 729 | 364 | +99,624 | 137 | 0.88s | +380 | +184,396 | 252.9 |
+| `depth-6-shared` | 729 | all 729 | 6 | +67,982 | 93 | 0.74s | +380 | +174,652 | 239.6 |
+| `depth-7-distinct` | 2187 | all 2187 | 1093 | +298,954 | 137 | 1.32s | +430 | +601,384 | 275.0 |
+| `depth-7-shared` | 2187 | all 2187 | 7 | +202,564 | 93 | 1.00s | +430 | +571,312 | 261.2 |
+| `depth-8-distinct` | 6561 | **0** | 3280 | +301,138 | n/a — none is | 1.59s | +475,034 | +527,514 | 80.4 |
+| `depth-8-shared` | 6561 | **0** | 8 | +202,564 | n/a — none is | 0.93s | +444,962 | +497,442 | 75.8 |
 
 **The growth is linear in leaves, not exponential in depth.** Depth is only where the leaves come from. Per addressable leaf the union costs 150 instantiations at depth 1 against 137 at depth 7 — a factor of 0.9 across a shape 729 times larger.
 Distinct subtrees cost 1.48× shared ones at depth 7 and 1.44× at depth 5, which
@@ -113,9 +113,9 @@ That is a fact about mistyped paths in an editor, not about correct code.
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `width-30` | 30 | all 30 | 1 | +2,503 | 83 | 0.45s | +130 | +3,871 | 129.0 |
-| `width-100` | 100 | all 100 | 1 | +7,823 | 78 | 0.48s | +130 | +12,901 | 129.0 |
-| `width-300` | 300 | all 300 | 1 | +23,023 | 77 | 0.81s | +130 | +38,701 | 129.0 |
+| `width-30` | 30 | all 30 | 1 | +2,503 | 83 | 0.50s | +130 | +3,871 | 129.0 |
+| `width-100` | 100 | all 100 | 1 | +7,823 | 78 | 0.49s | +130 | +12,901 | 129.0 |
+| `width-300` | 300 | all 300 | 1 | +23,023 | 77 | 1.23s | +130 | +38,701 | 129.0 |
 
 Flat and linear: 83, 78 and
 77 instantiations per leaf across a tenfold range. Width is
@@ -134,10 +134,10 @@ it there would be measuring a compile error. `record-member` carries a
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `array-declared` | 10 | all 10 | 5 | +3,350 | 335 | 0.53s | +159 | +2,226 | 222.6 |
-| `array-concrete` | 10 | all 10 | 5 | +3,350 | 335 | 0.55s | +159 | +2,165 | 216.5 |
-| `record-member` | 5 | all 5 | 2 | +793 | 159 | 0.49s | +133 | +805 | 161.0 |
-| `self-referential` | 10 | **7** | 1 | +1,637 | 234 | 0.47s | +130 | +2,959 | 295.9 |
+| `array-declared` | 10 | all 10 | 5 | +3,350 | 335 | 5.24s | +159 | +2,226 | 222.6 |
+| `array-concrete` | 10 | all 10 | 5 | +3,350 | 335 | 3.55s | +159 | +2,165 | 216.5 |
+| `record-member` | 5 | all 5 | 2 | +793 | 159 | 0.60s | +133 | +805 | 161.0 |
+| `self-referential` | 10 | **7** | 1 | +1,637 | 234 | 0.57s | +130 | +2,959 | 295.9 |
 
 The two array rows are the same root compiled twice, and their
 `building the union` figures came back identical — so the difference between
@@ -194,8 +194,8 @@ so the value keeps its shape, but the interface extends `ReadonlyMap` — one of
 
 | shape | leaves (counted) | addressable | interfaces | building the union | per addressable leaf | Check time, 0 calls | 1 call | every leaf | per call |
 |---|---|---|---|---|---|---|---|---|---|
-| `depth-6-distinct` | 729 | all 729 | 364 | +99,624 | 137 | 0.67s | +380 | +184,396 | 252.9 |
-| `opaque-2-of-3` | 245 | all 245 | 364 | +35,540 | 145 | 0.55s | +380 | +61,724 | 251.9 |
+| `depth-6-distinct` | 729 | all 729 | 364 | +99,624 | 137 | 0.88s | +380 | +184,396 | 252.9 |
+| `opaque-2-of-3` | 245 | all 245 | 364 | +35,540 | 145 | 2.53s | +380 | +61,724 | 251.9 |
 
 The two rows declare the same
 364 interfaces and carry the same
@@ -221,11 +221,11 @@ measurement rather than an assumption: the same program, 3 separate
 
 | compile | instantiations | types | Check time | Memory used | wall clock |
 |---|---|---|---|---|---|
-| 1 | 99,881 | 9,296 | 0.69s | 108 MB | 1373 ms |
-| 2 | 99,881 | 9,296 | 0.63s | 112 MB | 1308 ms |
-| 3 | 99,881 | 9,296 | 0.63s | 109 MB | 1304 ms |
+| 1 | 99,881 | 9,296 | 1.00s | 109 MB | 1889 ms |
+| 2 | 99,881 | 9,296 | 0.93s | 112 MB | 1958 ms |
+| 3 | 99,881 | 9,296 | 0.91s | 108 MB | 1983 ms |
 
-Instantiations came back identical all 3 times. Check time spread 9.5% over that same identical work, which is why the time columns in this document are context and never an argument.
+Instantiations came back identical all 3 times. Check time spread 9.9% over that same identical work, which is why the time columns in this document are context and never an argument.
 
 **A gate was still not added, and the reason is the compiler rather than the
 machine.** `typescript` is a devDependency at a caret range. The figures here
@@ -318,7 +318,7 @@ union. `test/types-containers/container-shapes.type-test.ts` pins both halves.
 | @types/react | 19.3.0 |
 | machine | AMD Ryzen 7 5825U with Radeon Graphics, 16 cores, 15.3 GB, win32 10.0.26200 |
 | programs compiled | 77 |
-| run took | 2.3 minutes |
+| run took | 3.7 minutes |
 
 **Machine-dependent in the time and memory columns, compiler-dependent in every
 column.** Check time and Memory used move with the machine; instantiations and

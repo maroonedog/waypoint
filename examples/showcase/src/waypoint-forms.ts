@@ -10,7 +10,7 @@ import { applicationSchema } from "./schema.js";
 
 export const applicationAdapter = zodFormResolver(applicationSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof applicationAdapter;
   }

@@ -10,7 +10,7 @@ import { signupSchema } from "./schema.js";
 
 const signupAdapter = zodFormResolver(signupSchema);
 
-declare module "@maroonedog/waypoint/react" {
+declare module "@maroonedog/waypoint" {
   interface WaypointForms {
     form: typeof signupAdapter;
   }

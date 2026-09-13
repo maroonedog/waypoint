@@ -8,7 +8,7 @@
 // ===========================================================================
 import type { ReactElement, ReactNode } from "react";
 import { useRows, type RowsBinding } from "./use-rows.js";
-import type { FormListPath } from "./waypoint-forms.js";
+import type { FormListPath } from "../contract/index.js";
 
 export interface FieldRowsProps<Q extends FormListPath> {
   /**
