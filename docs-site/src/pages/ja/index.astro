@@ -1,0 +1,557 @@
+---
+// ===========================================================================
+// ja/index.astro — / の日本語版。
+//
+// 原文は ../index.astro で、食い違ったときは英語が正です。
+//
+// TRANSLATED, NOT TRANSPOSED. 一文ずつ対応させるのではなく、同じことを日本語で
+// 言い直しています。文の切り方が変わっている箇所はありますが、主張・数値・
+// コード・ライブラリ名・ファイルパスは一つも変えていません。
+//
+// コードは ../../demo/landing-code.ts から来ます。英語版と同じモジュールなので、
+// 訳文の側でコードが古くなることは構造的に起こりません。translate できるのは
+// 文であって、署名ではない。
+//
+// 埋め込まれている5つのデモと下のフォームは、動いているプログラムそのものです。
+// その中のラベルや文言は英語のまま ― プログラムを訳すとそれはもう
+// 「このサイトが動かしているプログラム」ではなくなるからで、ページにもそう
+// 書いてあります。
+// ===========================================================================
+import Base from "../../layouts/Base.astro";
+import Code from "../../components/Code.astro";
+import LiveForm from "../../demo/LiveForm.tsx";
+import Proof from "../../components/Proof.astro";
+import AField from "../../demo/proof/AField.tsx";
+import CrossField from "../../demo/proof/CrossField.tsx";
+import AList from "../../demo/proof/AList.tsx";
+import Uncontrolled from "../../demo/proof/Uncontrolled.tsx";
+import SwitchAStepOff from "../../demo/proof/SwitchAStepOff.tsx";
+import aFieldSource from "../../demo/proof/AField.tsx?raw";
+import crossFieldSource from "../../demo/proof/CrossField.tsx?raw";
+import aListSource from "../../demo/proof/AList.tsx?raw";
+import uncontrolledSource from "../../demo/proof/Uncontrolled.tsx?raw";
+import switchAStepOffSource from "../../demo/proof/SwitchAStepOff.tsx?raw";
+import { clone, whole, snippet } from "../../demo/landing-code.js";
+
+const snippets = [
+  { id: "field", title: "フィールド1つ", note: "読んだセルだけを購読し、それ以外は購読しません。" },
+  { id: "list", title: "リスト", note: "入れ子配列専用の API はありません。" },
+  { id: "cross-field", title: "2フィールドにまたがるルール", note: "deps 配列も依存フィールドの列挙もありません。" },
+  { id: "submit", title: "送信", note: "" },
+  {
+    id: "uncontrolled",
+    title: "React を起こさない",
+    note: "同じセルを、命令的に購読します。1打鍵のコストは 0 コミット。",
+  },
+  {
+    id: "participation",
+    title: "サブツリーをオフにする",
+    note: "submit をブロックしなくなり、入力された値はそのまま残ります。",
+  },
+];
+
+const LIBS = ["@maroonedog/waypoint", "react-hook-form 7.87", "TanStack Form 1.33", "Formik 2.4"];
+
+// セルは tsc 自身の判定であって、誰かのドキュメントから読んだものではありません。
+// 「コンパイルエラー」は tsc がその行を拒否したという事実の訳で、評価ではない。
+const PATHS: readonly (readonly [string, readonly string[]])[] = [
+  [
+    "静的なパスの奥深くのタイポ",
+    ["コンパイルエラー", "コンパイルエラー", "コンパイルエラー", "エラーなし"],
+  ],
+  [
+    "補間された map インデックスの隣のタイポ",
+    ["コンパイルエラー", "コンパイルエラー", "コンパイルエラー", "エラーなし"],
+  ],
+  [
+    "そのフィールドのエラーメッセージを読むときのタイポ",
+    ["コンパイルエラー", "コンパイルエラー（errors オブジェクト上で）", "コンパイルエラー", "エラーなし"],
+  ],
+  [
+    "正しいパス、2階層下のコンポーネント、prop も form オブジェクトも無し",
+    [
+      "検査される。値の型は string | undefined",
+      "エラーなし ― not.a.real.path.at.all も同じくエラーなし",
+      "そこではどのパスもコンパイルできない",
+      "エラーなし ― どんな文字列でも通る",
+    ],
+  ],
+  [
+    "その prop 無しコンポーネントの中でのタイポ",
+    ["コンパイルエラー", "エラーなし", "該当なし ― そこでは何もコンパイルできない", "エラーなし"],
+  ],
+  [
+    "…フォームの型を手で再宣言、あるいは手で通したあと",
+    [
+      "宣言するものが無い。すでに検査されている",
+      "コンパイルエラー（useFormContext<Order>() 経由）",
+      "コンパイルエラー（型付き form prop 経由）",
+      "エラーなし ― パスは検査されないまま",
+    ],
+  ],
+];
+
+// 5つのデモの主張と「何を見るか」。英語版は ../../demo/proof/index.json を
+// 読みますが、こちらは同じことを日本語で言い直したものを持ちます。原文が正です。
+const PROOF = {
+  "a-field": {
+    claim: "1つのフィールドを読むコンポーネントは、そのフィールドが変わったときに再レンダーし、それ以外のときにはしません。",
+    watch: "name に打ち込むと、その行のカウンタだけが上がり、billing は 1 のままです。3文字より短くすると、メッセージが出ます。",
+  },
+  "cross-field": {
+    claim: "2つのフィールドにまたがるルールは、自分が名指ししたパスに対して報告します。だから打ち込んでいるのが billing でも、メッセージは shipping に着きます。",
+    watch: "billing の郵便番号を1桁変えてください。エラーは、あなたが触っていない shipping の下に出ます。",
+  },
+  "a-list": {
+    claim: "行を削除しても、その下の全行は自分の値・自分のエラー・自分の React key を保ちます。振り直されるのは住所だけです。",
+    watch: "行を足して空のままにすると、すぐ Required と読みます。上の2行に違う sku を入れてから一番上の行を消すと、残った行はどれも値を保ち、空の行は Required を保ち、各行の横に印字された key は動かないまま、その隣の住所だけが繰り上がります。",
+  },
+  uncontrolled: {
+    claim: "1つのフォームに2つの入力。useField は値を React に置いて1打鍵ごとに再レンダーし、useUncontrolledField は値を DOM ノードに置くので、打鍵は React に一切届きません。",
+    watch: "左の箱に打つとカウンタが1打鍵ごとに1つ上がります。右の箱に打つとどちらのカウンタも動きません ― そこで右の箱を空にすると、レンダー1回ぶんの費用で隣に「Required」が出ます。ずっと全打鍵を持っていた、とフォームが言っているわけです。",
+  },
+  "switch-a-step-off": {
+    claim: "オフにしたセクションは submit をブロックしなくなり、そこに打ち込まれた値は全部残るので、それを読むルールは読み続けます。",
+    watch: "「same as billing」をチェックすると、郵便番号のエラーが消え、submit は渡したペイロードを印字します ― その中に \"shipping\":{\"postcode\":\"530-0002\"} がまだ入っています。「blocked by shipping.postcode」ではなく。チェックを外すと、オフの間に打った内容をルールが判定します。",
+  },
+} as const;
+
+const CAN: readonly (readonly [string, string, string, boolean])[] = [
+  ["フィールドを検証する", "スキーマがすでにそう言っています。リゾルバを1回呼ぶだけ。", "/contract/", false],
+  [
+    "2つのフィールドにまたがるルール",
+    "1回のパスがルート全体を判定するので、deps 配列なしでメッセージがもう片方のフィールドに着きます。",
+    "/validation/",
+    false,
+  ],
+  [
+    "入れ子のフィールド配列",
+    "useRows は具体的なパスを取り、行は自分の住所を下に渡します。入れ子配列専用の API はありません。",
+    "/api/#useRows",
+    false,
+  ],
+  [
+    "タブや if の裏にあるフィールド",
+    "マウントは購読です。隠れているフィールドも値を保ち、検証され、submit をブロックし続けます。",
+    "/validation/",
+    false,
+  ],
+  [
+    "複数ステップのフォーム",
+    "useParticipation がステップを「submit をブロックするもの」から外し、値は残します。submit はブロックしたパスを報告し、コンポーネントが存在しないパスも含みます。",
+    "/validation/",
+    false,
+  ],
+  [
+    "そのハンドル名が使われているかサーバに聞く",
+    "validate は Promise を返せます。パスには番号が振られているので、追い越された答えは捨てられます。",
+    "/validation/",
+    false,
+  ],
+  [
+    "別の言語のメッセージ",
+    "メッセージはあなたのバリデータから来るので、すでにあなたのものです。このライブラリは1つも書きません。",
+    "",
+    false,
+  ],
+  [
+    "下書きの自動保存",
+    "ルートのセルを購読してください。確定した変更ごとに通知が1回、React の外側で。",
+    "/api/",
+    false,
+  ],
+  [
+    "200フィールドあっても速いまま",
+    "useUncontrolledField は再レンダーの代わりに DOM ノードを書きます。1打鍵は 0 コミットです。",
+    "/runtime/",
+    false,
+  ],
+  [
+    "自前の入力とデザインシステム",
+    "このライブラリは input もクラス名も1つも出荷しません。ウィジェットが受け付けるフィールドはパスの型が言います。",
+    "/paths/",
+    false,
+  ],
+  [
+    "状態コンテナを差し替える",
+    "不透明なキーに対するメンバー5つ。規範的な4つのルールを検査する適合キット付き。",
+    "/contract/",
+    false,
+  ],
+  [
+    "submit したあとのサーバエラー",
+    "form.adoptIssues(issues) ― このライブラリの setError です。すべてのパスにマージされるので、フィールドに届き、errorCount に数えられ、blockedBy に現れます。その submit はそれによって拒否され、それを報告します。次に押したときはサーバにもう一度聞きます。",
+    "/validation/",
+    false,
+  ],
+  [
+    "blur のときだけ、あるいは submit のときだけ検証する",
+    "createForm の validateOn です。submit が拒否されたあとはどの設定でも change で判定し直すので、フォームがたった今文句を言ったフィールドを直せば消えます。",
+    "/validation/",
+    false,
+  ],
+  [
+    "ファイルアップロード",
+    'kind: "file"。ベンダーではなく仕様から読みます ― バイナリ文字列は format: "binary" か contentEncoding: "binary" ― なので、Standard Schema に答えるバリデータならどれでもファイルウィジェットになります。',
+    "/contract/",
+    false,
+  ],
+  [
+    "Next の Server Component からバインディングを import する",
+    './react エントリが "use client" を持っているので、自前のラッパーモジュールなしで import できます。',
+    "",
+    false,
+  ],
+  [
+    "バリデータを debounce する",
+    "debounceMs はありません。1回のパスがルート全体を判定するので、パスを遅らせると必須項目のメッセージまで一緒に遅れます。debounce は非同期ルールの中でしてください。adapter.validate の第2引数が、追い越されたパスをキャンセルする AbortSignal です。",
+    "/validation/",
+    true,
+  ],
+  [
+    "複数ファイルを一度に、またはファイルサイズの上限",
+    'kind: "file" は1ファイルです。複数選択は「リスト全体を置き換える1つのイベント」で、rows() が持っているのは append・remove・move であって、リストごと差し替える操作ではありません。バイト数の範囲は運ばずに捨てています ― constraints.minLength がすでに文字数と配列要素数を意味しているからです。multiple な input は自分で描き、リストは rows() で保ってください。',
+    "",
+    true,
+  ],
+  [
+    "FormData、サーバアクション、RSC のデータフロー",
+    'すべての input にはすでに name が具体的なパスで入っているので、そのまま post すればサーバには owner.name や items[0].quantity をキーにしたフラットな組で届きます ― ただしそれをルートに畳み戻すものはここにはありませんし、チェックされていないチェックボックスが false を意味するのか、"" が空文字列なのか値が無いのかを決めるものもありません。自分でデコードするか、readRoot() から JSON を post してください。',
+    "",
+    true,
+  ],
+  [
+    "React Native",
+    'core エントリに DOM はありません ― lib: ["ES2020"] と DOM 型なしでコンパイルされ、プロジェクト分割はそれを検査するために存在します ― が、バインディングの側にはあります。inputProps は minLength や aria-describedby といった DOM 属性で、useUncontrolledField は HTMLInputElement を書きます。buildTextInputProps が { value, onChangeText, onBlur } を返す8番目のエントリポイントと、uncontrolled フックを持たない構成が要るでしょう。それまでは ./core を使って、バインディングは自分で書いてください。',
+    "",
+    true,
+  ],
+  [
+    "devtools 拡張",
+    "ありません。あるのは、それを作るときの継ぎ目です。createForm はストアを取り、ストアは不透明なキーに対するメンバー5つで、書き込みを全部記録するストアは計測フックではなくただの差し替えです。上のフォームの下にあるテープが、まさにそれで、148行です。",
+    "/contract/",
+    true,
+  ],
+];
+
+const TRY = [
+  ["billing を変える", "メッセージは shipping に出ます"],
+  ["name に打ち込む", "その行のカウンタだけが動きます"],
+];
+---
+
+<Base
+  title="waypoint — フィールドの住所は、それを描くコンポーネントより先にある"
+  description="フィールドの住所は、それを描く末端が存在する前にコンパイラが検査済みの型であり、その住所が指すセルはすでに書かれています。レジストリ宣言1つ、prop なし、ジェネリクス引数なし、マウント時の register も unregister もなし。"
+  bare
+>
+  <h1>フィールドの住所は、それを描くコンポーネントより先にある。</h1>
+
+  <p class="lead">
+    主張は1つ、半分が2つ。まず<strong>コンパイラがすでに検査した型</strong>であること ―
+    レジストリ宣言1つで、prop もジェネリクス引数もなく、末端では何も import しません。
+    そして<strong>すでに書かれている状態</strong>であること ―
+    セルはすべて <code>createForm</code> の時点で作られるので、マウントは購読でしかなく、
+    register も unregister も <code>shouldUnregister</code> もありません。
+  </p>
+
+  <div class="mt-7 flex flex-wrap gap-3">
+    <a
+      class="rounded-[3px] bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
+      href="/runtime/" hreflang="en" lang="en">どう動くか（英語）→</a
+    >
+    <a
+      class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
+      href="/ja/start/">はじめる</a
+    >
+    <a
+      class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
+      href="https://github.com/maroonedog/waypoint">GitHub</a
+    >
+  </div>
+
+  <p class="caption mt-6">
+    <strong>まだ何も公開されていません。</strong>印刷できる npm install はなく、
+    固定するバージョンもなく、本番で動かした人もいません。あるのは clone だけです。
+  </p>
+  <Code code={clone} label="shell: clone it" lang="sh" flush />
+
+  <!-- ================================================== the thesis -->
+  <section>
+    <h2>フィールドは文字列で、その文字列は検査される</h2>
+    <p class="lead">
+      react-hook-form も TanStack Form もタイポを弾きます ― フォームの型がスコープにある限りは。
+      ここではそれが、アプリケーション全体に対して1度だけスコープに入ります。
+      prop も form オブジェクトも import も持たない末端が、それでも{" "}
+      <code>shipments[0].lines[0].skuu</code> を弾きます。
+    </p>
+
+    <div class="mt-6 overflow-x-auto">
+      <table>
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">TypeScript 5.9 strict でコンパイル</th>
+            {LIBS.map((lib) => <th class="pr-4">{lib}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            PATHS.map(([theCase, cells]) => (
+              <tr class="hairline">
+                <td class="pr-4 font-medium">{theCase}</td>
+                {cells.map((cell) => (
+                  <td
+                    class:list={[
+                      "pr-4",
+                      cell.startsWith("コンパイルエラー") || cell.startsWith("検査される")
+                        ? "text-primary"
+                        : "text-on-surface-variant",
+                    ]}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="caption">
+      スキーマは4つとも同じ1つ ― <code>shipments[*].lines[*].sku</code> ― をコンパイルしています。
+      補間された <code>{"${i}"}</code> は差別化要因ではありません。react-hook-form と
+      TanStack のパス union にも本当に含まれているメンバーです。
+    </p>
+
+    <p class="note">
+      <strong>その代償。</strong>{" "}
+      <code>declare module "@maroonedog/waypoint"</code>{" "}
+      のブロックが1つ ― フレームワーク側ではなく<strong>ルート</strong>のエントリに対して書くので、
+      1つのレジストリがすべてのバインディングに効きます ― そしてそれは
+      <code>tsconfig</code> の <code>include</code> の中に居続ける必要があります。
+      消せば全呼び出し箇所がコンパイルしなくなります。それが望ましい壊れ方です。
+      制約が2つ。フォームを2つ登録すると、キーを書かない <code>useField</code> は
+      フォーム名を書くまで両方の union に対して検査されます。そして{" "}
+      <strong>住所として書けるのは7セグメントまでで、8つめは書けません。</strong>
+      それより深い正しい末端は、受け入れられるのではなく拒否されます。
+      union がコンパイラにいくら請求するのか、どこで止まるのか、住所を付けないサブツリーの逃げ道は{" "}
+      <a
+        class="link font-mono"
+        href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
+        >docs/measurements-types.md</a
+      >に実測してあります。
+    </p>
+
+    <p class="mt-8">
+      <strong class="text-on-surface">もう半分は、その住所が指すセルがすでに書かれていることです。</strong>
+      セルはすべて <code>createForm</code> の時点で記述リストから作られます。どのコンポーネントも
+      マウントする前に、です。だから末端が現れることは購読以上の何かではありません ―
+      register も unregister も <code>shouldUnregister</code> も ref コールバックもなく、
+      ポータルの中・遅延チャンクの中・条件の裏にあるフィールドは特別扱いを必要としません。
+      コンパイル時に検査されていても、コンポーネントがマウントするまで何も指していない住所は
+      住所の半分でしかありません。だからこの2つは、2つの機能ではなく1つの主張なのです。
+    </p>
+  </section>
+
+  <!-- ================================================== proof -->
+  <section>
+    <h2>5つのこと、それぞれ動いているものの隣で</h2>
+
+    <p class="caption">
+      下の5つは動いているプログラムそのものです。左のコードは右で動いているファイルの
+      <code>?raw</code> インポートなので、表示されているコードと動いているコードは同じ1ファイルです。
+      プログラムの中のラベルは英語のままにしてあります ― 訳してしまうと、それはもう
+      このサイトが動かしているプログラムではなくなるからです。
+    </p>
+
+    <Proof claim={PROOF["a-field"].claim} watch={PROOF["a-field"].watch} source={aFieldSource} file="file: AField.tsx">
+      <AField client:visible />
+    </Proof>
+
+    <Proof claim={PROOF["cross-field"].claim} watch={PROOF["cross-field"].watch} source={crossFieldSource} file="file: CrossField.tsx">
+      <CrossField client:visible />
+    </Proof>
+
+    <Proof claim={PROOF["a-list"].claim} watch={PROOF["a-list"].watch} source={aListSource} file="file: AList.tsx">
+      <AList client:visible />
+    </Proof>
+
+    <Proof claim={PROOF.uncontrolled.claim} watch={PROOF.uncontrolled.watch} source={uncontrolledSource} file="file: Uncontrolled.tsx">
+      <Uncontrolled client:visible />
+    </Proof>
+
+    <Proof claim={PROOF["switch-a-step-off"].claim} watch={PROOF["switch-a-step-off"].watch} source={switchAStepOffSource} file="file: SwitchAStepOff.tsx">
+      <SwitchAStepOff client:visible />
+    </Proof>
+  </section>
+
+  <!-- ================================================== live -->
+  <section>
+    <h2>ランタイム、書き込みを印字しながら</h2>
+    <p class="caption">
+      誰も触っていないフィールドに対してルールが報告すること自体は珍しくありません ―
+      レコード全体を見るバリデータはどれもやります。違うのは請求額です。201フィールドのとき、
+      これは 201 パスに対する1回のパスと 2 コミットで済みます。react-hook-form の{" "}
+      <code>deps</code> 構成は 402 パスに対する2回のパスを払います。そして{" "}
+      <code>react-hook-form-scoped</code> は 0 コミットですが、それはメッセージを一切出さないからで、
+      ベンチマークはそれを勝ちではなく<em>disagrees</em>（一致しない）と採点します。
+    </p>
+
+    <LiveForm client:load />
+
+    <ul class="mt-5 grid gap-2 sm:grid-cols-2">
+      {
+        TRY.map(([what, then]) => (
+          <li class="flex gap-2 text-sm leading-relaxed">
+            <span class="font-medium whitespace-nowrap">{what}</span>
+            <span class="text-on-surface-variant">― {then}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <p class="caption">
+      本物のライブラリを、ソースからビルドしたものです。一番下のパネルはセルストアが
+      自分で実況しているもので、<code>createForm</code> に記録するストアを渡しているだけ ―
+      ストアを差し替える普通のやり方です。
+    </p>
+  </section>
+
+  <!-- ================================================== the whole idea -->
+  <section>
+    <h2>以上すべてを、10行で</h2>
+    <Code code={whole} label="the whole idea" />
+  </section>
+
+  <!-- ================================================== what you can build -->
+  <section>
+    <h2>これで何が作れるのか</h2>
+    <p class="caption">
+      取り消し線の行は、このライブラリが<strong>やらない</strong>ことです。それぞれ、
+      代わりに何を使えばいいかが書いてあります。表に入れてあるのは、外すとこの手の表が
+      広告になるからです。
+    </p>
+
+    <div class="overflow-x-auto">
+      <table>
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">やりたいこと</th>
+            <th class="pr-4">どうやるか</th>
+            <th>&nbsp;</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            CAN.map(([need, how, where, no]) => (
+              <tr class="hairline">
+                <td class:list={["pr-4", no ? "verdict line-through" : "font-medium"]}>
+                  {need}
+                </td>
+                <td class="pr-4 text-on-surface-variant">{how}</td>
+                <td class="whitespace-nowrap">
+                  {where === "" ? (
+                    ""
+                  ) : (
+                    <a class="link" href={where} hreflang="en" lang="en">
+                      →
+                    </a>
+                  )}
+                </td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="caption">右端のリンク先は英語のページです。</p>
+  </section>
+
+  <!-- ================================================== in code -->
+  <section>
+    <h2>6つのこと、コードで</h2>
+    <div class="grid gap-6 lg:grid-cols-2">
+      {
+        snippets.map((one) => (
+          <div class="min-w-0">
+            <p class="mb-2 text-sm font-semibold">{one.title}</p>
+            <Code code={snippet(one.id).code} lang={snippet(one.id).lang} flush />
+            {one.note && <p class="caption">{one.note}</p>}
+          </div>
+        ))
+      }
+    </div>
+    <p class="caption">
+      フックとコンポーネントの実際の署名は{" "}
+      <a class="link" href="/api/" hreflang="en" lang="en">API（英語）</a>にあります。
+    </p>
+  </section>
+
+  <!-- ================================================== measured -->
+  <section>
+    <h2>実測、負けから先に</h2>
+    <p class="caption">
+      <strong class="text-on-surface">waypoint は3シナリオすべてで、どのサイズでも負けています</strong>
+      ― レポート自身がその言葉で、表を印字するより先にそう書いています。
+    </p>
+
+    <div class="overflow-x-auto">
+      <table>
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">201フィールドのとき</th>
+            <th class="pr-4">waypoint</th>
+            <th class="pr-4">負けた相手</th>
+            <th>それはどう採点されたか</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="hairline">
+            <td class="pr-4">1文字打つ、判定は変わらない</td>
+            <td class="num measured pr-4">212 fibers</td>
+            <td class="pr-4 font-mono">0 — waypoint (uncontrolled)</td>
+            <td class="text-on-surface-variant">一致する</td>
+          </tr>
+          <tr class="hairline">
+            <td class="pr-4">打っているフィールドが不正になる</td>
+            <td class="num measured pr-4">424 fibers</td>
+            <td class="pr-4 font-mono">0 — react-hook-form-on-submit</td>
+            <td class="text-on-surface-variant">submit のときだけ一致する</td>
+          </tr>
+          <tr class="hairline">
+            <td class="pr-4">ルールが別の場所に報告する</td>
+            <td class="num measured pr-4">424 fibers</td>
+            <td class="pr-4 font-mono">0 — react-hook-form-scoped</td>
+            <td class="verdict">一致しない</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="caption">
+      ここの整数はすべて CI でゲートされています。1つでも動けば CI が落ちます。{" "}
+      <a class="link" href="/benchmark/" hreflang="en" lang="en"
+        >ベンチマークが見えるもの・見えないもの（英語）→</a
+      >
+    </p>
+  </section>
+
+  <!-- ================================================== status -->
+  <section class="rounded-[3px] border border-outline-variant p-6">
+    <p class="label">現在地</p>
+    <p class="mt-3">
+      <strong>一度も公開されたことがありません ― publish ワークフローは手動起動のみで、
+      一度も実行されていません ― そして本番で動かした人もいません。</strong>
+    </p>
+    <p class="caption">
+      353本のテスト、<code>test:types</code> が走らせる13本のコンパイル時プログラム、
+      そしてそのすべてを使う画面が1つ。制約が2つ ― キーにドットを含むフィールドは住所を持てず、
+      検証パスは確定した変更のたびにルート全体を判定します。
+    </p>
+    <p class="caption">
+      このページは<a class="link" href="/" hreflang="en" lang="en">英語版</a>の翻訳です。
+      このサイトの共通言語は英語で、日本語はその上に重ねる層です。両方が食い違ったときは英語が正です。
+    </p>
+  </section>
+</Base>

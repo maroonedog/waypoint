@@ -19,6 +19,7 @@ import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
+import { TRANSLATED, routeOf } from "./src/i18n/locales.mjs";
 
 const PACKAGE = "@maroonedog/waypoint";
 
@@ -75,7 +76,40 @@ export default defineConfig({
   // `og:url` and the sitemap name a page nobody is serving, and the README
   // says so rather than leaving a reader to find out.
   site: "https://maroonedog.github.io/waypoint",
-  integrations: [react(), sitemap()],
+
+  // ENGLISH IS CANONICAL AND JAPANESE IS A LAYER OVER IT, which is why the
+  // default locale takes no prefix: `/api/` is the page and `/ja/api/` is the
+  // same page in Japanese. `fallback` is deliberately NOT set — with it, a
+  // route with no Japanese would quietly serve the English one under a
+  // Japanese URL, and a reader who asked for Japanese and was given English
+  // without being told has been misled. Every `/ja/` route is written by
+  // hand, and the ones that are not translated yet say so in Japanese.
+  i18n: {
+    defaultLocale: "en",
+    locales: ["en", "ja"],
+    routing: { prefixDefaultLocale: false },
+  },
+
+  integrations: [
+    react(),
+    // The sitemap has to be told that two URLs are one page in two languages.
+    // Without it they are listed as unrelated, and a search engine shows
+    // whichever it happened to see first to everybody.
+    sitemap({
+      i18n: { defaultLocale: "en", locales: { en: "en", ja: "ja" } },
+      // The integration assumes every locale has every page, which is how the
+      // sitemap came to claim a Japanese alternate for all ten routes while
+      // the pages themselves claimed it for two. A search engine takes the
+      // sitemap's word for it, and would have handed a Japanese reader a
+      // page that is a summary and a link. One list decides both — it is in
+      // src/i18n/locales.mjs, which this file and the layout both read.
+      serialize(item) {
+        if (TRANSLATED.includes(routeOf(new URL(item.url).pathname))) return item;
+        const { links, ...alone } = item;
+        return alone;
+      },
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     resolve: {

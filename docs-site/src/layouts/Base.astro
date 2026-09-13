@@ -25,6 +25,7 @@
 // so the column does not move when the rail arrives.
 // ===========================================================================
 import "../styles.css";
+import { TRANSLATED, localeOf, routeOf } from "../i18n/locales.mjs";
 
 interface Props {
   readonly title: string;
@@ -34,7 +35,41 @@ interface Props {
 }
 
 const { title, description, bare = false } = Astro.props;
+
+// ===========================================================================
+// Two languages, and one list that decides everything about them.
+//
+// ENGLISH IS THE CANONICAL TEXT and Japanese is a layer over it. A page keeps
+// its route in both — `/api/` and `/ja/api/` — so everything below works off
+// ONE derived fact: the path with the locale prefix taken off. The register,
+// the Material list, the section index and the language control all read it,
+// which is what stops `/ja/api/` from being spaced like a page you read while
+// `/api/` is spaced like a page you search.
+//
+// `TRANSLATED` is that one list. The control offers Japanese only where there
+// is Japanese, the `hreflang` pair is emitted only for those routes, and a
+// route that is not on it gets a Japanese page that says so — rather than
+// English served silently under a Japanese URL, which is what Astro's
+// `fallback` would have done and why astro.config.mjs does not set it.
+// ===========================================================================
+// The three of them come from src/i18n/locales.mjs, which the sitemap in
+// astro.config.mjs also reads — see the comment there.
+const locale: "en" | "ja" = localeOf(Astro.url.pathname);
+const route = routeOf(Astro.url.pathname);
+const hasJapanese = TRANSLATED.includes(route);
+
+/** The same route in the other language. */
+const inLocale = (target: "en" | "ja", path: string): string =>
+  target === "ja" ? `/ja${path}` : path;
+
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const alternates = hasJapanese
+  ? [
+      { hreflang: "en", href: new URL(route, Astro.site).href },
+      { hreflang: "ja", href: new URL(inLocale("ja", route), Astro.site).href },
+      { hreflang: "x-default", href: new URL(route, Astro.site).href },
+    ]
+  : [];
 
 // TWO REGISTERS, AND THE LIST LIVES HERE RATHER THAN IN A PROP. A page that
 // is returned to for one fact is set denser and heads its entries in the mono
@@ -49,8 +84,10 @@ const FINDING = ["/api/", "/benchmark/"];
 // on nine pages, for nothing.
 const MATERIAL = ["/showcase/"];
 
-const register = FINDING.includes(Astro.url.pathname) ? "finding" : "reading";
-const material = MATERIAL.includes(Astro.url.pathname);
+// Both read the route rather than the pathname, so a translated page is set
+// in the same register as the page it translates.
+const register = FINDING.includes(route) ? "finding" : "reading";
+const material = MATERIAL.includes(route);
 
 // The docs faces, requested as one stylesheet. Source Serif 4 for what is
 // argued, DM Mono for what is addressed — the rule is written down in
@@ -67,46 +104,71 @@ const MATERIAL_FACES =
 // Grouped, because ten flat links is a list and three groups of three, three
 // and four is a structure. The labels say what a reader wants, not what the
 // pages are about.
+//
+// BOTH LANGUAGES SIT IN ONE TABLE, beside the route they name. Two lists would
+// be two places for a page to be added and one place for it to be forgotten.
 const SECTIONS = [
   {
-    group: "Getting started",
+    group: { en: "Getting started", ja: "はじめに" },
     items: [
-      { href: "/", label: "Overview" },
-      { href: "/showcase/", label: "Showcase" },
-      { href: "/start/", label: "Start" },
+      { href: "/", label: { en: "Overview", ja: "概要" } },
+      { href: "/showcase/", label: { en: "Showcase", ja: "ショーケース" } },
+      { href: "/start/", label: { en: "Start", ja: "はじめる" } },
     ],
   },
   {
-    group: "How it behaves",
+    group: { en: "How it behaves", ja: "どう動くか" },
     items: [
-      { href: "/validation/", label: "Validation" },
-      { href: "/runtime/", label: "The runtime" },
-      { href: "/paths/", label: "Typed paths" },
+      { href: "/validation/", label: { en: "Validation", ja: "バリデーション" } },
+      { href: "/runtime/", label: { en: "The runtime", ja: "ランタイム" } },
+      { href: "/paths/", label: { en: "Typed paths", ja: "型付きパス" } },
     ],
   },
   {
-    group: "Reference",
+    group: { en: "Reference", ja: "リファレンス" },
     items: [
-      { href: "/contract/", label: "The contract" },
-      { href: "/api/", label: "API" },
-      { href: "/examples/", label: "Examples" },
-      { href: "/benchmark/", label: "Benchmark" },
+      { href: "/contract/", label: { en: "The contract", ja: "コントラクト" } },
+      { href: "/api/", label: { en: "API", ja: "API" } },
+      { href: "/examples/", label: { en: "Examples", ja: "サンプル" } },
+      { href: "/benchmark/", label: { en: "Benchmark", ja: "ベンチマーク" } },
     ],
   },
 ];
+
+// The chrome's own words. Short enough to live here; the pages' prose is not,
+// which is why a page is translated by writing it rather than by a dictionary.
+const UI = {
+  onThisPage: { en: "On this page", ja: "このページの内容" },
+  sections: { en: "Sections", ja: "セクション" },
+  documentation: { en: "Documentation", ja: "ドキュメント" },
+  status: { en: "unpublished", ja: "未公開" },
+  footer: {
+    en: "MIT licensed. Two resolvers ship — zod and luq — and they reach the contract by different roads: one is walked directly, the other is asked for a JSON Schema.",
+    ja: "MIT ライセンス。リゾルバは zod と luq の2つ。コントラクトへの到達の仕方が違い、片方は直接歩き、もう片方は JSON Schema を要求します。",
+  },
+  otherLanguage: { en: "日本語", ja: "English" },
+} as const;
+
+const t = <T extends { readonly en: string; readonly ja: string }>(x: T): string =>
+  locale === "ja" ? x.ja : x.en;
 
 const here = Astro.url.pathname;
 const flat = SECTIONS.flatMap((section) => section.items);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {
+      alternates.map((one) => (
+        <link rel="alternate" hreflang={one.hreflang} href={one.href} />
+      ))
+    }
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -181,30 +243,54 @@ const flat = SECTIONS.flatMap((section) => section.items);
             "flex flex-1 flex-wrap gap-x-4 gap-y-1 font-mono text-[0.8125rem]",
             !bare && "lg:hidden",
           ]}
-          aria-label="Sections"
+          aria-label={t(UI.sections)}
         >
           {
-            flat.slice(1).map((item) => (
-              <a
-                href={item.href}
-                aria-current={here === item.href ? "page" : undefined}
-                class:list={[
-                  "underline-offset-4 hover:underline",
-                  here === item.href ? "text-on-surface" : "text-on-surface-variant",
-                ]}
-              >
-                {item.label}
-              </a>
-            ))
+            flat.slice(1).map((item) => {
+              const href = inLocale(locale, item.href);
+              return (
+                <a
+                  href={href}
+                  aria-current={here === href ? "page" : undefined}
+                  class:list={[
+                    "underline-offset-4 hover:underline",
+                    here === href ? "text-on-surface" : "text-on-surface-variant",
+                  ]}
+                >
+                  {t(item.label)}
+                </a>
+              );
+            })
           }
         </nav>
+        <!-- THE CONTROL IS ALWAYS A LINK, AND IT ALWAYS LANDS SOMEWHERE REAL.
+             A greyed-out switch on the eight routes that are English only
+             would make the reader guess what greyed-out meant; a switch that
+             silently served English under a Japanese URL would be worse. Every
+             route has a Japanese page, and the ones that are not translated
+             say so in Japanese and link back. So this is one link, in both
+             directions, on every page.
+
+             `hreflang` and `lang` because a screen reader on a Japanese page
+             should say "English" in English, not read the word with Japanese
+             phonemes. -->
+        <p class="ml-auto shrink-0 font-mono text-[0.8125rem]">
+          <a
+            class="text-on-surface-variant underline-offset-4 hover:underline"
+            href={inLocale(locale === "ja" ? "en" : "ja", route)}
+            hreflang={locale === "ja" ? "en" : "ja"}
+            lang={locale === "ja" ? "en" : "ja"}
+          >
+            {t(UI.otherLanguage)}
+          </a>
+        </p>
         <!-- Hidden below lg on a documentation page, where the wrapping
              section nav needs the room and the footer carries the same link.
              Never hidden on the landing page: it is where a reader goes to
              obtain a library that is not published anywhere else. -->
         <a
           class:list={[
-            "ml-auto font-mono text-[0.8125rem] text-on-surface-variant underline-offset-4 hover:underline",
+            "shrink-0 font-mono text-[0.8125rem] text-on-surface-variant underline-offset-4 hover:underline",
             !bare && "hidden lg:block",
           ]}
           href="https://github.com/maroonedog/waypoint">GitHub</a
@@ -224,13 +310,15 @@ const flat = SECTIONS.flatMap((section) => section.items);
         <div class="mx-auto grid max-w-[92rem] gap-x-10 px-4 sm:px-6 lg:grid-cols-[13rem_minmax(0,1fr)] wide:grid-cols-[13rem_minmax(0,1fr)_13rem]">
           <nav
             class="hidden lg:sticky lg:top-14 lg:block lg:h-[calc(100vh-3.5rem)] lg:overflow-y-auto lg:py-10"
-            aria-label="Documentation"
+            aria-label={t(UI.documentation)}
           >
             {SECTIONS.map((section) => (
               <div class="mb-6">
-                <p class="label">{section.group}</p>
+                <p class="label">{t(section.group)}</p>
                 <ul class="mt-2 grid gap-0.5">
-                  {section.items.map((item) => (
+                  {section.items.map((item) => {
+                    const href = inLocale(locale, item.href);
+                    return (
                     <li>
                       {/* The one place the mark's geometry is used. Hollow on
                           hover, filled on the page you are on — the place is
@@ -239,14 +327,15 @@ const flat = SECTIONS.flatMap((section) => section.items);
                           that said nothing and could have sat on any site.
                           See `.index-link` in styles.css. */}
                       <a
-                        href={item.href}
-                        aria-current={here === item.href ? "page" : undefined}
+                        href={href}
+                        aria-current={here === href ? "page" : undefined}
                         class="index-link"
                       >
-                        {item.label}
+                        {t(item.label)}
                       </a>
                     </li>
-                  ))}
+                    );
+                  })}
                 </ul>
               </div>
             ))}
@@ -261,7 +350,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
 
           <aside
             class="hidden wide:sticky wide:top-14 wide:block wide:h-[calc(100vh-3.5rem)] wide:overflow-y-auto wide:py-10"
-            aria-label="On this page"
+            aria-label={t(UI.onThisPage)}
           >
             {/* A LINE DOWN THE LIST, and one segment of it lit. The rail said
                 which sections a page has and never which one the reader was
@@ -303,16 +392,10 @@ const flat = SECTIONS.flatMap((section) => section.items);
       <div
         class="hairline flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3 pt-8"
       >
-        <p class="caption">
-          MIT licensed. Two resolvers ship — zod and{" "}
-          <a class="link" href="https://luq.dev"
-            >luq</a
-          > — and they reach the contract by different roads: one is walked
-          directly, the other is asked for a JSON Schema.
-        </p>
+        <p class="caption">{t(UI.footer)}</p>
         <p class="label shrink-0">
           <span class="qualifies">status</span><span class="colon">:</span>{" "}
-          <span class="named">unpublished</span>
+          <span class="named">{t(UI.status)}</span>
           <!-- The separator is punctuation between two facts, not a fact. It
                is hidden from a screen reader, and it takes the quiet ink
                rather than the boundary line: the line colour measures 3.43:1

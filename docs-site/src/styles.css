@@ -769,3 +769,60 @@ main .measured {
 main .verdict {
   color: var(--wp-verdict);
 }
+
+/* ===========================================================================
+   Japanese.
+
+   TWO THINGS WERE BEING DECIDED BY ACCIDENT, and both are visible on the page.
+
+   THE FACE. Source Serif 4 has no Japanese glyphs, so every kana and kanji
+   fell through to `ui-serif` and the browser picked — Yu Mincho on Windows,
+   Hiragino on macOS, whatever is installed on a Linux box. The stack below
+   names the choice and keeps Source Serif 4 in FRONT of it, which is what
+   makes a mixed line work: the Latin in `createForm` and `react-hook-form`
+   comes from the Latin face and the Japanese around it from the Japanese one.
+   A CJK webfont is deliberately not loaded — this site just took three unused
+   Roboto files off nine pages, and a megabyte of Noto Serif JP would put them
+   back with interest.
+
+   THE MEASURE. `ch` is the width of a "0", so a cap counted in it gives a
+   Japanese line half as many characters as an English one — the landing
+   headline came out at four lines of eight characters, breaking after
+   「住所」 and starting the next line with 「は、」. The caps below are in
+   `em`, which for full-width characters is one character, so they say what
+   they mean: about 34 characters of running text and 14 in a headline.
+
+   `line-break: strict` is the Japanese rule set rather than the loose one, so
+   small kana and the prolonged sound mark do not start a line.
+   =========================================================================== */
+html[lang="ja"] body {
+  font-family:
+    "Source Serif 4", "Hiragino Mincho ProN", "Yu Mincho", YuMincho,
+    "Noto Serif JP", "Noto Serif CJK JP", "MS PMincho", serif;
+  line-break: strict;
+}
+
+html[lang="ja"] main :is(p, li, figcaption) {
+  max-width: 34em;
+}
+html[lang="ja"] main .lead {
+  max-width: 26em;
+}
+html[lang="ja"] main .caption {
+  max-width: 32em;
+}
+html[lang="ja"] main h1 {
+  max-width: 18em;
+}
+html[lang="ja"] main.is-landing h1 {
+  max-width: 14em;
+  letter-spacing: -0.01em;
+}
+html[lang="ja"] main.is-landing .lead {
+  max-width: 26em;
+}
+/* A table cell and a code label are as wide as what they hold, in either
+   language. */
+html[lang="ja"] main :is(td, th, .code-label) {
+  max-width: none;
+}
