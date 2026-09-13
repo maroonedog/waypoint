@@ -84,24 +84,24 @@ function StepFields({ step }: { readonly step: StepKey }): ReactElement {
   if (step === "traveller") {
     return (
       <>
-        <Text at="form:traveller.name" label="Name" />
-        <Text at="form:traveller.email" label="Email" />
+        <Text at="booking:traveller.name" label="Name" />
+        <Text at="booking:traveller.email" label="Email" />
       </>
     );
   }
   if (step === "trip") {
     return (
       <>
-        <Text at="form:trip.from" label="From" />
-        <Text at="form:trip.to" label="To" />
-        <Num at="form:trip.nights" label="Nights" />
+        <Text at="booking:trip.from" label="From" />
+        <Text at="booking:trip.to" label="To" />
+        <Num at="booking:trip.nights" label="Nights" />
       </>
     );
   }
   return (
     <>
-      <Text at="form:payment.holder" label="Name on the card" />
-      <Text at="form:payment.number" label="Card number" />
+      <Text at="booking:payment.holder" label="Name on the card" />
+      <Text at="booking:payment.number" label="Card number" />
     </>
   );
 }
@@ -205,6 +205,7 @@ function Review(): ReactElement {
 export function BookingWizard(): ReactElement {
   const form = useCreateForm(() => ({
     adapter: bookingAdapter,
+    key: "booking",
     defaultValues: structuredClone(EMPTY_BOOKING),
   }));
   const [at, setAt] = useState(0);

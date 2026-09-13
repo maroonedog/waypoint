@@ -102,6 +102,10 @@ function Footer({
 export function SignupForm(): ReactElement {
   const form = useCreateForm(() => ({
     adapter: signupAdapter,
+    // Named where it is created, so every `signup:` path below is checked
+    // against it. Said at the provider instead, it would be two declarations
+    // that can disagree — and the runtime throws when they do.
+    key: "signup",
     defaultValues: structuredClone(EMPTY_SIGNUP),
   }));
   const [log, setLog] = useState<readonly string[]>([
@@ -161,11 +165,11 @@ export function SignupForm(): ReactElement {
         {account === undefined ? null : (
           <p className="ok">Account {account} created.</p>
         )}
-        <Text at="form:handle" hint="ada, grace and alan are taken" />
-        <Text at="form:email" />
-        <Text at="form:card.holder" />
+        <Text at="signup:handle" hint="ada, grace and alan are taken" />
+        <Text at="signup:email" />
+        <Text at="signup:card.holder" />
         <Text
-          at="form:card.number"
+          at="signup:card.number"
           hint="sixteen digits; one ending in 0 is declined"
         />
         <Footer press={press} />

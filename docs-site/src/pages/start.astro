@@ -118,31 +118,35 @@ const entryPoints = [
     </table>
   </div>
 
-  <h2 class="mt-16 text-2xl font-bold">Two you can run</h2>
+  <h2 class="mt-16 text-2xl font-bold">Four you can type into now</h2>
   <p class="mt-3 leading-relaxed text-on-surface-variant">
-    One of them writes the same nested shape four times — waypoint,
-    react-hook-form, Formik and TanStack Form, against one schema, side by side
-    on one page — so the difference is how a field two levels inside a list
-    says which row it belongs to, and nothing else.
+    The example applications run on this site rather than only on a port.
+    <a class="underline underline-offset-4" href="/showcase/">Showcase</a> is a
+    23-input trade application across six sections, drawn with the
+    application's own components; the
+    <a class="underline underline-offset-4" href="/examples/">Examples</a> page
+    carries three more — a server-error round trip, two forms sharing one
+    component, and a wizard — each of them the example program itself, imported
+    and mounted, not a copy.
   </p>
 
-  <Code
-    code={`npm run example:nested-arrays   # http://localhost:5181
-npm run example:showcase        # http://localhost:5179`}
-    label="shell"
-  />
-
   <p class="caption">
-    The second is a 23-input application form across six sections, drawn with
-    the application's own components. Both have their own README. Neither
-    needs a build: the package resolves to its <strong>source</strong>, so
-    an edit inside <code>src/core</code> reloads the page.
+    Two are commands, because they need libraries this site does not carry:
+    <code>npm run example:nested-arrays</code> writes the same nested shape
+    four times — waypoint, react-hook-form, Formik and TanStack Form, against
+    one schema, side by side — so the difference is how a field two levels
+    inside a list says which row it belongs to, and nothing else;
+    <code>npm run example:playground</code> counts renders per keystroke and
+    swaps the store underneath. Every example has its own README, and none of
+    them needs a build: the package resolves to its
+    <strong>source</strong>, so an edit inside <code>src/core</code> reloads
+    the page.
   </p>
 
   <section class="mt-16 rounded-xl border border-outline-variant p-6">
     <p class="label">Where it stands</p>
     <p class="mt-3 leading-relaxed text-on-surface-variant">
-      277 tests, the eight compile-time programs <code>test:types</code> runs,
+      353 tests, the thirteen compile-time programs <code>test:types</code> runs,
       and a screen that uses all of it. <strong class="text-on-surface">Nothing
       has ever been published — the publish workflow is manual-dispatch only
       and has never been run — and nobody has run it in production.</strong>

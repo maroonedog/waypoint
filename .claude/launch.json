@@ -14,11 +14,12 @@
     },
     {
       "name": "docs-site",
-      "runtimeExecutable": "npx",
+      "runtimeExecutable": "npm",
       "runtimeArgs": [
-        "vite",
-        "--config",
-        "docs-site/vite.config.ts"
+        "run",
+        "dev",
+        "--prefix",
+        "docs-site"
       ],
       "port": 5180
     },

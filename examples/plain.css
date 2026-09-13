@@ -1,8 +1,20 @@
 /* The unstyled examples share this, so each one is about its own subject and
    none of them is about CSS. The showcase is the example that draws a designed
-   interface; these three deliberately do not compete with it. */
+   interface; these deliberately do not compete with it.
 
-:root {
+   EVERY RULE IS SCOPED TO `.wp-example`, and that is what lets these run on
+   the documentation site rather than only on their own port. They used to
+   style `body`, `header` and `section` directly — correct for a page that is
+   nothing but the example, and fatal the moment the example is a component on
+   somebody else's page. `body` became the scope itself, so the class carries
+   the ground, the colour and the font that the document used to. */
+
+/* THE VARIABLES SIT ON THE SCOPE, NOT ON `:root`. On the documentation site
+   this stylesheet is loaded into a page that has its own palette and its own
+   light/dark switch, and `color-scheme: light` written at the root would have
+   settled that argument for the whole document from inside an example. Here
+   the declaration reaches exactly what the class encloses. */
+.wp-example {
   --ink: #16211f;
   --soft: #5a6a67;
   --line: #d8d5cd;
@@ -14,37 +26,65 @@
   --good: #2f6f5e;
   --good-bg: #e4efeb;
   color-scheme: light;
-}
-
-* { box-sizing: border-box; }
-
-body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
   font: 15px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-main { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+.wp-example, .wp-example * { box-sizing: border-box; }
 
-header { border-bottom: 1px solid var(--line); background: var(--card); }
-header > div { max-width: 46rem; margin: 0 auto; padding: 1.5rem 1.25rem; }
-h1 { margin: 0 0 .35rem; font-size: 1.4rem; font-weight: 600; }
-header p { margin: 0; color: var(--soft); font-size: .93rem; max-width: 40rem; }
+/* ON ITS OWN PORT THE EXAMPLE IS THE PAGE, and the ground has to reach the
+   bottom of the viewport; embedded in the documentation site it is one block
+   among many and must not. Only the standalone entry adds this class, so the
+   difference is declared rather than guessed at from the DOM. */
+.wp-page { min-height: 100vh; }
+/* The document around it, and the ONLY rule in this file that reaches outside
+   the scope — reached through `:has`, so it applies on the standalone page
+   and nowhere else. Dropping the old `body` rule left the browser's own 8px
+   margin behind: a white frame around the paper on every example's own page,
+   which read as a bug rather than as a margin. */
+body:has(.wp-page) { margin: 0; }
 
-h2 { margin: 0 0 .75rem; font-size: 1.05rem; font-weight: 600; }
+.wp-example main { max-width: 46rem; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
 
-section {
+.wp-example header { border-bottom: 1px solid var(--line); background: var(--card); }
+.wp-example header > div { max-width: 46rem; margin: 0 auto; padding: 1.5rem 1.25rem; }
+.wp-example h1 { margin: 0 0 .35rem; font-size: 1.4rem; font-weight: 600; }
+.wp-example header p { margin: 0; color: var(--soft); font-size: .93rem; max-width: 40rem; }
+
+/* THE HOST HAS OPINIONS ABOUT `h2` AND `.note`, AND IT IS ENTITLED TO THEM —
+   this stylesheet is the guest. Measured on the documentation site, where
+   these examples also run: `main h2` puts a rule above every heading and
+   `.note` is a callout with an accent edge and a filled ground, so an
+   example dropped onto that page grew section dividers inside its own card
+   and its quiet footnotes came out as alerts. Both are re-declared in full
+   here rather than renamed — the names belong to the example, and the class
+   is already enough specificity to keep them. What each rule needs is every
+   property the host sets, including the ones this file would otherwise be
+   content to leave at their initial values. */
+.wp-example h2 {
+  margin: 0 0 .75rem;
+  padding-top: 0;
+  border-top: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.wp-example section {
   background: var(--card);
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 1.1rem 1.25rem;
   margin-bottom: 1rem;
 }
+/* Separation between sections, not padding under the last one — which on
+   the documentation site would be a gap inside the frame. */
+.wp-example section:last-child { margin-bottom: 0; }
 
-.field { display: flex; flex-direction: column; gap: .25rem; margin-bottom: 1rem; }
-.field > span:first-child { font-size: .85rem; font-weight: 600; }
-.field input, .field select {
+.wp-example .field { display: flex; flex-direction: column; gap: .25rem; margin-bottom: 1rem; }
+.wp-example .field > span:first-child { font-size: .85rem; font-weight: 600; }
+.wp-example .field input, .wp-example .field select {
   font: inherit;
   padding: .5rem .6rem;
   border: 1px solid var(--line);
@@ -52,15 +92,15 @@ section {
   background: #fff;
   color: inherit;
 }
-.field input:focus-visible, .field select:focus-visible {
+.wp-example .field input:focus-visible, .wp-example .field select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 1px;
 }
-.field input[aria-invalid="true"] { border-color: var(--bad); }
-.field .hint { font-size: .8rem; color: var(--soft); }
-.field .msg { font-size: .82rem; color: var(--bad); min-height: 1.2em; }
+.wp-example .field input[aria-invalid="true"] { border-color: var(--bad); }
+.wp-example .field .hint { font-size: .8rem; color: var(--soft); }
+.wp-example .field .msg { font-size: .82rem; color: var(--bad); min-height: 1.2em; }
 
-button {
+.wp-example button {
   font: inherit;
   font-weight: 600;
   padding: .5rem .9rem;
@@ -70,15 +110,24 @@ button {
   color: #fff;
   cursor: pointer;
 }
-button.quiet { background: transparent; color: var(--accent); }
-button:disabled { opacity: .45; cursor: default; }
+.wp-example button.quiet { background: transparent; color: var(--accent); }
+.wp-example button:disabled { opacity: .45; cursor: default; }
 
-.row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
-.spread { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
+.wp-example .row { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.wp-example .spread { display: flex; flex-wrap: wrap; gap: .75rem; justify-content: space-between; align-items: center; }
 
-.note { font-size: .88rem; color: var(--soft); margin: 0 0 .8rem; }
+.wp-example .note {
+  margin: 0 0 .8rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-size: .88rem;
+  line-height: inherit;
+  color: var(--soft);
+}
 
-.alert {
+.wp-example .alert {
   background: var(--bad-bg);
   color: var(--bad);
   border-radius: 5px;
@@ -86,7 +135,7 @@ button:disabled { opacity: .45; cursor: default; }
   font-size: .88rem;
   margin: 0 0 .9rem;
 }
-.ok {
+.wp-example .ok {
   background: var(--good-bg);
   color: var(--good);
   border-radius: 5px;
@@ -95,15 +144,19 @@ button:disabled { opacity: .45; cursor: default; }
   margin: 0 0 .9rem;
 }
 
-ul.plain { margin: 0; padding-left: 1.1rem; }
-ul.plain li { margin: .2rem 0; }
+/* `list-style` IS SET RATHER THAN INHERITED. A Tailwind preflight turns the
+   markers off for every `ul` on the page, so on the documentation site this
+   list arrived indented and unmarked — an indent with nothing to explain it.
+   On its own page the declaration changes nothing. */
+.wp-example ul.plain { margin: 0; padding-left: 1.1rem; list-style: disc; }
+.wp-example ul.plain li { margin: .2rem 0; }
 
-code, .mono {
+.wp-example code, .wp-example .mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: .86em;
 }
 
-.log {
+.wp-example .log {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: .8rem;
   line-height: 1.7;
@@ -117,6 +170,6 @@ code, .mono {
   white-space: pre-wrap;
 }
 
-.steps { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
-.steps button { border-color: var(--line); background: #fff; color: var(--soft); }
-.steps button[aria-current="step"] { border-color: var(--accent); color: var(--accent); }
+.wp-example .steps { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.wp-example .steps button { border-color: var(--line); background: #fff; color: var(--soft); }
+.wp-example .steps button[aria-current="step"] { border-color: var(--accent); color: var(--accent); }

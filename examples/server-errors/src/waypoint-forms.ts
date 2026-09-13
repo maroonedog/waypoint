@@ -12,7 +12,7 @@ const signupAdapter = zodFormResolver(signupSchema);
 
 declare module "@maroonedog/waypoint" {
   interface WaypointForms {
-    form: typeof signupAdapter;
+    signup: typeof signupAdapter;
   }
 }
 

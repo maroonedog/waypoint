@@ -4,6 +4,10 @@
 npm run example:two-forms  # http://localhost:5183
 ```
 
+It also runs on the documentation site, at `/examples/`, mounted from these
+same files. The reason to run it here instead is that the package resolves
+to its source, so an edit inside `src/core` reloads the page.
+
 Both forms declare `owner.email` and mean different things by it. Both screens
 draw it with the **same component**, which imports neither schema, receives no
 handle and takes one prop.

@@ -4,6 +4,10 @@
 npm run example:server-errors  # http://localhost:5182
 ```
 
+It also runs on the documentation site, at `/examples/`, mounted from these
+same files. The reason to run it here instead is that the package resolves
+to its source, so an edit inside `src/core` reloads the page.
+
 Two kinds of complaint reach one list. The schema judges the shape with the
 value in front of it. The server judges what the schema cannot see — whether a
 handle is taken, whether a card will be accepted — and its answer goes to

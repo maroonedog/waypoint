@@ -4,6 +4,10 @@
 npm run example:wizard  # http://localhost:5184
 ```
 
+It also runs on the documentation site, at `/examples/`, mounted from these
+same files. The reason to run it here instead is that the package resolves
+to its source, so an edit inside `src/core` reloads the page.
+
 A wizard is not several forms. It is one value, judged as a whole, shown a
 piece at a time. The schema here has a rule that compares a field on step 1
 with a field on step 3 — which no arrangement of three separate forms could

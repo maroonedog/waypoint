@@ -11,7 +11,7 @@ const bookingAdapter = zodFormResolver(bookingSchema);
 
 declare module "@maroonedog/waypoint" {
   interface WaypointForms {
-    form: typeof bookingAdapter;
+    booking: typeof bookingAdapter;
   }
 }
 
