@@ -616,11 +616,17 @@ main.is-landing .lead {
   max-width: 44ch;
 }
 
-/* A PARAGRAPH AFTER A LEAD HAD NO GAP AT ALL. The sheet spaces what follows a
-   heading and what follows a caption; a lead had only ever been followed by a
-   block with a margin of its own, so nothing covered this until the landing
-   page grew a paragraph under its claim and the two ran together. */
-.lead + p {
+/* TWO PARAGRAPHS IN A ROW HAD NO GAP AT ALL, and it took a while to surface
+   because the pages alternate: a paragraph is followed by a code block, a
+   table, a caption or a heading, and each of those is spaced by a rule of its
+   own. Nothing covered plain prose following plain prose until a page put two
+   next to each other, and then they ran together into one block of text.
+
+   `main p + p` rather than `.lead + p`, which is what this rule was when the
+   landing page first hit it. A lead is a `p`, so the general rule covers that
+   case and every other one. `.caption + .caption` keeps its tighter gap — it
+   is two classes against this rule's one element and one class. */
+main p + p {
   margin-top: var(--gap-block);
 }
 

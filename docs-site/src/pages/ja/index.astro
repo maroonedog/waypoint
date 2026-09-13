@@ -272,15 +272,20 @@ const TRY = [
   <p class="lead">
     どのコンポーネントからでも、どんな深さでも{" "}
     <code>useField("form:billing.postcode")</code> と書けます。この文字列はコンパイラが
-    検査していて、そこに届けるために渡したものは何もありません。
+    検査しています。しかも、そこまで何も渡していません。
+  </p>
+
+  <p>理由は2つです。</p>
+
+  <p>
+    まず、<strong>このパスはコンパイラが検査した型です</strong>。レジストリの宣言を1度
+    書けば、あとは props もジェネリクスも渡しませんし、末端で import するものもありません。
   </p>
 
   <p>
-    成り立たせているものが2つあります。1つは、パスが<strong>コンパイラの検査を通った型</strong>
-    であること。レジストリの宣言を1度書くだけで、props もジェネリクスも渡さず、末端では
-    何も import しません。もう1つは、パスが指す<strong>セルがもう書かれている</strong>こと。
-    セルは <code>createForm</code> の時点で全部そろうので、マウントは購読するだけです。
-    register も unregister も <code>shouldUnregister</code> もありません。
+    そして、<strong>パスが指すセルはもう書かれています</strong>。セルは{" "}
+    <code>createForm</code> の時点で全部そろうので、コンポーネントがマウントしてやることは
+    購読だけ。register も unregister も <code>shouldUnregister</code> もありません。
   </p>
 
   <div class="mt-7 flex flex-wrap gap-3">
