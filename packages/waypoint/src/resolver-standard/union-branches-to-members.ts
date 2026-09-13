@@ -26,7 +26,7 @@
 //            branches' values as its choices. `z.union([z.literal("a"),
 //            z.literal("b")])` is this, and so is a discriminant.
 //   opaque   anything else, including a union that mixes an object with a
-//            scalar. Read here on zod 4.6.1, `z.union([z.string(),
+//            scalar. Read here on zod 4.6.4, `z.union([z.string(),
 //            z.object({…})])` is the mixed case, and there is no one field a
 //            renderer could draw for it — so it stays the single "unknown"
 //            leaf it is today rather than being half-described.

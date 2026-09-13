@@ -27,7 +27,7 @@
 // OBJECT to be descended into; a tuple spells the positions elsewhere —
 // `prefixItems` with `items: false` in 2020-12, an ARRAY of schemas under
 // `items` in draft-07 — and neither is one element type. Descending anyway is
-// what this walk used to do, and against zod 4.6.1's `items: false` it emitted
+// what this walk used to do, and against zod 4.6.4's `items: false` it emitted
 // a descriptor at `pair[*]` of kind "unknown" describing a `false`. There is
 // no honest alternative to stopping: a descriptor is keyed by the RULE, and
 // `declaredPathOf` rewrites `[0]` back to `[*]` before any lookup, so a
@@ -50,7 +50,7 @@
 // A BINARY STRING IS A FILE, AND A DOCUMENT SAYS SO IN TWO SPELLINGS. A file
 // upload is not a vendor fact: it is `type: "string"` carrying OpenAPI's
 // `format: "binary"`, or 2020-12's `contentEncoding: "binary"`. Both are read,
-// because a document may carry either — and zod 4.6.1's `z.file()` carries
+// because a document may carry either — and zod 4.6.4's `z.file()` carries
 // both, measured here as
 // `{"type":"string","format":"binary","contentEncoding":"binary"}`. So every
 // vendor answering `~standard.jsonSchema` gets a file widget out of this walk

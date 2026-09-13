@@ -4,7 +4,7 @@
 //
 // KEPT, AND THE DIFF IS THE ARGUMENT. zod implements both specs fully, so this
 // file looks redundant until you run the two paths side by side. Measured here
-// against zod 4.6.1, over every schema in test/zod-resolver.test.mjs and
+// against zod 4.6.4, over every schema in test/zod-resolver.test.mjs and
 // test/zod-beyond-json-schema.test.mjs plus one
 // written to provoke it, the generic walk reproduced the old hand-written one
 // byte for byte on every field except three:

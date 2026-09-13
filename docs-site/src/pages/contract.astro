@@ -24,7 +24,7 @@
 //
 // The descriptor diff in `roads` is measured output, not prose: it is the
 // three rows where a zod schema and its own JSON Schema disagree, produced by
-// running both paths over the same schemas on zod 4.6.1. The three stages in
+// running both paths over the same schemas on zod 4.6.4. The three stages in
 // `drawn` were likewise produced by running the zod resolver and
 // buildInputProps, not typed out.
 // ===========================================================================
@@ -91,7 +91,7 @@ standardFormResolver(judging, { fields: myFields })
 `;
 
 const roads = `
-// zod 4.6.1, both paths, over every schema in test/zod-resolver.test.mjs
+// zod 4.6.4, both paths, over every schema in test/zod-resolver.test.mjs
 // and test/zod-beyond-json-schema.test.mjs. Identical on every field
 // but these three, which are what the second file pins:
 
@@ -235,7 +235,7 @@ import type * as z from "zod";
 
   <h2 class="mt-16 text-2xl font-bold">So why do two vendor resolvers remain?</h2>
 
-  <Code code={roads} label="measured, zod 4.6.1" />
+  <Code code={roads} label="measured, zod 4.6.4" />
 
   <p class="caption">
     Because a spec member that does not exist cannot carry anything. Over every
@@ -311,7 +311,7 @@ import type * as z from "zod";
     Three resolvers ship and they now work alike: all of them flatten the same
     tree — one with <code>$ref</code> and combinators in it — into one
     descriptor per leaf, through the same walk. Nor is that route free. Run here
-    on zod 4.6.1, asking a schema containing <code>z.date()</code> for its JSON
+    on zod 4.6.4, asking a schema containing <code>z.date()</code> for its JSON
     Schema throws <code>Date cannot be represented in JSON Schema</code> and
     emits <strong class="text-on-surface">no property at all</strong> — the
     whole document is lost to one field, and it is the most common non-text

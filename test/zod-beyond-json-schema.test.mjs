@@ -32,7 +32,7 @@ import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { byPath } from "./support/descriptor-lookup.mjs";
 
 test("a JS Date keeps its widget, which JSON Schema cannot represent at all", () => {
-  // Run here on zod 4.6.1, `jsonSchema.input()` on a schema containing
+  // Run here on zod 4.6.4, `jsonSchema.input()` on a schema containing
   // `z.date()` throws `Date cannot be represented in JSON Schema` and emits no
   // property whatsoever — the whole document is lost to the one field. The
   // resolver passes `{ unrepresentable: "any" }`, which gets the document back

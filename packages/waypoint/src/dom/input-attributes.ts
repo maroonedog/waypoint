@@ -27,7 +27,7 @@
 //
 // `accept` is NOT emitted on a file field, and that is a stated gap rather
 // than an oversight. The MIME list a vendor declares does reach the document —
-// zod 4.6.1 writes `z.file().mime(["image/png"])` as
+// zod 4.6.4 writes `z.file().mime(["image/png"])` as
 // `contentMediaType: "image/png"`, and two of them as an `anyOf` of
 // `contentMediaType` nodes, both measured here — but `FormFieldConstraints`
 // has no member that means "the media types this accepts", and inventing one

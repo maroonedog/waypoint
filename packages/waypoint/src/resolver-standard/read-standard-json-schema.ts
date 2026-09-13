@@ -19,7 +19,7 @@
 // the fallback costs a second call on exactly the vendors that need it.
 //
 // A THROW IS A DECLINE, NOT A FAULT. Producing a JSON Schema is where vendors
-// fail, and they fail for ordinary reasons: run here against zod 4.6.1,
+// fail, and they fail for ordinary reasons: run here against zod 4.6.4,
 // `z.object({ when: z.date() })` throws `Date cannot be represented in JSON
 // Schema` and emits NO property at all, not merely a lossy one — the whole
 // document is lost to one field. Letting that reach the caller would mean a

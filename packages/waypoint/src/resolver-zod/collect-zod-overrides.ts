@@ -4,7 +4,7 @@
 //
 // THIS FILE IS WHAT IS LEFT OF A WALK THAT USED TO BUILD EVERY DESCRIPTOR.
 // zod's JSON Schema now supplies path, kind, presence, bounds, format, label
-// and description — measured, not assumed: run against zod 4.6.1, the generic
+// and description — measured, not assumed: run against zod 4.6.4, the generic
 // walk and the old hand-written one produced byte-identical descriptors for
 // every field of every schema in test/zod-resolver.test.mjs, which when the
 // measurement was taken also held the schemas that now live in

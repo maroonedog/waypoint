@@ -217,7 +217,7 @@ Style, layout and paint are the part of a keystroke that jsdom cannot see at all
 | performance.now() tick | 5 µs |
 | hardwareConcurrency | 2 |
 
-Machine: INTEL(R) XEON(R) PLATINUM 8573C, 2 cores, 7.8 GB, linux 6.17.0-1022-azure, node v23.11.1. react 19.3.0, react-dom 19.3.0, zod 4.6.1, react-hook-form 7.87.0, formik 2.4.9, @tanstack/react-form 1.33.5. Bundle 475 kB across both origins (http://127.0.0.1:5191 and http://127.0.0.1:5192). Run took 11.9 minutes.
+Machine: INTEL(R) XEON(R) PLATINUM 8573C, 2 cores, 7.8 GB, linux 6.17.0-1022-azure, node v23.11.1. react 19.3.0, react-dom 19.3.0, zod 4.6.4, react-hook-form 7.87.0, formik 2.4.9, @tanstack/react-form 1.33.5. Bundle 475 kB across both origins (http://127.0.0.1:5191 and http://127.0.0.1:5192). Run took 11.9 minutes.
 
 How a sample was taken: 21 interleaved pairs per comparison, 12 keystrokes per sample, each keystroke followed by a presented frame and a macrotask; both members of a pair inside ONE tracing session, on two origins so that they are two renderer processes; order alternating every pair and origin alternating at the half-way point. Trace categories: `devtools.timeline`, `blink.user_timing`, `v8`, `disabled-by-default-v8.gc`.
 

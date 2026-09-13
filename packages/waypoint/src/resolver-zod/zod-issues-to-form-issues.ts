@@ -5,7 +5,7 @@
 // `code` IS WHY THIS FILE EXISTS. `StandardSchemaV1.Issue` has exactly two
 // members, `message` and `path` — read from zod's vendored copy of the spec —
 // so the generic mapper cannot carry a code without inventing a member, and it
-// does not. zod returns one anyway: run here on zod 4.6.1, the issues off
+// does not. zod returns one anyway: run here on zod 4.6.4, the issues off
 // `~standard.validate` are byte-identical to `safeParse`'s, `code:
 // "too_small"` included. An application that replaces a message by matching
 // its code needs that, and test/zod-resolver.test.mjs has asserted on it since
