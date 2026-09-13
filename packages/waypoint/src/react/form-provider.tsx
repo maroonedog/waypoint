@@ -56,9 +56,9 @@ export interface FormProviderProps<T, TPath extends string> {
    * it twice — and the two names cannot drift apart. Omit both and the
    * default key stands, which is what an application with one form wants.
    *
-   * A registered key rather than a string: the prefix every path now carries
-   * is compared against this, so a typo here would refuse every path in the
-   * subtree rather than one.
+   * A registered key rather than a string, so a misspelling does not compile
+   * and never reaches a subtree to break. What the type cannot check is the
+   * one below: whether this name and the form's own agree.
    */
   readonly formKey?: FormKey;
   /** Layer 2. Omit it and layer 3 still works; nothing else needs one. */

@@ -23,10 +23,9 @@
 // WHAT THE PREFIX BUYS, exactly. A call that named no key used to be checked
 // against EVERY registered form at once, so it accepted every registered
 // form's paths while only one form's were right where it stood. Qualified, the
-// union names a form in every member, so another form's path is refused rather
-// than silently accepted — and `useFormHandle`'s key guard, which a keyless
-// call could never reach because it had no key to pass, now has one at every
-// call site.
+// union names a form in every member, so a path belonging to another form says
+// so where it is written, and the provider-key comparison in
+// parse-qualified-path.ts has a name to compare.
 //
 // AN UNPREFIXED PATH IS STILL LEGAL WHEN EXACTLY ONE FORM IS REGISTERED, and
 // that is `SoleFormKey`'s whole job. An application with one form should not
@@ -222,11 +221,17 @@ type QualifiedRule<TKey> = TKey extends keyof FormTypeRegistry
 
 /**
  * Any PLACE any registered form has, qualified by the form it belongs to —
- * the type a VIEW component's `path` prop takes. A component that draws one
- * field for whatever path it is handed belongs to the design system rather
- * than to a form, and this is how it says so without giving up on checking
- * what it is handed. Qualified, the prop also says WHICH form each path it
- * accepts came from, which a keyless union cannot.
+ * the type a VIEW component's `path` prop takes, in an application that
+ * registered one. A component drawing one field for whatever path it is handed
+ * belongs to the design system rather than to a form, and this says so without
+ * giving up on checking what it is handed; qualified, the prop also says WHICH
+ * form each path came from, which a keyless union cannot.
+ *
+ * IN A PACKAGE OF ITS OWN it says nothing, because a registry belongs to a
+ * COMPILATION and that package's has none: this resolves to the
+ * no-registration message there, and the component cannot be type-checked
+ * until it is compiled inside an application that registers. Publishing such a
+ * component with its paths checked is not solved.
  *
  * A place and not a rule, because that is what such a component does with it:
  * it hands it to `useField`, which addresses one value. A row's own

@@ -2,9 +2,11 @@
 // use-form-for-path.ts — the form a qualified path names, and the path inside
 // it.
 //
-// Every path-taking hook in this entry begins here, so the colon is read once
-// and `./core` is handed a bare path. What the hook does with the two halves
-// differs; which half is which does not, and no hook decides it for itself.
+// The hooks that take a path and hand back a binding begin here, so the colon
+// is read once and `./core` is handed a bare path. What each does with the two
+// halves differs; which half is which does not, and none decides it for itself.
+// `useParticipation` reads the colon with the same function and does not come
+// through here, because it takes a form handle rather than finding one.
 //
 // The key comparison happens on the way through. A path that names another
 // form throws rather than drawing nothing, which is the guard the keyless call

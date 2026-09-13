@@ -189,7 +189,7 @@ const components = [
   {
     name: "<FormProvider>",
     summary:
-      "Puts one handle in reach of a subtree. formKey says which registered form this is, and the prefix on every path below is compared against it; omit it and the key the form was created with is used, so the name is written once. It is a registered key rather than a string, because a typo in it would refuse the whole subtree.",
+      "Puts one handle in reach of a subtree. formKey says which registered form this is, and a qualified path below is compared against it; omit it and the key the form was created with is used, so the name is written once. Give both and they must agree — a disagreement throws where it is rendered, because it makes every path beneath read a form nobody meant.",
     signature: `<FormProvider form={form} formKey?="order" widgets?={registry}>`,
   },
   {
@@ -238,7 +238,7 @@ type InhabitedPath<T, K> // K, unless T has no value at K
 // layer and the runtime ever see. The prefix rides to their LEFT: FormPath is
 // ConcretePath with a registered key in front of it, FormColumnPath is
 // PartlyBoundPath, FormListPath the arrays, FormDeclaredPath the rules. The
-// colon comes off in one place in ./react, and nothing below it sees one.
+// colon is read by one function in ./react, and nothing below it sees one.
 //
 // A surface addressing ONE value takes ConcretePath: useField, useFieldValue,
 // useFieldIssues, useUncontrolledField, useParticipation, <Field>, and

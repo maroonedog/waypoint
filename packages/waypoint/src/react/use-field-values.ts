@@ -12,10 +12,10 @@
 // has one wildcard left, so it reads that row's column rather than every row's.
 // Nothing here treats that as a case — a bound index is just a path.
 //
-// SO THE PATH TYPE IS THE WIDE ONE, and this is the hook that wants it. Every
-// other path surface in the package narrowed to a PLACE, because every other
-// one addresses a single value. This one addresses a set, and it reaches
-// `expandDeclaredPath`, which handles any number of wildcards still standing.
+// SO THE PATH TYPE IS THE WIDE ONE, and this is the hook that wants it. A hook
+// addressing a single value narrows to a PLACE, where a wildcard has nothing to
+// read; this one addresses a set, and it reaches `expandDeclaredPath`, which
+// handles any number of wildcards still standing.
 // `FormColumnPath` is that set, qualified: the form is named in front of the
 // wildcards, which sit where they always did.
 // The rule-or-place union was therefore too NARROW here, not too wide: it

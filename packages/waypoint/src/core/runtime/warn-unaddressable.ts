@@ -34,12 +34,16 @@ export const forgetUnaddressableWarnings = (): void => alreadyWarned.clear();
  * SEARCHED ON THE BARE PATH, QUOTED WITH THE FORM IN FRONT OF IT, and those
  * have to be two different strings.
  *
- * The reader searches their own source for what they typed, and what they
- * typed names a form. A form's own vocabulary does not: it is the paths this
- * one declares, and the resemblance is looked for in that vocabulary, so the
- * name has to come off before the search and go back on after it — onto the
- * suggestions as well. Then the whole line reads in one vocabulary and every
- * path in it can be pasted straight back into the source.
+ * The reader searches their own source for what they typed. A form's own
+ * vocabulary is the paths it declares, so the resemblance is looked for in
+ * that vocabulary and the name goes back on afterwards — onto the suggestions
+ * as well — so that the whole line reads in one of them.
+ *
+ * WHICH NAME, and this is the limit: the one in `FormOptions.key`, because
+ * `./core` has no context to read. An application that named the form at the
+ * PROVIDER instead gets bare quotes and bare suggestions here while having
+ * written a qualified path, and cannot paste them back. Naming the form where
+ * it is created is what buys the prefix in these messages.
  *
  * Skipping the second half would be the worse half to skip. A qualified
  * spelling handed to a search over unqualified paths resembles none of them,

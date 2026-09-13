@@ -132,8 +132,8 @@ function ruleWhereAPlaceIsRequired(): void {
   useUncontrolledField("form:items[*].sku");
   // @ts-expect-error one list has one row order; this names as many as there are shipments
   useRows("form:shipments[*].lines");
-  // `useParticipation` is scoped by the handle passed to it rather than by the
-  // enclosing provider, so its path already names one form and carries no key.
+  // `useParticipation` takes either spelling, and strips a prefix against the
+  // enclosing provider like every other path surface.
   // @ts-expect-error a wildcard dormant root matches nothing and silences nothing
   useParticipation(useForm(), "items[*]", false);
 }

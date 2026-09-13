@@ -4,8 +4,8 @@
 //
 // `useField` could always be told which form it meant, because it took the key
 // as a second argument. None of the surfaces below could. A `<Field>` has one
-// `path` prop and no room beside it; `FormPathTo<string>` is a type with no
-// parameter to name a form in; `AutoForm`'s `only` was a list of bare strings;
+// `path` prop and no room beside it; `FormPathTo<string>` HAD no parameter to
+// name a form in; `AutoForm`'s `only` was a list of bare strings;
 // `FormProvider`'s `formKey` was a `string`, so a typo in it was a typo
 // nothing read. Each of them was therefore checked against EVERY registered
 // form's paths at once, and one screen's path compiled inside another's.

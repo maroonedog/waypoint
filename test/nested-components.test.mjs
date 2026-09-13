@@ -54,8 +54,8 @@ const DEFAULTS = {
  * ONE prop, not two. The address names its own form — `form:billing` — so a
  * component shared between forms takes a single self-describing string rather
  * than an address plus a key to read it in. `postcode.path` below is the
- * unqualified half: it is written into the DOM, where it has to match what a
- * lookup by `name` will ask for.
+ * unqualified half — the prefix comes off before `./core` sees it — and the
+ * test ids the assertions look for are built from that half.
  */
 function AddressFields({ at }) {
   const postcode = useField(`${at}.postcode`);

@@ -10,11 +10,13 @@
 // recognises. A row that only promised `string` would hand every component
 // below it an unchecked path, and the checking would stop at the first list.
 //
-// IT CARRIES ITS FORM, so it is a whole address rather than half of one. The
-// list knew which form it was reading; until the form was part of the path
-// that knowledge stopped at the row, and a component built
-// `` `${row.path}.sku` `` from it and still needed a key threaded down beside
-// it to say which form the result belonged to.
+// IT CARRIES WHATEVER THE CALLER WROTE, prefix and all, so a qualified list
+// hands down a whole address rather than half of one. The list knew which form
+// it was reading; until the form could be part of the path that knowledge
+// stopped at the row, and a component built `` `${row.path}.sku` `` from it and
+// still needed a key threaded down beside it. A sole-form application writing
+// `useRows("items")` gets rows at `items[0]` with no form in them, which is
+// the same spelling it wrote and the same one it can address.
 //
 // There was a `<FieldScope row={row}>` here once, and passing the row to it so
 // that it could put the row back into context was a round trip through the

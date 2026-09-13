@@ -73,11 +73,11 @@ const asWritten = (path: string): string => `form:${path}`;
 /**
  * The inverse: what the shape catalogue calls the leaf a written path names.
  *
- * A diagnostic is matched back to a leaf by the path in the line that produced
- * it, and the catalogue names its leaves with no form in front of them. Left
- * qualified, every one of those comparisons fails — and it fails in the
- * direction that reads as "the compiler accepted it", so a table of what the
- * depth budget refuses reported every path in the sweep as addressable.
+ * The catalogue names its leaves with no form in front of them, and
+ * `run-types-bench.ts` compares a refused leaf's path against one of those
+ * names as a string. Left qualified, that comparison fails — and it fails in
+ * the direction that reads as "nothing was refused", which is what feeds the
+ * sentence about how many segments are addressable.
  *
  * Split lexically, on a head standing before the first `.` or `[`, which is
  * the rule the library itself applies on both sides.

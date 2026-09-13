@@ -14,15 +14,15 @@
 // form has? Warn, stay silent, or — for `items[*]`, where guessing would
 // address a row nobody asked for — throw.
 //
-// THE PATHS HERE CARRY NO FORM IN FRONT OF THEM, and that is the arm under
+// MOST PATHS HERE CARRY NO FORM IN FRONT OF THEM, and that is the arm under
 // test. An application with one registered form writes its paths bare, so bare
-// is a spelling that has to keep working, and this is where it is held. The
-// qualified arm is `hook-form-key.test.mjs`: there the call site names the
-// form, here the enclosing provider answers.
+// is a spelling that has to keep working, and this is where it is held; what
+// happens when the call site names a form instead is in
+// `hook-form-key.test.mjs`.
 //
 // The last section is about the DIAGNOSTIC rather than about addressing, and
 // it is where both spellings appear. A warning is read by somebody searching
-// their own source for what they typed, so what it quotes has to be the
+// their own source for what they typed, so what it quotes should be the
 // spelling they wrote — which means a qualified call has to produce a
 // qualified message, suggestions included.
 import { test } from "node:test";

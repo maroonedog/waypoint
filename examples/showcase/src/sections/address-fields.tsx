@@ -14,10 +14,14 @@ import { MdSelectField } from "../md/select-field.js";
  * and a place that is missing one of these five fields will not compile.
  *
  * Each of those places names its form: `form:billing`, `form:shipping`. That
- * is what makes ONE prop enough. The section belongs to the design system
- * rather than to a form, and while a path carried no form there was nowhere to
- * say which one it had been handed — so another screen's path fitted this prop
- * exactly as well, and the mistake arrived as blank inputs.
+ * is what makes ONE prop enough — the section belongs to the design system
+ * rather than to a form, and a path that carries its own form is a whole
+ * instruction rather than half of one.
+ *
+ * It is not a compile-time guarantee that the form is THIS screen's.
+ * `FormPathOver` defaults to every registered key, so a second screen's place
+ * still satisfies this prop; what the prefix buys is that the provider can
+ * compare the name at run time instead of drawing blank inputs in silence.
  */
 export function AddressFields({
   at,

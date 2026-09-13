@@ -43,8 +43,8 @@ Verified against source before writing: `rememberDeclaredCalls` runs uncondition
 > registered key, and the value type is read in the form it names rather than
 > in whichever registered form happens to declare something there. What forced
 > it was that a key could only ever be passed as a SEPARATE argument, and a
-> surface with no argument list has nowhere to put one — a `<Field path>` is a
-> single prop, `FormPathTo<string>` is a type with no parameter for a form, and
+> surface with no argument list had nowhere to put one — a `<Field path>` is a
+> single prop, `FormPathTo<string>` had no parameter for a form, and
 > `row.path` is one string handed down. Each of those was therefore checked
 > against every registered form's paths at once, so a path belonging to another
 > screen compiled where it stood and arrived as a control that drew nothing.

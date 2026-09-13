@@ -1,8 +1,10 @@
 // ===========================================================================
 // parse-qualified-path.ts — the colon, split in one place.
 //
-// A qualified path names a form and a place in it: `admin:quotas.seats`. Every
-// hook in this entry takes one, and this is where the two halves come apart.
+// A qualified path names a form and a place in it: `admin:quotas.seats`. The
+// hooks that address a field take one, and this is where the two halves come
+// apart — the ones that address a FORM take a key instead, and `useCell` and
+// `useCreateForm` take neither.
 // Below here nothing ever sees a prefix: `./core` addresses a VALUE with a
 // path, and the concrete-path grammar has no case for a colon — a prefix that
 // reached it would be read as part of the first member's NAME and quietly

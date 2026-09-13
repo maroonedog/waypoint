@@ -8,10 +8,13 @@
 // its prefix against it, which turns "typed against one form, rendered under
 // another" from a silent wrong answer into a thrown one.
 //
-// EVERY path now carries that prefix, so every call reaches that comparison.
-// The guard existed before and a call could avoid it by saying nothing: it was
-// asked only of a call that passed a key as a separate argument, and a call
-// that passed none handed it `undefined` and skipped it.
+// A QUALIFIED path reaches that comparison. The guard existed before and was
+// asked only of a call that passed a key as a separate argument; a call that
+// passed none handed it `undefined` and skipped it, so the spelling with
+// nothing in front of it was the spelling nothing checked. That spelling is
+// now legal only where one form is registered, which is where there is
+// nothing to tell apart — but it still reaches no comparison, and a bare path
+// under a provider key that disagrees does nothing at all.
 //
 // The default is what an application with one form gets without writing
 // anything down, so an unprefixed path and a `form:`-prefixed one reach the

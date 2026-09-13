@@ -109,7 +109,9 @@ const viewTypes = [
     <code>form</code> is the key declared above, the colon ends it, and the
     value type is read in <em>that</em> form. Register one and the prefix is
     optional; skip the declaration entirely and the hooks are not unchecked —
-    they are refused, and the error quotes the declaration you are missing.
+    they are refused, and the error quotes the declaration you are missing. A
+    dependency that registered a form of its own is the exception: registration
+    belongs to the compilation, so you inherit that one's paths instead.
   </p>
 
   <h2 class="mt-16 text-2xl font-bold">Why a registry and not a prop</h2>
