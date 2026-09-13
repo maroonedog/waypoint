@@ -22,9 +22,13 @@
 //
 // A string, not an object, so the context value is stable by construction.
 // ===========================================================================
+// The default itself is in `../dom`, because the second binding's provider
+// needs the same one and two copies of a string that have to agree are how
+// they stop agreeing. It is re-exported here, and from `./react`, under the
+// spelling it has always had.
 import { createContext } from "react";
+import { DEFAULT_FORM_KEY } from "../dom/parse-qualified-path.js";
 
-/** The key a provider carries when it does not name one. */
-export const DEFAULT_FORM_KEY = "form";
+export { DEFAULT_FORM_KEY };
 
 export const FormKeyContext = createContext<string>(DEFAULT_FORM_KEY);

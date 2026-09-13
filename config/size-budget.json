@@ -19,9 +19,16 @@
     {
       "id": "@maroonedog/waypoint/react",
       "entry": "export * from \"@maroonedog/waypoint/react\";",
-      "minified": 32236,
-      "gzipped": 11398,
-      "budget": 12538
+      "minified": 32244,
+      "gzipped": 11409,
+      "budget": 12550
+    },
+    {
+      "id": "@maroonedog/waypoint/vue",
+      "entry": "export * from \"@maroonedog/waypoint/vue\";",
+      "minified": 27820,
+      "gzipped": 10098,
+      "budget": 11108
     },
     {
       "id": "@maroonedog/waypoint/resolver-standard",
@@ -61,16 +68,30 @@
     {
       "id": "react (a screen: useField, useRows, FormProvider, useCreateForm)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";",
-      "minified": 24352,
-      "gzipped": 8914,
-      "budget": 9806
+      "minified": 24360,
+      "gzipped": 8927,
+      "budget": 9820
+    },
+    {
+      "id": "vue (a screen: useField, useRows, FormProvider, useCreateForm)",
+      "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/vue\";",
+      "minified": 25541,
+      "gzipped": 9306,
+      "budget": 10237
     },
     {
       "id": "react (useField alone)",
       "entry": "export { useField } from \"@maroonedog/waypoint/react\";",
-      "minified": 5313,
+      "minified": 5321,
       "gzipped": 2156,
       "budget": 2372
+    },
+    {
+      "id": "vue (useField alone)",
+      "entry": "export { useField } from \"@maroonedog/waypoint/vue\";",
+      "minified": 6422,
+      "gzipped": 2533,
+      "budget": 2787
     },
     {
       "id": "core (createForm alone)",
@@ -89,9 +110,9 @@
     {
       "id": "a screen + resolver-zod (what an application installs)",
       "entry": "export { useField, useRows, FormProvider, useCreateForm } from \"@maroonedog/waypoint/react\";\nexport { zodFormResolver } from \"@maroonedog/waypoint/resolver-zod\";",
-      "minified": 30972,
-      "gzipped": 11118,
-      "budget": 12230
+      "minified": 30980,
+      "gzipped": 11138,
+      "budget": 12252
     }
   ]
 }

@@ -17,10 +17,16 @@
 // The context default is `"immediately"`, which is what this library did
 // before any of this existed: an application that sets nothing sees no change.
 // ===========================================================================
+// The default itself is in `../dom`, beside the rule that reads it, because
+// the second binding's provider needs the same one. Re-exported here, and from
+// `./react`, under the spelling it has always had.
 import { createContext } from "react";
-import type { IssueVisibility } from "../dom/issue-visibility.js";
+import {
+  DEFAULT_ISSUE_VISIBILITY,
+  type IssueVisibility,
+} from "../dom/issue-visibility.js";
 
-export const DEFAULT_ISSUE_VISIBILITY: IssueVisibility = "immediately";
+export { DEFAULT_ISSUE_VISIBILITY };
 
 export const IssueVisibilityContext = createContext<IssueVisibility>(
   DEFAULT_ISSUE_VISIBILITY

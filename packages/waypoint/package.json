@@ -1,7 +1,7 @@
 {
   "name": "@maroonedog/waypoint",
   "version": "0.1.0",
-  "description": "A field's address exists before the component that draws it: typed paths the compiler has already checked and runtime state already written, with a contract any validator can describe itself through, resolvers and React bindings behind one install",
+  "description": "A field's address exists before the component that draws it: typed paths the compiler has already checked and runtime state already written, with a contract any validator can describe itself through, resolvers and React and Vue bindings behind one install",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -34,6 +34,10 @@
       "types": "./dist/react/index.d.ts",
       "default": "./dist/react/index.js"
     },
+    "./vue": {
+      "types": "./dist/vue/index.d.ts",
+      "default": "./dist/vue/index.js"
+    },
     "./resolver-standard": {
       "types": "./dist/resolver-standard/index.d.ts",
       "default": "./dist/resolver-standard/index.js"
@@ -59,6 +63,9 @@
       ],
       "react": [
         "dist/react/index.d.ts"
+      ],
+      "vue": [
+        "dist/vue/index.d.ts"
       ],
       "resolver-standard": [
         "dist/resolver-standard/index.d.ts"
@@ -86,6 +93,7 @@
     "form",
     "forms",
     "react",
+    "vue",
     "schema",
     "validation",
     "typescript",
@@ -98,10 +106,14 @@
   "dependencies": {},
   "peerDependencies": {
     "react": ">=18",
+    "vue": ">=3.5.0",
     "zod": "^4.0.0"
   },
   "peerDependenciesMeta": {
     "react": {
+      "optional": true
+    },
+    "vue": {
       "optional": true
     },
     "zod": {

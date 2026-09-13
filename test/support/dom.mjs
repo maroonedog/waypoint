@@ -63,6 +63,15 @@ globalThis.document = dom.window.document;
 globalThis.HTMLElement = dom.window.HTMLElement;
 globalThis.Event = dom.window.Event;
 globalThis.Node = dom.window.Node;
+// The two Vue needs, and it needs them as GLOBALS rather than off `window`:
+// @vue/runtime-dom's mount path dereferences `Element` unguarded to decide
+// whether it was handed a node, and `SVGElement` unguarded to work out a root
+// namespace. `MathMLElement` is deliberately absent from this list — that same
+// call site reaches it through `typeof MathMLElement === "function"`, and this
+// jsdom does not define one. Without these two, mounting fails as a bare
+// `ReferenceError` with nothing in it to say which library wanted the name.
+globalThis.Element = dom.window.Element;
+globalThis.SVGElement = dom.window.SVGElement;
 try {
   Object.defineProperty(globalThis, "navigator", {
     value: dom.window.navigator,

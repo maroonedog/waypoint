@@ -47,6 +47,17 @@ import { NO_ISSUES } from "../core/index.js";
  */
 export type IssueVisibility = "immediately" | "touched" | "dirty";
 
+/**
+ * What a subtree that sets nothing gets, which is what this library did before
+ * the option existed: an application that says nothing sees no change.
+ *
+ * It is here rather than beside either binding's provider for the reason
+ * `DEFAULT_FORM_KEY` is in parse-qualified-path.ts — it is the default side of
+ * the comparison this file performs, and a second binding holding its own copy
+ * would be two declarations of one fact that have to agree.
+ */
+export const DEFAULT_ISSUE_VISIBILITY: IssueVisibility = "immediately";
+
 export interface VisibilityInput {
   readonly visibility: IssueVisibility;
   readonly isTouched: boolean;

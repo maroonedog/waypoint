@@ -37,6 +37,7 @@ const EXTERNAL = [
   "react",
   "react-dom",
   "react/jsx-runtime",
+  "vue",
   "zod",
   "zustand",
   "@maroonedog/luq",
@@ -82,6 +83,7 @@ const SUBJECTS: readonly (readonly [string, string])[] = [
   [PACKAGE, `export * from "${PACKAGE}";`],
   [`${PACKAGE}/core`, `export * from "${PACKAGE}/core";`],
   [`${PACKAGE}/react`, `export * from "${PACKAGE}/react";`],
+  [`${PACKAGE}/vue`, `export * from "${PACKAGE}/vue";`],
   [
     `${PACKAGE}/resolver-standard`,
     `export * from "${PACKAGE}/resolver-standard";`,
@@ -102,9 +104,19 @@ const SUBJECTS: readonly (readonly [string, string])[] = [
     "react (a screen: useField, useRows, FormProvider, useCreateForm)",
     `export { useField, useRows, FormProvider, useCreateForm } from "${PACKAGE}/react";`,
   ],
+  // The same screen from the other binding, which is the row that says what a
+  // second binding costs and what it shares. Most of both figures is `./core`
+  // and `../dom`, so the two should sit close together; a gap opening between
+  // them is one binding reimplementing something the other takes from the
+  // shared layer, and this is where that shows before anybody reads the diff.
+  [
+    "vue (a screen: useField, useRows, FormProvider, useCreateForm)",
+    `export { useField, useRows, FormProvider, useCreateForm } from "${PACKAGE}/vue";`,
+  ],
   // The floor row. It is the one figure `sideEffects: false` is really
   // promising, and the one that would go quietly wrong first.
   ["react (useField alone)", `export { useField } from "${PACKAGE}/react";`],
+  ["vue (useField alone)", `export { useField } from "${PACKAGE}/vue";`],
   ["core (createForm alone)", `export { createForm } from "${PACKAGE}/core";`],
   [
     "core (assertFormStoreContract alone)",

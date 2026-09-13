@@ -65,6 +65,42 @@
       "why": "A fresh array every render wakes every dependency array watching the issues."
     },
     {
+      "id": "vue-change-event-key",
+      "file": "vue/vue-input-props.js",
+      "find": "        onInput: (event) => onChange(changeEventLike(event)),",
+      "replace": "        onChange: (event) => onChange(changeEventLike(event)),",
+      "test": "test/vue-binding.test.mjs",
+      "catches": "the change handler is bound to the event a keystroke fires",
+      "why": "React's onChange fires on a keystroke and Vue's fires on a commit, so the React spelling renders perfectly and writes the cell a blur late."
+    },
+    {
+      "id": "vue-cell-invalidation",
+      "file": "vue/use-cell.js",
+      "find": "        version.value;\n        return toValue(source).read();",
+      "replace": "        return toValue(source).read();",
+      "test": "test/vue-field.test.mjs",
+      "catches": "a validation message appears",
+      "why": "A computed with no dependency on the notification counter caches the first read for ever, and the screen simply stops changing."
+    },
+    {
+      "id": "vue-cell-scope-guard",
+      "file": "vue/use-cell.js",
+      "find": "    if (getCurrentScope() === undefined) {",
+      "replace": "    if (false) {",
+      "test": "test/vue-binding.test.mjs",
+      "catches": "useCell refuses to subscribe where nothing could ever unsubscribe",
+      "why": "watchEffect outside a scope leaks its subscription and warns about nothing, which is the one leak Vue does not report for itself."
+    },
+    {
+      "id": "vue-decorate-handler-order",
+      "file": "vue/decorate-vnode.js",
+      "find": "    const decorated = cloneVNode(node, merged);\n    decorated.props = merged;",
+      "replace": "    const decorated = cloneVNode(node, merged);",
+      "test": "test/vue-binding.test.mjs",
+      "catches": "decorate composes what must compose and wins everything else",
+      "why": "cloneVNode merges through mergeProps, which runs the caller's handler before ours — so the caller reads the cell one keystroke behind."
+    },
+    {
       "id": "revalidate-complaint",
       "file": "core/runtime/create-form.js",
       "find": "        if ((store.read(issuesCell(path))?.length ?? 0) > 0)\n            return true;",

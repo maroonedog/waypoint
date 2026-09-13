@@ -1,0 +1,16 @@
+{
+  "//": "The `./vue` entry: the second binding, and the first thing that proves `../dom` is a seam rather than a folder name. It needs the DOM lib for the same reason `./react` does — a field's props are DOM attributes — and it needs no JSX factory, because every component here is a `defineComponent` with a render function and the applications that use it write templates the SFC compiler handles. It names `vue` and nothing else outside itself, which is why it is not in test/framework-free-layers.test.mjs's list.",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "rootDir": ".",
+    "outDir": "../../dist/vue",
+    "tsBuildInfoFile": "../../.tsbuildinfo/vue.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [
+    { "path": "../contract" },
+    { "path": "../core" },
+    { "path": "../dom" }
+  ]
+}

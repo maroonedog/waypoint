@@ -46,6 +46,7 @@ at all, and `./react` is the only entry whose built output names React.
 | `@maroonedog/waypoint` | The contract, the registry and the path types: `FormAdapter`, `FormIssue`, `WaypointForms`, `FormPath`, `FormPathTo`, `FieldPath`, `ConcretePath`. **`declare module` goes here.** One runtime export, `isPending`. |
 | `@maroonedog/waypoint/core` | The runtime: `createForm`, `createCellStore`, `assertFormStoreContract`. No React, no validator, no DOM. |
 | `@maroonedog/waypoint/react` | `useField`, `useRows`, `useFormStatus`, `FormProvider`, `<Field>`, `<AutoForm>`. |
+| `@maroonedog/waypoint/vue` | `useField`, `useRows`, `useFormStatus`, `FormProvider`, `<Field>`, `<FieldRows>` for Vue 3, against the SAME registry — the `declare module` names the package, not a binding. It carries no `<AutoForm>`, no uncontrolled binding and no error summary yet; everything they are built on is reachable through `useForm()`. |
 | `@maroonedog/waypoint/resolver-standard` | `standardFormResolver` — any validator that implements Standard Schema and its JSON Schema companion. Names no vendor. |
 | `@maroonedog/waypoint/resolver-zod` | `zodFormResolver`: the above, plus the three facts zod's JSON Schema does not carry about zod. zod is a type-only import, erased at build time. |
 | `@maroonedog/waypoint/resolver-luq` | `luqFormResolver`: the above, plus luq's issue codes and severities, which the spec has no member for. |

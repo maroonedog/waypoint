@@ -41,6 +41,17 @@
 // paths are built from data and have no literal to put a prefix on.
 // ===========================================================================
 
+/**
+ * The key a provider carries when it does not name one, and therefore the key
+ * an unprefixed path is read against.
+ *
+ * It is here rather than beside either binding's provider because it is the
+ * DEFAULT SIDE of the comparison this file performs, and a second binding
+ * holding its own copy of the string would be two declarations of one fact
+ * that have to agree. `./react` re-exports it under the spelling it had.
+ */
+export const DEFAULT_FORM_KEY = "form";
+
 /** Where a qualifying head may stop. A colon after either of these is a name. */
 const PATH_STEP = /[.[]/;
 

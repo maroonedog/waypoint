@@ -1,5 +1,5 @@
 {
-  "//": "The packages' SOURCE, compiled with a form registered. test/types compiles the emitted .d.ts, which carries no implementation signatures — so an overload that does not match its own implementation is invisible there. It is visible here, and it shipped once: useForm's implementation returned FormHandle<never, string>, which stops satisfying the keyless overload the moment AnyValues is no longer never, i.e. in every application that registers a form and in none that does not.",
+  "//": "The packages' SOURCE, compiled with a form registered. test/types compiles the emitted .d.ts, which carries no implementation signatures — so an overload that does not match its own implementation is invisible there. It is visible here, and it shipped once: useForm's implementation returned FormHandle<never, string>, which stops satisfying the keyless overload the moment AnyValues is no longer never, i.e. in every application that registers a form and in none that does not. It is also the one program that compiles BOTH bindings against ONE augmentation, which is the whole claim `./vue` makes about the registry.",
   "compilerOptions": {
     "target": "ES2020",
     "module": "NodeNext",
@@ -25,6 +25,9 @@
       ],
       "@maroonedog/waypoint/react": [
         "../../packages/waypoint/src/react/index.ts"
+      ],
+      "@maroonedog/waypoint/vue": [
+        "../../packages/waypoint/src/vue/index.ts"
       ]
     }
   },

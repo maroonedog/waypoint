@@ -213,6 +213,7 @@ The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 | `@maroonedog/waypoint/resolver-luq` | The above, plus [luq](https://luq.dev)'s issue codes and severities, which the spec has no member for. |
 | `@maroonedog/waypoint/core` | The runtime. No React, no validator, no DOM. |
 | `@maroonedog/waypoint/react` | React bindings. It re-exports the path types, and declares none of them. |
+| `@maroonedog/waypoint/vue` | Vue 3 bindings, reading the SAME registry the React ones do, because the `declare module` names the package rather than a binding. |
 | `@maroonedog/waypoint/store-zustand` | A zustand store, as a shipped instance of the store contract `./core` exports. |
 
 They are entry points rather than packages because they all install together
