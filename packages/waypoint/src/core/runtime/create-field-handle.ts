@@ -59,7 +59,10 @@ export interface FieldHandleRequest {
    * belongs to the form and not to the field, because one pass judges the
    * whole root and there is no per-field pass a field could gate.
    */
-  readonly requestValidationAt: (moment: "change" | "blur") => void;
+  readonly requestValidationAt: (
+    moment: "change" | "blur",
+    path: string
+  ) => void;
   /** Drops adopted issues a write here made stale; see adopted-issues.ts. */
   readonly forgetAdoptedAround: (path: string) => void;
   readonly setParticipating: (path: string, participating: boolean) => void;
@@ -108,11 +111,11 @@ export function createFieldHandle<TValue>(
       // `validateOn: "submit"`, where no pass follows at all, the stale
       // verdict still leaves the screen.
       forgetAdoptedAround(path);
-      requestValidationAt("change");
+      requestValidationAt("change", path);
     },
     markTouched() {
       store.write(touchedCell(path), true);
-      requestValidationAt("blur");
+      requestValidationAt("blur", path);
     },
     setParticipating(participating) {
       setParticipating(path, participating);

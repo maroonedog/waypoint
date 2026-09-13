@@ -99,8 +99,8 @@ const triggers = [
 /** Which moments a VALUE EDIT asks at. Everything else is unconditional. */
 const moments = [
   ["\"change\"", "the default", "A pass follows every keystroke, coalesced to one per settled turn."],
-  ["\"blur\"", "markTouched()", "setValue asks for nothing; the blur asks."],
-  ["\"submit\"", "submit() only", "Neither asks. errorCount is 0 until the first submit."],
+  ["\"blur\"", "markTouched()", "setValue asks for nothing until the field is already complaining; then the edit that might fix it asks."],
+  ["\"submit\"", "submit() only", "Neither asks. errorCount is 0 until the first submit; after one is refused, edits ask again."],
 ];
 ---
 
@@ -248,6 +248,16 @@ const moments = [
     edits. <code>reset</code>, <code>setParticipating</code> and a row edit
     still judge under every setting, because each changes <em>which</em> issues
     block rather than what one value is.
+  </p>
+
+  <p class="caption">
+    <strong class="text-on-surface">A complaint does not outlive the value it
+    was about.</strong> Whatever the setting, an edit at a path that is
+    currently carrying an issue — or below one that is — asks for a pass.
+    Without it, <code>"blur"</code> left a field marked
+    <code>aria-invalid</code> with a message about a value the reader had
+    already corrected, for as long as they spent correcting it. It is the rule
+    a server&rsquo;s issues already follow, applied to the schema&rsquo;s.
   </p>
 
   <div class="mt-6 overflow-x-auto">

@@ -35,6 +35,7 @@ import {
   ROOT_CELL,
   blockingIssuesCell,
   errorCountCell,
+  issuesCell,
   participatingCell,
   submitCountCell,
   submittingCell,
@@ -42,6 +43,7 @@ import {
 } from "../store/cell-key.js";
 import { createCellStore } from "../store/create-cell-store.js";
 import { assertConcretePath } from "../path/assert-concrete-path.js";
+import { ancestorPathsOf } from "../path/path-relation.js";
 import { declaredPathOf } from "../path/declared-path-of.js";
 import { buildDescriptorTree } from "../descriptors/build-descriptor-tree.js";
 import { createDescriptorIndex } from "../descriptors/descriptor-index.js";
@@ -134,19 +136,57 @@ export function createForm<T, TPath extends string = string>(
   };
 
   const validateOn = options.validateOn ?? "change";
+
+  /**
+   * Whether a verdict this write could have made stale is on screen.
+   *
+   * The path itself, and its ancestors. "This row is a duplicate" does not
+   * survive an edit inside the row, which is the rule adopted-issues.ts states
+   * and applies to what a server said; this is the same rule applied to what
+   * the schema said. Bounded by the declared path depth, so it is a handful of
+   * map lookups on a keystroke and no allocation beyond the ancestor list.
+   *
+   * NOT DESCENDANTS, and that is a limit rather than a decision: a store is
+   * five opaque members with no iteration, so the paths below this one cannot
+   * be enumerated to be asked. An issue on `items[0].sku` therefore does not
+   * make an edit to `items` re-judge — which is the direction nobody types in.
+   */
+  const complaintNearby = (path: string): boolean => {
+    if ((store.read(issuesCell(path))?.length ?? 0) > 0) return true;
+    for (const ancestor of ancestorPathsOf(path)) {
+      if ((store.read(issuesCell(ancestor))?.length ?? 0) > 0) return true;
+    }
+    return false;
+  };
+
   /**
    * One pass judges the whole root, so this is the form's decision and the
-   * field only reports which moment it is at. The submit-count clause is what
-   * makes "blur" and "submit" usable rather than merely present: once the form
-   * has refused a submit, fixing the field it complained about has to clear
-   * the complaint.
+   * field only reports which moment it is at, and which path it was.
+   *
+   * TWO CLAUSES MAKE "blur" AND "submit" USABLE RATHER THAN MERELY PRESENT,
+   * and they are the same clause twice. Once the form has refused a submit,
+   * fixing the field it complained about has to clear the complaint. And a
+   * field that is ALREADY COMPLAINING has to clear it too, submit or no
+   * submit: under "blur" the verdict was published at the last blur, and
+   * without this it outlives the value it was about — the field goes on
+   * carrying `aria-invalid` and a message about a value that is no longer
+   * there, for as long as the reader spends fixing it. Measured before this
+   * clause existed: a field left at "a needs 3", typed back to a valid "Ada",
+   * still said "a needs 3" until it was blurred again.
+   *
+   * It costs a cell read on a keystroke, and only on the settings that asked
+   * for fewer passes: under "change" the first clause has already returned.
    */
-  const requestValidationAt = (moment: "change" | "blur"): void => {
+  const requestValidationAt = (
+    moment: "change" | "blur",
+    path: string
+  ): void => {
     if (moment === validateOn) {
       scheduler.request();
       return;
     }
-    if (moment === "change" && (store.read(submitCountCell) ?? 0) > 0) {
+    if (moment !== "change") return;
+    if ((store.read(submitCountCell) ?? 0) > 0 || complaintNearby(path)) {
       scheduler.request();
     }
   };

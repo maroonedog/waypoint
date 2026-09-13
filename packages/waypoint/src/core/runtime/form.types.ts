@@ -64,6 +64,15 @@ export interface FieldHandle<TValue> {
  * the alternative is a person fixing the field the form just complained about
  * and watching the complaint stay. That is the defect react-hook-form's
  * `reValidateMode` exists for, and here it costs one cell read.
+ *
+ * AND SO DOES A FIELD THAT IS ALREADY COMPLAINING, submit or no submit. The
+ * paragraph above named the defect and closed half of it. Under `"blur"` the
+ * verdict is published at the blur, and before any submit an edit asked for
+ * nothing — so a field left at "a needs 3", typed back to a valid value, went
+ * on saying "a needs 3", with `aria-invalid` set, until it was blurred again.
+ * Measured. The same cell read closes the other half, at the path and at its
+ * ancestors: it is the rule `adoptIssues` already follows for what a server
+ * said, applied to what the schema said.
  */
 export type FormValidationMoment = "change" | "blur" | "submit";
 
