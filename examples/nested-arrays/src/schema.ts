@@ -13,25 +13,25 @@ import { z } from "zod";
 
 export const orderSchema = z.object({
   customer: z.object({
-    name: z.string().min(1, "必須です"),
+    name: z.string().min(1, "required"),
   }),
   shipments: z
     .array(
       z.object({
         address: z.object({
-          postcode: z.string().regex(/^\d{3}-\d{4}$/, "000-0000 の形式で"),
+          postcode: z.string().regex(/^\d{3}-\d{4}$/, "use the form 000-0000"),
         }),
         lines: z
           .array(
             z.object({
-              sku: z.string().min(1, "必須です"),
-              qty: z.string().min(1, "必須です"),
+              sku: z.string().min(1, "required"),
+              qty: z.string().min(1, "required"),
             })
           )
-          .min(1, "1行以上必要です"),
+          .min(1, "at least one line"),
       })
     )
-    .min(1, "1件以上必要です"),
+    .min(1, "at least one shipment"),
 });
 
 export type Order = z.infer<typeof orderSchema>;

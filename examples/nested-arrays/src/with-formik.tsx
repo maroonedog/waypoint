@@ -24,6 +24,7 @@ import {
   type Order,
 } from "./schema.js";
 import { Panel, Row } from "./ui.js";
+import ownSource from "./with-formik.tsx?raw";
 
 /**
  * `getIn` on a CONTAINER returns its children's errors rather than a message —
@@ -62,8 +63,8 @@ export function WithFormik() {
     >
       {({ values, errors }) => (
         <Form>
-          <Panel title="Formik" note="141 行 / 「shipments」13回">
-            <Row label="お名前" error={message(getIn(errors, "customer.name"))}>
+          <Panel title="Formik" source={ownSource}>
+            <Row label="Name" error={message(getIn(errors, "customer.name"))}>
               <Field name="customer.name" />
             </Row>
 
@@ -73,17 +74,17 @@ export function WithFormik() {
                   {values.shipments.map((shipment, index) => (
                     <div className="card" key={index}>
                       <div className="card-head">
-                        <strong>配送先 {index + 1}</strong>
+                        <strong>Shipment {index + 1}</strong>
                         <button
                           type="button"
                           onClick={() => shipments.remove(index)}
                         >
-                          削除
+                          Remove
                         </button>
                       </div>
 
                       <Row
-                        label="郵便番号"
+                        label="Postcode"
                         error={message(
                           getIn(errors, `shipments.${index}.address.postcode`)
                         )}
@@ -95,7 +96,7 @@ export function WithFormik() {
                         {(lines) => (
                           <div className="inner">
                             <p className="inner-head">
-                              明細{" "}
+                              Lines{" "}
                               <em>
                                 {message(
                                   getIn(errors, `shipments.${index}.lines`)
@@ -118,7 +119,7 @@ export function WithFormik() {
                                   />
                                 </Row>
                                 <Row
-                                  label="数量"
+                                  label="Qty"
                                   error={message(
                                     getIn(
                                       errors,
@@ -142,7 +143,7 @@ export function WithFormik() {
                               type="button"
                               onClick={() => lines.push(blankLine())}
                             >
-                              + 明細
+                              + line
                             </button>
                           </div>
                         )}
@@ -153,7 +154,7 @@ export function WithFormik() {
                     type="button"
                     onClick={() => shipments.push(blankShipment())}
                   >
-                    + 配送先
+                    + shipment
                   </button>
                 </>
               )}

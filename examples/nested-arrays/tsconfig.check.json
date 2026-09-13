@@ -6,5 +6,8 @@
     "isolatedModules": true, "verbatimModuleSyntax": true, "noEmit": true,
     "skipLibCheck": true
   },
-  "include": ["src/waypoint-forms.ts", "src/with-waypoint.tsx", "src/schema.ts", "src/ui.tsx"]
+  "include": [
+    "src/waypoint-forms.ts", "src/with-waypoint.tsx", "src/schema.ts",
+    "src/ui.tsx", "src/raw-modules.d.ts"
+  ]
 }

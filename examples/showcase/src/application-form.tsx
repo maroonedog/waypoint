@@ -21,31 +21,29 @@ import { SectionCard } from "./md/section-card.js";
 
 function ApplicantSection(): ReactElement {
   return (
-    <SectionCard icon="badge" title="ご担当者さま" caption="ご連絡先を入力してください">
+    <SectionCard
+      icon="badge"
+      title="Who to contact"
+      caption="How we reach you about this account"
+    >
       <Field path="form:applicant.lastName">
-        {(field) => <MdTextField field={field} label="姓" />}
+        {(field) => <MdTextField field={field} label="Last name" />}
       </Field>
       <Field path="form:applicant.firstName">
-        {(field) => <MdTextField field={field} label="名" />}
-      </Field>
-      <Field path="form:applicant.lastNameKana">
-        {(field) => <MdTextField field={field} label="セイ" hint="全角カタカナ" />}
-      </Field>
-      <Field path="form:applicant.firstNameKana">
-        {(field) => <MdTextField field={field} label="メイ" hint="全角カタカナ" />}
+        {(field) => <MdTextField field={field} label="First name" />}
       </Field>
       <Field path="form:applicant.birthDate">
-        {(field) => <MdTextField field={field} label="生年月日" type="date" />}
+        {(field) => <MdTextField field={field} label="Date of birth" type="date" />}
       </Field>
       <Field path="form:applicant.phone">
         {(field) => (
-          <MdTextField field={field} label="電話番号" leading="call" hint="例: 03-1234-5678" />
+          <MdTextField field={field} label="Phone" leading="call" hint="e.g. (212) 555-0184" />
         )}
       </Field>
       <div className="sm:col-span-2">
         <Field path="form:applicant.email">
           {(field) => (
-            <MdTextField field={field} label="メールアドレス" type="email" leading="mail" />
+            <MdTextField field={field} label="Email" type="email" leading="mail" />
           )}
         </Field>
       </div>
@@ -55,20 +53,25 @@ function ApplicantSection(): ReactElement {
 
 function CompanySection(): ReactElement {
   return (
-    <SectionCard icon="apartment" title="会社情報">
+    <SectionCard icon="apartment" title="The company">
       <div className="sm:col-span-2">
         <Field path="form:company.name">
-          {(field) => <MdTextField field={field} label="会社名" />}
+          {(field) => <MdTextField field={field} label="Company name" />}
         </Field>
       </div>
       <Field path="form:company.department">
-        {(field) => <MdTextField field={field} label="部署" hint="任意" />}
+        {(field) => <MdTextField field={field} label="Department" hint="optional" />}
       </Field>
       <Field path="form:company.title">
-        {(field) => <MdTextField field={field} label="役職" hint="任意" />}
+        {(field) => <MdTextField field={field} label="Job title" hint="optional" />}
       </Field>
       <Field path="form:company.employees">
-        {(field) => <MdNumberField field={field} label="従業員数" suffix="名" />}
+        {(field) => <MdNumberField field={field} label="Employees" suffix="people" />}
+      </Field>
+      <Field path="form:company.registration">
+        {(field) => (
+          <MdTextField field={field} label="Registration no." hint="e.g. NY-004512" />
+        )}
       </Field>
     </SectionCard>
   );
@@ -82,23 +85,23 @@ function AddressSections(): ReactElement {
   useParticipation(form, "form:shipping", !sameAsBilling);
   return (
     <>
-      <SectionCard icon="receipt_long" title="請求先住所">
+      <SectionCard icon="receipt_long" title="Billing address">
         <AddressFields at="form:billing" />
       </SectionCard>
 
       <SectionCard
         icon="local_shipping"
-        title="配送先住所"
+        title="Shipping address"
         caption={
           sameAsBilling
-            ? "請求先と同じ。入力した値は残ったまま、判定だけ止まっています"
+            ? "Same as billing. The values you typed are still here; only the verdict has stopped counting"
             : undefined
         }
         actions={
           <div className="w-40">
             <Field path="form:sameAsBilling">
               {(field) => (
-                <MdCheckboxField field={field} label="請求先と同じ" />
+                <MdCheckboxField field={field} label="Same as billing" />
               )}
             </Field>
           </div>
@@ -114,17 +117,17 @@ function AddressSections(): ReactElement {
 
 function TermsSection(): ReactElement {
   return (
-    <SectionCard icon="gavel" title="お支払いと確認事項">
+    <SectionCard icon="gavel" title="Payment and terms">
       <div className="sm:col-span-2">
         <Field path="form:payment">
           {(field) => (
             <MdChoiceChips
               field={field}
-              label="お支払い方法"
+              label="How you would like to pay"
               labels={{
-                invoice: "請求書払い",
-                card: "クレジットカード",
-                transfer: "銀行振込",
+                invoice: "Invoice",
+                card: "Credit card",
+                transfer: "Bank transfer",
               }}
             />
           )}
@@ -133,7 +136,12 @@ function TermsSection(): ReactElement {
       <div className="sm:col-span-2">
         <Field path="form:note">
           {(field) => (
-            <MdTextField field={field} label="備考" multiline hint="任意 / 500 文字まで" />
+            <MdTextField
+              field={field}
+              label="Anything else"
+              multiline
+              hint="optional / up to 500 characters"
+            />
           )}
         </Field>
       </div>
@@ -142,7 +150,7 @@ function TermsSection(): ReactElement {
           {(field) => (
             <MdCheckboxField
               field={field}
-              label="利用規約およびプライバシーポリシーに同意します"
+              label="I accept the terms of service and the privacy policy"
             />
           )}
         </Field>
@@ -164,20 +172,21 @@ function SubmitBar({
     <div className="sticky bottom-0 z-10 -mx-1 mt-2 rounded-lg bg-surface-high/95 p-4 shadow-e2 backdrop-blur">
       {blocked.length === 0 ? null : (
         <p className="mb-3 rounded-sm bg-error-container px-4 py-3 text-sm text-on-error-container">
-          未入力・不備が {blocked.length} 件あります: {blocked.slice(0, 4).join(" / ")}
-          {blocked.length > 4 ? " ほか" : ""}
+          {blocked.length} field(s) are missing or wrong:{" "}
+          {blocked.slice(0, 4).join(" / ")}
+          {blocked.length > 4 ? " and more" : ""}
         </p>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-on-surface-variant">
           {errorCount === 0
-            ? "送信できます"
-            : `${errorCount} 件の入力を確認してください`}
-          {submitCount === 0 ? "" : ` · 送信を ${submitCount} 回試行`}
+            ? "Ready to send"
+            : `${errorCount} field(s) still need a look`}
+          {submitCount === 0 ? "" : ` · sent ${submitCount} time(s)`}
         </p>
         <div className="flex gap-2">
           <MdButton tone="text" onClick={() => form.reset()}>
-            入力を破棄
+            Discard
           </MdButton>
           <MdButton
             icon="send"
@@ -196,7 +205,7 @@ function SubmitBar({
                 });
             }}
           >
-            {isSubmitting ? "送信中…" : "申込を送信"}
+            {isSubmitting ? "Sending…" : "Send the application"}
           </MdButton>
         </div>
       </div>

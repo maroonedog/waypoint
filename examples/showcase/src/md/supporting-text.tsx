@@ -11,7 +11,7 @@ import type { FieldBinding } from "@maroonedog/waypoint/react";
  * several of them miss.
  *
  * It carries the error id and never the description id. The hints in this form
- * are application text — 「例: 100-0001」 is a wording decision, not something
+ * are application text — "e.g. 10001" is a wording decision, not something
  * the schema declared — so no descriptor here has a `description` and
  * `field.descriptionProps` is always undefined. A schema that did declare one
  * would want a second line, with that bag on it.

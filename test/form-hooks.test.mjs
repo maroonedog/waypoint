@@ -252,9 +252,9 @@ test("a container is addressable, and must not warn", async () => {
   // and reading a whole object is ordinary. Asking "has a descriptor" warned
   // about both, which is why the question is "is it a leaf or an ancestor".
   function Screen() {
-    useFieldIssues("items");   // 配列レベルの issue
-    useField("billing");       // オブジェクトまるごと
-    useFieldIssues("items[0]"); // 行そのもの
+    useFieldIssues("items");    // an issue at the level of the array
+    useField("billing");        // a whole object
+    useFieldIssues("items[0]"); // the row itself
     return null;
   }
   const { root, escaped, warned } = await mountCatching(

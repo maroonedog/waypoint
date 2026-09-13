@@ -25,6 +25,7 @@ import type { FormPathTo } from "@maroonedog/waypoint/react";
 import { orderAdapter } from "./waypoint-forms.js";
 import { defaults, blankLine, blankShipment } from "./schema.js";
 import { Panel, Row } from "./ui.js";
+import ownSource from "./with-waypoint.tsx?raw";
 
 /** Draws one text field, whatever text field it is handed. It belongs to the
  *  UI rather than to the form, so it takes a path rather than knowing one —
@@ -55,12 +56,12 @@ function Lines({ at }: { readonly at: `form:shipments[${number}]` }) {
   return (
     <div className="inner">
       <p className="inner-head">
-        明細 <em>{issues[0]?.message ?? ""}</em>
+        Lines <em>{issues[0]?.message ?? ""}</em>
       </p>
       {lines.rows.map((line) => (
         <div className="line" key={line.key}>
           <Text at={`${line.path}.sku`} label="SKU" />
-          <Text at={`${line.path}.qty`} label="数量" />
+          <Text at={`${line.path}.qty`} label="Qty" />
           <button type="button" onClick={() => lines.remove(line.index)}>
             ×
           </button>
@@ -70,7 +71,7 @@ function Lines({ at }: { readonly at: `form:shipments[${number}]` }) {
         type="button"
         onClick={() => lines.insert(lines.rows.length, blankLine())}
       >
-        + 明細
+        + line
       </button>
     </div>
   );
@@ -83,15 +84,15 @@ function Shipments() {
       {shipments.rows.map((shipment) => (
         <div className="card" key={shipment.key}>
           <div className="card-head">
-            <strong>配送先 {shipment.index + 1}</strong>
+            <strong>Shipment {shipment.index + 1}</strong>
             <button
               type="button"
               onClick={() => shipments.remove(shipment.index)}
             >
-              削除
+              Remove
             </button>
           </div>
-          <Text at={`${shipment.path}.address.postcode`} label="郵便番号" />
+          <Text at={`${shipment.path}.address.postcode`} label="Postcode" />
           <Lines at={shipment.path} />
         </div>
       ))}
@@ -101,7 +102,7 @@ function Shipments() {
           shipments.insert(shipments.rows.length, blankShipment())
         }
       >
-        + 配送先
+        + shipment
       </button>
     </>
   );
@@ -115,8 +116,8 @@ export function WithWaypoint() {
 
   return (
     <FormProvider form={form}>
-      <Panel title="@maroonedog/waypoint" note="91 行 / 「shipments」7回">
-        <Text at="form:customer.name" label="お名前" />
+      <Panel title="@maroonedog/waypoint" source={ownSource}>
+        <Text at="form:customer.name" label="Name" />
         <Shipments />
       </Panel>
     </FormProvider>

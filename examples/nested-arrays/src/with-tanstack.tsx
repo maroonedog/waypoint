@@ -15,6 +15,7 @@
 import { useForm } from "@tanstack/react-form";
 import { orderSchema, defaults, blankLine, blankShipment } from "./schema.js";
 import { Panel, Row } from "./ui.js";
+import ownSource from "./with-tanstack.tsx?raw";
 
 /** Only a string is a message: a list's errors can be its rows' errors. */
 const firstMessage = (errors: readonly unknown[]): string | undefined => {
@@ -33,10 +34,10 @@ export function WithTanStack() {
   });
 
   return (
-    <Panel title="@tanstack/react-form" note="132 行 / 「shipments」9回">
+    <Panel title="@tanstack/react-form" source={ownSource}>
       <form.Field name="customer.name">
         {(field) => (
-          <Row label="お名前" error={firstMessage(field.state.meta.errors)}>
+          <Row label="Name" error={firstMessage(field.state.meta.errors)}>
             <input
               value={field.state.value}
               onChange={(event) => field.handleChange(event.target.value)}
@@ -52,16 +53,16 @@ export function WithTanStack() {
             {shipments.state.value.map((_shipment, index) => (
               <div className="card" key={index}>
                 <div className="card-head">
-                  <strong>配送先 {index + 1}</strong>
+                  <strong>Shipment {index + 1}</strong>
                   <button type="button" onClick={() => shipments.removeValue(index)}>
-                    削除
+                    Remove
                   </button>
                 </div>
 
                 <form.Field name={`shipments[${index}].address.postcode`}>
                   {(field) => (
                     <Row
-                      label="郵便番号"
+                      label="Postcode"
                       error={firstMessage(field.state.meta.errors)}
                     >
                       <input
@@ -77,7 +78,7 @@ export function WithTanStack() {
                   {(lines) => (
                     <div className="inner">
                       <p className="inner-head">
-                        明細 <em>{firstMessage(lines.state.meta.errors) ?? ""}</em>
+                        Lines <em>{firstMessage(lines.state.meta.errors) ?? ""}</em>
                       </p>
                       {lines.state.value.map((_line, at) => (
                         <div className="line" key={at}>
@@ -104,7 +105,7 @@ export function WithTanStack() {
                           >
                             {(field) => (
                               <Row
-                                label="数量"
+                                label="Qty"
                                 error={firstMessage(field.state.meta.errors)}
                               >
                                 <input
@@ -126,7 +127,7 @@ export function WithTanStack() {
                         type="button"
                         onClick={() => lines.pushValue(blankLine())}
                       >
-                        + 明細
+                        + line
                       </button>
                     </div>
                   )}
@@ -137,7 +138,7 @@ export function WithTanStack() {
               type="button"
               onClick={() => shipments.pushValue(blankShipment())}
             >
-              + 配送先
+              + shipment
             </button>
           </>
         )}

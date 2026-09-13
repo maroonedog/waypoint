@@ -25,7 +25,7 @@ export interface TextFieldProps {
  * Two things are still hand-written, deliberately:
  *
  * `type` from the caller wins over the type the descriptor implies. The schema
- * declares 生年月日 as a string, because that is what it stores, so the
+ * declares the date of birth as a string, because that is what it stores, so the
  * descriptor says `text` and only the application knows it wants a date
  * picker. The descriptor's type is the fallback rather than the override.
  *

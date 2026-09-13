@@ -1,8 +1,8 @@
-# Showcase — お取引口座 開設申込
+# Showcase — a trade account application
 
 A reference screen for the runtime, drawn with Tailwind and Material Design 3.
-It is a real form: personal details, a company, two addresses, an order table
-and terms — 23 inputs across six sections.
+It is a real form: who to contact, the company, two addresses, an order table
+and terms — six sections, and every input in them declared by the schema.
 
 ```bash
 npm run example:showcase       # http://localhost:5179
@@ -17,9 +17,9 @@ page with no build step in between.
 |---|---|
 | Every field is a `<Field>` with a children function | Layer 3. The widgets here are the application's, and none of them ships with the library |
 | `AddressFields` is written once and placed twice | `at="form:billing"` and `at="form:shipping"` — one prop, and it is a location rather than a value; the address names its own form, so nothing has to be threaded beside it |
-| 「請求先と同じ」 hides the shipping address | `useParticipation(form, "form:shipping", …)` — the values stay in the store and stop counting toward what blocks a submit |
+| "Same as billing" hides the shipping address | `useParticipation(form, "form:shipping", …)` — the values stay in the store and stop counting toward what blocks a submit |
 | The order table adds, removes and renumbers rows | `<FieldRows>` hands each row its `row.path`, qualified by its form; row ids are React keys, cell keys stay concrete indices |
-| 「合計が上限を超えています」 | An array-level issue at `items`, read with `useFieldIssues("form:items")` — a path with no descriptor |
+| The over-the-limit message on the order table | An array-level issue at `items`, read with `useFieldIssues("form:items")` — a path with no descriptor |
 | The required marker and `minlength` on each input | `field.descriptor` — the schema said it, the widget drew it, nobody wrote it twice |
 | The submit bar counts what blocks | `useFormStatus()` — four cells, four subscriptions |
 | Submitting reports what stopped it | `form.submit()` returns `blockedBy`, including paths with no component on screen |

@@ -21,10 +21,10 @@ function Page() {
           </span>
           <div>
             <h1 className="text-lg font-medium text-on-surface">
-              お取引口座 開設申込
+              Trade account application
             </h1>
             <p className="text-sm text-on-surface-variant">
-              waypoint の参考画面 — Material Design 3
+              A reference screen for waypoint — Material Design 3
             </p>
           </div>
         </div>
@@ -37,14 +37,14 @@ function Page() {
               <span aria-hidden className="material-symbols-rounded text-[20px]">
                 check_circle
               </span>
-              申込を受け付けました
+              Application received
             </h2>
             <pre className="max-h-64 overflow-auto rounded-sm bg-surface-lowest/60 p-3 text-xs text-on-surface">
               {JSON.stringify(submitted, null, 2)}
             </pre>
             <div className="mt-3">
               <MdButton tone="outlined" onClick={() => setSubmitted(undefined)}>
-                閉じる
+                Close
               </MdButton>
             </div>
           </div>

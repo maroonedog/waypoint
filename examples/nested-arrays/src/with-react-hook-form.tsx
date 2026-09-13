@@ -20,6 +20,7 @@ import { useFieldArray, useForm, useFormContext, FormProvider } from "react-hook
 import { zodResolver } from "@hookform/resolvers/zod";
 import { orderSchema, defaults, blankLine, blankShipment, type Order } from "./schema.js";
 import { Panel, Row } from "./ui.js";
+import ownSource from "./with-react-hook-form.tsx?raw";
 
 function Lines({ at }: { readonly at: number }) {
   const { control, register, formState } = useFormContext<Order>();
@@ -31,7 +32,7 @@ function Lines({ at }: { readonly at: number }) {
   return (
     <div className="inner">
       <p className="inner-head">
-        明細 <em>{listError?.message ?? listError?.root?.message ?? ""}</em>
+        Lines <em>{listError?.message ?? listError?.root?.message ?? ""}</em>
       </p>
       {fields.map((line, index) => (
         <div className="line" key={line.id}>
@@ -42,7 +43,7 @@ function Lines({ at }: { readonly at: number }) {
             <input {...register(`shipments.${at}.lines.${index}.sku`)} />
           </Row>
           <Row
-            label="数量"
+            label="Qty"
             error={formState.errors.shipments?.[at]?.lines?.[index]?.qty?.message}
           >
             <input {...register(`shipments.${at}.lines.${index}.qty`)} />
@@ -53,7 +54,7 @@ function Lines({ at }: { readonly at: number }) {
         </div>
       ))}
       <button type="button" onClick={() => append(blankLine())}>
-        + 明細
+        + line
       </button>
     </div>
   );
@@ -67,13 +68,13 @@ function Shipments() {
       {fields.map((shipment, index) => (
         <div className="card" key={shipment.id}>
           <div className="card-head">
-            <strong>配送先 {index + 1}</strong>
+            <strong>Shipment {index + 1}</strong>
             <button type="button" onClick={() => remove(index)}>
-              削除
+              Remove
             </button>
           </div>
           <Row
-            label="郵便番号"
+            label="Postcode"
             error={
               formState.errors.shipments?.[index]?.address?.postcode?.message
             }
@@ -85,7 +86,7 @@ function Shipments() {
         </div>
       ))}
       <button type="button" onClick={() => append(blankShipment())}>
-        + 配送先
+        + shipment
       </button>
     </>
   );
@@ -101,8 +102,8 @@ export function WithReactHookForm() {
 
   return (
     <FormProvider {...methods}>
-      <Panel title="react-hook-form" note="94 行 / 「shipments」10回">
-        <Row label="お名前" error={methods.formState.errors.customer?.name?.message}>
+      <Panel title="react-hook-form" source={ownSource}>
+        <Row label="Name" error={methods.formState.errors.customer?.name?.message}>
           <input {...methods.register("customer.name")} />
         </Row>
         <Shipments />

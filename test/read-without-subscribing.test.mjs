@@ -17,8 +17,8 @@ import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
 import { createForm } from "@maroonedog/waypoint/core";
 
 const SCHEMA = z.object({
-  owner: z.object({ name: z.string().min(3, "3文字以上") }),
-  items: z.array(z.object({ sku: z.string().min(1, "必須") })).min(1),
+  owner: z.object({ name: z.string().min(3, "at least 3 characters") }),
+  items: z.array(z.object({ sku: z.string().min(1, "required") })).min(1),
 });
 
 const newForm = () =>
@@ -99,7 +99,7 @@ test("issues and flags are unaffected — only the value channel derives", async
   await settle();
 
   const field = form.field("owner.name");
-  assert.equal(field.sources.issues.read()[0]?.message, "3文字以上");
+  assert.equal(field.sources.issues.read()[0]?.message, "at least 3 characters");
   assert.equal(field.sources.dirty.read(), true);
   assert.equal(field.sources.touched.read(), false);
 });

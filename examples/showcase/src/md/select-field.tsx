@@ -46,7 +46,7 @@ export function MdSelectField({
           aria-invalid={wrong ? true : undefined}
           className="w-full appearance-none bg-transparent px-4 pb-2 pt-6 text-base text-on-surface outline-none"
         >
-          <option value="">選択してください</option>
+          <option value="">Choose one</option>
           {choices.map((choice) => (
             <option key={String(choice.value)} value={String(choice.value)}>
               {choice.label}

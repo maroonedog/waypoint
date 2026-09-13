@@ -27,7 +27,7 @@ export function AddressFields({
   at,
 }: {
   readonly at: FormPathOver<
-    "postcode" | "prefecture" | "city" | "street" | "building"
+    "postcode" | "state" | "city" | "street" | "building"
   >;
 }): ReactElement {
   return (
@@ -36,25 +36,25 @@ export function AddressFields({
         {(field) => (
           <MdTextField
             field={field}
-            label="郵便番号"
-            hint="例: 100-0001"
+            label="ZIP code"
+            hint="e.g. 10001"
             leading="markunread_mailbox"
           />
         )}
       </Field>
-      <Field path={`${at}.prefecture`}>
-        {(field) => <MdSelectField field={field} label="都道府県" />}
+      <Field path={`${at}.state`}>
+        {(field) => <MdSelectField field={field} label="State" />}
       </Field>
       <div className="sm:col-span-2">
         <Field path={`${at}.city`}>
           {(field) => (
-            <MdTextField field={field} label="市区町村" leading="location_city" />
+            <MdTextField field={field} label="City" leading="location_city" />
           )}
         </Field>
       </div>
       <div className="sm:col-span-2">
         <Field path={`${at}.street`}>
-          {(field) => <MdTextField field={field} label="番地" />}
+          {(field) => <MdTextField field={field} label="Street address" />}
         </Field>
       </div>
       <div className="sm:col-span-2">
@@ -62,8 +62,8 @@ export function AddressFields({
           {(field) => (
             <MdTextField
               field={field}
-              label="建物名・部屋番号"
-              hint="任意"
+              label="Apartment, suite, floor"
+              hint="optional"
             />
           )}
         </Field>

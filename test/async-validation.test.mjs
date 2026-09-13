@@ -11,7 +11,7 @@ import {
   validatingCell,
 } from "@maroonedog/waypoint/core";
 
-const SCHEMA = z.object({ handle: z.string().min(1, "必須です") });
+const SCHEMA = z.object({ handle: z.string().min(1, "required") });
 
 const TAKEN = "taken";
 
@@ -30,7 +30,7 @@ const askingAdapter = (settle) => {
 /** Answers straight away, one microtask later. */
 const uniquenessCheck = async (root) =>
   root?.handle === TAKEN
-    ? [{ path: "handle", message: "すでに使われています", code: "taken" }]
+    ? [{ path: "handle", message: "that handle is taken", code: "taken" }]
     : [];
 
 const build = (adapter, defaultValues = { handle: "" }) =>

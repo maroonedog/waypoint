@@ -1,47 +1,55 @@
 import { z } from "zod";
-import { PREFECTURES } from "./prefectures.js";
+import { STATES } from "./regions.js";
 
-const KANA = /^[ァ-ヶー\s]+$/;
-const PHONE = /^0\d{1,4}-?\d{1,4}-?\d{3,4}$/;
-const POSTCODE = /^\d{3}-?\d{4}$/;
+const PHONE = /^\+?1?[-. ]?\(?\d{3}\)?[-. ]?\d{3}[-. ]?\d{4}$/;
+const ZIP = /^\d{5}(-\d{4})?$/;
+const REGISTRATION = /^[A-Z]{2}-\d{6}$/;
 
 const address = z.object({
-  postcode: z.string().regex(POSTCODE, "郵便番号は 100-0001 の形式で入力してください"),
-  prefecture: z.enum(PREFECTURES),
-  city: z.string().min(1, "市区町村を入力してください").max(40),
-  street: z.string().min(1, "番地を入力してください").max(60),
+  postcode: z.string().regex(ZIP, "Use a ZIP code such as 10001 or 10001-2345"),
+  state: z.enum(STATES),
+  city: z.string().min(1, "City is required").max(40),
+  street: z.string().min(1, "Street address is required").max(60),
   building: z.string().max(60).optional(),
 });
 
 /** The declared limit, stated once so the message and the rule cannot drift. */
 export const ORDER_CEILING = 3_000_000;
 
+const money = (amount: number): string =>
+  amount.toLocaleString("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+
 export const applicationSchema = z
   .object({
     applicant: z.object({
-      lastName: z.string().min(1, "姓を入力してください").max(20),
-      firstName: z.string().min(1, "名を入力してください").max(20),
-      lastNameKana: z.string().regex(KANA, "全角カタカナで入力してください"),
-      firstNameKana: z.string().regex(KANA, "全角カタカナで入力してください"),
-      birthDate: z.string().min(1, "生年月日を入力してください"),
-      email: z.email("メールアドレスの形式が正しくありません"),
-      phone: z.string().regex(PHONE, "電話番号は 03-1234-5678 の形式で入力してください"),
+      lastName: z.string().min(1, "Last name is required").max(20),
+      firstName: z.string().min(1, "First name is required").max(20),
+      birthDate: z.string().min(1, "Date of birth is required"),
+      email: z.email("That is not an email address"),
+      phone: z.string().regex(PHONE, "Use a number such as (212) 555-0184"),
     }),
     company: z.object({
-      name: z.string().min(1, "会社名を入力してください").max(60),
+      name: z.string().min(1, "Company name is required").max(60),
       department: z.string().max(40).optional(),
       title: z.string().max(40).optional(),
-      employees: z.number().min(1, "1 以上を入力してください").max(1_000_000),
+      employees: z.number().min(1, "At least 1").max(1_000_000),
+      registration: z
+        .string()
+        .regex(REGISTRATION, "Two letters, a hyphen, six digits — e.g. NY-004512"),
     }),
     billing: address,
     shipping: address,
     sameAsBilling: z.boolean(),
     items: z.array(
       z.object({
-        sku: z.string().min(1, "商品コードを入力してください").max(20),
-        name: z.string().min(1, "品名を入力してください").max(60),
-        quantity: z.number().min(1, "1 以上を入力してください").max(999),
-        unitPrice: z.number().min(0, "0 以上を入力してください").max(9_999_999),
+        sku: z.string().min(1, "A product code is required").max(20),
+        name: z.string().min(1, "A description is required").max(60),
+        quantity: z.number().min(1, "At least 1").max(999),
+        unitPrice: z.number().min(0, "0 or more").max(9_999_999),
       })
     ),
     payment: z.enum(["invoice", "card", "transfer"]),
@@ -54,14 +62,14 @@ export const applicationSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["agreed"],
-        message: "利用規約への同意が必要です",
+        message: "The terms have to be accepted",
       });
     }
     if (value.items.length === 0) {
       ctx.addIssue({
         code: "custom",
         path: ["items"],
-        message: "明細を 1 行以上追加してください",
+        message: "Add at least one line",
       });
     }
     const total = value.items.reduce(
@@ -72,7 +80,7 @@ export const applicationSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["items"],
-        message: `合計 ${total.toLocaleString("ja-JP")} 円が上限 ${ORDER_CEILING.toLocaleString("ja-JP")} 円を超えています`,
+        message: `${money(total)} is over the ${money(ORDER_CEILING)} limit`,
       });
     }
     // The shipping address is judged against billing, and the toggle that
@@ -85,7 +93,8 @@ export const applicationSchema = z
       ctx.addIssue({
         code: "custom",
         path: ["shipping", "postcode"],
-        message: "請求先と同じ住所です。同一で良い場合は上のスイッチを入れてください",
+        message:
+          "This is the billing address. If that is right, use the switch above",
       });
     }
   });
@@ -94,15 +103,19 @@ export const EMPTY_APPLICATION = {
   applicant: {
     lastName: "",
     firstName: "",
-    lastNameKana: "",
-    firstNameKana: "",
     birthDate: "",
     email: "",
     phone: "",
   },
-  company: { name: "", department: "", title: "", employees: 1 },
-  billing: { postcode: "", prefecture: "東京都", city: "", street: "", building: "" },
-  shipping: { postcode: "", prefecture: "東京都", city: "", street: "", building: "" },
+  company: {
+    name: "",
+    department: "",
+    title: "",
+    employees: 1,
+    registration: "",
+  },
+  billing: { postcode: "", state: "New York", city: "", street: "", building: "" },
+  shipping: { postcode: "", state: "New York", city: "", street: "", building: "" },
   sameAsBilling: true,
   items: [{ sku: "", name: "", quantity: 1, unitPrice: 0 }],
   payment: "invoice",

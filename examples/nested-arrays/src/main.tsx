@@ -9,10 +9,11 @@ import "./styles.css";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <header>
-      <h1>配列とネストが混ざったフォーム</h1>
+      <h1>Arrays and nesting, in one form</h1>
       <p>
-        shipments[] → address{"{}"} → lines[] 。同じスキーマ・同じ見た目・同じ操作を
-        4実装で。違うのはフィールドの指し方だけです。
+        shipments[] → address{"{}"} → lines[]. One schema, one set of markup
+        and one set of controls, built four times. The only thing that differs
+        is how a field says which row it belongs to.
       </p>
     </header>
     <main>

@@ -25,7 +25,7 @@ import {
 const SCHEMA = z.object({
   items: z.array(
     z.object({
-      sku: z.string().min(1, "商品コードを入力してください"),
+      sku: z.string().min(1, "a product code is required"),
       tags: z.array(z.object({ label: z.string().min(1) })),
     })
   ),

@@ -28,8 +28,8 @@ export function ItemsSection(): ReactElement {
       {({ rows, insert, remove }) => (
         <SectionCard
           icon="list_alt"
-          title="ご注文明細"
-          caption={`${rows.length} 行`}
+          title="Order lines"
+          caption={`${rows.length} line(s)`}
           actions={
             <MdButton
               tone="tonal"
@@ -43,7 +43,7 @@ export function ItemsSection(): ReactElement {
                 })
               }
             >
-              行を追加
+              Add a line
             </MdButton>
           }
         >
@@ -53,31 +53,31 @@ export function ItemsSection(): ReactElement {
                 <div className="sm:col-span-3">
                   <Field path={`${row.path}.sku`}>
                     {(field) => (
-                      <MdTextField field={field} label="商品コード" />
+                      <MdTextField field={field} label="Product code" />
                     )}
                   </Field>
                 </div>
                 <div className="sm:col-span-4">
                   <Field path={`${row.path}.name`}>
-                    {(field) => <MdTextField field={field} label="品名" />}
+                    {(field) => <MdTextField field={field} label="Description" />}
                   </Field>
                 </div>
                 <div className="sm:col-span-2">
                   <Field path={`${row.path}.quantity`}>
-                    {(field) => <MdNumberField field={field} label="数量" />}
+                    {(field) => <MdNumberField field={field} label="Qty" />}
                   </Field>
                 </div>
                 <div className="sm:col-span-2">
                   <Field path={`${row.path}.unitPrice`}>
                     {(field) => (
-                      <MdNumberField field={field} label="単価" suffix="円" />
+                      <MdNumberField field={field} label="Unit price" suffix="USD" />
                     )}
                   </Field>
                 </div>
                 <div className="flex items-center justify-end sm:col-span-1">
                   <button
                     type="button"
-                    aria-label="この行を削除"
+                    aria-label="Remove this line"
                     onClick={() => remove(row.index)}
                     disabled={rows.length === 1}
                     className="state-layer relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full text-on-surface-variant disabled:opacity-38"
