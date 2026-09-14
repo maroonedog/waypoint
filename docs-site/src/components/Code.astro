@@ -54,8 +54,14 @@ interface Props {
    * /start/ — the first code a reader of this site meets. Passed as `ts`, it
    * was highlighted against the wrong grammar: `git` and `npm` set as
    * identifiers, `#` opening nothing.
+   *
+   * The last four arrived with /showcase/, which shows every file of the
+   * example rather than only the TypeScript ones: a directory has
+   * stylesheets, an entry document and two config files in it, and leaving
+   * those out is how a source listing stops being something you could
+   * rebuild the thing from.
    */
-  readonly lang?: "ts" | "tsx" | "sh";
+  readonly lang?: "ts" | "tsx" | "sh" | "css" | "html" | "json" | "md";
   /** Drop the top margin, for a block that sits directly under its own label. */
   readonly flush?: boolean;
   /**

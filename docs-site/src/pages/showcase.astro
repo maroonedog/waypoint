@@ -21,7 +21,9 @@
 // that looks complete and ignores typing is worse than one that is late.
 // ===========================================================================
 import Base from "../layouts/Base.astro";
+import Code from "../components/Code.astro";
 import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
+import { SOURCE, FILE_COUNT, LINE_COUNT } from "../demo/showcase-source.ts";
 ---
 
 <Base
@@ -70,6 +72,49 @@ import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
   </p>
 
   <ShowcaseScreen client:load />
+
+  <!-- A SHOWCASE THAT SHOWS NO SOURCE IS A DEMO. The form ran here and the
+       page said, in prose, that every label and bound came off the schema —
+       which is a claim about code, made without the code. What a form library
+       is selling is what the calling code looks like, so the calling code is
+       the exhibit, and a listing with parts left out is worth about as much as
+       no listing: the reader cannot tell what the missing part was doing. -->
+  <h2>Every file behind it</h2>
+
+  <p class="caption">
+    All {FILE_COUNT} files of <code>examples/showcase</code>, {LINE_COUNT}{" "}
+    lines, as they are on disk. The screen above imports this directory
+    directly, so this is the source of the form you just typed into rather than
+    a listing beside it — and the build fails if the directory gains a file
+    that is not on this page.
+  </p>
+
+  <p class="caption">
+    The two groups that hold every call into the library are open. The widgets
+    and the build files are folded, named and counted, one click each — with
+    all twenty-one unfolded the page is forty screens of code and a reader
+    cannot get past it.
+  </p>
+
+  {
+    SOURCE.map((group) => (
+      <>
+        <h3>{group.title}</h3>
+        <p class="caption">{group.note}</p>
+        {group.files.map((source) => (
+          <details class="source-file" open={group.openByDefault}>
+            <summary class="label">
+              <span class="qualifies">file</span>
+              <span class="colon">:</span>
+              <span class="named">{source.path}</span>
+              <span class="lines">{source.lines}</span>
+            </summary>
+            <Code code={source.code} lang={source.lang} flush />
+          </details>
+        ))}
+      </>
+    ))
+  }
 
   <h2>The same thing, locally</h2>
 

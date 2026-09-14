@@ -852,3 +852,62 @@ html[lang="ja"] main.is-landing .lead {
 html[lang="ja"] main :is(td, th, .code-label) {
   max-width: none;
 }
+
+/* ===========================================================================
+   The source listing on /showcase/.
+
+   A file is a disclosure rather than a plain block, and it is OPEN at rest:
+   the page's claim is that every file is on it, and a page that opens with
+   twenty-one collapsed rows has not shown anybody anything. The control is
+   there to get a file out of the way once it has been read, which is the
+   direction a reader of a long listing actually needs.
+
+   The summary is set in the label grammar the rest of the site uses —
+   qualifier, colon, name — so a file in this listing is titled the same way a
+   file in a code block is. The line count sits at the end, quiet: it is the
+   one thing a reader wants before deciding whether to open a file, and it
+   stops being useful the moment it competes with the name.
+   =========================================================================== */
+.source-file {
+  margin-top: var(--gap-block);
+}
+.source-file > summary {
+  display: flex;
+  align-items: baseline;
+  cursor: pointer;
+  padding: 0.35rem 0;
+  list-style: none;
+}
+.source-file > summary > .named {
+  margin-left: 0.35rem;
+}
+/* Safari draws its own triangle through `list-style: none`. */
+.source-file > summary::-webkit-details-marker {
+  display: none;
+}
+/* The marker is the site's own: a line that becomes a corner, not a triangle
+   borrowed from the browser's file picker. */
+.source-file > summary::before {
+  content: "";
+  flex: none;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-right: 0.55rem;
+  border-right: 1.5px solid var(--wp-mark);
+  border-bottom: 1.5px solid var(--wp-mark);
+  transform: rotate(45deg);
+  transition: transform 120ms ease;
+}
+.source-file[open] > summary::before {
+  transform: rotate(-135deg);
+}
+.source-file > summary > .lines {
+  margin-left: auto;
+  color: var(--wp-ink-quiet);
+  font-variant-numeric: tabular-nums;
+}
+@media (prefers-reduced-motion: reduce) {
+  .source-file > summary::before {
+    transition: none;
+  }
+}
