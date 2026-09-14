@@ -106,3 +106,74 @@ test("layer 2 names a widget with as", async () => {
   );
   await act(async () => root.unmount());
 });
+
+// ===========================================================================
+// `only`, which had no test and was broken.
+//
+// The narrowing matched a caller's path against the tree node's own `path`,
+// and the tree stores a list under `items` while hanging the row beneath it at
+// `items[*]`. So `only={["form:items[*]"]}` — the spelling `FormDeclaredPath`
+// admits, the spelling the prop's own comment recommends, the spelling the
+// type test asserts — matched nothing and drew nothing, silently. The checked
+// spelling was the broken one, which is the defect this package exists to make
+// impossible, so the claim is pinned here from now on.
+//
+// Both shapes of node are named, because they are keyed differently and only
+// one of them was wrong: a GROUP is its own path, a LIST is its path plus the
+// suffix. A test that took one would have passed throughout.
+// ===========================================================================
+
+const drawnPaths = (container) =>
+  [...container.querySelectorAll("[data-testid^='w-']")].map((node) =>
+    node.getAttribute("data-testid").slice(2)
+  );
+
+test("only narrows to a list, named as it is declared", async () => {
+  const form = newForm({ ...GOOD, items: [{ sku: "A" }, { sku: "B" }] });
+  const { container, root } = await mount(
+    h(
+      FormProvider,
+      { form, widgets: REGISTRY, partial: true },
+      h(AutoForm, { only: ["form:items[*]"] })
+    )
+  );
+  assert.deepEqual(
+    drawnPaths(container).sort(),
+    ["items[0].sku", "items[1].sku"],
+    "the list, every row of it, and nothing else"
+  );
+  await act(async () => root.unmount());
+});
+
+test("only narrows to a group, named as it is declared", async () => {
+  const form = newForm();
+  const { container, root } = await mount(
+    h(
+      FormProvider,
+      { form, widgets: REGISTRY, partial: true },
+      h(AutoForm, { only: ["form:owner"] })
+    )
+  );
+  assert.deepEqual(
+    drawnPaths(container).sort(),
+    ["owner.email", "owner.name"],
+    "the group's leaves, and neither plan nor the rows"
+  );
+  await act(async () => root.unmount());
+});
+
+test("only draws nothing for a name no declaration carries", async () => {
+  const form = newForm();
+  const { container, root } = await mount(
+    h(
+      FormProvider,
+      { form, widgets: REGISTRY, partial: true },
+      // The bare list path is refused by the type and is here as a STRING,
+      // because what is being pinned is what the runtime does with a name the
+      // tree does not hold: nothing, rather than a guess at what was meant.
+      h(AutoForm, { only: ["form:items"] })
+    )
+  );
+  assert.deepEqual(drawnPaths(container), [], "no node answers to that name");
+  await act(async () => root.unmount());
+});

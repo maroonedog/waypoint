@@ -153,7 +153,7 @@ export function PartlyByHand(): ReactElement {
             "auto:seats",
             "auto:giftWrap",
             "auto:notes",
-            "auto:lines",
+            "auto:lines[*]",
           ]}
           renderList={OrderLines}
         />

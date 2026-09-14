@@ -51,6 +51,15 @@ export interface AutoFormProps {
    * means the list itself. They are qualified like every other path a caller
    * writes, and the form is taken off again before they are matched against
    * the tree, which knows only its own.
+   *
+   * THE TREE STORES A LIST UNDER ITS OWN PATH and hangs the row under
+   * `${path}[*]`, so the node to compare against is not the string on the
+   * node. `nameOf` below puts the suffix back. Before it did,
+   * `only={["form:items[*]"]}` — the spelling this type names, the spelling
+   * the comment above recommends, and the spelling the type test asserts —
+   * matched no node and drew nothing at all, with no error anywhere: the
+   * checked spelling being the broken one, which is the defect shape this
+   * package exists to make impossible.
    */
   readonly only?: readonly FormDeclaredPath[];
   /**
@@ -109,6 +118,10 @@ function renderNode(
   );
 }
 
+/** What a caller writes to name this node: a list wears its `[*]`. */
+const nameOf = (node: DescriptorNode): string =>
+  node.kind === "list" ? `${node.path}[*]` : node.path;
+
 export function AutoForm(props: AutoFormProps): ReactElement {
   const form = useFormHandle();
   const formKey = useContext(FormKeyContext);
@@ -118,7 +131,7 @@ export function AutoForm(props: AutoFormProps): ReactElement {
       ? form.tree
       : form.tree.filter((node) =>
           only.some(
-            (wanted) => formPathWithin(wanted as string, formKey) === node.path
+            (wanted) => formPathWithin(wanted as string, formKey) === nameOf(node)
           )
         );
   return <>{drawn.map((node) => renderNode(node, renderList, [], formKey))}</>;

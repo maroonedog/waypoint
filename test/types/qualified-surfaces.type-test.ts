@@ -126,6 +126,13 @@ function autoFormOnly(): void {
   void createElement(AutoForm, { only: ["profile:items[*]"] });
   // @ts-expect-error and a misspelling is still a misspelling
   void createElement(AutoForm, { only: ["form:nmae"] });
+  // A LIST HAS ONE SPELLING HERE, and it is `items[*]`, above. The bare path
+  // is a real path — `useRows` and `<FieldRows>` address the list itself and
+  // take it — but it is not a DECLARED one. It used to compile here and then
+  // match no node in the descriptor tree, so the narrowing drew nothing and
+  // said nothing: the checked spelling being the broken one.
+  // @ts-expect-error a list is declared items[*], never items
+  void createElement(AutoForm, { only: ["form:items"] });
 }
 void autoFormOnly;
 

@@ -303,19 +303,43 @@ export type FormListPath = [keyof WaypointForms] extends [never]
   : `${QualifiedList<keyof WaypointForms> | WithoutFormKeyHead<ListsOf<SoleFormKey>>}`;
 
 /**
+ * A list's own path, dropped, so that a list has ONE spelling here.
+ *
+ * The adapter's path union carries both `items` and `items[*]`, and it has to:
+ * `useRows` and `<FieldRows>` address the list itself and take the bare one.
+ * A DECLARED path is a different question — it names an entry in the
+ * descriptor tree, where a list IS `items[*]` — so admitting both here would
+ * publish two spellings for one thing and leave a caller to find out which
+ * one the surface they are using meant.
+ *
+ * The rule is structural rather than a second list to keep in step: a path
+ * that also exists with `[*]` after it is a list's own path, wherever it sits
+ * and however deeply nested the list is.
+ */
+type WithoutListsOwnPath<All extends string, P extends string = All> =
+  P extends unknown ? (`${P}[*]` extends All ? never : P) : never;
+
+/**
  * Any DECLARED path any registered form has, qualified — the rule, with every
  * `[*]` still standing.
  *
  * A descriptor is keyed by the rule, so this is what names an entry in the
- * descriptor tree: a whole list is `form:items[*]` and not one row of it. It
- * is what a caller picking declarations out of a form takes, where a place
- * union would refuse the only spelling that means "the list itself".
+ * descriptor tree: a whole list is `form:items[*]` and not one row of it, and
+ * not the bare `form:items` either. It is what a caller picking declarations
+ * out of a form takes, where a place union would refuse the only spelling that
+ * means "the list itself".
+ *
+ * ONE SPELLING, because the alternative was measured: `<AutoForm only>` reads
+ * these against the descriptor tree, the tree keys a list at `items[*]`, and
+ * `form:items` therefore type-checked and silently drew nothing.
  */
 export type FormDeclaredPath = [keyof WaypointForms] extends [never]
   ? NoRegistration
-  : `${
-      | QualifiedRule<keyof WaypointForms>
-      | WithoutFormKeyHead<RulesOf<SoleFormKey>>}`;
+  : WithoutListsOwnPath<
+      `${
+        | QualifiedRule<keyof WaypointForms>
+        | WithoutFormKeyHead<RulesOf<SoleFormKey>>}`
+    >;
 
 /**
  * Which form a qualified path names.
