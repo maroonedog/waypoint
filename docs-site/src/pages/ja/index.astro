@@ -291,6 +291,24 @@ const TRY = [
   </div>
 
   <p class="caption mt-6">
+  <!-- 主張の前に、まず何であるかを書きます。ここにはもともと仕組みの話
+       （なぜパスが型検査されるのか、なぜセルが先にあるのか）が入っていましたが、
+       それはこのページが展開する議論であって、初めて来た人の問いへの答えでは
+       ありません。zod は同じ位置に「What is Zod?」で3文、drizzle も
+       「What's Drizzle?」で数行。比較もなく、賛成も反対もしようのない3文です。 -->
+  <section>
+    <h2>waypoint とは</h2>
+    <p>
+      React と Vue のフォームライブラリです。フォームの形は、いま使っている
+      バリデータ（zod、valibot、リゾルバを書けば他のものでも）でそのまま書きます。
+      その記述を <code>declare module</code> ひとつで登録しておけば、あとはどの
+      コンポーネントからでも{" "}
+      <code>useField("form:billing.postcode")</code>{" "}
+      のようにパスでフィールドを読めます。そこまで何かを渡す必要も、フォームの
+      オブジェクトを持っている必要もありません。
+    </p>
+  </section>
+
     <strong>まだ公開していません。</strong>なのでここに載せられる npm install のコマンドは
     ありませんし、固定できるバージョンもなく、本番で使った人もいません。あるのは clone だけです。
   </p>
@@ -310,124 +328,6 @@ const TRY = [
     リゾルバの呼び出しが1行、レジストリの宣言、そしてフィールドを読むコンポーネント。
   </p>
   <Code code={whole} label="ts: the whole idea" flush />
-
-  <section>
-    <h2>この10行が成り立つ理由</h2>
-    <p>理由は2つです。</p>
-
-    <p>
-      まず、<strong>このパスはコンパイラが検査した型です</strong>。レジストリの宣言を1度
-      書けば、あとは props もジェネリクスも渡しませんし、末端で import するものもありません。
-    </p>
-
-    <p>
-      そして、<strong>パスが指すセルはもう書かれています</strong>。セルは{" "}
-      <code>createForm</code> の時点で全部そろうので、コンポーネントがマウントしてやることは
-      購読だけ。register も unregister も <code>shouldUnregister</code> もありません。
-    </p>
-  </section>
-
-  <!-- ================================================== the thesis -->
-  <section>
-    <h2>フィールドは文字列で、その文字列は検査される</h2>
-    <p class="lead">
-      react-hook-form も TanStack Form もタイポは弾きます。ただ、それはフォームの型が
-      その場に届いている限りの話です。こちらはアプリケーション全体に1度だけ届けているので、
-      props も form オブジェクトも import も持たない末端のコンポーネントでも{" "}
-      <code>shipments[0].lines[0].skuu</code> は弾かれます。
-    </p>
-
-    <p class="caption mt-6">
-      <strong class="text-on-surface">6行のうち3行は、waypoint・react-hook-form・
-      TanStack Form で差が出ません。</strong>その3行には印を付けました。差は6つではなく1つ、
-      フォームの型がその場に届いていないときに何が起きるか、そこだけです。
-    </p>
-
-    <p class="caption">
-      どのセルも、同じ1つのスキーマに対して <code>tsc</code> が出した結果です。どこかの
-      ドキュメントを読んで書いたものではないので、議論ではなくコンパイルで確かめられます。
-      バージョンは固定していますが、どれも動きえます。間違っている行や古くなっている行が
-      あれば、{" "}
-      <a class="link" href="https://github.com/maroonedog/waypoint/issues"
-        >食い違うコードを添えて issue を立ててください</a
-      >。直します。
-    </p>
-
-    <div class="mt-[var(--gap-block)] overflow-x-auto">
-      <table>
-        <thead class="text-left">
-          <tr>
-            <th class="pr-4">TypeScript 5.9 strict でコンパイル</th>
-            {LIBS.map((lib) => <th class="pr-4">{lib}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {
-            PATHS.map(({ theCase, cells, same }) => (
-              <tr class="hairline">
-                <td class="pr-4 font-medium">
-                  {theCase}
-                  {same && (
-                    <span class="ml-2 font-normal whitespace-nowrap text-on-surface-variant">
-                      （差なし）
-                    </span>
-                  )}
-                </td>
-                {cells.map((cell) => (
-                  <td
-                    class:list={[
-                      "pr-4",
-                      cell.startsWith("コンパイルエラー") || cell.startsWith("検査される")
-                        ? "text-primary"
-                        : "text-on-surface-variant",
-                    ]}
-                  >
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <p class="caption">
-      4つとも同じスキーマ（<code>shipments[*].lines[*].sku</code>）をコンパイルした結果です。
-      ちなみに <code>{"${i}"}</code> のような補間は差になりません。react-hook-form にも
-      TanStack にも、パスの union のメンバーとして入っているので。
-    </p>
-
-    <p class="note">
-      <strong>何を払うことになるか。</strong>{" "}
-      <code>declare module "@maroonedog/waypoint"</code>{" "}
-      のブロックを1つ書きます。書く相手はフレームワーク側ではなく<strong>ルート</strong>の
-      エントリなので、1つのレジストリがすべてのバインディングに効きます。そしてこのファイルは
-      <code>tsconfig</code> の <code>include</code> の中に居続ける必要があります。外れれば
-      呼び出し箇所が全部コンパイルできなくなりますが、壊れ方としてはそれが正しい向きです。
-      制約は2つあります。フォームを2つ登録すると、キーを省いた <code>useField</code> は
-      フォーム名を書くまで両方の union に対して検査されます。それから、
-      <strong>住所として書けるのは7セグメントまでで、8つめは書けません</strong>。それより
-      深いところにある正しい末端は、通るのではなく拒否されます。この union がコンパイラに
-      どれだけ負担をかけるのか、どこで打ち切られるのか、住所を付けないサブツリーの逃げ道は、{" "}
-      <a
-        class="link font-mono"
-        href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
-        >docs/measurements-types.md</a
-      >に実測が置いてあります。
-    </p>
-
-    <p class="mt-8">
-      <strong class="text-on-surface">もう1つは、その住所が指すセルがすでに書かれていることです。</strong>
-      セルは <code>createForm</code> の時点で記述リストから全部作られます。どのコンポーネントが
-      マウントするよりも前にです。だから末端が画面に現れても、起きているのは購読だけになります。
-      register も unregister も <code>shouldUnregister</code> も ref コールバックも要らず、
-      ポータルの中、遅延読み込みされたチャンクの中、条件分岐の裏にあるフィールドも、特別扱い
-      しなくて済みます。型としては検査されていても、コンポーネントがマウントするまで何も
-      指していない住所は、住所として半分です。この2つを別々の機能ではなく1つの主張として
-      書いているのは、そのためです。
-    </p>
-  </section>
 
   <!-- ================================================== proof -->
   <section>
@@ -555,6 +455,108 @@ const TRY = [
     <p class="caption">
       フックとコンポーネントの実際のシグネチャは{" "}
       <a class="link" href="/api/" hreflang="en" lang="en">API のページ（英語）</a>にあります。
+    </p>
+  </section>
+
+  <!-- ================================================== the thesis -->
+  <section>
+    <h2>フィールドは文字列で、その文字列は検査される</h2>
+    <p class="lead">
+      react-hook-form も TanStack Form もタイポは弾きます。ただ、それはフォームの型が
+      その場に届いている限りの話です。こちらはアプリケーション全体に1度だけ届けているので、
+      props も form オブジェクトも import も持たない末端のコンポーネントでも{" "}
+      <code>shipments[0].lines[0].skuu</code> は弾かれます。
+    </p>
+
+    <p class="caption mt-6">
+      <strong class="text-on-surface">6行のうち3行は、waypoint・react-hook-form・
+      TanStack Form で差が出ません。</strong>その3行には印を付けました。差は6つではなく1つ、
+      フォームの型がその場に届いていないときに何が起きるか、そこだけです。
+    </p>
+
+    <p class="caption">
+      どのセルも、同じ1つのスキーマに対して <code>tsc</code> が出した結果です。どこかの
+      ドキュメントを読んで書いたものではないので、議論ではなくコンパイルで確かめられます。
+      バージョンは固定していますが、どれも動きえます。間違っている行や古くなっている行が
+      あれば、{" "}
+      <a class="link" href="https://github.com/maroonedog/waypoint/issues"
+        >食い違うコードを添えて issue を立ててください</a
+      >。直します。
+    </p>
+
+    <div class="mt-[var(--gap-block)] overflow-x-auto">
+      <table>
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">TypeScript 5.9 strict でコンパイル</th>
+            {LIBS.map((lib) => <th class="pr-4">{lib}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            PATHS.map(({ theCase, cells, same }) => (
+              <tr class="hairline">
+                <td class="pr-4 font-medium">
+                  {theCase}
+                  {same && (
+                    <span class="ml-2 font-normal whitespace-nowrap text-on-surface-variant">
+                      （差なし）
+                    </span>
+                  )}
+                </td>
+                {cells.map((cell) => (
+                  <td
+                    class:list={[
+                      "pr-4",
+                      cell.startsWith("コンパイルエラー") || cell.startsWith("検査される")
+                        ? "text-primary"
+                        : "text-on-surface-variant",
+                    ]}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="caption">
+      4つとも同じスキーマ（<code>shipments[*].lines[*].sku</code>）をコンパイルした結果です。
+      ちなみに <code>{"${i}"}</code> のような補間は差になりません。react-hook-form にも
+      TanStack にも、パスの union のメンバーとして入っているので。
+    </p>
+
+    <p class="note">
+      <strong>何を払うことになるか。</strong>{" "}
+      <code>declare module "@maroonedog/waypoint"</code>{" "}
+      のブロックを1つ書きます。書く相手はフレームワーク側ではなく<strong>ルート</strong>の
+      エントリなので、1つのレジストリがすべてのバインディングに効きます。そしてこのファイルは
+      <code>tsconfig</code> の <code>include</code> の中に居続ける必要があります。外れれば
+      呼び出し箇所が全部コンパイルできなくなりますが、壊れ方としてはそれが正しい向きです。
+      制約は2つあります。フォームを2つ登録すると、キーを省いた <code>useField</code> は
+      フォーム名を書くまで両方の union に対して検査されます。それから、
+      <strong>住所として書けるのは7セグメントまでで、8つめは書けません</strong>。それより
+      深いところにある正しい末端は、通るのではなく拒否されます。この union がコンパイラに
+      どれだけ負担をかけるのか、どこで打ち切られるのか、住所を付けないサブツリーの逃げ道は、{" "}
+      <a
+        class="link font-mono"
+        href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
+        >docs/measurements-types.md</a
+      >に実測が置いてあります。
+    </p>
+
+    <p class="mt-8">
+      <strong class="text-on-surface">もう1つは、その住所が指すセルがすでに書かれていることです。</strong>
+      セルは <code>createForm</code> の時点で記述リストから全部作られます。どのコンポーネントが
+      マウントするよりも前にです。だから末端が画面に現れても、起きているのは購読だけになります。
+      register も unregister も <code>shouldUnregister</code> も ref コールバックも要らず、
+      ポータルの中、遅延読み込みされたチャンクの中、条件分岐の裏にあるフィールドも、特別扱い
+      しなくて済みます。型としては検査されていても、コンポーネントがマウントするまで何も
+      指していない住所は、住所として半分です。この2つを別々の機能ではなく1つの主張として
+      書いているのは、そのためです。
     </p>
   </section>
 

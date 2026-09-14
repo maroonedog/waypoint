@@ -317,6 +317,25 @@ const TRY = [
     >
   </div>
 
+  <!-- WHAT IT IS, BEFORE WHAT IT ARGUES. This slot used to hold the
+       mechanism — why the path type-checks, why the cell already exists —
+       which is the argument the page makes and not an answer to the
+       question a stranger arrives with. zod gives the slot three sentences
+       under "What is Zod?"; drizzle the same under "What's Drizzle?".
+       Three sentences, no comparison, nothing to agree or disagree with. -->
+  <section>
+    <h2>What waypoint is</h2>
+    <p>
+      A form library for React and Vue. You describe the form once with the
+      validator you already use — zod, valibot, or anything you write a
+      resolver for — and register that description once, in a single{" "}
+      <code>declare module</code> block. After that any component reads a
+      field by its path,{" "}
+      <code>useField("form:billing.postcode")</code>, with nothing threaded
+      down to it and no form object in scope.
+    </p>
+  </section>
+
   <!-- HOW TO OBTAIN IT, ON THE PAGE WHERE THE DECISION IS MADE. Nothing is
        published, so there is no install line to print and the honest route is
        a clone — which was a page away, on /start/, reachable from a landing
@@ -346,142 +365,6 @@ const TRY = [
     A resolver call, a registry declaration, and a component reading a field.
   </p>
   <Code code={whole} label="ts: the whole idea" flush />
-
-  <section>
-    <h2>What makes those ten lines work</h2>
-    <p>
-      Two things. The path is a <strong>type the compiler has already
-      checked</strong>: one registry declaration, no prop, no generic argument,
-      nothing imported at the leaf. And the cell it names is{" "}
-      <strong>already written</strong> — every cell is seeded at{" "}
-      <code>createForm</code>, so mounting is a subscription, with no register,
-      no unregister and no <code>shouldUnregister</code>.
-    </p>
-  </section>
-
-  <!-- ================================================== the thesis -->
-  <section>
-    <h2>A field is a string, and the string is checked</h2>
-    <p class="lead">
-      react-hook-form and TanStack Form reject a typo too — while the form's
-      type is in scope. Here it is in scope once, for the whole application: a
-      leaf with no props, no form object and no import still rejects{" "}
-      <code>shipments[0].lines[0].skuu</code>.
-    </p>
-
-    <!-- THE CAVEAT GOES ABOVE THE TABLE. Under it, a reader who scans the grid
-         and moves on has already formed the impression the grid gives, and the
-         grid gives a scorecard: four named libraries, one of them winning
-         every row. The two things that make it not a scorecard — that three of
-         the six rows show no difference, and that anybody can run it and
-         disagree — have to arrive first.
-
-         This is a stronger invitation than a comparison table can usually
-         make: every cell is tsc's verdict on one schema, so it is falsifiable
-         by typing, not a judgement to be argued with. -->
-    <p class="caption mt-6">
-      <strong class="text-on-surface">Three of these six rows show no
-      difference</strong> between waypoint, react-hook-form and TanStack Form —
-      they are marked. The difference is one thing, not six: what happens where
-      the form's type is not in scope.
-    </p>
-
-    <p class="caption">
-      Every cell is <code>tsc</code>'s own verdict on one shared schema, not a
-      reading of anybody's documentation, so it can be checked by compiling
-      rather than argued with. If a row is wrong or out of date — these are
-      pinned versions, and any of them may have moved —{" "}
-      <a class="link" href="https://github.com/maroonedog/waypoint/issues"
-        >open an issue with the code that disagrees</a
-      > and it will be corrected.
-    </p>
-
-    <div class="mt-[var(--gap-block)] overflow-x-auto">
-      <table>
-        <thead class="text-left">
-          <tr>
-            <th class="pr-4">Compiled, TypeScript 5.9 strict</th>
-            {LIBS.map((lib) => <th class="pr-4">{lib}</th>)}
-          </tr>
-        </thead>
-        <tbody>
-          {
-            PATHS.map(({ theCase, cells, same }) => (
-              <tr class="hairline">
-                <td class="pr-4 font-medium">
-                  {theCase}
-                  {same && (
-                    <span class="ml-2 font-normal whitespace-nowrap text-on-surface-variant">
-                      (no difference)
-                    </span>
-                  )}
-                </td>
-                {cells.map((cell) => (
-                  <td
-                    class:list={[
-                      "pr-4",
-                      cell.startsWith("compile error") || cell.startsWith("checked")
-                        ? "text-primary"
-                        : "text-on-surface-variant",
-                    ]}
-                  >
-                    {cell}
-                  </td>
-                ))}
-              </tr>
-            ))
-          }
-        </tbody>
-      </table>
-    </div>
-
-    <p class="caption">
-      One shared schema, <code>shipments[*].lines[*].sku</code>, compiled in all
-      four. An interpolated <code>{"${i}"}</code> is a real member of
-      react-hook-form's and TanStack's path unions too, which is why the second
-      row is one of the three that separate nothing.
-    </p>
-
-    <p class="note">
-      <strong>What it costs.</strong> One{" "}
-      <code>declare module "@maroonedog/waypoint"</code> block, written against
-      the ROOT entry rather than a framework's, so one registry serves every
-      binding. It has to stay inside <code>tsconfig</code>'s{" "}
-      <code>include</code>: delete it and every call site stops compiling, which
-      is the failure direction you want.
-    </p>
-
-    <p class="note">
-      <strong>Two limits.</strong> Register a second form and a keyless{" "}
-      <code>useField</code> is checked against the union of both until you name
-      the form key. And <strong>seven path segments are addressable, eight are
-      not</strong> — a correct leaf deeper than that is rejected rather than
-      accepted. What the union costs the compiler, where it stops,
-      and the escape hatch for a subtree you do not address are measured in{" "}
-      <!-- Mono, because the link text is a path in the repository rather than
-           the name of a document: it is a thing the reader could type. -->
-      <a
-        class="link font-mono"
-        href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
-        >docs/measurements-types.md</a
-      >.
-    </p>
-
-    <p class="mt-8">
-      <strong class="text-on-surface">The other half is that the cell the
-      address names is already written.</strong> Every cell is seeded at{" "}
-      <code>createForm</code> from the descriptor list, before any component
-      mounts. A leaf appearing is a subscription and nothing else: no register,
-      no unregister, no <code>shouldUnregister</code>, no ref callback. A field
-      in a portal, in a lazy chunk or behind a condition is not a special case.
-    </p>
-
-    <p class="mt-8">
-      An address checked at compile time that named nothing until a component
-      mounted would be half an address. That is why these are one claim rather
-      than two features.
-    </p>
-  </section>
 
   <!-- ================================================== proof -->
   <section>
@@ -618,6 +501,130 @@ const TRY = [
     <p class="caption">
       Every hook and component, with its real signature, is on{" "}
       <a class="link" href="/api/">API</a>.
+    </p>
+  </section>
+
+  <!-- ================================================== the thesis -->
+  <section>
+    <h2>A field is a string, and the string is checked</h2>
+    <p class="lead">
+      react-hook-form and TanStack Form reject a typo too — while the form's
+      type is in scope. Here it is in scope once, for the whole application: a
+      leaf with no props, no form object and no import still rejects{" "}
+      <code>shipments[0].lines[0].skuu</code>.
+    </p>
+
+    <!-- THE CAVEAT GOES ABOVE THE TABLE. Under it, a reader who scans the grid
+         and moves on has already formed the impression the grid gives, and the
+         grid gives a scorecard: four named libraries, one of them winning
+         every row. The two things that make it not a scorecard — that three of
+         the six rows show no difference, and that anybody can run it and
+         disagree — have to arrive first.
+
+         This is a stronger invitation than a comparison table can usually
+         make: every cell is tsc's verdict on one schema, so it is falsifiable
+         by typing, not a judgement to be argued with. -->
+    <p class="caption mt-6">
+      <strong class="text-on-surface">Three of these six rows show no
+      difference</strong> between waypoint, react-hook-form and TanStack Form —
+      they are marked. The difference is one thing, not six: what happens where
+      the form's type is not in scope.
+    </p>
+
+    <p class="caption">
+      Every cell is <code>tsc</code>'s own verdict on one shared schema, not a
+      reading of anybody's documentation, so it can be checked by compiling
+      rather than argued with. If a row is wrong or out of date — these are
+      pinned versions, and any of them may have moved —{" "}
+      <a class="link" href="https://github.com/maroonedog/waypoint/issues"
+        >open an issue with the code that disagrees</a
+      > and it will be corrected.
+    </p>
+
+    <div class="mt-[var(--gap-block)] overflow-x-auto">
+      <table>
+        <thead class="text-left">
+          <tr>
+            <th class="pr-4">Compiled, TypeScript 5.9 strict</th>
+            {LIBS.map((lib) => <th class="pr-4">{lib}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            PATHS.map(({ theCase, cells, same }) => (
+              <tr class="hairline">
+                <td class="pr-4 font-medium">
+                  {theCase}
+                  {same && (
+                    <span class="ml-2 font-normal whitespace-nowrap text-on-surface-variant">
+                      (no difference)
+                    </span>
+                  )}
+                </td>
+                {cells.map((cell) => (
+                  <td
+                    class:list={[
+                      "pr-4",
+                      cell.startsWith("compile error") || cell.startsWith("checked")
+                        ? "text-primary"
+                        : "text-on-surface-variant",
+                    ]}
+                  >
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <p class="caption">
+      One shared schema, <code>shipments[*].lines[*].sku</code>, compiled in all
+      four. An interpolated <code>{"${i}"}</code> is a real member of
+      react-hook-form's and TanStack's path unions too, which is why the second
+      row is one of the three that separate nothing.
+    </p>
+
+    <p class="note">
+      <strong>What it costs.</strong> One{" "}
+      <code>declare module "@maroonedog/waypoint"</code> block, written against
+      the ROOT entry rather than a framework's, so one registry serves every
+      binding. It has to stay inside <code>tsconfig</code>'s{" "}
+      <code>include</code>: delete it and every call site stops compiling, which
+      is the failure direction you want.
+    </p>
+
+    <p class="note">
+      <strong>Two limits.</strong> Register a second form and a keyless{" "}
+      <code>useField</code> is checked against the union of both until you name
+      the form key. And <strong>seven path segments are addressable, eight are
+      not</strong> — a correct leaf deeper than that is rejected rather than
+      accepted. What the union costs the compiler, where it stops,
+      and the escape hatch for a subtree you do not address are measured in{" "}
+      <!-- Mono, because the link text is a path in the repository rather than
+           the name of a document: it is a thing the reader could type. -->
+      <a
+        class="link font-mono"
+        href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
+        >docs/measurements-types.md</a
+      >.
+    </p>
+
+    <p class="mt-8">
+      <strong class="text-on-surface">The other half is that the cell the
+      address names is already written.</strong> Every cell is seeded at{" "}
+      <code>createForm</code> from the descriptor list, before any component
+      mounts. A leaf appearing is a subscription and nothing else: no register,
+      no unregister, no <code>shouldUnregister</code>, no ref callback. A field
+      in a portal, in a lazy chunk or behind a condition is not a special case.
+    </p>
+
+    <p class="mt-8">
+      An address checked at compile time that named nothing until a component
+      mounted would be half an address. That is why these are one claim rather
+      than two features.
     </p>
   </section>
 
