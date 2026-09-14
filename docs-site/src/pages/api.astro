@@ -220,8 +220,10 @@ const components = [
   {
     name: "<AutoForm>",
     summary:
-      "Layer 1: every declared field, in declaration order, drawn through the widget registry. It ships no input of its own.",
+      "Layer 1: draws the whole form. It walks the registered fields in declaration order and renders each one through the widget registry — so an application writes a widget per KIND of input rather than a component per field, and a field added to the schema appears, labelled from its title, validated and blocking the submit, with no component edited. It ships no input of its own; an empty registry draws nothing. The price is that its paths are read out of the descriptor tree and bound to row indices at run time, which makes this the one layer where a path is not checked by the compiler. There is one running on the showcase, with all three of its files.",
     signature: `<AutoForm only?={["form:billing"]} renderList?={(binding, rows) => …} />`,
+    href: "/showcase/#autoform",
+    hrefLabel: "See one running",
   },
 ];
 

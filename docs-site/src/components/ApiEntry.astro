@@ -31,10 +31,29 @@ interface Props {
   readonly example?: string;
   readonly returns?: readonly Member[];
   readonly returnsTitle?: string;
+  /**
+   * Where this one is running, for an entry a reader can meet here first.
+   *
+   * Most of this index names something the pages have already shown working,
+   * so a reference row is a reminder. `<AutoForm>` was not: it drew a whole
+   * form and appeared nowhere on the site, which made its row a reader's only
+   * meeting with it — a signature, and no idea what pointing it at a schema
+   * would put on the screen.
+   */
+  readonly href?: string;
+  readonly hrefLabel?: string;
 }
 
-const { name, summary, signature, example, returns, returnsTitle } =
-  Astro.props;
+const {
+  name,
+  summary,
+  signature,
+  example,
+  returns,
+  returnsTitle,
+  href,
+  hrefLabel,
+} = Astro.props;
 const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
 ---
 
@@ -56,6 +75,16 @@ const slug = name.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "");
        The gap under the heading, the measure and the leading come from the
        stylesheet. -->
   <p>{summary}</p>
+
+  {
+    href !== undefined && (
+      <p class="caption">
+        <a class="link" href={href}>
+          {hrefLabel ?? "See it running"} →
+        </a>
+      </p>
+    )
+  }
 
   <Code code={signature} />
 
