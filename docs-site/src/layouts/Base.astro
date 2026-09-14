@@ -426,10 +426,17 @@ const flat = SECTIONS.flatMap((section) => section.items);
             // of them naming the inside of a form. An island is somebody
             // else's document mounted here; where it starts is a section of
             // this page, and what it says inside is not.
+            //
+            // NEITHER IS A POPOVER'S. /showcase/ carries one panel per section
+            // of the form, each titled, and they went into the rail as six
+            // more entries — a contents list offering to scroll a reader to
+            // something that is not on the page until they open it. A popover
+            // is over the document rather than in it, which is the same
+            // argument as the island's and lands in the same filter.
             var headings = Array.prototype.filter.call(
               document.querySelectorAll("main h2"),
               function (h) {
-                return !h.closest("astro-island");
+                return !h.closest("astro-island") && !h.closest("[popover]");
               }
             );
             if (headings.length < 2) {

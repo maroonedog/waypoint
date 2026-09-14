@@ -20,11 +20,47 @@
 // here, and it makes this site a program with two registered forms, which is
 // the arrangement qualified paths exist for.
 // ===========================================================================
-import { useState, type ReactElement } from "react";
+import { useCallback, useState, type ReactElement, type ReactNode } from "react";
 import { ApplicationForm } from "../../../examples/showcase/src/application-form.js";
+import {
+  SectionSourceProvider,
+  type SectionId,
+} from "../../../examples/showcase/src/section-source.js";
+import { panelIdOf } from "./section-panel.js";
+
+// THE CONTROL FOR ONE SECTION'S CODE, and it is only a button: the panel it
+// opens is rendered by showcase.astro, already highlighted, because Shiki runs
+// at build time. `popovertarget` joins the two across the island boundary with
+// no JavaScript of ours in between — no state, no portal, nothing to hydrate
+// beyond the button itself, and a click outside already closes it.
+//
+// Lower case on purpose. React 19 has `popoverTarget`, but writing the HTML
+// attribute is what actually reaches the DOM on either version, and this is a
+// DOM API rather than a React one.
+function SectionCode({ id }: { readonly id: SectionId }): ReactElement {
+  return (
+    <button
+      type="button"
+      {...{ popovertarget: panelIdOf(id) }}
+      className="state-layer relative flex items-center gap-1.5 overflow-hidden rounded-full px-3 py-1.5 text-sm text-on-surface-variant"
+    >
+      <span aria-hidden className="material-symbols-rounded text-[18px]">
+        code
+      </span>
+      Code
+    </button>
+  );
+}
 
 export default function ShowcaseScreen(): ReactElement {
   const [submitted, setSubmitted] = useState<unknown>(undefined);
+
+  // Stable, so the provider does not hand every card a new function on each
+  // keystroke the form takes.
+  const sectionSource = useCallback(
+    (id: SectionId): ReactNode => <SectionCode id={id} />,
+    []
+  );
 
   return (
     // `md3-scope` IS WHAT KEEPS THIS A MATERIAL SCREEN. The documentation site
@@ -55,7 +91,9 @@ export default function ShowcaseScreen(): ReactElement {
           </button>
         </div>
       )}
-      <ApplicationForm onSubmitted={setSubmitted} />
+      <SectionSourceProvider value={sectionSource}>
+        <ApplicationForm onSubmitted={setSubmitted} />
+      </SectionSourceProvider>
     </div>
   );
 }

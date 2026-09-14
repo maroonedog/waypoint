@@ -911,3 +911,70 @@ html[lang="ja"] main :is(td, th, .code-label) {
     transition: none;
   }
 }
+
+/* ===========================================================================
+   The per-section code panel on /showcase/.
+
+   Opened from a control in the running form's own section header, so it is
+   answering a question the reader asked in place: it opens over the page
+   rather than sending them to the listing at the foot of it.
+
+   The browser puts a popover in the top layer, which means no z-index here
+   and no stacking context to lose it in. Sizing is the only work: a function
+   is wide and can be long, so the panel takes the code's measure and scrolls
+   inside itself, and the whole thing stays inside a small viewport.
+
+   `::backdrop` is what makes it read as being over the page rather than in
+   it, and it is what a light dismiss aims at.
+   =========================================================================== */
+.source-panel {
+  max-width: min(80ch, 94vw);
+  max-height: 86vh;
+  overflow: auto;
+  overscroll-behavior: contain;
+  margin: auto;
+  border: 1px solid var(--wp-line);
+  border-radius: 3px;
+  background: var(--wp-paper);
+  color: var(--wp-ink);
+  padding: 1.25rem 1.4rem 1.5rem;
+  box-shadow: 0 18px 48px rgb(20 24 22 / 0.22);
+}
+.source-panel::backdrop {
+  background: rgb(20 24 22 / 0.32);
+}
+/* A heading, not a section heading: it names the panel, and the contents
+   rail skips it — the rail reads every `main h2` and then drops the ones
+   inside an island or a popover, which is where these are. Sized here rather
+   than left to the sheet's h2, which is sized for a page. */
+.source-panel > .source-panel-title {
+  margin: 0.5rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.source-panel > .caption {
+  max-width: none;
+}
+
+/* The panel scrolls, so the close control sticks to the top of it rather than
+   sitting in the flow: scrolled to the foot of a long function, a reader
+   should not have to come back up to leave. Floated, so the label and title
+   set beside it instead of under it. */
+.source-panel > .source-panel-close {
+  position: sticky;
+  top: 0;
+  float: right;
+  margin: -0.4rem -0.5rem 0 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--wp-ink-quiet);
+  background: var(--wp-paper);
+}
+.source-panel > .source-panel-close:hover {
+  color: var(--wp-ink);
+  background: var(--wp-sunk);
+}

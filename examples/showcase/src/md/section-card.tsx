@@ -1,4 +1,5 @@
 import type { ReactElement, ReactNode } from "react";
+import { useSectionSource, type SectionId } from "../section-source.js";
 
 /** One MD3 filled card, used as a section of the form. */
 export function SectionCard({
@@ -6,14 +7,22 @@ export function SectionCard({
   caption,
   icon,
   actions,
+  sourceId,
   children,
 }: {
   title: string;
   caption?: string;
   icon: string;
   actions?: ReactNode;
+  /**
+   * Which section this is, for anything mounted around the form that wants to
+   * put a control in the header. Nothing does by default — see
+   * section-source.tsx.
+   */
+  sourceId?: SectionId;
   children: ReactNode;
 }): ReactElement {
+  const source = useSectionSource(sourceId);
   return (
     <section className="rounded-lg bg-surface-low p-5 sm:p-6">
       <header className="mb-5 flex items-start gap-3">
@@ -35,6 +44,7 @@ export function SectionCard({
         {actions === undefined ? null : (
           <div className="shrink-0">{actions}</div>
         )}
+        {source === null ? null : <div className="shrink-0">{source}</div>}
       </header>
       <div className="grid gap-x-4 gap-y-1 sm:grid-cols-2">{children}</div>
     </section>

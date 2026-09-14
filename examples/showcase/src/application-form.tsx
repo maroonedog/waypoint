@@ -25,6 +25,7 @@ function ApplicantSection(): ReactElement {
       icon="badge"
       title="Who to contact"
       caption="How we reach you about this account"
+      sourceId="applicant"
     >
       <Field path="application:applicant.lastName">
         {(field) => <MdTextField field={field} label="Last name" />}
@@ -53,7 +54,7 @@ function ApplicantSection(): ReactElement {
 
 function CompanySection(): ReactElement {
   return (
-    <SectionCard icon="apartment" title="The company">
+    <SectionCard icon="apartment" title="The company" sourceId="company">
       <div className="sm:col-span-2">
         <Field path="application:company.name">
           {(field) => <MdTextField field={field} label="Company name" />}
@@ -85,13 +86,14 @@ function AddressSections(): ReactElement {
   useParticipation(form, "application:shipping", !sameAsBilling);
   return (
     <>
-      <SectionCard icon="receipt_long" title="Billing address">
+      <SectionCard icon="receipt_long" title="Billing address" sourceId="billing">
         <AddressFields at="application:billing" />
       </SectionCard>
 
       <SectionCard
         icon="local_shipping"
         title="Shipping address"
+        sourceId="shipping"
         caption={
           sameAsBilling
             ? "Same as billing. The values you typed are still here; only the verdict has stopped counting"
@@ -117,7 +119,7 @@ function AddressSections(): ReactElement {
 
 function TermsSection(): ReactElement {
   return (
-    <SectionCard icon="gavel" title="Payment and terms">
+    <SectionCard icon="gavel" title="Payment and terms" sourceId="terms">
       <div className="sm:col-span-2">
         <Field path="application:payment">
           {(field) => (

@@ -24,6 +24,8 @@ import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
 import { SOURCE, FILE_COUNT, LINE_COUNT } from "../demo/showcase-source.ts";
+import { SECTIONS } from "../demo/showcase-sections.ts";
+import { panelIdOf } from "../demo/section-panel.ts";
 ---
 
 <Base
@@ -72,6 +74,42 @@ import { SOURCE, FILE_COUNT, LINE_COUNT } from "../demo/showcase-source.ts";
   </p>
 
   <ShowcaseScreen client:load />
+
+  <!-- ONE PANEL PER SECTION, opened by the Code control in that section's own
+       header. The listing at the foot of this page answers "what is all of
+       this"; a reader standing in front of the order lines has a narrower
+       question, and walking them down to a file named in a group is not an
+       answer to it.
+
+       They live out here rather than inside the island because the code in
+       them is highlighted at build time, and because a popover is put in the
+       top layer by the browser — where it sits in the document decides
+       nothing about where it appears. -->
+  {
+    SECTIONS.map((section) => (
+      <div id={panelIdOf(section.id)} popover class="source-panel">
+        <!-- A click outside closes it already — that is the browser's own
+             light dismiss, and it was checked here rather than assumed. The
+             button is for the reader who does not know that, and for the one
+             whose pointer is a finger. -->
+        <button
+          type="button"
+          class="source-panel-close"
+          popovertarget={panelIdOf(section.id)}
+          popovertargetaction="hide"
+          aria-label={`Close the code for ${section.title}`}>&times;</button
+        >
+        <p class="label">
+          <span class="qualifies">file</span>
+          <span class="colon">:</span>{" "}
+          <span class="named">{section.file}</span>
+        </p>
+        <h2 class="source-panel-title">{section.title}</h2>
+        <p class="caption">{section.note}</p>
+        <Code code={section.code} lang="tsx" flush />
+      </div>
+    ))
+  }
 
   <!-- A SHOWCASE THAT SHOWS NO SOURCE IS A DEMO. The form ran here and the
        page said, in prose, that every label and bound came off the schema —

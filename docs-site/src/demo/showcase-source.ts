@@ -106,12 +106,13 @@ export const SOURCE: readonly SourceGroup[] = [
   },
   {
     title: "The form",
-    note: "Every call into the library on this page is in these three files.",
+    note: "Every call into the library on this page is in the first three. The fourth is the empty slot in each section header that this site fills with a Code control, and the example leaves empty.",
     openByDefault: true,
     files: [
       file("src/application-form.tsx"),
       file("src/sections/address-fields.tsx"),
       file("src/sections/items-section.tsx"),
+      file("src/section-source.tsx"),
     ],
   },
   {

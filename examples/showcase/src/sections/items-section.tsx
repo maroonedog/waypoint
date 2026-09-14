@@ -30,6 +30,7 @@ export function ItemsSection(): ReactElement {
           icon="list_alt"
           title="Order lines"
           caption={`${rows.length} line(s)`}
+          sourceId="items"
           actions={
             <MdButton
               tone="tonal"
