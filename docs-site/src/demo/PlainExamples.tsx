@@ -31,6 +31,11 @@ import {
   CustomerScreen,
 } from "../../../examples/two-forms/src/screens.js";
 import { BookingWizard } from "../../../examples/wizard/src/booking-wizard.js";
+import {
+  PartlyByHand,
+  SwappedTable,
+  WholeForm,
+} from "../../../examples/auto-form/src/screens.js";
 
 /** The scope the shared stylesheet needs, and a frame to sit in. */
 function Frame({ children }: { children: ReactElement }): ReactElement {
@@ -55,6 +60,22 @@ export function TwoFormsExample(): ReactElement {
       <>
         <CustomerScreen />
         <AdminScreen />
+      </>
+    </Frame>
+  );
+}
+
+// THREE SCREENS IN ONE FRAME, because they are one argument: this is what
+// layer 1 draws, this is how you take a field back, and this is the table
+// being the design. Split across three frames a reader would meet them as
+// three examples and would have to be told they share a schema.
+export function AutoFormExample(): ReactElement {
+  return (
+    <Frame>
+      <>
+        <WholeForm />
+        <PartlyByHand />
+        <SwappedTable />
       </>
     </Frame>
   );

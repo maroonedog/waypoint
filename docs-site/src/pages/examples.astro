@@ -24,10 +24,12 @@
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import {
+  AutoFormExample,
   ServerErrorsExample,
   TwoFormsExample,
   WizardExample,
 } from "../demo/PlainExamples.tsx";
+import autoWidgetsSource from "../../../examples/auto-form/src/widgets.tsx?raw";
 
 const serverErrors = `
 await form.submit(async (root) => {
@@ -51,6 +53,22 @@ function Text({ at, label }: { at: FormPathTo<string>; label: string }) {
 
 <Text at="customer:owner.email" label="Email" />
 <Text at="admin:owner.email"    label="Owner email" />
+`.trim();
+
+const autoRegistry = autoWidgetsSource
+  .slice(autoWidgetsSource.indexOf("export const ORDER_WIDGETS"))
+  .split("};")[0]
+  .concat("};");
+
+const autoOnly = `
+// What \`only\` leaves out is ordinary layer-3 code in the same provider.
+<AutoForm only={["auto:reference", "auto:email", "auto:lines[*]"]} />
+
+<Field path="auto:priority">
+  {(field) => field.descriptor?.choices?.map((choice) => (
+    <button onClick={() => field.setValue(choice.value)}>{choice.label}</button>
+  ))}
+</Field>
 `.trim();
 
 const wizardProvider = `
@@ -82,6 +100,7 @@ const COMMANDS = [
   { name: "server-errors", port: 5182, here: "#server-errors" },
   { name: "two-forms", port: 5183, here: "#two-forms" },
   { name: "wizard", port: 5184, here: "#wizard" },
+  { name: "auto-form", port: 5186, here: "#auto-form" },
   { name: "playground", port: 5178, here: undefined },
   { name: "nested-arrays", port: 5181, here: undefined },
 ];
@@ -186,6 +205,61 @@ const COMMANDS = [
   <div><WizardExample client:load /></div>
 
   <Code code={wizardProvider} label="app: wizard" lang="tsx" flush />
+
+  <!-- THE ONE THAT ANSWERS "AND HOW DO I CHANGE IT". `<AutoForm>` draws a
+       whole form from the registry, which is the most surprising thing this
+       package does and the easiest to distrust: a reader who cannot see where
+       the seams are assumes there are none. So this example is not a demo of
+       AutoForm, it is a demo of every way of overriding it — which is the same
+       page, read from the other side. -->
+  <h2 id="auto-form">auto-form</h2>
+
+  <p class="caption">
+    Layer 1, and every seam in it. One schema and one widget table draw
+    everything below; no component in the example is written for a particular
+    field. Which input a field gets is decided by which rung of the table it
+    matched, and the rungs are tried most specific first — a name the caller
+    wrote, this declared path, the format the validator named, the fact that
+    the field is closed, its kind, then the fallback.
+  </p>
+
+  <p class="caption">
+    <strong class="text-on-surface">Things to try.</strong> Add a line: the
+    quantity stepper appears on the new row too, from{" "}
+    <strong class="text-on-surface">one</strong> <code>byPath</code> entry
+    spelled <code>lines[*].qty</code> — the lookup matches the declared path,
+    so a registry never grows an entry per row. On the third screen, type into
+    a few fields and then drop to the smallest table: the select, the counted
+    textarea and the stepper go, the values stay exactly where they were, and
+    the only thing that changed is which object was on the provider. Look at
+    what survives that — the plain inputs are still <code>type="email"</code>{" "}
+    and <code>type="number"</code>, because the type is on the binding rather
+    than in the widget. On the second screen, the priority buttons are
+    hand-written next to an <code>only</code>, and the options in them are
+    still the schema&rsquo;s.
+  </p>
+
+  <div><AutoFormExample client:load /></div>
+
+  <Code code={autoRegistry} label="app: auto-form" lang="tsx" flush />
+
+  <p class="caption">
+    That table is the whole of what the application supplies. To change one
+    field, add a <code>byPath</code> entry; to change a class of them, a{" "}
+    <code>byFormat</code> or <code>byKind</code> one; to change the chrome
+    around a list, pass <code>renderList</code>. To take a field back
+    altogether, name the rest in <code>only</code> and write it yourself.
+  </p>
+
+  <Code code={autoOnly} label="app: auto-form" lang="tsx" flush />
+
+  <p class="note">
+    <strong>What it costs.</strong> <code>AutoForm</code> reads its paths out
+    of the descriptor tree and splices row indices into them at run time, so
+    this is the one layer of the library where a path is not checked by the
+    compiler. The hand-written <code>&lt;Field path="auto:priority"&gt;</code>{" "}
+    beside it is checked exactly as it would be anywhere else.
+  </p>
 
   <h2>The two that stay commands</h2>
 
