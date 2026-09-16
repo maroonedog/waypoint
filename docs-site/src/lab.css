@@ -1,0 +1,206 @@
+/* A notebook cover and a working bench. Embedded applications keep their
+   own styling; the workbook selectors only address the documentation host. */
+:root {
+  --wp-paper: #f0f3f4;
+  --wp-sunk: #f5f7f8;
+  --wp-ink: #193552;
+  --wp-ink-quiet: #59636a;
+  --wp-line-faint: #cfd8dd;
+  --wp-line: #77858e;
+  --wp-mark: #b84428;
+  --font-sans: "Manrope", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  --lab-note: #dce5e6;
+  --lab-highlight: #edb949;
+  --lab-index: #e9e1d1;
+  --lab-panel: #ffffff;
+  --lab-code: #193f59;
+  --lab-code-ink: #fff8e9;
+  --lab-code-muted: #c3d4dc;
+}
+html[lang="ja"] body { font-family: var(--font-sans); }
+body { font-size: 1rem; }
+html { scroll-behavior: smooth; }
+.site-header { background: var(--wp-paper); }
+.site-header > div { min-height: 64px; gap: 2rem; }
+.site-wordmark { font-family: var(--font-sans); font-size: 1.4rem; font-weight: 800; letter-spacing: -.06em; }
+.site-wordmark svg { color: var(--wp-mark); width: 28px; height: 28px; }
+.site-header nav { font-family: var(--font-sans); font-size: .875rem; gap: 1.2rem; }
+.site-header > div { position: relative; flex-wrap: nowrap; gap: 20px; }
+.header-language { margin-left: auto; order: 1; }
+.header-menu { order: 2; }
+.header-menu summary { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--wp-line-faint); border-radius: 5px; font-size: .8rem; cursor: pointer; list-style: none; }
+.header-menu summary::-webkit-details-marker { display: none; }
+.header-menu[open] summary { background: var(--lab-note); }
+.site-header .header-menu-panel { position: absolute; top: calc(100% + 1px); right: 24px; width: min(620px, calc(100vw - 32px)); max-height: calc(100dvh - 85px); overflow-y: auto; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 24px; padding: 24px; background: var(--lab-panel); border: 1px solid var(--wp-line-faint); box-shadow: 0 12px 24px #19355218; }
+.header-menu-panel ul { display: grid; gap: 4px; margin-top: 10px; }
+.header-menu-panel li a { display: block; padding: 7px 5px; border-radius: 3px; }
+.header-menu-panel a:hover, .header-menu-panel a[aria-current="page"] { color: var(--wp-mark); background: var(--wp-sunk); }
+.header-menu-github { grid-column: 1 / -1; border-top: 1px solid var(--wp-line-faint); padding-top: 12px; font-size: .8rem; }
+@media (min-width: 1024px) { .header-menu-with-sidebar { display: none; } }
+.index-link { border-radius: 8px; }
+.index-link[aria-current="page"] { background: var(--lab-note); color: var(--wp-mark); }
+main:not(.is-landing) > h1 { font-family: var(--font-sans); font-weight: 800; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -.045em; }
+main:not(.is-landing) .lead { color: var(--wp-ink-quiet); font-size: 1.2rem; line-height: 1.8; }
+main:not(.is-landing) > section > h2, main:not(.is-landing) > h2 { border-color: var(--wp-line-faint); }
+.skip-link { position: fixed; top: -100px; left: 1rem; z-index: 100; background: var(--wp-ink); color: var(--wp-paper); padding: .7rem 1rem; border-radius: 8px; }
+.skip-link:focus { top: 1rem; }
+.landing-page main.is-landing { padding-top: 0; padding-bottom: 2rem; }
+.workbook :is(h1,h2,h3,p,pre) { margin: 0; max-width: none; }
+.workbook :is(h1,h2,h3) { font-family: var(--font-sans); }
+.workbook :is(a,button,input,summary):focus-visible { outline: 3px solid var(--wp-mark); outline-offset: 4px; }
+.workbook button, .workbook summary { cursor: pointer; }
+.book-running-head { display: flex; justify-content: space-between; gap: 16px; padding: 22px 0 0; font-family: var(--font-mono); font-size: .63rem; letter-spacing: .1em; color: var(--wp-ink-quiet); }
+.book-masthead { display: flex; align-items: center; justify-content: space-between; gap: 35px; border-bottom: 2px solid var(--wp-ink); padding: 0 0 18px; }
+main.is-landing .book-masthead h1 { font-family: var(--font-sans); font-weight: 800; font-size: clamp(5.8rem, 15vw, 13.5rem); letter-spacing: -.09em; line-height: 1.2; max-width: none; }
+.book-masthead h1 > span { color: var(--wp-mark); }
+.book-flower { width: clamp(65px, 12vw, 155px); flex-shrink: 0; color: var(--wp-mark); transform: rotate(-12deg); transition: transform .5s; }
+.book-masthead:hover .book-flower { transform: rotate(18deg); }
+.book-intro { display: grid; grid-template-columns: 1.05fr 1.3fr .7fr; gap: 35px; align-items: center; padding: 25px 0 36px; }
+.book-intro .book-tagline { font-size: clamp(1.3rem, 2.1vw, 1.85rem); line-height: 1.5; font-weight: 800; letter-spacing: -.04em; white-space: pre-line; }
+.book-intro .book-description { font-size: .83rem; line-height: 1.9; color: var(--wp-ink-quiet); }
+.book-start { display: flex; justify-content: space-between; align-items: center; gap: 20px; background: var(--lab-highlight); padding: 17px 16px; border: 1px solid var(--wp-ink); font-size: .8rem; font-weight: 700; transform: rotate(-3deg); transition: transform .2s; }
+.book-start:hover { transform: rotate(0deg) translateY(-2px); }
+.book-start > span:last-child { font-size: 1.6rem; }
+.book-section-label { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 15px 0; }
+.workbook .book-section-label h2 { font-size: 1rem; font-weight: 700; letter-spacing: -.02em; }
+.book-section-label > span, .book-small { font-family: var(--font-mono); font-size: .63rem; letter-spacing: .06em; color: var(--wp-ink-quiet); }
+.book-bench { scroll-margin-top: 90px; }
+.form-lab { display: grid; grid-template-columns: 190px minmax(0,1fr) minmax(0,.9fr); grid-template-areas: 'top top top' 'tabs workspace source' 'tabs bottom bottom'; border: 1px solid var(--wp-ink); background: var(--lab-panel); }
+.lab-topbar { grid-area: top; display: flex; justify-content: space-between; align-items: center; padding: 10px 18px; background: var(--wp-ink); color: var(--wp-paper); font-family: var(--font-mono); font-size: .6rem; letter-spacing: .08em; }
+.lab-topbar > span:first-child { display: flex; gap: 8px; align-items: center; }
+.lab-topbar i { width: 6px; height: 6px; border-radius: 50%; background: #edb949; }
+.lab-tabs { grid-area: tabs; display: flex; flex-direction: column; background: var(--lab-index); padding: 25px 0 20px; border-right: 1px solid var(--wp-ink); }
+.lab-tab-caption { padding: 0 18px 20px; font-family: var(--font-mono); font-size: .6rem; color: var(--wp-ink-quiet); }
+.lab-tabs button { display: flex; align-items: center; gap: 12px; text-align: left; padding: 18px 14px; border-block: 1px solid transparent; font-size: .77rem; line-height: 1.4; }
+.lab-tab-number { font-family: var(--font-mono); font-size: .64rem; }
+.lab-tab-arrow { margin-left: auto; opacity: 0; }
+.lab-tabs button[aria-pressed="true"] { background: var(--lab-panel); border-color: var(--wp-ink); margin-right: -1px; font-weight: 700; }
+.lab-tabs button[aria-pressed="true"] .lab-tab-arrow { opacity: 1; }
+.lab-tabs button:hover { color: var(--wp-mark); }
+.lab-tabs .lab-tab-note { white-space: pre-line; font-size: .73rem; line-height: 1.8; margin: auto 18px 0; padding-top: 24px; transform: rotate(-5deg); }
+.lab-tab-note > span { display: block; font-size: 3.5rem; line-height: 1; padding-top: 15px; color: var(--wp-mark); }
+.lab-workspace { grid-area: workspace; padding: 25px 28px 30px; min-height: 330px; background-image: radial-gradient(var(--wp-line-faint) .7px, transparent .7px); background-size: 12px 12px; }
+.lab-workspace .lab-instruction { font-size: .78rem; line-height: 1.8; margin-bottom: 24px; max-width: 29em; }
+.lab-field + .lab-field { margin-top: 19px; }
+.lab-field-heading { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; font-size: .8rem; font-weight: 600; }
+.lab-render { font-family: var(--font-mono); font-size: .62rem; background: #edb949; color: #193552; padding: 3px 7px; border-radius: 2px; animation: lab-pop .35s ease-out; }
+.lab-field input { width: 100%; background: var(--lab-panel); border: 1px solid var(--wp-line); border-bottom: 2px solid var(--wp-ink); border-radius: 3px; padding: 11px 12px; font-size: .95rem; color: var(--wp-ink); }
+.lab-field input[aria-invalid="true"] { border-color: var(--wp-verdict); }
+.lab-field-note { display: flex; flex-wrap: wrap; gap: 4px 8px; justify-content: space-between; margin-top: 6px; font-size: .64rem; }
+.lab-field-note code { background: var(--lab-panel); padding: 0; color: var(--wp-ink-quiet); font-size: inherit; overflow-wrap: anywhere; }
+.lab-field-note span { color: var(--wp-verdict); background: var(--lab-panel); }
+.lab-source { grid-area: source; display: flex; flex-direction: column; min-width: 0; position: relative; background: var(--lab-code); --wp-ink: var(--lab-code-ink); --wp-ink-quiet: var(--lab-code-muted); --wp-mark: #edb949; padding: 27px 24px; border-left: 1px solid var(--wp-line); }
+.lab-source > span:first-child { font-family: var(--font-mono); font-size: .63rem; color: var(--wp-ink-quiet); }
+.lab-source pre { margin-top: 30px; font-size: .73rem; line-height: 1.85; overflow-x: auto; color: var(--wp-ink); padding-bottom: 12px; }
+.lab-source > p { margin-top: auto; padding-top: 35px; max-width: 22em; font-size: .72rem; line-height: 1.8; color: var(--wp-ink-quiet); }
+.lab-source .lab-source-mark { align-self: flex-end; font-family: var(--font-mono); color: var(--wp-mark); font-size: 2.1rem; transform: rotate(8deg); padding-top: 15px; }
+.lab-bottom { grid-area: bottom; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; border-top: 1px solid var(--wp-line); padding: 10px 20px; font-size: .66rem; color: var(--wp-ink-quiet); }
+.lab-bottom button { padding: 6px 0; color: var(--wp-mark); }
+.lab-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.lab-row .lab-field { flex: 1; min-width: 0; }
+.lab-remove { border: 1px solid var(--wp-line-faint); border-radius: 50%; width: 30px; height: 30px; flex-shrink: 0; background: var(--lab-panel); }
+.lab-add { border: 1px dashed var(--wp-line); border-radius: 3px; padding: 8px 12px; width: 100%; font-size: .8rem; color: var(--wp-mark); background: var(--lab-panel); }
+.book-margin-note { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-top: 15px; }
+.book-margin-note > span { font-size: 1.4rem; color: var(--wp-mark); }
+.book-margin-note > p { font-size: .73rem; color: var(--wp-ink-quiet); flex: 1; }
+.book-margin-note > a { font-size: .73rem; text-decoration: underline; text-underline-offset: 4px; }
+.book-chapters { margin-top: 60px; }
+.book-chapter { border-top: 1px solid var(--wp-ink); }
+.book-chapter:last-child { border-bottom: 1px solid var(--wp-ink); }
+.book-chapter summary { display: flex; align-items: center; gap: 28px; list-style: none; padding: 26px 10px; }
+.book-chapter summary::-webkit-details-marker { display: none; }
+.chapter-number { font-family: var(--font-mono); font-size: .75rem; background: var(--lab-highlight); width: 33px; height: 33px; display: grid; place-items: center; border-radius: 50%; flex-shrink: 0; }
+.book-chapter:nth-of-type(2) .chapter-number { background: var(--lab-note); }
+.book-chapter:nth-of-type(3) .chapter-number { background: var(--lab-index); }
+.book-chapter summary h3 { font-size: clamp(1rem, 2vw, 1.55rem); font-weight: 600; letter-spacing: -.035em; }
+.chapter-subtitle { margin-left: auto; font-family: var(--font-mono); font-size: .6rem; color: var(--wp-ink-quiet); }
+.chapter-toggle { font-size: 1.5rem; font-weight: 400; transition: transform .2s; }
+.book-chapter[open] .chapter-toggle { transform: rotate(45deg); }
+.book-chapter[open] { background: var(--lab-panel); }
+.chapter-content { display: flex; align-items: baseline; gap: 30px; padding: 0 30px 30px 72px; }
+.chapter-content p { font-size: .9rem; line-height: 1.9; max-width: 48em; }
+.chapter-content a { flex-shrink: 0; margin-left: auto; font-size: .78rem; color: var(--wp-mark); text-decoration: underline; text-underline-offset: 4px; }
+.book-recipe { margin: 65px 0; padding: 30px; border: 1px solid var(--wp-line-faint); border-left: 7px solid var(--lab-index); }
+.book-recipe-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 25px; margin-bottom: 25px; }
+.book-recipe-heading h2 { margin-top: 10px; font-size: 1.5rem; font-weight: 700; }
+.book-recipe-heading > a { font-size: .76rem; }
+.book-recipe .code-block { min-width: 0; }
+.book-directory { display: flex; align-items: center; flex-wrap: wrap; gap: 20px 36px; padding: 28px 0; border-block: 1px solid var(--wp-ink); }
+.book-directory > span { margin-right: auto; }
+.book-directory a { font-size: 1.05rem; font-weight: 700; }
+.book-directory a > span { color: var(--wp-mark); }
+.book-colophon { display: flex; align-items: baseline; gap: 30px; padding: 25px 0; }
+.book-colophon p { max-width: 58em; font-size: .73rem; line-height: 1.9; color: var(--wp-ink-quiet); }
+.book-colophon a { margin-left: auto; white-space: nowrap; font-size: .75rem; }
+@keyframes lab-pop { from { transform: scale(1.15); } to { transform: scale(1); } }
+@media (prefers-color-scheme: dark) {
+  :root { --wp-paper: #17252e; --wp-sunk: #101b22; --wp-ink: #f3ecdd; --wp-ink-quiet: #b9c5c8; --wp-line: #8a9798; --wp-line-faint: #3e4e55; --wp-mark: #f29a76; --lab-note: #304c5b; --lab-highlight: #edb949; --lab-index: #354047; --lab-panel: #1d303b; --lab-code: #10202d; }
+}
+@media (max-width: 1000px) {
+  .form-lab { grid-template-columns: 155px minmax(0,1fr) minmax(0,.95fr); }
+  .lab-tabs button { gap: 7px; font-size: .7rem; padding-inline: 10px; }
+  .lab-workspace { padding-inline: 20px; }
+  .lab-source { padding-inline: 18px; }
+  .lab-source pre { font-size: .65rem; }
+  .book-intro { gap: 20px; grid-template-columns: 1fr 1.25fr; }
+  .book-start { grid-column: 2; justify-self: end; padding: 8px 15px; }
+  .chapter-subtitle { display: none; }
+  .chapter-toggle { margin-left: auto; }
+}
+@media (max-width: 700px) {
+  .site-header > div { gap: 12px; padding-block: 12px; }
+  .site-header .site-wordmark { font-size: 1.2rem; }
+  .site-header .header-menu-panel { grid-template-columns: 1fr; right: 16px; gap: 20px; padding: 20px; }
+  .header-menu-panel ul { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .book-running-head { font-size: .52rem; padding-top: 20px; }
+  .book-running-head span:nth-child(2) { display: none; }
+  .book-masthead { gap: 12px; padding: 16px 0 12px; }
+  main.is-landing .book-masthead h1 { font-size: clamp(3.7rem, 14.5vw, 6.5rem); }
+  .book-flower { width: clamp(36px, 9vw, 64px); }
+  .book-intro { grid-template-columns: 1fr; padding: 20px 0; }
+  .book-intro .book-tagline { font-size: 1.45rem; }
+  .book-intro .book-description { font-size: .8rem; }
+  .book-start { grid-column: 1; justify-self: start; margin: 5px 0 10px; }
+  .book-section-label { align-items: flex-start; flex-direction: column; gap: 5px; }
+  .book-section-label > span { font-size: .56rem; }
+  .form-lab { grid-template-columns: minmax(0,1fr); grid-template-areas: 'top' 'tabs' 'workspace' 'source' 'bottom'; }
+  .lab-topbar { padding: 10px 12px; font-size: .53rem; }
+  .lab-tabs { flex-direction: row; padding: 0; border-right: 0; border-bottom: 1px solid var(--wp-ink); }
+  .lab-tab-caption, .lab-tab-note { display: none; }
+  .lab-tabs button { flex: 1; flex-direction: column; justify-content: center; padding: 12px 3px; gap: 5px; border: 0; border-right: 1px solid var(--wp-line); font-size: .65rem; }
+  .lab-tabs button:last-of-type { border-right: 0; }
+  .lab-tabs button[aria-pressed="true"] { margin: 0; background: var(--lab-highlight); }
+  .lab-tab-arrow { display: none; }
+  .lab-workspace { min-height: 0; padding: 22px 18px 26px; }
+  .lab-source { border-left: 0; border-top: 1px solid var(--wp-line); padding: 18px; }
+  .lab-source pre { margin-top: 15px; font-size: .67rem; }
+  .lab-source > p { padding-top: 10px; max-width: none; }
+  .lab-source .lab-source-mark { display: none; }
+  .lab-bottom { font-size: .6rem; padding-inline: 12px; }
+  .book-margin-note { gap: 8px; }
+  .book-margin-note > p { flex-basis: 80%; }
+  .book-margin-note > a { margin-left: 20px; }
+  .book-chapters { margin-top: 38px; }
+  .book-chapter summary { gap: 12px; padding: 20px 0; }
+  .book-chapter summary h3 { font-size: .95rem; }
+  .chapter-number { width: 27px; height: 27px; font-size: .65rem; }
+  .chapter-content { display: block; padding: 0 12px 22px 39px; }
+  .chapter-content p { font-size: .8rem; }
+  .chapter-content a { display: inline-block; margin-top: 12px; }
+  .book-recipe { margin: 38px 0; padding: 18px 12px; }
+  .book-recipe-heading { display: block; }
+  .book-recipe-heading h2 { font-size: 1.1rem; margin-bottom: 12px; }
+  .book-directory { gap: 20px; }
+  .book-directory > span { flex-basis: 100%; }
+  .book-directory a { font-size: .9rem; }
+  .book-colophon { flex-wrap: wrap; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .workbook *, .workbook *::after { animation: none !important; transition: none !important; }
+}
+
+/* The ochre labels keep dark ink in either colour scheme. */
+.book-start, .chapter-number, .lab-render { color: #193552; }
+.book-chapter:nth-of-type(2) .chapter-number, .book-chapter:nth-of-type(3) .chapter-number { color: var(--wp-ink); }
+@media (max-width: 700px) { .lab-tabs button[aria-pressed="true"] { color: #193552; } }

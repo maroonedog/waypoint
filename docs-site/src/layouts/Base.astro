@@ -25,6 +25,7 @@
 // so the column does not move when the rail arrives.
 // ===========================================================================
 import "../styles.css";
+import "../lab.css";
 import { TRANSLATED, localeOf, routeOf } from "../i18n/locales.mjs";
 
 interface Props {
@@ -89,15 +90,9 @@ const MATERIAL = ["/showcase/"];
 const register = FINDING.includes(route) ? "finding" : "reading";
 const material = MATERIAL.includes(route);
 
-// The docs faces, requested as one stylesheet. Source Serif 4 for what is
-// argued, DM Mono for what is addressed — the rule is written down in
-// styles.css because it decides every call site.
-//
-// 500 IS IN THE RANGE BECAUSE 68 ELEMENTS ASK FOR IT. Without it `font-medium`
-// on a serif element resolved down to 400 and rendered as body text, so every
-// emphasis written that way was silently not there.
+// A rounded sans for the docs and a mono for code; Japanese uses the OS sans.
 const FACES =
-  "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&display=swap";
+  "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap";
 const MATERIAL_FACES =
   "https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&family=Roboto:wght@400;500;700&display=swap";
 
@@ -131,6 +126,7 @@ const SECTIONS = [
       { href: "/api/", label: { en: "API", ja: "API" } },
       { href: "/examples/", label: { en: "Examples", ja: "サンプル" } },
       { href: "/benchmark/", label: { en: "Benchmark", ja: "ベンチマーク" } },
+      { href: "/details/", label: { en: "Design notes", ja: "設計ノート" } },
     ],
   },
 ];
@@ -143,8 +139,8 @@ const UI = {
   documentation: { en: "Documentation", ja: "ドキュメント" },
   status: { en: "unpublished", ja: "未公開" },
   footer: {
-    en: "MIT licensed. Two resolvers ship — zod and luq — and they reach the contract by different roads: one is walked directly, the other is asked for a JSON Schema.",
-    ja: "MIT ライセンス。リゾルバは zod 用と luq 用の2つで、コントラクトへの届き方が違います。片方はスキーマを直接たどり、もう片方には JSON Schema を出してもらう形です。",
+    en: "Made for curious builders. MIT licensed.",
+    ja: "つくるのが好きな人へ。MIT ライセンス。",
   },
   otherLanguage: { en: "日本語", ja: "English" },
 } as const;
@@ -153,7 +149,7 @@ const t = <T extends { readonly en: string; readonly ja: string }>(x: T): string
   locale === "ja" ? x.ja : x.en;
 
 const here = Astro.url.pathname;
-const flat = SECTIONS.flatMap((section) => section.items);
+
 ---
 
 <!doctype html>
@@ -182,9 +178,10 @@ const flat = SECTIONS.flatMap((section) => section.items);
     {material && <link href={MATERIAL_FACES} rel="stylesheet" />}
   </head>
 
-  <body class="bg-surface text-on-surface">
+  <body class:list={["bg-surface text-on-surface", bare && "landing-page"]}>
+    <a class="skip-link" href="#main-content">{locale === "ja" ? "本文へスキップ" : "Skip to content"}</a>
     <header
-      class="sticky top-0 z-20 border-b border-outline-variant bg-surface/85 backdrop-blur"
+      class="site-header sticky top-0 z-20 border-b border-outline-variant bg-surface/85 backdrop-blur"
     >
       <!-- THE HEADER'S CONTAINER IS THE PAGE'S CONTAINER. The two frames are
            different widths, and one container for both put the wordmark and
@@ -195,7 +192,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
       <div
         class:list={[
           "mx-auto flex items-center gap-6 py-3",
-          bare ? "max-w-5xl px-6" : "max-w-[92rem] px-4 sm:px-6",
+          bare ? "max-w-[80rem] px-6" : "max-w-[92rem] px-4 sm:px-6",
         ]}
       >
         <!-- THE MARK IS DRAWN HERE RATHER THAN LINKED, and the difference is
@@ -210,8 +207,8 @@ const flat = SECTIONS.flatMap((section) => section.items);
              second accessible name on one link is one more thing a screen
              reader reads out for no gain. -->
         <a
-          href="/"
-          class="flex shrink-0 items-center gap-2 font-mono text-sm font-medium text-on-surface"
+          href={inLocale(locale, "/")}
+          class="site-wordmark flex shrink-0 items-center gap-2 font-mono text-sm font-medium text-on-surface"
         >
           <svg
             aria-hidden="true"
@@ -228,41 +225,21 @@ const flat = SECTIONS.flatMap((section) => section.items);
             <circle cx="16" cy="16" r="3.2" fill="currentColor"></circle>
           </svg>waypoint
         </a>
-        <!-- Below lg the index is not on the page, so the sections live here
-             and wrap rather than scroll: a link you have to scroll to is a
-             link nobody finds.
-
-             ON THE LANDING PAGE THERE IS NO INDEX AT ANY WIDTH, so this is the
-             only navigation the page has and it must not be hidden. Measured
-             before this line: above 1024px `/` carried exactly one in-site
-             link — the wordmark, which points at the page you are already on —
-             and `/start/` appeared once in the whole document, inside a nav
-             that was display:none. -->
-        <nav
-          class:list={[
-            "flex flex-1 flex-wrap gap-x-4 gap-y-1 font-mono text-[0.8125rem]",
-            !bare && "lg:hidden",
-          ]}
-          aria-label={t(UI.sections)}
-        >
-          {
-            flat.slice(1).map((item) => {
-              const href = inLocale(locale, item.href);
-              return (
-                <a
-                  href={href}
-                  aria-current={here === href ? "page" : undefined}
-                  class:list={[
-                    "underline-offset-4 hover:underline",
-                    here === href ? "text-on-surface" : "text-on-surface-variant",
-                  ]}
-                >
-                  {t(item.label)}
-                </a>
-              );
-            })
-          }
-        </nav>
+        <details class:list={["header-menu", !bare && "header-menu-with-sidebar"]}>
+          <summary><span aria-hidden="true">☰</span> {locale === "ja" ? "メニュー" : "Menu"}</summary>
+          <nav class="header-menu-panel" aria-label={t(UI.sections)}>
+            {SECTIONS.map((section) => (
+              <div>
+                <p class="label">{t(section.group)}</p>
+                <ul>{section.items.map((item) => {
+                  const href = inLocale(locale, item.href);
+                  return <li><a href={href} aria-current={here === href ? "page" : undefined}>{t(item.label)}</a></li>;
+                })}</ul>
+              </div>
+            ))}
+            <a class="header-menu-github" href="https://github.com/maroonedog/waypoint">GitHub ↗</a>
+          </nav>
+        </details>
         <!-- THE CONTROL IS ALWAYS A LINK, AND IT ALWAYS LANDS SOMEWHERE REAL.
              A greyed-out switch on the eight routes that are English only
              would make the reader guess what greyed-out meant; a switch that
@@ -274,7 +251,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
              `hreflang` and `lang` because a screen reader on a Japanese page
              should say "English" in English, not read the word with Japanese
              phonemes. -->
-        <p class="ml-auto shrink-0 font-mono text-[0.8125rem]">
+        <p class="header-language shrink-0 font-mono text-[0.8125rem]">
           <a
             class="text-on-surface-variant underline-offset-4 hover:underline"
             href={inLocale(locale === "ja" ? "en" : "ja", route)}
@@ -284,25 +261,27 @@ const flat = SECTIONS.flatMap((section) => section.items);
             {t(UI.otherLanguage)}
           </a>
         </p>
-        <!-- Hidden below lg on a documentation page, where the wrapping
-             section nav needs the room and the footer carries the same link.
-             Never hidden on the landing page: it is where a reader goes to
-             obtain a library that is not published anywhere else. -->
-        <a
-          class:list={[
-            "shrink-0 font-mono text-[0.8125rem] text-on-surface-variant underline-offset-4 hover:underline",
-            !bare && "hidden lg:block",
-          ]}
-          href="https://github.com/maroonedog/waypoint">GitHub</a
-        >
       </div>
     </header>
+    <script>
+      const menu = document.querySelector<HTMLDetailsElement>(".header-menu");
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && menu?.open) {
+          menu.open = false;
+          menu.querySelector("summary")?.focus();
+        }
+      });
+      document.addEventListener("click", (event) => {
+        if (menu?.open && event.target instanceof Node && !menu.contains(event.target)) menu.open = false;
+      });
+    </script>
 
     {
       bare ? (
         <main
+          id="main-content"
           data-register={register}
-          class="is-landing mx-auto max-w-5xl px-6 pt-20 pb-20 sm:pt-24"
+          class="is-landing mx-auto max-w-[80rem] px-6 pt-20 pb-20 sm:pt-24"
         >
           <slot />
         </main>
@@ -342,6 +321,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
           </nav>
 
           <main
+          id="main-content"
             data-register={register}
             class="min-w-0 max-w-[54rem] pt-16 pb-20 lg:pt-10"
           >
@@ -380,7 +360,7 @@ const flat = SECTIONS.flatMap((section) => section.items);
     <footer
       class:list={[
         "px-6 pb-16",
-        bare ? "mx-auto max-w-5xl" : "mx-auto max-w-[92rem] lg:pl-[14.5rem]",
+        bare ? "mx-auto max-w-[80rem]" : "mx-auto max-w-[92rem] lg:pl-[14.5rem]",
       ]}
     >
       <!-- THE STATUS LINE IS THE POINT OF THIS FOOTER. Most library footers

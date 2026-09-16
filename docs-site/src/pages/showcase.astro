@@ -44,21 +44,9 @@ import { panelIdOf } from "../demo/section-panel.ts";
     tells you what stopped it. It is running on this page.
   </p>
 
-  <p class="caption">
-    Every label, every bound, every <code>type</code> and every aria attribute
-    below came off the zod schema. The widgets are the application's — this
-    library ships none — and what they were handed is one binding each.
-  </p>
+  <p class="caption">The schema supplies labels, constraints, and accessibility attributes. The application supplies the widgets.</p>
 
-  <p class="caption">
-    <strong class="text-on-surface">Things to try.</strong> Send it empty: the
-    bar names the paths that blocked it, including ones you have to scroll to.
-    Tick <em>Same as billing</em>: the shipping fields go, their values stay,
-    and they stop counting toward the block. Put two of the same address in and
-    the complaint lands on the shipping postcode — a rule reporting against a
-    field you did not touch. Push the order total over the ceiling and the
-    message arrives at <code>items</code>, a path with no input of its own.
-  </p>
+  <p class="caption">Submit empty to see blocking paths. Toggle <em>Same as billing</em> to retain shipping values while excluding their errors. Exceed the order ceiling to see an error on <code>items</code>.</p>
 
   <!-- THE GUEST IS NAMED, AND IN THE SITE'S OWN GRAMMAR. Every other block of
        evidence on this site arrives under `qualifier: value` — `file:`,

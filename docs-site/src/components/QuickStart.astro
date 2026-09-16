@@ -1,0 +1,39 @@
+---
+import Base from "../layouts/Base.astro";
+import Code from "./Code.astro";
+import source from "../../../examples/quick-start/src/App.tsx?raw";
+interface Props { locale: "en" | "ja" }
+const { locale } = Astro.props;
+const ja = locale === "ja";
+const install = `git clone https://github.com/maroonedog/waypoint
+cd waypoint
+npm ci
+npm run example:quick-start`;
+---
+<Base title={ja ? "はじめる — waypoint" : "Start — waypoint"} description={ja ? "最小フォームを起動して、入力・検証・保存を試す。" : "Run a minimal form, validate an email, and save its value."}>
+  <h1>{ja ? "はじめる" : "Start"}</h1>
+  <p class="lead">{ja ? "メールアドレスのフォームで、入力・検証・保存を試しましょう。" : "Try input, validation, and saving with a simple email form."}</p>
+  <h2>{ja ? "1. 起動する" : "1. Run it"}</h2>
+  <p>{ja ? "Node 22.14 以上とネット接続が必要です。" : "Requires Node 22.14 or newer and an internet connection."}</p>
+  <Code code={install} label="terminal" lang="sh" />
+  <p>{ja ? "配布用パッケージを一時フォルダにインストールし、検証後に起動します。Vite が表示する URL を開いてください。" : "This installs the packed package in a temporary app, verifies it, then starts Vite. Open the URL it prints."}</p>
+  <h2>{ja ? "2. 入力してみる" : "2. Try it"}</h2>
+  <ul>
+    <li><code>invalid</code> → {ja ? "Save を押すとエラー。保存されません。" : "Press Save: an error appears and nothing is saved."}</li>
+    <li><code>ada@example.com</code> → {ja ? "Save を押すと値が画面に表示されます。" : "Press Save: the saved address appears."}</li>
+  </ul>
+  <p class="caption">{ja ? "保存は画面内だけで、サーバーへの送信はありません。" : "The result stays on this page; no backend request is sent."}</p>
+  <h2>{ja ? "3. コードを変えてみる" : "3. Make it yours"}</h2>
+  <p>{ja ? "表示された一時フォルダの src/App.tsx を編集してください。スキーマ・型登録・入力欄がこのファイルにまとまっています。" : "Edit src/App.tsx in the printed temporary directory. It contains the schema, type registration, and input binding."}</p>
+  <Code code={source} label="src/App.tsx" lang="tsx" />
+  <p class="caption">{ja ? "停止は Ctrl+C。フォルダは残るので、その中で npm run dev を実行すれば再開できます。" : "Stop with Ctrl+C. The folder is retained; run npm run dev inside it to restart."}</p>
+  <h2>{ja ? "次に読む" : "Next steps"}</h2>
+  <ul>
+    <li><a class="link" href="/paths/">{ja ? "型登録・配列・複数フォーム（英語）" : "Typed paths, arrays, and multiple forms"}</a></li>
+    <li><a class="link" href="/validation/">{ja ? "検証と送信エラー（英語）" : "Validation and submission errors"}</a></li>
+    <li><a class="link" href="/examples/">{ja ? "実用サンプル（英語）" : "Working examples"}</a></li>
+    <li><a class="link" href="/api/">{ja ? "API・インポート先（英語）" : "API and imports"}</a></li>
+    <li><a class="link" href={ja ? "/ja/details/" : "/details/"}>{ja ? "設計の理由と制約" : "Design decisions and tradeoffs"}</a></li>
+  </ul>
+  <p class="caption">{ja ? "配布物だけを検証する場合は、リポジトリ直下で npm run verify:package を実行します。npm への公開は不要です。" : "To verify without starting a server, run npm run verify:package at the repository root. No npm release is required."}</p>
+</Base>

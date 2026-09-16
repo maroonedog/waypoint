@@ -14,18 +14,15 @@
 # having now: a docs page that stops compiling should fail review, not fail
 # silently until the day someone tries to publish it.
 #
-# `public/CNAME` carries the domain into the artifact, and the build fails
-# without it: a deploy missing that file silently drops the custom domain and
-# the site answers on github.io instead.
+# If a custom domain is configured, its CNAME must survive the build unchanged.
+# Without a configured domain, a build does not need a CNAME.
 # ===========================================================================
 name: Docs
 
 on:
+  # Pages import library source, examples and benchmark artifacts outside
+  # docs-site, so changes anywhere in the repository can break their build.
   pull_request:
-    paths:
-      - "docs-site/**"
-      - "examples/showcase/src/md3-tokens.css"
-      - ".github/workflows/deploy-docs.yml"
   workflow_dispatch:
     inputs:
       publish:
@@ -58,14 +55,10 @@ jobs:
       - run: npm run build
         working-directory: docs-site
 
-      - name: Fail if the CNAME did not reach the artifact
+      - name: Verify the configured custom domain survives the build
+        if: ${{ hashFiles('docs-site/public/CNAME') != '' }}
         run: |
-          test -f docs-site/dist/CNAME || {
-            echo "docs-site/dist/CNAME is missing; a deploy without it drops"
-            echo "the custom domain and the site answers on github.io instead."
-            exit 1
-          }
-          cat docs-site/dist/CNAME
+          cmp docs-site/public/CNAME docs-site/dist/CNAME
 
       - uses: actions/upload-artifact@v4
         with:

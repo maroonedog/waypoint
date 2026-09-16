@@ -28,9 +28,7 @@ const { route, title, about } = Astro.props as Untranslated;
 >
   <h1>{title}</h1>
 
-  <p class="lead">
-    このページはまだ日本語になっていません。<strong>原文は英語版のほうです。</strong>
-  </p>
+  <p class="lead">このページは英語版で読めます。</p>
 
   {about.map((line) => <p>{line}</p>)}
 
@@ -39,11 +37,5 @@ const { route, title, about } = Astro.props as Untranslated;
     <a class="link" href={route} hreflang="en" lang="en">{title}（英語）→</a>
   </p>
 
-  <p class="caption">
-    日本語になっているのは<a class="link" href="/ja/">概要</a>と<a
-      class="link"
-      href="/ja/start/">はじめる</a
-    >の2ページです。使うかどうかを決めるのに要るのがこの2つで、ほかは決めたあとに引くページなので、この順にしています。
-    このサイトの共通語は英語で、日本語はその上の層。食い違っていたら英語が正です。
-  </p>
+
 </Base>

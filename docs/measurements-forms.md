@@ -29,12 +29,12 @@ No milliseconds are published from this lane. jsdom does no layout and no paint,
 
 ## Policies
 
-Each subject is scored at the moment its OWN policy claims a verdict, and the citation is the library documentation rather than our reading of it. The on-change policy is the only policy waypoint has; the default of three of the libraries beside it is not.
+Each subject is scored at the moment its OWN policy claims a verdict. This recording uses on-change validation for the waypoint subjects. Waypoint also supports blur and submit modes, which these rows do not measure. The policy descriptions below have been corrected; the recorded measurements are unchanged.
 
 | subject | library | policy | documented as | notes |
 |---|---|---|---|---|
-| form-contract-use-field | @maroonedog/waypoint | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | No validation-mode knob exists; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly. |
-| form-contract-uncontrolled | @maroonedog/waypoint | on-change | README: one whole-root validation pass per settled change; FormOptions carries no validation mode | The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for. |
+| form-contract-use-field | @maroonedog/waypoint | on-change | FormOptions.validateOn: change | Uses on-change validation; every settled change is judged. inputProps is not used, so the DOM matches the shared leaf exactly. |
+| form-contract-uncontrolled | @maroonedog/waypoint | on-change | FormOptions.validateOn: change | The value cell is subscribed imperatively and written to the DOM node, so a keystroke does not re-render. The stated cost: an uncontrolled input cannot be transformed as it is typed, which is what useField is for. |
 | hand-written-per-field-state | (none) | on-change | written for this benchmark to judge on every change | One useState per leaf, a mutable root, one whole-root pass per change, per-path notification. No store, no library. |
 | react-hook-form-scoped | react-hook-form | on-change | react-hook-form useForm options: mode | register with a per-leaf useFormState({name, exact}). mode onChange, criteriaMode all, shouldUnregister false. The root reads no formState. |
 | react-hook-form-deps | react-hook-form | on-change | react-hook-form register options: deps | The scoped subject plus register(name, { deps }) on the one field the shared schema makes another field depend on. |

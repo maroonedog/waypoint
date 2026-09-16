@@ -1,0 +1,38 @@
+---
+import Base from "../layouts/Base.astro";
+import FormLab from "../demo/FormLab.tsx";
+interface Props { locale: "en" | "ja" }
+const { locale } = Astro.props;
+const ja = locale === "ja";
+const href = (path: string) => ja ? `/ja${path}` : path;
+const chapters = ja ? [
+  { title: "パスひとつで、フィールドへ。", subtitle: "TYPED PATHS", text: "フォームの型を一度登録すれば、奥のコンポーネントからもパスでアクセスできます。項目名の書き間違いは、コンパイラにおまかせ。", url: "/paths/" },
+  { title: "画面を離れても、入力はそのまま。", subtitle: "PERSISTENT STATE", text: "タブやステップを切り替えても値を保持。隠れているフィールドも検証できるので、画面の構成を自由に考えられます。", url: "/runtime/" },
+  { title: "ルールは、使い慣れたスキーマで。", subtitle: "YOUR SCHEMA", text: "Zod、luq、Standard Schema に対応。バリデーターが持っている情報を、入力項目の説明や検証に使います。", url: "/contract/" },
+] : [
+  { title: "A field is just a path away.", subtitle: "TYPED PATHS", text: "Register the form type once, then reach a field from deep in your component tree. The compiler spots a name that doesn't belong.", url: "/paths/" },
+  { title: "Leave the screen. Keep the input.", subtitle: "PERSISTENT STATE", text: "Values stay put when you switch tabs or steps. Hidden fields can still validate, leaving you free to shape the screen.", url: "/runtime/" },
+  { title: "Keep the rules you already know.", subtitle: "YOUR SCHEMA", text: "Use Zod, luq, or Standard Schema. The information in your validator describes your fields and judges their values.", url: "/contract/" },
+];
+---
+<Base bare title={ja ? "waypoint — 触ってわかる、フォームの道しるべ。" : "waypoint — A field guide to better forms."} description={ja ? "React と Vue のフォームを、型付きパスでつなぐ。小さな実験から、waypoint を試してみよう。" : "Connect React and Vue forms with typed paths. Get to know waypoint through a few small experiments."}>
+  <div class="workbook">
+    <section class="book-cover" aria-labelledby="book-title">
+      <div class="book-running-head"><span>THE FORM NOTEBOOK</span><span>REACT / VUE / TYPESCRIPT</span><span>{ja ? "ただいま開発中" : "A WORK IN PROGRESS"}</span></div>
+      <div class="book-masthead"><h1 id="book-title">waypoint<span>.</span></h1><svg class="book-flower" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 3 59 30 81 13 75 40 98 50 75 60 81 87 59 70 50 97 41 70 19 87 25 60 2 50 25 40 19 13 41 30Z" fill="currentColor" /><circle cx="50" cy="50" r="12" fill="var(--wp-paper)" /></svg></div>
+      <div class="book-intro"><p class="book-tagline">{ja ? "触ってわかる、\nフォームの道しるべ。" : "A field guide to\nbetter forms."}</p><p class="book-description">{ja ? "入力して、ルールを試して、行を増やして。小さな実験から、はじめよう。フォームを型付きパスでつなぐ、React と Vue のライブラリです。" : "Type something. Test a rule. Add a row. Start with a little experiment. Waypoint connects your React and Vue form fields with typed paths."}</p><a class="book-start" href={href("/start/")}><span>{ja ? "自分のフォームで使う" : "Build your own form"}</span><span aria-hidden="true">↗</span></a></div>
+    </section>
+    <section class="book-bench" id="playground" aria-labelledby="bench-title">
+      <div class="book-section-label"><h2 id="bench-title">{ja ? "まず、手を動かそう。" : "Make yourself at home."}</h2><span>{ja ? "↓ 実験を選んでスタート" : "↓ PICK AN EXPERIMENT"}</span></div>
+      <FormLab locale={locale} client:load />
+      <noscript><p>{ja ? "実験を試すには JavaScript を有効にしてください。" : "Enable JavaScript to try the experiments."}</p></noscript>
+      <div class="book-margin-note"><span aria-hidden="true">↳</span><p>{ja ? "これは本物のフォーム。数値もエラーも、いま入力した結果です。" : "Real fields. Real counters. Everything here responds to what you type."}</p><a href={href("/showcase/")}>{ja ? "もっと大きなフォームで遊ぶ ↗" : "Try a bigger form ↗"}</a></div>
+    </section>
+    <section class="book-chapters" aria-labelledby="chapters-title">
+      <div class="book-section-label"><h2 id="chapters-title">{ja ? "気になったところを、ひらく。" : "Pull on a thread."}</h2><span>FIELD NOTES / 01—03</span></div>
+      {chapters.map((chapter, index) => <details class="book-chapter"><summary><span class="chapter-number">0{index + 1}</span><h3>{chapter.title}</h3><span class="chapter-subtitle">{chapter.subtitle}</span><span class="chapter-toggle" aria-hidden="true">+</span></summary><div class="chapter-content"><p>{chapter.text}</p><a href={href(chapter.url)}>{ja ? "ドキュメントを読む" : "Read the docs"} ↗</a></div></details>)}
+    </section>
+    <nav class="book-directory" aria-label={ja ? "ドキュメントを探す" : "Explore the documentation"}><span class="book-small">KEEP EXPLORING</span><a href={href("/api/")}>API <span>↗</span></a><a href={href("/examples/")}>{ja ? "サンプル" : "Examples"} <span>↗</span></a><a href={href("/details/")}>{ja ? "設計ノート" : "Design notes"} <span>↗</span></a><a href={href("/benchmark/")}>{ja ? "計測結果" : "Benchmarks"} <span>↗</span></a></nav>
+    <div class="book-colophon"><p>{ja ? "まだ育てているところです。npm には未公開で、本番運用の実績もまだありません。ソースを試したり、気づいたことを教えてもらえたら。" : "Still growing. Not published on npm or used in production yet. Try the source and tell us what you find."}</p><a href="https://github.com/maroonedog/waypoint">GitHub ↗</a></div>
+  </div>
+</Base>

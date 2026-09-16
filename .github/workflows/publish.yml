@@ -63,6 +63,8 @@ jobs:
       # a package, and the tarball is assembled from dist.
       - run: npm run verify
 
+      - run: npm run verify:package
+
       - name: Refuse a version that is already on the registry
         run: |
           NAME=$(node -p "require('./packages/waypoint/package.json').name")

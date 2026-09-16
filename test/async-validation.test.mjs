@@ -123,6 +123,63 @@ test("submit hands over once the asking validator is content", async () => {
   assert.deepEqual(outcome, { submitted: true, blockedBy: [] });
 });
 
+for (const validateOn of ["change", "submit"]) {
+  test(`submit sends the validated snapshot across an edit (${validateOn})`, async () => {
+    const waiting = [];
+    const form = createForm({
+      adapter: askingAdapter(() => new Promise((resolve) => waiting.push(resolve))),
+      defaultValues: { handle: "free" },
+      validateOn,
+    });
+    const submittedRoot = form.readRoot();
+    let handed;
+    const attempt = form.submit((root) => { handed = root; });
+    form.field("handle").setValue("");
+    // Let the edit's scheduled pass start, then finish the submit's pass.
+    await Promise.resolve();
+    waiting[0]([]);
+    const outcome = await attempt;
+    for (const resolve of waiting.slice(1)) resolve([]);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    assert.equal(outcome.submitted, true);
+    assert.equal(handed, submittedRoot, "send exactly the root that was judged");
+    assert.deepEqual(handed, { handle: "free" });
+    assert.deepEqual(form.readRoot(), { handle: "" }, "keep the subsequent edit");
+    assert.equal(form.validating.read(), false);
+  });
+}
+
+test("an edit cannot turn a rejected submit snapshot into a successful submit", async () => {
+  let finish;
+  const form = createForm({
+    adapter: askingAdapter(() => new Promise((resolve) => { finish = resolve; })),
+    defaultValues: { handle: "" },
+    validateOn: "submit",
+  });
+  let handed = false;
+  const attempt = form.submit(() => { handed = true; });
+  form.field("handle").setValue("free");
+  finish([]);
+  const outcome = await attempt;
+  assert.equal(outcome.submitted, false);
+  assert.equal(handed, false);
+  assert.equal(outcome.blockedBy[0].message, "required");
+});
+
+test("a synchronous verdict also submits its snapshot across the await boundary", async () => {
+  const form = createForm({
+    adapter: zodFormResolver(SCHEMA),
+    defaultValues: { handle: "free" },
+    validateOn: "submit",
+  });
+  let handed;
+  const attempt = form.submit((root) => { handed = root; });
+  form.field("handle").setValue("");
+  assert.equal((await attempt).submitted, true);
+  assert.deepEqual(handed, { handle: "free" });
+});
+
 test("one field can be validated on its own, asynchronously", async () => {
   const form = build(askingAdapter(uniquenessCheck), { handle: TAKEN });
   const issues = await form.field("handle").validate();

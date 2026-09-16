@@ -41,9 +41,12 @@ export async function submitForm(
   const { store, judgeNow, blockingOf, handler } = request;
   store.write(submittingCell, true);
   try {
+    // Writes replace the root, so retain the value this pass judges. Reading
+    // again after awaiting would send edits that its verdict never checked.
+    const submittedRoot = store.read(ROOT_CELL);
     const blockedBy = blockingOf(await judgeNow());
     if (blockedBy.length > 0) return { submitted: false, blockedBy };
-    await handler(store.read(ROOT_CELL));
+    await handler(submittedRoot);
     return { submitted: true, blockedBy: [] };
   } finally {
     store.batch(() => {

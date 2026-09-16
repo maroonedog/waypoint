@@ -77,8 +77,8 @@ const sections: string[] = [
   "",
   "Each subject is scored at the moment its OWN policy claims a verdict, and " +
     "the citation is the library documentation rather than our reading of it. " +
-    "The on-change policy is the only policy waypoint has; the default " +
-    "of three of the libraries beside it is not.",
+    "The waypoint subjects explicitly select on-change validation. " +
+    "Other available modes are not measured by those subjects.",
   "",
   [
     "| subject | library | policy | documented as | notes |",

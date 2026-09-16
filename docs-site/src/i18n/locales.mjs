@@ -19,7 +19,7 @@
 // ===========================================================================
 
 /** Routes with a hand-written Japanese page. Everything else is English. */
-export const TRANSLATED = ["/", "/start/"];
+export const TRANSLATED = ["/", "/start/", "/details/"];
 
 /** The locale a pathname belongs to. */
 export const localeOf = (pathname) =>

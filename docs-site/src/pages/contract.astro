@@ -135,33 +135,13 @@ import type * as z from "zod";
 >
   <h1>The contract</h1>
 
-  <p class="lead">
-    <strong>A form needs a flat list of fields. A schema is a tree.</strong>{" "}
-    Describing a schema without a value is not scarce —{" "}
-    <code>getZodConstraint</code>, <code>superValidate</code>,{" "}
-    <code>toFieldConfig</code> and <code>ZodBridge</code> all do it, and
-    Standard Schema now carries a JSON Schema member several validators
-    implement. The walk from the tree to the list is the work, and it is written
-    once, against the format rather than against a vendor. That is what makes
-    this contract neutral by construction rather than by rewriting the walk per
-    validator.
-  </p>
+  <p class="lead">A resolver turns a schema into field descriptors and a whole-root validator. Bindings use the descriptors for labels, input constraints, and accessibility attributes.</p>
 
   <h2>What a descriptor draws</h2>
 
   <Code code={drawn} label="schema → descriptor → input" />
 
-  <p class="caption">
-    The <code>_r_N_</code> prefix is React 19.3's <code>useId</code>, one scope
-    per hook call — the shape is the point, not the spelling. Stage 2 is what
-    the resolver returns and stage 3 is what{" "}
-    <code>inputProps</code> carries; both were produced by running them, not
-    typed out. An attribute is emitted only when the schema declared the bound:{" "}
-    <code>bio</code> declared nothing, so its input carries nothing.{" "}
-    <code>aria-invalid</code> appears only once a field has issues. Stamping{" "}
-    <code>aria-invalid="false"</code> on forty untouched inputs asserts
-    something about each of them that nothing has checked.
-  </p>
+  <p class="caption">IDs are scoped per hook call. Bounds appear only when declared by the schema; <code>aria-invalid</code> appears when the field has issues.</p>
 
   <h2>What a screen reader is handed</h2>
   <p>
@@ -178,42 +158,17 @@ import type * as z from "zod";
     goes stale.
   </p>
 
-  <p class="note">
-    <strong>Not a differentiator, and not claimed as one.</strong>{" "}
-    <code>@rjsf/core</code>, <code>@autoform/shadcn</code> and{" "}
-    <code>@jsonforms/vanilla-renderers</code> all emit aria attributes derived
-    from a parsed schema, and Conform ships <code>id</code>,{" "}
-    <code>errorId</code>, <code>descriptionId</code>, <code>ariaInvalid</code>,{" "}
-    <code>ariaDescribedBy</code> and <code>focusFirst</code>.{" "}
-    <strong>Not done, and not scheduled:</strong> an error summary with focus
-    management on a failed submit, a WCAG map criterion by criterion, a gated{" "}
-    <code>axe</code> suite, and an audit by somebody who does this for a living.
-    Nothing here has met a real screen reader. The live-region caveat above is
-    what the ARIA practices describe, not something measured here.
-  </p>
+  <p class="note">Render the error element even when empty so its live region can announce later updates. Automated accessibility checks do not replace testing with assistive technology.</p>
 
   <h2>Two members</h2>
 
   <Code code={resolver} label="type: FormAdapter" />
 
-  <p class="caption">
-    There is no registry, no vendor tag and no dispatch: a resolver is named at
-    the call site. There is no <code>FormResolver</code> type either. All three
-    resolvers are unary today, so one would be accurate — and that is the
-    reason not to write it. It would describe what exists rather than constrain
-    what may be, and the next vendor would widen it. The two members are what
-    every vendor agrees to.
-  </p>
+  <p class="caption">Pass a resolver explicitly when creating the form. Its contract consists of field descriptors and validation.</p>
 
   <h2>Neutral by construction</h2>
 
-  <p>
-    This used to be argued by shipping two resolvers, which proves only that two
-    can be written. The generic one now takes <strong>both</strong> its members
-    from specifications this package does not own, and names no vendor in its
-    entry point. A validator that implements them works without a file being
-    added here.
-  </p>
+  <p>The standard resolver reads both validation and JSON Schema from the validator. No vendor-specific adapter is needed when both interfaces are supported.</p>
   <p>
     <code>draft-2020-12</code> is asked for first and <code>draft-07</code> on a
     throw: the spec tells a library to throw on a target it does not support,
@@ -222,54 +177,20 @@ import type * as z from "zod";
 
   <Code code={neutral} label="the degradation, in the type system" />
 
-  <p class="caption">
-    <strong class="text-on-surface">A form that draws nothing now says so.</strong>{" "}
-    A resolver with no descriptors still returns a working{" "}
-    <code>validate</code>, so the form judges correctly, gates submit correctly
-    and renders nothing. Every symptom points at the renderer. The compiler
-    catches the case it can see and names the missing member. The two it cannot
-    — a converter that threw, a document with nothing in it — get a sentence
-    each on the console, because they are different bugs. Nothing throws: a form
-    that validates and draws nothing is the better failure.
-  </p>
+  <p class="caption">Without descriptors, validation still works but no fields are described. Missing schema interfaces produce a type error; failed converters or empty documents produce console warnings.</p>
 
   <h2>So why do two vendor resolvers remain?</h2>
 
   <Code code={roads} label="measured: zod 4.6.4" />
 
-  <p class="caption">
-    Because a spec member that does not exist cannot carry anything. Over every
-    schema in the zod resolver's own test file, the generic walk reproduced the
-    hand-written one <em>byte for byte</em>. That includes{" "}
-    <code>.describe()</code> and <code>.meta()</code> text, which reaches JSON
-    Schema <code>title</code> and <code>description</code> on its own, so the
-    103-line walk that read <code>globalThis.__zod_globalRegistry</code> is
-    deleted.
-  </p>
-  <p class="caption">
-    The three rows above are what is left. Each is UI that would otherwise
-    change under a version bump: a date picker becoming a text box, an option
-    losing its capital, <code>min="-9007199254740991"</code> on a number input.
-    The other gap is <code>code</code>:{" "}
-    <code>StandardSchemaV1.Issue</code> has <code>message</code> and{" "}
-    <code>path</code> and nothing else, so both vendor resolvers keep the{" "}
-    <strong class="text-on-surface">verdict</strong> and take the{" "}
-    <strong class="text-on-surface">descriptors</strong> from the generic one.
-  </p>
+  <p class="caption">Vendor resolvers preserve details JSON Schema does not carry, illustrated above.</p>
+  <p class="caption">Standard Schema issues contain a message and path, but no vendor error code. Vendor resolvers retain those codes while reusing the generic descriptor conversion.</p>
 
   <h2>One descriptor is one field</h2>
 
   <Code code={descriptor} label="type: FormFieldDescriptor" />
 
-  <p class="caption">
-    One entry per leaf, and an array is described once through a wildcard
-    rather than once per row. Constraint values are carried{" "}
-    <em>as declared</em>: a pattern stays a <code>RegExp</code>. And{" "}
-    <code>kind</code> is a <strong class="text-on-surface">widget</strong>{" "}
-    decision that deliberately need not round-trip to a TypeScript type — a
-    validator that accepts a string carrying a date is free to describe it{" "}
-    <code>date</code>, because that is the input a person should be given.
-  </p>
+  <p class="caption">Each leaf has one descriptor; array rows share a wildcard descriptor. Constraints keep their declared values, including <code>RegExp</code>. The <code>kind</code> selects a widget and need not match the TypeScript value type.</p>
 
   <h2>The type survives</h2>
 

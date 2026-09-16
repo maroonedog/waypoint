@@ -28,7 +28,9 @@
     "example:two-forms": "vite --config examples/two-forms/vite.config.ts examples/two-forms",
     "example:wizard": "vite --config examples/wizard/vite.config.ts examples/wizard",
     "example:auto-form": "vite --config examples/auto-form/vite.config.ts examples/auto-form",
-    "mutation": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-mutations.ts"
+    "mutation": "node --experimental-strip-types --disable-warning=ExperimentalWarning bench/run-mutations.ts",
+    "verify:package": "node scripts/verify-package.mjs",
+    "example:quick-start": "node scripts/verify-package.mjs --serve"
   },
   "devDependencies": {
     "@hookform/resolvers": "^5.9.1",

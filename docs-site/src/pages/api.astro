@@ -10,11 +10,22 @@ import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import ApiEntry from "../components/ApiEntry.astro";
 
+const entryPoints = [
+  ["@maroonedog/waypoint/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
+  ["@maroonedog/waypoint/vue", "useField · useRows · useFormStatus · FormProvider · <Field>", "The same, for Vue 3, against the same registry."],
+  ["@maroonedog/waypoint", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
+  ["@maroonedog/waypoint/resolver-standard", "standardFormResolver", "Any validator that speaks Standard Schema and its JSON Schema companion. Names no vendor."],
+  ["@maroonedog/waypoint/resolver-zod", "zodFormResolver", "The above, plus the three facts zod's JSON Schema does not carry about zod."],
+  ["@maroonedog/waypoint/resolver-luq", "luqFormResolver", "The above, plus luq's issue codes, which the spec has no member for."],
+  ["@maroonedog/waypoint/core", "createForm · createCellStore · assertFormStoreContract", "The runtime. No React."],
+  ["@maroonedog/waypoint/store-zustand", "createZustandCellStore", "A worked example of substituting the store."],
+];
+
 const hooks = [
   {
     name: "useCreateForm()",
     summary:
-      "Builds the form and keeps it for this component's lifetime. The argument is a function so the options are evaluated once rather than on every render.",
+      "Creates a form once per component lifetime. Supply its options through a function.",
     signature: `function useCreateForm<T, TPath extends string>(
   options: () => FormOptions<T, TPath>
 ): FormHandle<T, TPath>`,
@@ -30,7 +41,7 @@ const hooks = [
   {
     name: "useField()",
     summary:
-      "One field: its value, its issues, its flags, and the writers for them. Subscribes to five cells, so a keystroke re-renders this component and nothing else. The path is a PLACE — one field is one value, so items[*].sku has no answer here and does not compile; that question is useFieldValues.",
+      "Reads and updates one concrete field. Wildcard paths require useFieldValues.",
     signature: `function useField<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>,
   options?: {
@@ -45,7 +56,7 @@ const hooks = [
 <em {...field.errorProps}>{field.issues[0]?.message}</em>`,
     returns: [
       { name: "value", type: "T | undefined", note: "The current value." },
-      { name: "issues", type: "readonly FormIssue[]", note: "What this binding is willing to SAY — the last pass's verdict for this path, gated by showIssues. Never undefined; the empty list is interned. It is not what blocks: a field waiting for its first blur publishes nothing here and still refuses the submit." },
+      { name: "issues", type: "readonly FormIssue[]", note: "Issues visible under showIssues; always an array. Hidden issues can still block submission." },
       { name: "isTouched", type: "boolean", note: "Set by markTouched, usually on blur." },
       { name: "isDirty", type: "boolean", note: "Differs from the value it was built with." },
       { name: "isParticipating", type: "boolean", note: "Whether it counts toward blocking a submit." },
@@ -86,7 +97,7 @@ const hooks = [
       { name: "onBlur", type: "() => void", note: "Marks touched." },
       { name: "issues / isTouched / isParticipating", type: "—", note: "Subscribed. No value and no isDirty: subscribing to those is the cost this hook avoids." },
       { name: "setValue / markTouched / validate / issuesFor", type: "—", note: "As on FieldBinding." },
-      { name: "inputProps / labelProps / descriptionProps / errorProps", type: "—", note: "The same four bags, with ref and defaultValue in place of value: the id, name, type, bounds and aria wiring do not differ between the two bindings, and are derived once for both." },
+      { name: "inputProps / labelProps / descriptionProps / errorProps", type: "—", note: "Same attributes as FieldBinding, with ref and defaultValue replacing value." },
       { name: "decorate", type: "(element, part?) => ReactElement", note: "As on FieldBinding, and the ref composes rather than replacing one the caller already put on the element." },
     ],
     returnsTitle: "UncontrolledFieldBinding<T>",
@@ -94,7 +105,7 @@ const hooks = [
   {
     name: "useFieldValue()",
     summary:
-      "One field's value and nothing else. A summary that only mirrors a value has no reason to be woken when the error on it moves.",
+      "Subscribes to one field value without subscribing to its issues.",
     signature: `function useFieldValue<Q extends FormPath>(
   path: Q & InhabitedFormPath<Q>
 ): ValueAtFormPath<Q> | undefined`,
@@ -176,7 +187,7 @@ await form.submit(save);`,
     returns: [
       { name: "field", type: "(path) => FieldHandle", note: "Outside React too: sources, setValue, validate, issuesFor." },
       { name: "rows", type: "(arrayPath) => RowsHandle", note: "" },
-      { name: "submit", type: "(handler) => Promise<SubmitOutcome>", note: "{ submitted, blockedBy }. Judges the whole root first." },
+      { name: "submit", type: "(handler) => Promise<SubmitOutcome>", note: "{ submitted, blockedBy }. Judges the whole root and sends that validated snapshot; later edits stay in the form." },
       { name: "adoptIssues", type: "(issues) => void", note: "The setError of this library. Merged into every pass, so they are counted and reported; one submit is refused by them and consumes them." },
       { name: "reset", type: "(defaultValues?) => void", note: "" },
       { name: "validate", type: "() => MaybeAsync<FormIssue[]>", note: "Judges now, not on the microtask." },
@@ -354,6 +365,10 @@ const slugOf = (name: string): string =>
     }
   </nav>
 
+  <h2 id="imports">Imports</h2>
+  <div class="overflow-x-auto"><table><thead><tr><th>Package entry</th><th>Exports</th></tr></thead>
+    <tbody>{entryPoints.map(([entry, exports]) => <tr><td><code>{entry}</code></td><td>{exports}</td></tr>)}</tbody>
+  </table></div>
   <h2>Hooks</h2>
   <!-- gap-10 against ApiEntry's own `pt-6`: the rule opening an entry sits
        nearer the entry it opens than the one it closes. Changing it here would

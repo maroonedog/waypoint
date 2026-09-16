@@ -8,7 +8,7 @@
 // ===========================================================================
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
-import TypeAndInstance from "../components/TypeAndInstance.astro";
+
 
 const registration = `
 // src/waypoint-forms.ts — one file, one declaration, one time.
@@ -92,36 +92,18 @@ const viewTypes = [
 >
   <h1>Typed paths</h1>
 
-  <p class="lead">
-    <strong>A misspelt field path is a compile error
-    instead of an input that renders blank and is never validated</strong> —
-    inside arrays, and with a computed index. A typo in an optional-chained
-    error lookup is worse than blank: it reads as <em>no error here</em>.
-  </p>
+  <p class="lead">Register your schema once. Field paths, including array indices, are checked at compile time.</p>
 
   <h2>One declaration, once</h2>
 
   <Code code={registration} label="file: src/waypoint-forms.ts" />
   <Code code={usage} label="any component, any depth" lang="tsx" />
 
-  <p class="caption">
-    <strong class="text-on-surface">A path carries its form.</strong>{" "}
-    <code>form</code> is the key declared above, the colon ends it, and the
-    value type is read in <em>that</em> form. Register one and the prefix is
-    optional; skip the declaration entirely and the hooks are not unchecked —
-    they are refused, and the error quotes the declaration you are missing. A
-    dependency that registered a form of its own is the exception: registration
-    belongs to the compilation, so you inherit that one's paths instead.
-  </p>
+  <p class="caption"><code>form</code> names the registered form. With one form, the prefix is optional. Registration applies to the whole TypeScript compilation, including declarations from dependencies. Without a registration, hooks are refused.</p>
 
-  <h2>Why a registry and not a prop</h2>
-  <p>
-    Because the types cannot travel with the instance. One React context object
-    serves every form in an application, so the context cannot be generic, and a
-    path union cannot pass through it.
-  </p>
-
-  <TypeAndInstance />
+  <p>Keep the declaration within your tsconfig's include. Components need not import it;
+    the component creating the form imports the adapter value.</p>
+  <p><a class="link" href="/details/#type-registration">Why register the type? →</a></p>
 
   <h2>Interpolated paths stay checked</h2>
 
@@ -131,32 +113,11 @@ const viewTypes = [
 
   <Code code={several} label="two forms, two keys" />
 
-  <p class="caption">
-    With two registered, the unprefixed spellings leave the union. An
-    application that grows a second form is told at every call site rather than
-    at one. Every path-taking surface gets this for free, including the ones
-    with no room for a key beside the path: a{" "}
-    <code>&lt;Field path&gt;</code>, a <code>FormPathTo&lt;string&gt;</code>{" "}
-    prop, and a row's own <code>row.path</code>.
-  </p>
+  <p class="caption">With multiple forms, every path needs a prefix, including component props and row paths.</p>
 
-  <p class="caption">
-    The key names a form in the <em>registry</em>; the instance still comes
-    from the nearest provider, and nothing relates the two. So the provider
-    carries its key — name the form at <code>createForm({"{ key: \"order\" }"})</code>{" "}
-    and the provider takes it from there — and a path whose head names a
-    different form throws, saying which two are being confused.
-  </p>
+  <p class="caption">Set <code>key</code> when creating a named form. Its provider rejects paths naming a different form.</p>
 
-  <p class="caption">
-    Where the prefix ends is <em>lexical</em>: a head qualifies a path only
-    when it stands before the first <code>.</code> or <code>[</code>. A{" "}
-    <code>Record&lt;string, T&gt;</code> key may contain a colon, so{" "}
-    <code>byId.a:b.amount</code> stays an ordinary path — the first{" "}
-    <code>.</code> comes first. It is a lexical rule rather than "is this head
-    registered?" because the run time has to apply the same rule and has no
-    registry to consult, only the one key its provider carries.
-  </p>
+  <p class="caption">A prefix must precede the first <code>.</code> or <code>[</code>. Thus <code>byId.a:b.amount</code> is an ordinary path, not a form prefix.</p>
 
   <h2>Path types for the view layer</h2>
 
@@ -186,85 +147,13 @@ const viewTypes = [
     </table>
   </div>
 
-  <p class="caption">
-    All three are computed from the registered schema rather than listed, so a
-    third address arriving in it needs no edit in the section that draws one.
-  </p>
+  <p class="caption">These types are derived from the registered schema.</p>
 
-  <h2>What the union costs, and where it stops</h2>
-  <p>
-    <code>npm run bench:types</code> compiles one throwaway program per shape
-    under <code>--extendedDiagnostics</code> and prints the deltas. Like the
-    timing lane, it is <strong>printed and never
-    gated</strong>: <code>typescript</code> sits at a caret range, so a patch
-    bump rewrites every figure without anybody touching a type.
-  </p>
-
-  <div class="mt-6 overflow-x-auto">
-    <table>
-      <tbody>
-        <tr class="hairline">
-          <td class="w-64 pr-4 font-medium">Building the union</td>
-          <td>
-            <span class="measured font-mono">77–137</span> instantiations per
-            leaf, once, in whatever file declares the adapter. It does not grow
-            with the number of components.
-          </td>
-        </tr>
-        <tr class="hairline">
-          <td class="pr-4 font-medium">One accepted call</td>
-          <td>
-            <span class="measured font-mono">129.0</span> instantiations at
-            width 300, and <span class="measured font-mono">275.0</span> at
-            depth 7. A thousand components addressing one form is not where this
-            goes wrong.
-          </td>
-        </tr>
-        <tr class="hairline">
-          <td class="pr-4 font-medium">The depth budget</td>
-          <td>
-            <strong>Seven path segments are addressable
-            and eight are not.</strong> <code>PathDepthBudget</code> is 6, in{" "}
-            <code>src/contract/path-depth.types.ts</code>. A form nested
-            past seven segments does not compile slowly — its fields stop being
-            addressable at all.
-          </td>
-        </tr>
-        <tr class="hairline">
-          <td class="pr-4 font-medium">One refused call</td>
-          <td>
-            <span class="measured font-mono">475,034</span> instantiations,
-            because the compiler elaborates the whole union into the message.
-            That is a fact about a mistyped path in an editor, not about correct
-            code.
-          </td>
-        </tr>
-        <tr class="hairline">
-          <td class="pr-4 font-medium">The escape hatch</td>
-          <td>
-            <code>OpaqueObject</code>. A member whose interface extends one of
-            its arms ends the path there and keeps its own type and its own
-            members, so the container stays nameable and nothing below it is.
-            On a 729-leaf shape that took the union from{" "}
-            <span class="measured font-mono">99,592</span> instantiations to{" "}
-            <span class="measured font-mono">35,508</span> for two of three
-            subtrees — exactly the paths given up, and no discount on the rest.
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <p class="caption">
-    Every figure above is a delta over a floor the document also prints. No
-    shape in the sweep produced <code>TS2589</code>, a self-referential root
-    included, which is what the budget exists for.{" "}
-    <a
-      class="link"
-      href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md"
-      >The measurement, with what it cannot see →</a
-    >
-  </p>
+  <h2>Depth and compiler cost</h2>
+  <p>Paths support up to <strong>seven segments</strong>; deeper fields are not addressable.
+    <code>OpaqueObject</code> stops traversal at a container while keeping its value type.
+    Invalid paths can be expensive for the compiler to explain.</p>
+  <p><a class="link" href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md">Compiler measurements and limits →</a></p>
 
   <h2>A schema nobody wrote down</h2>
 
@@ -295,12 +184,5 @@ const viewTypes = [
     </p>
   </div>
 
-  <p class="caption">
-    It <strong class="text-on-surface">warns, once per path; it does not
-    throw</strong>. A mis-addressed field is inert, but it cannot let bad data
-    through: the pass judges the whole root, so the verdict and the submit gate
-    stay correct. The resemblance is searched for with the prefix off, because
-    a form's own vocabulary has none in it, then put back on afterwards. Every
-    path in the line can be pasted straight back into the source.
-  </p>
+  <p class="caption">An unknown path warns once and produces an inert field. Validation still checks the whole root and can block submission.</p>
 </Base>

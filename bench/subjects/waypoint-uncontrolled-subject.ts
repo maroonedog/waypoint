@@ -51,8 +51,7 @@ export const waypointUncontrolledSubject: Subject = {
     "so a keystroke does not re-render. The stated cost: an uncontrolled " +
     "input cannot be transformed as it is typed, which is what useField is for.",
   policyCitation:
-    "README: one whole-root validation pass per settled change; FormOptions " +
-    "carries no validation mode",
+    "FormOptions.validateOn: change (explicitly selected for this subject)",
   Leaf,
 
   mount(container, context) {
@@ -62,6 +61,7 @@ export const waypointUncontrolledSubject: Subject = {
     const form: FormHandle<unknown, string> = createForm({
       adapter,
       defaultValues: context.defaults(),
+      validateOn: "change",
     });
     const root: Root = createRoot(container);
     root.render(

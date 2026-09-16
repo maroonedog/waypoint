@@ -90,6 +90,16 @@ git clone https://github.com/maroonedog/waypoint
 cd waypoint && npm install && npm run verify
 ```
 
+### Try a complete form
+
+With Node 22.14 or newer, run `npm run example:quick-start` after installing the
+repository dependencies. It packs waypoint, installs the tarball in an independent
+temporary app, verifies it, and starts a local Vite server. Try an invalid email,
+then save a valid one. The demo displays the submitted value without a backend.
+See [the sample instructions](examples/quick-start/README.md).
+
+`npm run verify:package` runs the same package-consumer checks without a server.
+
 ## One screen of it
 
 ```ts
@@ -263,7 +273,7 @@ The rest — `useUncontrolledField`, `useFieldValue`, `useFieldValues`,
 `useErrorSummary`, `<Field>`, `<FieldRows>`, `<AutoForm>`, `adoptIssues` and
 `validateOn` — is on the site's **API** page, with the emitted signatures.
 
-## Seven entry points, one package
+## Entry points, one package
 
 | Entry | What it is |
 |---|---|
@@ -363,9 +373,11 @@ No example needs a build: they resolve the package to its **source**.
 
 ## Where it stands
 
-291 tests and eleven compile-time programs, one of which exists only to prove that
+`npm run verify` builds the package, runs the runtime tests and checks the
+compile-time programs and examples. The compiler checks include proving that
 an application registering nothing is refused rather than quietly unchecked —
-so long as nothing it depends on registered a form of its own.
+so long as nothing it depends on registered a form of its own. The test runner
+prints the current test count.
 **Nothing has ever been published, and nobody has run this in production.**
 
 `CLAUDE.md` carries the conventions this codebase is held to.

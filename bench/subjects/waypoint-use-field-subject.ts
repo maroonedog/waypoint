@@ -7,8 +7,8 @@
 // the DOM and therefore what the comparison is measuring. The configuration
 // that does use them ships separately as an own-tree subject.
 //
-// There is no validation-mode knob to set, because this library has none — a
-// gap recorded in words in the report rather than folded into a number.
+// Use on-change validation explicitly so the comparison's policy remains
+// stable if the library's default changes.
 // ===========================================================================
 import { createElement as h, type ReactElement } from "react";
 import { createForm, readValueAt, type FormHandle } from "@maroonedog/waypoint/core";
@@ -44,11 +44,10 @@ export const waypointUseFieldSubject: Subject = {
     "swappable-store",
   ],
   notes:
-    "No validation-mode knob exists; every settled change is judged. " +
+    "Uses validateOn: change; every settled change is judged. " +
     "inputProps is not used, so the DOM matches the shared leaf exactly.",
   policyCitation:
-    "README: one whole-root validation pass per settled change; FormOptions " +
-    "carries no validation mode",
+    "FormOptions.validateOn: change (explicitly selected for this subject)",
   Leaf,
 
   mount(container, context) {
@@ -58,6 +57,7 @@ export const waypointUseFieldSubject: Subject = {
     const form: FormHandle<unknown, string> = createForm({
       adapter,
       defaultValues: context.defaults(),
+      validateOn: "change",
     });
     const root: Root = createRoot(container);
     root.render(

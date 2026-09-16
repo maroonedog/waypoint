@@ -177,7 +177,11 @@ export interface FormHandle<T, TPath extends string = string> {
   readonly submitting: CellSource<boolean>;
   readonly submitCount: CellSource<number>;
   readonly validating: CellSource<boolean>;
-  /** Judges everything, then hands the root over only if nothing blocks. */
+  /**
+   * Judges everything, then hands the validated root snapshot over only if
+   * nothing blocks. Edits made while validation waits remain in the form and
+   * belong to a subsequent submission.
+   */
   submit(handler: SubmitHandler): Promise<SubmitOutcome>;
   /**
    * Takes ownership of issues the validator could not produce — what a server

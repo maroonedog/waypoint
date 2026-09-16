@@ -71,23 +71,11 @@ const woken = [
 >
   <h1>How a value changes</h1>
 
-  <p class="lead">
-    <strong>A keystroke wakes the row it landed in,
-    plus the row an error moved to — no other field row renders.</strong>{" "}
-    Nothing is lifted and there is no dependency array: values live in a flat,
-    path-keyed cell space outside React, and a component subscribes to the
-    cells it reads.
-  </p>
+  <p class="lead">Fields subscribe to their own values and state. Type below to see which rows render and which cells change.</p>
 
   <LiveForm client:load />
 
-  <p class="caption">
-    The panel under the form is the cell store narrating itself. A recording
-    store is handed to <code>createForm</code> — the same option an application
-    uses to keep a form in zustand — so every write is printed, newest first.
-    A keystroke writes the root and one value; an <code>issues</code> line
-    appears only on the pass where a verdict actually moved.
-  </p>
+  <p class="caption">The log shows cell-store writes, newest first. A keystroke writes the root and field value; issues are written when the verdict changes.</p>
 
   <!-- Six things to try, drawn as a divided list rather than as six filled
        tiles: each entry is an instruction and its consequence, which is a pair
@@ -106,12 +94,7 @@ const woken = [
 
   <h2>The same runtime, on your machine</h2>
 
-  <p>
-    Nothing is published, so there is no sandbox to link to — you clone it. Both
-    examples resolve the package to its <strong>source</strong>, so an edit
-    inside <code>src/core</code> reloads the page with no build step
-    in between.
-  </p>
+  <p>Run the development examples from a clone. They resolve waypoint to source, so edits reload without rebuilding the package.</p>
 
   <Code
     code={`git clone https://github.com/maroonedog/waypoint
@@ -157,13 +140,7 @@ npm run docs:dev                # this site, with the form above`}
     </table>
   </div>
 
-  <p class="caption">
-    That zero is parity with react-hook-form's <code>register</code>, not a win
-    over it. The price, and why it is a second hook rather than the default: an
-    uncontrolled input cannot be transformed as it is typed. Masking,
-    upper-casing and inserting separators all need the value to come back
-    through React, which is what <code>useField</code> is for.
-  </p>
+  <p class="caption">Use <code>useField</code> for input masking and formatting. <code>useUncontrolledField</code> avoids value-driven renders but cannot transform values as you type. See the <a class="link" href="/benchmark/">benchmark</a> for comparisons.</p>
 
   <h2>What one keystroke does</h2>
 
@@ -173,9 +150,7 @@ npm run docs:dev                # this site, with the form above`}
 
   <Code code={writing} label="every write goes through a handle" />
 
-  <p class="caption">
-    No <code>setState</code>, and no form object to spread.
-  </p>
+
 
   <p class="note">
     What asks for a pass, and what does not — and what one costs — is on{" "}
@@ -213,8 +188,5 @@ npm run docs:dev                # this site, with the form above`}
     The pass still runs: <code>setValue</code> always asks for one.
   </p>
 
-  <p class="caption">
-    Every figure here came from running the runtime with a counting adapter
-    around the real zod resolver.
-  </p>
+
 </Base>
