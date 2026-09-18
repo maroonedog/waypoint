@@ -72,9 +72,10 @@ than like a mistake. The same string in `site` puts a dead `og:url` on every
 page. Both survived a full technology review before anybody checked the DNS.
 
 `site` has to hold something, because `@astrojs/sitemap` refuses to run
-without it. It holds the GitHub Pages address for the repository as actually
-named, with a comment saying it is a placeholder. Whoever registers a domain
-changes that line and puts the CNAME back, in a commit that says so.
+without it. It holds the GitHub Pages host, and `base` holds the repository's
+own name — the pair that addresses a project page, which is where the site is
+served until somebody registers a domain. Whoever does changes those two lines
+and puts the CNAME back, in a commit that says so.
 
 Registering a domain is the author's decision. So is the product's name, and so
 is the repository's — an agent may propose one and must not write one in.

@@ -20,12 +20,13 @@ from the descriptor list, before any component exists, so mounting is a
 subscription — no register, no unregister, no `shouldUnregister`.
 
 📖 **The documentation site is the documentation.** It is in `docs-site/` and is
-**not served anywhere yet** — no domain has been chosen and GitHub Pages will
-not publish a private repository. `npm run docs:dev` builds it. What is there
-and not here: a form you can type into with a render counter on every row and a
-tape printing every cell the runtime writes, the two-spec contract, how a path
-gets its type and what it costs the compiler, every hook and component with the
-signature the package emits, and the benchmark with its losses first.
+served at <https://maroonedog.github.io/waypoint/> — a project page under the
+repository's own name, because no domain has been chosen. `npm run docs:dev`
+runs it locally. What is there and not here: a form you can type into with a
+render counter on every row and a tape printing every cell the runtime writes,
+the two-spec contract, how a path gets its type and what it costs the compiler,
+every hook and component with the signature the package emits, and the
+benchmark with its losses first.
 
 ## Motivation
 

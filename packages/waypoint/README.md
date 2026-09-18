@@ -192,6 +192,7 @@ APIs may change during 0.x. Registration is global to a TypeScript program, not
 isolated per package or Provider. Multiple installed waypoint versions and
 declaration-bundler rewrites have not been validated. Keys containing dots are
 not supported by the path grammar. Source and declaration maps ship in the
-package; the repository and documentation site may not be publicly accessible.
+package. The repository is public and its documentation site is at
+<https://maroonedog.github.io/waypoint/>.
 
 MIT.
