@@ -11,6 +11,7 @@
 // pins something narrower than the claim wanted to say, the claim was cut
 // down to the test.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 
@@ -110,16 +111,41 @@ const moments = [
 
 <Base
   title="Validation — waypoint"
-  description="One pass judges the whole root on every settled change. That is what lets a rule report against a field that did not move, what lets an unrendered field block a submit — and what it costs."
+  description="Whole-form validation by default, optional partial execution with dependency-aware error merging, and whole-form checks on submit."
 >
   <h1>Validation</h1>
 
-  <p class="lead">Validation checks the whole root, including fields that are not rendered. Cross-field rules need no dependency list.</p>
+  <p class="lead">Validation checks the whole root by default, including fields that are not rendered. Partial-capable adapters can narrow execution while preserving errors outside the validated scope.</p>
+
+  <h2>Partial execution</h2>
+  <Code code={`const adapter = zodFormResolver(schema, { partial: true });
+const form = createForm({ adapter, defaultValues });
+await form.field("email").validate();
+await form.validate(["email", "profile.name"]);
+await form.submit(save); // always validates the whole form`} label="opt-in Zod partial execution" />
+  <p>Zod validates selected top-level subtrees: editing <code>profile.name</code>
+    validates all of <code>profile</code>, and an array-row edit validates the
+    whole array. Unrelated top-level validators are skipped. Root refinements,
+    unknown keys and unsupported selection fall back to whole-form validation.</p>
+  <p>Custom adapters can implement <code>validatePartial(root, paths, signal?)</code>
+    and return <code>{'{ paths, issues }'}</code>. Returned paths must cover the
+    request and every affected dependency; issues replace only those subtrees.
+    Use an empty-string path for a whole-root verdict. Superseded async work is
+    included in the next pass, and stale results cannot overwrite current errors.
+    Valibot object schemas also support <code>{'{ partial: true }'}</code>, including
+    async objects with explicit field descriptors. Root pipes, fallback wrappers
+    and unsupported shapes retain whole-form validation.
+    Luq 2.9+ supports <code>{'{ partial: true, dependencies: { password: ["confirmation"] } }'}</code>.
+    Its selected plan skips unrelated subtrees; declare cross-subtree dependencies
+    explicitly. Submit always runs the full validator.
+    Adapters without this capability, including Standard Schema,
+    retain whole-form execution. <code>FormProvider partial</code> is a separate
+    screen-coverage setting.</p>
 
   <h2>A rule that spans two fields</h2>
   <Code code={crossField} label="schema: the demo's own" />
 
-  <p class="caption">The rule can report an error on shipping even when only billing changes or the shipping field is unmounted. See <a class="link" href="/benchmark/">benchmarks</a> for the cost.</p>
+  <p class="caption">The rule can report an error on shipping even when only billing changes or the shipping field is unmounted. See <a class="link" href={servedPath("/benchmark/")}>benchmarks</a> for the cost.</p>
 
   <h2>A field nobody has rendered</h2>
   <p>
@@ -292,7 +318,7 @@ const moments = [
     <code>config/form-baseline.json</code> — the file{" "}
     <code>npm run bench:forms:check</code> compares every run against, and CI
     fails when one of them moves.{" "}
-    <a class="link" href="/benchmark/"
+    <a class="link" href={servedPath("/benchmark/")}
       >What the benchmark can and cannot see →</a
     >
   </p>

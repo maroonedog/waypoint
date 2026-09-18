@@ -43,7 +43,7 @@ export interface FieldHandle<TValue> {
    * stays in the store either way, so a cross-field rule goes on reading it.
    */
   setParticipating(participating: boolean): void;
-  /** Judges the whole root, writes the verdict back, returns this path's part. */
+  /** Uses partial execution when supported, commits the verdict, returns this path's issues. */
   validate(): MaybeAsync<readonly FormIssue[]>;
   /** The issues this path would carry if its value were `candidate`. */
   issuesFor(candidate: unknown): MaybeAsync<readonly FormIssue[]>;
@@ -95,11 +95,8 @@ export interface FormOptions<T, TPath extends string> {
   /**
    * Defaults to `"change"`.
    *
-   * ON THE FORM, NEVER PER FIELD, and that is a fact about this architecture
-   * rather than a smaller first version. One pass judges the whole root, so a
-   * field set to `"blur"` would be re-judged the moment any OTHER field
-   * changed — there is no per-field pass to gate. A per-field knob here would
-   * be a promise the runtime cannot keep.
+   * The trigger belongs to the form. A partial adapter may expand an edit to
+   * dependent fields; a whole-root adapter judges all fields on that trigger.
    */
   readonly validateOn?: FormValidationMoment;
   /**
@@ -239,6 +236,6 @@ export interface FormHandle<T, TPath extends string = string> {
    */
   rows(arrayPath: string): RowsHandle;
   readRoot(): unknown;
-  /** Judges the whole root now and writes the verdict back. */
-  validate(): MaybeAsync<readonly FormIssue[]>;
+  /** Omit paths for whole-root validation; adapters may support scoped execution. */
+  validate(paths?: readonly ConcretePath<TPath>[]): MaybeAsync<readonly FormIssue[]>;
 }

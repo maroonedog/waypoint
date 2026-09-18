@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["ES2020", "DOM"],
+    "rootDir": ".",
+    "outDir": "../../dist/resolver-valibot",
+    "tsBuildInfoFile": "../../.tsbuildinfo/resolver-valibot.tsbuildinfo"
+  },
+  "include": ["."],
+  "references": [{ "path": "../contract" }, { "path": "../resolver-standard" }]
+}

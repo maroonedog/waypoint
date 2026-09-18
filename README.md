@@ -12,6 +12,9 @@ declaration it is missing quoted back at it. Two caveats: a dependency that
 registers a form registers it for you, and registration is global to the
 compilation with nothing namespacing it yet.
 
+Reusable packages should export adapters without registering forms; the consuming
+application owns the registration. See [package composition and its limits](docs/registry-composition.md).
+
 The cell it names is already written. Every cell is seeded at `createForm`
 from the descriptor list, before any component exists, so mounting is a
 subscription — no register, no unregister, no `shouldUnregister`.
@@ -77,13 +80,23 @@ typo too — the comparison table on the site marks the three rows of six where
 nothing separates the three of us. The difference is what happens where it is
 not in scope, which is most of a real component tree.
 
-Whether that is worth a dependency is not this README's call: nothing here has
-been published, and nobody has run it in production.
+This is the initial 0.1.0 release line. Production adoption is not established,
+and APIs may change during 0.x.
 
 ## Install
 
-Nothing is published. The publish workflow is manual-dispatch only and has
-never been run.
+Valibot is supported through `@maroonedog/waypoint/resolver-valibot` with optional
+peers `valibot` and `@valibot/to-json-schema`. See the
+[Valibot adapter instructions](packages/waypoint/README.md#valibot).
+
+The release target is `@maroonedog/waypoint@0.1.0`. Releases are explicit;
+the publish workflow is manual-dispatch only. For React with Zod:
+
+```bash
+npm install @maroonedog/waypoint react react-dom zod
+```
+
+TypeScript 5.9+ is the tested baseline. To work on a source checkout:
 
 ```bash
 git clone https://github.com/maroonedog/waypoint
@@ -177,9 +190,21 @@ moment, with nothing rendered.
 
 ## When a field starts complaining
 
-`validateOn` decides when a PASS RUNS, and that is a fact about the form: one
-pass judges the whole root, so there is no per-field pass to gate. What it was
-also being asked to decide is when a FIELD SPEAKS, and it never could —
+For actual partial execution with Zod, opt in with
+`zodFormResolver(schema, { partial: true })`. Edits and `field.validate()` then
+validate the affected top-level subtrees; `form.validate(["email"])` requests an
+explicit scope. Unrelated errors are retained. Root refinements fall back to full
+validation, and submit always validates the whole form. Other adapters can
+implement `validatePartial`. Valibot also supports
+`valibotFormResolver(schema, { partial: true })` for object schemas, falling back
+for root pipes and unsupported shapes. See [partial validation](docs/partial-validation.md)
+for dependency rules, async behavior and resolver support. Luq 2.9+ also supports
+`luqFormResolver(schema, { partial: true, dependencies: { password: ["confirmation"] } })`.
+Its dependency map must declare cross-subtree reads; submission remains whole-form.
+
+`validateOn` decides when validation runs. Whole-root validation is the default;
+partial-capable adapters can narrow execution and expand affected dependencies.
+That is separate from when a field displays its issues —
 measured on a two-field form with `validateOn: "blur"`, blurring `a`
 published `b`'s verdict too, and a field nobody had reached was marked
 `aria-invalid` because a different one lost focus.
@@ -245,8 +270,8 @@ useField("form:owner.name", {
 `resolver-zod` states zod's own `$ZodIssueCode`; `resolver-standard` states
 **`never`**, because the spec's issue has no code member — so matching a code
 against the generic resolver is a compile error rather than a dead branch.
-`resolver-luq` states `string`: luq has codes and does not publish a union of
-them.
+`resolver-luq` currently exposes codes as `string`, rather than narrowing them to
+Luq's native issue-code union.
 
 It costs a fixed **+2,619 instantiations** per compilation and **+32 per
 registered form**, constant at every depth — `npm run bench:types` prints it,
@@ -328,6 +353,7 @@ not depend on the machine; the time lane is printed and never gated.
 ```bash
 npm run bench:forms         # counts, in jsdom
 npm run bench:types         # what the path types cost the compiler
+npm run bench:editor        # emitted declarations: completion, hover, edited diagnostics
 npm run bench:self-audit    # the runtime against its own design document
 npm run mutation            # every pinned behaviour, taken away once
 ```
@@ -343,6 +369,14 @@ It has already earned itself. An identity claim about `messageFor` was pinned
 by a test that took an earlier return and never reached the line it was about;
 the behaviour could be deleted with the suite green.
 
+The [editor-service measurements](docs/measurements-editor.md) use multiple files
+and registered forms against emitted declarations. They separate the first request,
+unchanged repeats and requests after a path edit, and compare adapter type identity
+against an in-memory counterfactual. Raw samples and measurement limits are included;
+these are Language Service timings, not keystroke-to-pixel editor measurements.
+The [findings](docs/editor-findings.md) include a separate alternating-order
+confirmation of the thirty-form completion cost (`npm run bench:editor:focus`).
+
 ## Examples
 
 ```bash
@@ -351,6 +385,7 @@ npm run example:server-errors   # what a server says, and what drops it
 npm run example:two-forms       # two forms on one page, one set of inputs
 npm run example:wizard          # one form, three screens
 npm run example:nested-arrays   # the same shape in four libraries, side by side
+npm run example:async-validation # cancellation, cached answers, fresh submit checks
 npm run docs:dev                # the documentation site
 ```
 
@@ -372,6 +407,10 @@ npm run docs:dev                # the documentation site
 No example needs a build: they resolve the package to its **source**.
 
 ## Where it stands
+
+The [pilot plan](docs/pilot-plan.md) records the next adoption and measurement
+questions. The [async validation example](examples/async-validation/README.md)
+documents both the working recipe and the whole-root scheduling limitation.
 
 `npm run verify` builds the package, runs the runtime tests and checks the
 compile-time programs and examples. The compiler checks include proving that

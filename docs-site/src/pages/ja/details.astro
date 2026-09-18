@@ -18,6 +18,7 @@
 // その中のラベルや文言は英語のまま残しています。訳してしまうと「このサイトが
 // 動かしているプログラム」ではなくなるからで、その旨はページにも書いてあります。
 // ===========================================================================
+import { servedPath } from "../../i18n/locales.mjs";
 import Base from "../../layouts/Base.astro";
 import Code from "../../components/Code.astro";
 import LiveForm from "../../demo/LiveForm.tsx";
@@ -226,7 +227,7 @@ const CAN: readonly (readonly [string, string, string, boolean])[] = [
   ],
   [
     "複数ファイルを一度に、またはファイルサイズの上限",
-    'kind: "file" が指すのは1ファイルです。複数選択はリスト全体を一度に置き換えるイベントですが、rows() にあるのは append・remove・move で、丸ごと差し替える操作はありません。バイト数の上限も運んでいません。constraints.minLength がすでに文字数と配列要素数を指しているからです。multiple な input は自分で描いて、リストは rows() で持ってください。',
+    'kind: "file" が指すのは1ファイルです。複数選択はリスト全体を一度に置き換えるイベントですが、rows() にあるのは insert・remove・move で、丸ごと差し替える操作はありません。バイト数の上限も運んでいません。constraints.minLength がすでに文字数と配列要素数を指しているからです。multiple な input は自分で描いて、リストは rows() で持ってください。',
     "",
     true,
   ],
@@ -277,11 +278,11 @@ const TRY = [
   <div class="mt-7 flex flex-wrap gap-3">
     <a
       class="rounded-[3px] bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
-      href="/runtime/" hreflang="en" lang="en">どう動くか（英語）→</a
+      href={servedPath("/runtime/")} hreflang="en" lang="en">どう動くか（英語）→</a
     >
     <a
       class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
-      href="/ja/start/">はじめる</a
+      href={servedPath("/ja/start/")}>はじめる</a
     >
     <a
       class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
@@ -289,7 +290,6 @@ const TRY = [
     >
   </div>
 
-  <p class="caption mt-6">
   <!-- 主張の前に、まず何であるかを書きます。ここにはもともと仕組みの話
        （なぜパスが型検査されるのか、なぜセルが先にあるのか）が入っていましたが、
        それはこのページが展開する議論であって、初めて来た人の問いへの答えでは
@@ -308,10 +308,13 @@ const TRY = [
     </p>
   </section>
 
-    <strong>まだ公開していません。</strong>なのでここに載せられる npm install のコマンドは
-    ありませんし、固定できるバージョンもなく、本番で使った人もいません。あるのは clone だけです。
+  <p class="caption mt-6">
+    <strong>初版のリリース系列は0.1.0です。</strong>本番利用の実績は未確認で、0.xではAPIが
+    変わる可能性があります。利用時はパッケージをインストールし、開発する場合はアクセス権のある
+    リポジトリをcloneしてください。
   </p>
-  <Code code={clone} label="shell: clone it" lang="sh" flush />
+  <Code code="npm install @maroonedog/waypoint" label="shell: install" lang="sh" flush />
+  <Code code={clone} label="shell: source checkout (repository access required)" lang="sh" flush />
 
   <!-- 理屈より先にコードを出します。しばらく順番が逆で、名前・タグラインのあとに
        「なぜ動くか」を80語ぶん置いて、そのあとにボタンでした。ライブラリの表紙に
@@ -423,7 +426,7 @@ const TRY = [
                   {where === "" ? (
                     ""
                   ) : (
-                    <a class="link" href={where} hreflang="en" lang="en">
+                    <a class="link" href={servedPath(where)} hreflang="en" lang="en">
                       →
                     </a>
                   )}
@@ -453,7 +456,7 @@ const TRY = [
     </div>
     <p class="caption">
       フックとコンポーネントの実際のシグネチャは{" "}
-      <a class="link" href="/api/" hreflang="en" lang="en">API のページ（英語）</a>にあります。
+      <a class="link" href={servedPath("/api/")} hreflang="en" lang="en">API のページ（英語）</a>にあります。
     </p>
   </section>
 
@@ -602,7 +605,7 @@ const TRY = [
 
     <p class="caption">
       ここに出ている整数はすべて CI で固定してあり、1つでも動けば CI が落ちます。{" "}
-      <a class="link" href="/benchmark/" hreflang="en" lang="en"
+      <a class="link" href={servedPath("/benchmark/")} hreflang="en" lang="en"
         >ベンチマークが見えるもの・見えないもの（英語）→</a
       >
     </p>
@@ -612,16 +615,15 @@ const TRY = [
   <section class="rounded-[3px] border border-outline-variant p-6">
     <p class="label">現在地</p>
     <p class="mt-3">
-      <strong>一度も公開していません。publish のワークフローは手動起動のみで、まだ一度も
-      実行していませんし、本番で使った人もいません。</strong>
+      <strong>初版のリリース系列は0.1.0です。公開は明示的に行い、本番利用の実績は未確認です。</strong>
     </p>
     <p class="caption">
-      テストが353本、<code>test:types</code> が走らせるコンパイル時プログラムが13本、
-      それを全部使う画面が1つ。分かっている制約は2つあります。キーにドットを含むフィールドは
-      パスを持てません。それと、検証は変更が確定するたびにルート全体を判定します。
+      実行時テスト、型検査、サンプル画面で動作を確認しています。キーにドットを含むフィールドは
+      パスを持てません。検証は標準では全体実行で、Zod・Valibot・luqでは部分実行を選択できます。
+      型登録はコンパイル単位で共有され、パッケージごとには分離されません。
     </p>
     <p class="caption">
-      このページは<a class="link" href="/" hreflang="en" lang="en">英語版</a>から書き起こした
+      このページは<a class="link" href={servedPath("/")} hreflang="en" lang="en">英語版</a>から書き起こした
       ものです。このサイトの共通語は英語で、日本語はその上の層。食い違っていたら英語が正です。
     </p>
   </section>

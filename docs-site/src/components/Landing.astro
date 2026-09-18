@@ -1,10 +1,11 @@
 ---
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import FormLab from "../demo/FormLab.tsx";
 interface Props { locale: "en" | "ja" }
 const { locale } = Astro.props;
 const ja = locale === "ja";
-const href = (path: string) => ja ? `/ja${path}` : path;
+const href = (path: string) => servedPath(ja ? `/ja${path}` : path);
 const chapters = ja ? [
   { title: "パスひとつで、フィールドへ。", subtitle: "TYPED PATHS", text: "フォームの型を一度登録すれば、奥のコンポーネントからもパスでアクセスできます。項目名の書き間違いは、コンパイラにおまかせ。", url: "/paths/" },
   { title: "画面を離れても、入力はそのまま。", subtitle: "PERSISTENT STATE", text: "タブやステップを切り替えても値を保持。隠れているフィールドも検証できるので、画面の構成を自由に考えられます。", url: "/runtime/" },

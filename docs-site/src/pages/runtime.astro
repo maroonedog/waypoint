@@ -6,6 +6,7 @@
 // prose. Every figure here was produced by running the runtime with a counting
 // adapter, and a reader can reproduce two of them by typing.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import WriteFlow from "../components/WriteFlow.astro";
@@ -140,7 +141,7 @@ npm run docs:dev                # this site, with the form above`}
     </table>
   </div>
 
-  <p class="caption">Use <code>useField</code> for input masking and formatting. <code>useUncontrolledField</code> avoids value-driven renders but cannot transform values as you type. See the <a class="link" href="/benchmark/">benchmark</a> for comparisons.</p>
+  <p class="caption">Use <code>useField</code> for input masking and formatting. <code>useUncontrolledField</code> avoids value-driven renders but cannot transform values as you type. See the <a class="link" href={servedPath("/benchmark/")}>benchmark</a> for comparisons.</p>
 
   <h2>What one keystroke does</h2>
 
@@ -154,7 +155,7 @@ npm run docs:dev                # this site, with the form above`}
 
   <p class="note">
     What asks for a pass, and what does not — and what one costs — is on{" "}
-    <a class="link" href="/validation/"
+    <a class="link" href={servedPath("/validation/")}
       >Validation</a
     >.
   </p>

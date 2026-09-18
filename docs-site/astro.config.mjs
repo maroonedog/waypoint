@@ -19,7 +19,7 @@ import { defineConfig } from "astro/config";
 import react from "@astrojs/react";
 import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
-import { TRANSLATED, routeOf } from "./src/i18n/locales.mjs";
+import { BASE, TRANSLATED, routeOf } from "./src/i18n/locales.mjs";
 
 const PACKAGE = "@maroonedog/waypoint";
 
@@ -66,16 +66,23 @@ const entryAliases = [
 ];
 
 export default defineConfig({
-  // A PLACEHOLDER, and it has to be one: `@astrojs/sitemap` refuses to run
-  // without `site`, and NO DOMAIN HAS BEEN CHOSEN. `formcontract.dev` was
-  // never registered — it answered NXDOMAIN — and picking its replacement is
-  // the author's call rather than this file's. So this names the address
-  // GitHub Pages would serve from for the repository as it is actually named,
-  // which is at least under the author's control. Whoever picks a domain
-  // changes this line and puts `docs-site/public/CNAME` back; until then every
-  // `og:url` and the sitemap name a page nobody is serving, and the README
-  // says so rather than leaving a reader to find out.
-  site: "https://maroonedog.github.io/waypoint",
+  // NO DOMAIN HAS BEEN CHOSEN, and neither line below is one. `formcontract.dev`
+  // was never registered — it answered NXDOMAIN — and picking a replacement is
+  // the author's call rather than this file's. These two name the address
+  // GitHub Pages serves a project site from for the repository as it is
+  // actually named, which is under the author's control and is where the site
+  // is published. Whoever registers a domain changes them and puts
+  // `docs-site/public/CNAME` back, in a commit that says so.
+  //
+  // `base` IS THE OTHER HALF OF `site` AND IS NOT OPTIONAL. A project site is
+  // served under /<repository>/, so `site` holds the host and `base` holds the
+  // rest — the pairing GitHub's own Astro recipe uses, and the one
+  // `@astrojs/sitemap` composes back into an absolute URL. Without `base`,
+  // Astro writes its stylesheet and script tags at the root of the host and
+  // the deployed page loads none of them. Hand-written links never reach Astro
+  // at all; src/i18n/locales.mjs owns the string and gives it to them.
+  site: "https://maroonedog.github.io",
+  base: BASE,
 
   // ENGLISH IS CANONICAL AND JAPANESE IS A LAYER OVER IT, which is why the
   // default locale takes no prefix: `/api/` is the page and `/ja/api/` is the

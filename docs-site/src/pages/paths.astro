@@ -6,6 +6,7 @@
 // travel with the form. Written as the problem first, since the design only
 // reads as reasonable once the constraint that forced it is on the page.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 
@@ -103,7 +104,7 @@ const viewTypes = [
 
   <p>Keep the declaration within your tsconfig's include. Components need not import it;
     the component creating the form imports the adapter value.</p>
-  <p><a class="link" href="/details/#type-registration">Why register the type? →</a></p>
+  <p><a class="link" href={servedPath("/details/#type-registration")}>Why register the type? →</a></p>
 
   <h2>Interpolated paths stay checked</h2>
 
@@ -118,6 +119,22 @@ const viewTypes = [
   <p class="caption">Set <code>key</code> when creating a named form. Its provider rejects paths naming a different form.</p>
 
   <p class="caption">A prefix must precede the first <code>.</code> or <code>[</code>. Thus <code>byId.a:b.amount</code> is an ordinary path, not a form prefix.</p>
+
+  <h2>Let the application own registration</h2>
+  <p>
+    Reusable packages should export adapters without augmenting <code>WaypointForms</code>
+    from their ordinary entry. The consuming application chooses the keys and registers
+    them in its own source. Shared controls can accept <code>FormPathTo&lt;string&gt;</code>:
+    their emitted declarations refer to the consumer's registry without registering a
+    dummy form. Use qualified paths so adding a second form does not invalidate existing calls.
+  </p>
+  <p>
+    The registry is global to a compilation. A dependency augmentation still registers
+    forms for its consumer, and <code>skipLibCheck</code> can suppress conflicts between
+    incompatible registrations inside dependency declarations. Adapter types retain
+    their value and path identities, but that cannot force declaration checking or
+    provide namespace isolation. Provider identity is still checked at runtime.
+  </p>
 
   <h2>Path types for the view layer</h2>
 
@@ -154,6 +171,13 @@ const viewTypes = [
     <code>OpaqueObject</code> stops traversal at a container while keeping its value type.
     Invalid paths can be expensive for the compiler to explain.</p>
   <p><a class="link" href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-types.md">Compiler measurements and limits →</a></p>
+  <p>
+    <code>npm run bench:editor</code> measures the TypeScript Language Service against
+    emitted declarations in multi-file applications. It separates first requests,
+    cached repeats and requests after editing a path, for completion, hover and
+    diagnostics. This excludes editor rendering and tsserver transport overhead.
+    <a class="link" href="https://github.com/maroonedog/waypoint/blob/master/docs/measurements-editor.md">Editor-service measurements and raw samples →</a>
+  </p>
 
   <h2>A schema nobody wrote down</h2>
 
@@ -184,5 +208,5 @@ const viewTypes = [
     </p>
   </div>
 
-  <p class="caption">An unknown path warns once and produces an inert field. Validation still checks the whole root and can block submission.</p>
+  <p class="caption">An unknown path warns once by default; use onFieldMismatch: "throw" to reject it. Submission validates the whole form and can still be blocked by errors.</p>
 </Base>

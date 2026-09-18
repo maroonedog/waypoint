@@ -1,18 +1,24 @@
 # ===========================================================================
 # deploy-docs.yml — the documentation site, when somebody asks for it.
 #
-# NOT on push, deliberately, and there is no `public/CNAME`: NO DOMAIN HAS BEEN
-# CHOSEN. `formcontract.dev` was never registered — it answered NXDOMAIN, which
-# is why the rename cost nothing — and picking its replacement is the author's
-# call rather than this file's. A CNAME naming a domain nobody owns does not
-# fail loudly; it makes Pages serve nothing at an address that does not exist.
-# GitHub Pages is also unavailable for this repository while it is private on
-# the current plan, so a push trigger would paint every commit with a red X for
-# a deployment nobody asked for.
+# THERE IS NO `public/CNAME` BECAUSE NO DOMAIN HAS BEEN CHOSEN.
+# `formcontract.dev` was never registered — it answered NXDOMAIN, which is why
+# the rename cost nothing — and picking its replacement is the author's call
+# rather than this file's. A CNAME naming a domain nobody owns does not fail
+# loudly; it makes Pages serve nothing at an address that does not exist.
 #
-# It builds on every pull request instead, which is the half that is worth
-# having now: a docs page that stops compiling should fail review, not fail
-# silently until the day someone tries to publish it.
+# Until one is chosen the site is published where a project site goes:
+# https://maroonedog.github.io/waypoint/. That address has a path in it, which
+# is what `base` in docs-site/astro.config.mjs exists for. A build that drops
+# it still succeeds here and still serves a page with no stylesheet, so the
+# thing to open after a publish is the deployed page, not this run's green
+# check.
+#
+# PUBLISHING IS THE DISPATCH INPUT AND NOT A PUSH. On a pull request this
+# builds and stops, which is the half that is worth having on every commit: a
+# docs page that stops compiling should fail review, not fail silently until
+# the day someone tries to publish it. `workflow_dispatch` with `publish` is
+# the other half.
 #
 # If a custom domain is configured, its CNAME must survive the build unchanged.
 # Without a configured domain, a build does not need a CNAME.
@@ -26,7 +32,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: "Also deploy to GitHub Pages (needs Pages enabled first)"
+        description: "Also deploy to GitHub Pages"
         type: boolean
         default: false
 

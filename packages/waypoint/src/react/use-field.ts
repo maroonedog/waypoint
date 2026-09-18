@@ -43,7 +43,8 @@ import type {
 } from "../contract/index.js";
 
 export function useField<Q extends FormPath>(
-  path: Q & InhabitedFormPath<Q>,
+  // Infer the address from Q; the value-dependent guard only checks validity.
+  path: Q & NoInfer<InhabitedFormPath<Q>>,
   options?: FieldOptions<CodesAtFormPath<Q>>
 ): FieldBinding<ValueAtFormPath<Q>>;
 export function useField(

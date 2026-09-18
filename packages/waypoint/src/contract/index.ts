@@ -9,6 +9,7 @@ export type {
   FormAdapter,
   FormPaths,
   FormValues,
+  PartialValidationResult,
 } from "./form-adapter.types.js";
 export type { FieldPath } from "./field-path.types.js";
 export type {

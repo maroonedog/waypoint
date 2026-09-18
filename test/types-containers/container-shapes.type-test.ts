@@ -29,8 +29,9 @@
 // path type costs instantiations proportional to paths times depth.
 // ===========================================================================
 import { z } from "zod";
-import type { FieldPath, FormPaths } from "@maroonedog/waypoint";
+import type { FieldPath, FormPaths, FormPath, InhabitedFormPath } from "@maroonedog/waypoint";
 import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
+import { createForm } from "@maroonedog/waypoint/core";
 import {
   useField,
   useFieldValues,
@@ -113,3 +114,31 @@ function refused(): void {
   useField("bag.whatever.label.deeper");
 }
 void refused;
+
+function useRegisteredField<Q extends FormPath>(path: Q & NoInfer<InhabitedFormPath<Q>>) {
+  return useField<Q>(path);
+}
+
+function inferredBindings(branch: "who.a" | "who.b"): void {
+  assertExact<Exact<ReturnType<typeof useRegisteredField<"who.a">>["value"], string | undefined>>(true);
+  const union = useRegisteredField(branch);
+  assertExact<Exact<typeof union.value, string | number | undefined>>(true);
+  const record = useRegisteredField("bag.whatever.label");
+  assertExact<Exact<typeof record.value, string | undefined>>(true);
+  // @ts-expect-error the record entry has no labell member
+  useRegisteredField("bag.whatever.labell");
+  // @ts-expect-error an invalid record suffix must not infer a broader valid path
+  useField("bag.whatever.label.deeper");
+}
+void inferredBindings;
+
+function partialValidationPaths(): void {
+  const form = createForm({ adapter: zodFormResolver(schema, { partial: true }) });
+  form.validate(["who.a", "rest[0]", "bag.somewhere.label"]);
+  form.validate();
+  // @ts-expect-error a scoped validation path must exist in the form
+  form.validate(["who.missing"]);
+  // @ts-expect-error scoped validation takes concrete rows
+  form.validate(["rest[*]"]);
+}
+void partialValidationPaths;

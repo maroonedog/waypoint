@@ -1,4 +1,5 @@
 ---
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "./Code.astro";
 import source from "../../../examples/quick-start/src/App.tsx?raw";
@@ -13,7 +14,10 @@ npm run example:quick-start`;
 <Base title={ja ? "はじめる — waypoint" : "Start — waypoint"} description={ja ? "最小フォームを起動して、入力・検証・保存を試す。" : "Run a minimal form, validate an email, and save its value."}>
   <h1>{ja ? "はじめる" : "Start"}</h1>
   <p class="lead">{ja ? "メールアドレスのフォームで、入力・検証・保存を試しましょう。" : "Try input, validation, and saving with a simple email form."}</p>
-  <h2>{ja ? "1. 起動する" : "1. Run it"}</h2>
+  <h2>{ja ? "既存のReactアプリに導入する" : "Install in an existing React app"}</h2>
+  <Code code="npm install @maroonedog/waypoint react react-dom zod" label="terminal" lang="sh" />
+  <p>{ja ? "下の src/App.tsx をアプリに配置してください。ソースから試す場合は、リポジトリへのアクセス権が必要です。" : "Use the src/App.tsx below in your app. The source checkout route below requires repository access."}</p>
+  <h2>{ja ? "1. ソースから起動する" : "1. Run from source"}</h2>
   <p>{ja ? "Node 22.14 以上とネット接続が必要です。" : "Requires Node 22.14 or newer and an internet connection."}</p>
   <Code code={install} label="terminal" lang="sh" />
   <p>{ja ? "配布用パッケージを一時フォルダにインストールし、検証後に起動します。Vite が表示する URL を開いてください。" : "This installs the packed package in a temporary app, verifies it, then starts Vite. Open the URL it prints."}</p>
@@ -29,11 +33,11 @@ npm run example:quick-start`;
   <p class="caption">{ja ? "停止は Ctrl+C。フォルダは残るので、その中で npm run dev を実行すれば再開できます。" : "Stop with Ctrl+C. The folder is retained; run npm run dev inside it to restart."}</p>
   <h2>{ja ? "次に読む" : "Next steps"}</h2>
   <ul>
-    <li><a class="link" href="/paths/">{ja ? "型登録・配列・複数フォーム（英語）" : "Typed paths, arrays, and multiple forms"}</a></li>
-    <li><a class="link" href="/validation/">{ja ? "検証と送信エラー（英語）" : "Validation and submission errors"}</a></li>
-    <li><a class="link" href="/examples/">{ja ? "実用サンプル（英語）" : "Working examples"}</a></li>
-    <li><a class="link" href="/api/">{ja ? "API・インポート先（英語）" : "API and imports"}</a></li>
-    <li><a class="link" href={ja ? "/ja/details/" : "/details/"}>{ja ? "設計の理由と制約" : "Design decisions and tradeoffs"}</a></li>
+    <li><a class="link" href={servedPath("/paths/")}>{ja ? "型登録・配列・複数フォーム（英語）" : "Typed paths, arrays, and multiple forms"}</a></li>
+    <li><a class="link" href={servedPath("/validation/")}>{ja ? "検証と送信エラー（英語）" : "Validation and submission errors"}</a></li>
+    <li><a class="link" href={servedPath("/examples/")}>{ja ? "実用サンプル（英語）" : "Working examples"}</a></li>
+    <li><a class="link" href={servedPath("/api/")}>{ja ? "API・インポート先（英語）" : "API and imports"}</a></li>
+    <li><a class="link" href={servedPath(ja ? "/ja/details/" : "/details/")}>{ja ? "設計の理由と制約" : "Design decisions and tradeoffs"}</a></li>
   </ul>
   <p class="caption">{ja ? "配布物だけを検証する場合は、リポジトリ直下で npm run verify:package を実行します。npm への公開は不要です。" : "To verify without starting a server, run npm run verify:package at the repository root. No npm release is required."}</p>
 </Base>

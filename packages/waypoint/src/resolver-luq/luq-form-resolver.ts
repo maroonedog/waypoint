@@ -35,6 +35,8 @@
 // caller does not get to choose.
 // ===========================================================================
 import type { FormAdapter, FormIssue } from "../contract/index.js";
+import { createPartialValidator } from "@maroonedog/luq/form";
+import type { Validator } from "@maroonedog/luq";
 import {
   standardFormResolver,
   type StandardFormOptions,
@@ -50,15 +52,21 @@ import {
  * What `toStandardJsonSchema(validator)` hands back: the spec's two members,
  * and luq's own `validate` beside them.
  *
- * luq is named in no import, so the compiled output never mentions it and
- * installing this resolver cannot pull in a second copy or pin a version. The
- * one runtime dependency is the object the caller hands in.
+ * Partial execution requires a Luq-built validator whose origin is retained
+ * by the Standard Schema bridge.
  */
 export interface LuqDescribableValidator<T> extends StandardSchemaWithJSON<T> {
   validate(
     value: unknown,
-    options?: { readonly abortEarly?: boolean }
+    options?: { readonly abortEarly?: boolean; readonly abortEarlyOnEachField?: boolean }
   ): { readonly valid: boolean; readonly issues: readonly LuqIssueShape[] };
+}
+
+export interface LuqFormOptions extends StandardFormOptions {
+  /** Opt in to selected-plan execution of top-level subtrees. */
+  readonly partial?: boolean;
+  /** Changed subtree -> other subtrees whose rules depend on it. Expanded transitively. */
+  readonly dependencies?: Readonly<Record<string, readonly string[]>>;
 }
 
 /**
@@ -83,14 +91,48 @@ export interface LuqDescribableValidator<T> extends StandardSchemaWithJSON<T> {
  */
 export function luqFormResolver<T extends object>(
   describable: LuqDescribableValidator<T>,
-  options?: StandardFormOptions
+  options: LuqFormOptions = {}
 ): FormAdapter<T, StandardPaths<T>> {
   const described = standardFormResolver(describable, options);
+  const collectAll = { abortEarly: false, abortEarlyOnEachField: false };
+  const validate = (root: unknown): readonly FormIssue[] =>
+    luqIssuesToFormIssues(describable.validate(root, collectAll).issues);
+  const topLevel = (path: string): string => path.split(/[.\[]/, 1)[0] ?? "";
+  const dependencies = Object.entries(options.dependencies ?? {}).map(([path, affected]) =>
+    [topLevel(path), affected.map(topLevel)] as const);
   return {
     fields: described.fields,
-    validate(root: unknown): readonly FormIssue[] {
-      const outcome = describable.validate(root, { abortEarly: false });
-      return luqIssuesToFormIssues(outcome.issues);
-    },
+    validate,
+    ...(options.partial === true ? {
+      validatePartial(root: unknown, paths: readonly string[]) {
+        const full = () => ({ paths: [""], issues: validate(root) });
+        if (root === null || typeof root !== "object" || Array.isArray(root) || paths.length === 0)
+          return full();
+        const scopes = new Set(paths.map(topLevel));
+        for (const scope of scopes) {
+          for (const [changed, affected] of dependencies) {
+            if (changed === scope) for (const path of affected) scopes.add(path);
+          }
+        }
+        if (scopes.has("")) return full();
+        const selectedPaths = [...scopes];
+        let selected;
+        try {
+          // The runtime checks Luq origin; the structural public interface also
+          // permits legacy adapters that cannot supply a selectable plan.
+          selected = createPartialValidator(
+            describable as unknown as Validator<Record<string, unknown>>,
+            selectedPaths
+          );
+        } catch (error) {
+          if (error instanceof TypeError || error instanceof RangeError) return full();
+          throw error;
+        }
+        const issues = luqIssuesToFormIssues(selected.validate(root, collectAll).issues);
+        if (issues.some(issue => !selectedPaths.some(path => issue.path === path ||
+            issue.path.startsWith(`${path}.`) || issue.path.startsWith(`${path}[`)))) return full();
+        return { paths: selectedPaths, issues };
+      },
+    } : {}),
   };
 }

@@ -1,0 +1,3968 @@
+{
+  "recordedAt": "2026-09-17T22:05:07.671Z",
+  "typescript": "5.9.3",
+  "node": "v23.11.0",
+  "machine": {
+    "cpu": "AMD Ryzen 7 5825U with Radeon Graphics",
+    "cores": 16,
+    "memoryGiB": 15.3,
+    "platform": "win32 10.0.26200"
+  },
+  "declarationHash": "88afd920f5f982876f67be513cc4cc8e31a12df56a6e94f7716e695d4d5005f7",
+  "sourceHashes": {
+    "run-editor-guard-comparison.mjs": "080edae967748c579248faa13aa585befd259922d2bb4d935983424b784d574f",
+    "editor/measure-service.mjs": "9995aab473366ac1d3bcb743965ea110a535fea2a4efd91a4e09f8bbcb33afd9",
+    "editor/workloads.mjs": "3fdb8cc1f06091321af43875ee4ed32a6c943573fac9e427fb1f0c65dae38345",
+    "editor/report.mjs": "574f873c9b7ff6dd38f719d9d86fa50ac197d2f984baa87a6a68bba016888b2e"
+  },
+  "rows": [
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 51.73950000000002,
+          "previousMs": 57.27060000000006,
+          "changePercent": -9.657834910058616
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 47.47034999999994,
+          "previousMs": 78.15929999999992,
+          "changePercent": -39.264617262437106
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 82.25800000000004,
+          "previousMs": 53.362850000000094,
+          "changePercent": 54.14843847358208
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 43.13954999999987,
+          "previousMs": 62.73739999999998,
+          "changePercent": -31.237905938084964
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 54.202749999999924,
+          "previousMs": 76.75804999999991,
+          "changePercent": -29.384930961638567
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 61.447900000000004,
+          "previousMs": 77.08414999999991,
+          "changePercent": -20.28464995722198
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 269.6468,
+          "previousMs": 288.43970000000013,
+          "changePercent": -6.515365256585737
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 194.65155000000004,
+          "previousMs": 250.20715000000018,
+          "changePercent": -22.203841896604516
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 205.53769999999986,
+          "previousMs": 277.9847500000001,
+          "changePercent": -26.061519561774592
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "trials": 6,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 237.34885000000008,
+          "previousMs": 360.6213499999999,
+          "changePercent": -34.18336157856429
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 246.98385000000007,
+          "previousMs": 445.6614999999997,
+          "changePercent": -44.58039341518165
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 266.6887999999999,
+          "previousMs": 426.461,
+          "changePercent": -37.464668515995626
+        },
+        {
+          "trial": 3,
+          "first": "current",
+          "currentMs": 233.4946,
+          "previousMs": 365.2881000000002,
+          "changePercent": -36.07933026014265
+        },
+        {
+          "trial": 4,
+          "first": "guarded",
+          "currentMs": 294.5287000000001,
+          "previousMs": 372.9347500000001,
+          "changePercent": -21.024066542471576
+        },
+        {
+          "trial": 5,
+          "first": "current",
+          "currentMs": 238.95904999999993,
+          "previousMs": 352.6415000000002,
+          "changePercent": -32.2373997388283
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 193.36260000000016,
+          "previousMs": 197.9845999999999,
+          "changePercent": -2.334525008510624
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 182.46515,
+          "previousMs": 239.36669999999992,
+          "changePercent": -23.77170675787399
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 189.70415000000003,
+          "previousMs": 213.47974999999985,
+          "changePercent": -11.137168747855398
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 228.71399999999994,
+          "previousMs": 243.60490000000004,
+          "changePercent": -6.112725975544864
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 244.702,
+          "previousMs": 249.32484999999997,
+          "changePercent": -1.8541473102259842
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 229.18079999999986,
+          "previousMs": 251.87299999999982,
+          "changePercent": -9.009381712212095
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 123.13344999999993,
+          "previousMs": 114.6996999999999,
+          "changePercent": 7.35289630225715
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 123.12789999999995,
+          "previousMs": 121.04134999999997,
+          "changePercent": 1.723832392814506
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 120.92299999999989,
+          "previousMs": 127.23860000000002,
+          "changePercent": -4.963588093550331
+        }
+      ]
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "trials": 3,
+      "paired": [
+        {
+          "trial": 0,
+          "first": "guarded",
+          "currentMs": 180.0773999999999,
+          "previousMs": 185.85714999999982,
+          "changePercent": -3.1097808182251385
+        },
+        {
+          "trial": 1,
+          "first": "current",
+          "currentMs": 183.47459999999978,
+          "previousMs": 183.37594999999988,
+          "changePercent": 0.05379658564816925
+        },
+        {
+          "trial": 2,
+          "first": "guarded",
+          "currentMs": 209.41174999999998,
+          "previousMs": 301.50700000000006,
+          "changePercent": -30.54497905521267
+        }
+      ]
+    }
+  ],
+  "samples": [
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 873.7289,
+      "warmMs": [
+        2.0749000000000706,
+        1.7735999999999876,
+        1.5026000000000295,
+        1.2207999999998265,
+        0.7526000000000295
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 72.28300000000013
+        },
+        {
+          "invalid": false,
+          "ms": 58.01739999999995
+        },
+        {
+          "invalid": false,
+          "ms": 65.30690000000004
+        },
+        {
+          "invalid": false,
+          "ms": 39.82399999999984
+        },
+        {
+          "invalid": false,
+          "ms": 44.96580000000017
+        },
+        {
+          "invalid": false,
+          "ms": 45.46160000000009
+        }
+      ],
+      "heapUsedBytes": 126021824,
+      "rssBytes": 195678208,
+      "applicationFiles": 3,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 147,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 819.4036999999998,
+      "warmMs": [
+        1.5395999999998367,
+        1.0958000000000538,
+        0.8282999999998992,
+        1.0132999999998447,
+        0.5580999999999676
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 87.16070000000013
+        },
+        {
+          "invalid": false,
+          "ms": 78.57960000000003
+        },
+        {
+          "invalid": false,
+          "ms": 65.10950000000003
+        },
+        {
+          "invalid": false,
+          "ms": 47.56100000000015
+        },
+        {
+          "invalid": false,
+          "ms": 45.4049
+        },
+        {
+          "invalid": false,
+          "ms": 49.43170000000009
+        }
+      ],
+      "heapUsedBytes": 132093408,
+      "rssBytes": 201519104,
+      "applicationFiles": 3,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 147,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 971.1412,
+      "warmMs": [
+        1.7476999999998952,
+        1.9284000000000106,
+        1.7274999999999636,
+        1.6347000000000662,
+        1.1158999999997832
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 181.99350000000004
+        },
+        {
+          "invalid": false,
+          "ms": 113.08900000000017
+        },
+        {
+          "invalid": false,
+          "ms": 93.73360000000002
+        },
+        {
+          "invalid": false,
+          "ms": 62.58499999999981
+        },
+        {
+          "invalid": false,
+          "ms": 61.38390000000004
+        },
+        {
+          "invalid": false,
+          "ms": 61.12880000000018
+        }
+      ],
+      "heapUsedBytes": 132379816,
+      "rssBytes": 201502720,
+      "applicationFiles": 3,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 147,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 802.4406,
+      "warmMs": [
+        2.0657000000001062,
+        1.8738000000000739,
+        1.5514000000000578,
+        1.4827999999999975,
+        0.9436999999998079
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 68.29739999999993
+        },
+        {
+          "invalid": false,
+          "ms": 54.04539999999997
+        },
+        {
+          "invalid": false,
+          "ms": 53.63130000000001
+        },
+        {
+          "invalid": false,
+          "ms": 41.30939999999987
+        },
+        {
+          "invalid": false,
+          "ms": 33.31770000000006
+        },
+        {
+          "invalid": false,
+          "ms": 37.22979999999984
+        }
+      ],
+      "heapUsedBytes": 125974712,
+      "rssBytes": 196636672,
+      "applicationFiles": 3,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 147,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 875.2996999999998,
+      "warmMs": [
+        2.0090000000000146,
+        1.5613000000000739,
+        1.9842000000001008,
+        2.074299999999994,
+        1.0331999999998516
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 150.05680000000007
+        },
+        {
+          "invalid": false,
+          "ms": 115.29250000000002
+        },
+        {
+          "invalid": false,
+          "ms": 90.11860000000001
+        },
+        {
+          "invalid": false,
+          "ms": 72.31619999999998
+        },
+        {
+          "invalid": false,
+          "ms": 74.39740000000006
+        },
+        {
+          "invalid": false,
+          "ms": 58.996599999999944
+        }
+      ],
+      "heapUsedBytes": 125762664,
+      "rssBytes": 196620288,
+      "applicationFiles": 3,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 147,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "one-form-one-file",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 27
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 803.8053,
+      "warmMs": [
+        1.9212999999999738,
+        1.4447000000000116,
+        0.9731999999999061,
+        1.3045000000001892,
+        0.7705000000000837
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 116.76350000000002
+        },
+        {
+          "invalid": false,
+          "ms": 70.39989999999989
+        },
+        {
+          "invalid": false,
+          "ms": 55.95490000000018
+        },
+        {
+          "invalid": false,
+          "ms": 50.77080000000001
+        },
+        {
+          "invalid": false,
+          "ms": 48.43600000000015
+        },
+        {
+          "invalid": false,
+          "ms": 48.452
+        }
+      ],
+      "heapUsedBytes": 132928248,
+      "rssBytes": 204587008,
+      "applicationFiles": 3,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 147,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1196.1209000000001,
+      "warmMs": [
+        1.9100999999998294,
+        1.2953999999999724,
+        1.2493999999999232,
+        2.253099999999904,
+        0.9674999999999727
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 73.90869999999995
+        },
+        {
+          "invalid": false,
+          "ms": 55.1703
+        },
+        {
+          "invalid": false,
+          "ms": 44.93099999999981
+        },
+        {
+          "invalid": false,
+          "ms": 41.34809999999993
+        },
+        {
+          "invalid": false,
+          "ms": 36.098900000000185
+        },
+        {
+          "invalid": false,
+          "ms": 36.539999999999964
+        }
+      ],
+      "heapUsedBytes": 128354384,
+      "rssBytes": 197984256,
+      "applicationFiles": 29,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 173,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1345.4983000000002,
+      "warmMs": [
+        1.8181999999999334,
+        1.4335000000000946,
+        1.0797000000000025,
+        1.5686000000000604,
+        0.8895999999999731
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 91.91120000000024
+        },
+        {
+          "invalid": false,
+          "ms": 75.58939999999984
+        },
+        {
+          "invalid": false,
+          "ms": 64.50799999999981
+        },
+        {
+          "invalid": false,
+          "ms": 60.96680000000015
+        },
+        {
+          "invalid": false,
+          "ms": 48.9078999999997
+        },
+        {
+          "invalid": false,
+          "ms": 56.57140000000027
+        }
+      ],
+      "heapUsedBytes": 120455008,
+      "rssBytes": 204435456,
+      "applicationFiles": 29,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 173,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1399.6602,
+      "warmMs": [
+        1.4717000000000553,
+        1.2166999999999462,
+        0.8885999999997694,
+        1.1434000000003834,
+        0.8472000000001572
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 79.58049999999957
+        },
+        {
+          "invalid": false,
+          "ms": 73.76870000000008
+        },
+        {
+          "invalid": false,
+          "ms": 65.34739999999965
+        },
+        {
+          "invalid": false,
+          "ms": 73.93560000000025
+        },
+        {
+          "invalid": false,
+          "ms": 86.35689999999977
+        },
+        {
+          "invalid": false,
+          "ms": 79.91930000000002
+        }
+      ],
+      "heapUsedBytes": 120829256,
+      "rssBytes": 204345344,
+      "applicationFiles": 29,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 173,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 981.5838999999999,
+      "warmMs": [
+        1.6371000000001459,
+        1.1990000000000691,
+        1.4280999999998585,
+        1.4884999999999309,
+        1.0615999999999985
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 66.89720000000011
+        },
+        {
+          "invalid": false,
+          "ms": 57.99199999999996
+        },
+        {
+          "invalid": false,
+          "ms": 61.53370000000018
+        },
+        {
+          "invalid": false,
+          "ms": 42.94139999999993
+        },
+        {
+          "invalid": false,
+          "ms": 50.413499999999885
+        },
+        {
+          "invalid": false,
+          "ms": 41.882199999999784
+        }
+      ],
+      "heapUsedBytes": 116689840,
+      "rssBytes": 197742592,
+      "applicationFiles": 29,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 173,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1067.0157,
+      "warmMs": [
+        1.7887000000000626,
+        1.429300000000012,
+        1.626399999999876,
+        1.2724000000000615,
+        0.8478999999999814
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 82.8563999999999
+        },
+        {
+          "invalid": false,
+          "ms": 64.42489999999998
+        },
+        {
+          "invalid": false,
+          "ms": 62.13110000000006
+        },
+        {
+          "invalid": false,
+          "ms": 60.76469999999995
+        },
+        {
+          "invalid": false,
+          "ms": 53.906600000000026
+        },
+        {
+          "invalid": false,
+          "ms": 56.73569999999995
+        }
+      ],
+      "heapUsedBytes": 128431544,
+      "rssBytes": 196947968,
+      "applicationFiles": 29,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 173,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "one-form-many-files",
+        "forms": 1,
+        "depth": 3,
+        "callsPerFile": 1
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1118.3853,
+      "warmMs": [
+        1.8147000000001299,
+        1.7577000000001135,
+        1.4180999999998676,
+        1.496900000000096,
+        0.8109999999999218
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 97.82950000000005
+        },
+        {
+          "invalid": false,
+          "ms": 88.6286
+        },
+        {
+          "invalid": false,
+          "ms": 81.31259999999975
+        },
+        {
+          "invalid": false,
+          "ms": 72.85570000000007
+        },
+        {
+          "invalid": false,
+          "ms": 69.54690000000028
+        },
+        {
+          "invalid": false,
+          "ms": 65.42680000000018
+        }
+      ],
+      "heapUsedBytes": 120961000,
+      "rssBytes": 206655488,
+      "applicationFiles": 29,
+      "backgroundCalls": 27,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 173,
+      "evidence": [
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78,
+        78
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1389.4905,
+      "warmMs": [
+        3.7195999999999003,
+        2.54300000000012,
+        1.9618000000000393,
+        1.5671000000002095,
+        0.9728000000000065
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 331.48
+        },
+        {
+          "invalid": false,
+          "ms": 345.2964000000002
+        },
+        {
+          "invalid": false,
+          "ms": 298.4528999999998
+        },
+        {
+          "invalid": false,
+          "ms": 213.79279999999972
+        },
+        {
+          "invalid": false,
+          "ms": 235.95309999999972
+        },
+        {
+          "invalid": false,
+          "ms": 240.8407000000002
+        }
+      ],
+      "heapUsedBytes": 142979832,
+      "rssBytes": 227553280,
+      "applicationFiles": 101,
+      "backgroundCalls": 270,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 245,
+      "evidence": [
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1053.7874000000002,
+      "warmMs": [
+        3.496599999999944,
+        1.8478000000000065,
+        1.2946000000001732,
+        1.2406000000000859,
+        0.6927000000000589
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 395.27430000000004
+        },
+        {
+          "invalid": false,
+          "ms": 339.18269999999984
+        },
+        {
+          "invalid": false,
+          "ms": 304.88380000000006
+        },
+        {
+          "invalid": false,
+          "ms": 271.9956000000002
+        },
+        {
+          "invalid": false,
+          "ms": 234.36599999999999
+        },
+        {
+          "invalid": false,
+          "ms": 228.88340000000017
+        }
+      ],
+      "heapUsedBytes": 148032400,
+      "rssBytes": 234815488,
+      "applicationFiles": 101,
+      "backgroundCalls": 270,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 245,
+      "evidence": [
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1000.304,
+      "warmMs": [
+        4.22829999999999,
+        3.072300000000041,
+        1.7828000000001794,
+        1.9188999999998941,
+        1.0190999999999804
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 254.24530000000004
+        },
+        {
+          "invalid": false,
+          "ms": 195.15109999999981
+        },
+        {
+          "invalid": false,
+          "ms": 219.92869999999994
+        },
+        {
+          "invalid": false,
+          "ms": 297.3828999999996
+        },
+        {
+          "invalid": false,
+          "ms": 321.3895000000002
+        },
+        {
+          "invalid": false,
+          "ms": 246.16900000000032
+        }
+      ],
+      "heapUsedBytes": 194467792,
+      "rssBytes": 278327296,
+      "applicationFiles": 101,
+      "backgroundCalls": 270,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 245,
+      "evidence": [
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 936.4643,
+      "warmMs": [
+        2.3704999999999927,
+        1.3117000000002008,
+        1.090099999999893,
+        1.1865999999999985,
+        0.743099999999913
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 219.3451
+        },
+        {
+          "invalid": false,
+          "ms": 271.76509999999985
+        },
+        {
+          "invalid": false,
+          "ms": 191.32130000000006
+        },
+        {
+          "invalid": false,
+          "ms": 183.79350000000022
+        },
+        {
+          "invalid": false,
+          "ms": 197.98180000000002
+        },
+        {
+          "invalid": false,
+          "ms": 184.57760000000007
+        }
+      ],
+      "heapUsedBytes": 159201768,
+      "rssBytes": 229765120,
+      "applicationFiles": 101,
+      "backgroundCalls": 270,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 245,
+      "evidence": [
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1109.0935,
+      "warmMs": [
+        3.2535999999997784,
+        2.522799999999961,
+        1.6122000000000298,
+        1.5799999999999272,
+        1.09699999999998
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 227.29729999999995
+        },
+        {
+          "invalid": false,
+          "ms": 204.98109999999997
+        },
+        {
+          "invalid": false,
+          "ms": 151.38459999999986
+        },
+        {
+          "invalid": false,
+          "ms": 145.11220000000003
+        },
+        {
+          "invalid": false,
+          "ms": 206.09429999999975
+        },
+        {
+          "invalid": false,
+          "ms": 271.7296000000001
+        }
+      ],
+      "heapUsedBytes": 142778792,
+      "rssBytes": 223698944,
+      "applicationFiles": 101,
+      "backgroundCalls": 270,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 245,
+      "evidence": [
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "ten-forms",
+        "forms": 10,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1023.0533999999999,
+      "warmMs": [
+        2.4937999999999647,
+        1.4994999999998981,
+        1.190599999999904,
+        1.3672999999998865,
+        1.0353999999999814
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 260.2971
+        },
+        {
+          "invalid": false,
+          "ms": 288.29179999999974
+        },
+        {
+          "invalid": false,
+          "ms": 274.56849999999986
+        },
+        {
+          "invalid": false,
+          "ms": 281.4010000000003
+        },
+        {
+          "invalid": false,
+          "ms": 302.13689999999997
+        },
+        {
+          "invalid": false,
+          "ms": 255.61349999999993
+        }
+      ],
+      "heapUsedBytes": 163945736,
+      "rssBytes": 235560960,
+      "applicationFiles": 101,
+      "backgroundCalls": 270,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 245,
+      "evidence": [
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390,
+        390
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1192.2937,
+      "warmMs": [
+        3.2282000000000153,
+        1.7878000000000611,
+        1.5829000000001088,
+        1.5815999999999804,
+        1.3834999999999127
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 359.01070000000004
+        },
+        {
+          "invalid": false,
+          "ms": 261.83100000000013
+        },
+        {
+          "invalid": false,
+          "ms": 242.60460000000012
+        },
+        {
+          "invalid": false,
+          "ms": 232.09310000000005
+        },
+        {
+          "invalid": false,
+          "ms": 224.48929999999973
+        },
+        {
+          "invalid": false,
+          "ms": 215.5926999999997
+        }
+      ],
+      "heapUsedBytes": 218646672,
+      "rssBytes": 304349184,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1381.1095,
+      "warmMs": [
+        4.723300000000108,
+        2.1626000000001113,
+        1.6886999999999261,
+        2.3420000000000982,
+        1.3805999999999585
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 548.0973999999999
+        },
+        {
+          "invalid": false,
+          "ms": 445.5641999999998
+        },
+        {
+          "invalid": false,
+          "ms": 349.04359999999997
+        },
+        {
+          "invalid": false,
+          "ms": 372.1990999999998
+        },
+        {
+          "invalid": false,
+          "ms": 342.66480000000047
+        },
+        {
+          "invalid": false,
+          "ms": 330.8729000000003
+        }
+      ],
+      "heapUsedBytes": 183195024,
+      "rssBytes": 329093120,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1504.839,
+      "warmMs": [
+        3.7173000000002503,
+        2.7865999999999076,
+        2.597400000000107,
+        1.9358999999999469,
+        1.1988999999998668
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 564.7471
+        },
+        {
+          "invalid": false,
+          "ms": 445.3925999999997
+        },
+        {
+          "invalid": false,
+          "ms": 469.4333999999999
+        },
+        {
+          "invalid": false,
+          "ms": 445.93039999999974
+        },
+        {
+          "invalid": false,
+          "ms": 361.5
+        },
+        {
+          "invalid": false,
+          "ms": 305.7597999999998
+        }
+      ],
+      "heapUsedBytes": 184675352,
+      "rssBytes": 331706368,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1218.0711000000001,
+      "warmMs": [
+        4.345100000000002,
+        2.65280000000007,
+        1.5483000000001539,
+        1.5317999999999756,
+        1.8608999999999014
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 355.8871999999999
+        },
+        {
+          "invalid": false,
+          "ms": 275.3899999999999
+        },
+        {
+          "invalid": false,
+          "ms": 247.04120000000012
+        },
+        {
+          "invalid": false,
+          "ms": 246.92650000000003
+        },
+        {
+          "invalid": false,
+          "ms": 220.73579999999993
+        },
+        {
+          "invalid": false,
+          "ms": 222.74519999999984
+        }
+      ],
+      "heapUsedBytes": 231727080,
+      "rssBytes": 310349824,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1198.8429,
+      "warmMs": [
+        3.4630999999999403,
+        2.1538000000000466,
+        2.092300000000023,
+        1.5407000000000153,
+        1.4130999999999858
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 361.7322999999999
+        },
+        {
+          "invalid": false,
+          "ms": 266.07699999999977
+        },
+        {
+          "invalid": false,
+          "ms": 277.38070000000016
+        },
+        {
+          "invalid": false,
+          "ms": 267.30060000000003
+        },
+        {
+          "invalid": false,
+          "ms": 247.4622999999997
+        },
+        {
+          "invalid": false,
+          "ms": 260.12000000000035
+        }
+      ],
+      "heapUsedBytes": 233053264,
+      "rssBytes": 307761152,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1671.7909000000002,
+      "warmMs": [
+        3.094100000000253,
+        1.9402000000000044,
+        1.6545000000000982,
+        1.8542999999999665,
+        1.389599999999973
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 650.4621999999999
+        },
+        {
+          "invalid": false,
+          "ms": 429.80549999999994
+        },
+        {
+          "invalid": false,
+          "ms": 423.1165000000001
+        },
+        {
+          "invalid": false,
+          "ms": 440.42840000000024
+        },
+        {
+          "invalid": false,
+          "ms": 422.8873000000003
+        },
+        {
+          "invalid": false,
+          "ms": 327.58050000000003
+        }
+      ],
+      "heapUsedBytes": 183615728,
+      "rssBytes": 332189696,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1482.1372999999999,
+      "warmMs": [
+        3.915399999999863,
+        2.4472999999998137,
+        1.7649000000001251,
+        1.7665000000001783,
+        1.175499999999829
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 522.0994000000001
+        },
+        {
+          "invalid": false,
+          "ms": 379.4767999999999
+        },
+        {
+          "invalid": false,
+          "ms": 341.96720000000005
+        },
+        {
+          "invalid": false,
+          "ms": 367.0947000000001
+        },
+        {
+          "invalid": false,
+          "ms": 363.4815000000003
+        },
+        {
+          "invalid": false,
+          "ms": 323.97879999999986
+        }
+      ],
+      "heapUsedBytes": 180045792,
+      "rssBytes": 330076160,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 3
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1306.1659,
+      "warmMs": [
+        3.1951000000001386,
+        1.9009000000000924,
+        2.474999999999909,
+        1.5929000000000997,
+        1.318899999999985
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 371.3824999999997
+        },
+        {
+          "invalid": false,
+          "ms": 273.1576
+        },
+        {
+          "invalid": false,
+          "ms": 241.04700000000003
+        },
+        {
+          "invalid": false,
+          "ms": 221.19700000000012
+        },
+        {
+          "invalid": false,
+          "ms": 225.94219999999996
+        },
+        {
+          "invalid": false,
+          "ms": 219.79410000000007
+        }
+      ],
+      "heapUsedBytes": 231577696,
+      "rssBytes": 309919744,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 3
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1184.8449,
+      "warmMs": [
+        3.526099999999815,
+        3.0469000000000506,
+        2.4759999999998854,
+        2.330799999999954,
+        1.330699999999979
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 352.78970000000004
+        },
+        {
+          "invalid": false,
+          "ms": 329.31309999999985
+        },
+        {
+          "invalid": false,
+          "ms": 284.4396999999999
+        },
+        {
+          "invalid": false,
+          "ms": 304.61770000000024
+        },
+        {
+          "invalid": false,
+          "ms": 235.13329999999996
+        },
+        {
+          "invalid": false,
+          "ms": 222.07290000000012
+        }
+      ],
+      "heapUsedBytes": 233246824,
+      "rssBytes": 307822592,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 4
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1358.335,
+      "warmMs": [
+        3.6148000000000593,
+        2.4415999999998803,
+        1.7934999999999945,
+        1.7150000000001455,
+        1.1410000000000764
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 494.5783999999999
+        },
+        {
+          "invalid": false,
+          "ms": 370.25390000000016
+        },
+        {
+          "invalid": false,
+          "ms": 375.6156000000001
+        },
+        {
+          "invalid": false,
+          "ms": 394.66449999999986
+        },
+        {
+          "invalid": false,
+          "ms": 339.3394000000003
+        },
+        {
+          "invalid": false,
+          "ms": 326.41669999999976
+        }
+      ],
+      "heapUsedBytes": 178806448,
+      "rssBytes": 331390976,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 4
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1319.2188999999998,
+      "warmMs": [
+        3.023200000000088,
+        1.904800000000023,
+        1.9247000000000298,
+        1.9399999999998272,
+        1.564300000000003
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 505.1784
+        },
+        {
+          "invalid": false,
+          "ms": 377.72400000000016
+        },
+        {
+          "invalid": false,
+          "ms": 341.0686999999998
+        },
+        {
+          "invalid": false,
+          "ms": 362.19550000000027
+        },
+        {
+          "invalid": false,
+          "ms": 343.0875000000001
+        },
+        {
+          "invalid": false,
+          "ms": 329.5155999999997
+        }
+      ],
+      "heapUsedBytes": 182101104,
+      "rssBytes": 330182656,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 5
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1233.2766000000001,
+      "warmMs": [
+        3.8951999999999316,
+        2.2593000000001666,
+        1.6702000000000226,
+        1.6091999999998734,
+        1.4072000000001026
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 346.9026000000001
+        },
+        {
+          "invalid": false,
+          "ms": 257.8827000000001
+        },
+        {
+          "invalid": false,
+          "ms": 242.3503999999998
+        },
+        {
+          "invalid": false,
+          "ms": 235.56770000000006
+        },
+        {
+          "invalid": false,
+          "ms": 216.3188
+        },
+        {
+          "invalid": false,
+          "ms": 220.1513
+        }
+      ],
+      "heapUsedBytes": 218402888,
+      "rssBytes": 308019200,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 5
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 949.9316000000001,
+      "warmMs": [
+        3.658999999999878,
+        2.350300000000061,
+        1.5235999999999876,
+        1.942199999999957,
+        0.9838999999999487
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 221.28139999999985
+        },
+        {
+          "invalid": false,
+          "ms": 171.6549
+        },
+        {
+          "invalid": false,
+          "ms": 148.8789999999999
+        },
+        {
+          "invalid": false,
+          "ms": 151.70619999999985
+        },
+        {
+          "invalid": false,
+          "ms": 215.07030000000032
+        },
+        {
+          "invalid": false,
+          "ms": 267.90989999999965
+        }
+      ],
+      "heapUsedBytes": 159421592,
+      "rssBytes": 246636544,
+      "applicationFiles": 83,
+      "backgroundCalls": 243,
+      "leavesPerForm": 243,
+      "declarationFiles": 90,
+      "loadedFiles": 227,
+      "evidence": [
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 969.0234999999999,
+      "warmMs": [
+        4.29769999999985,
+        2.2373000000000047,
+        1.6372000000001208,
+        1.797800000000052,
+        0.9104000000002088
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 234.41589999999997
+        },
+        {
+          "invalid": false,
+          "ms": 178.88289999999984
+        },
+        {
+          "invalid": false,
+          "ms": 273.9360999999999
+        },
+        {
+          "invalid": false,
+          "ms": 217.08629999999994
+        },
+        {
+          "invalid": false,
+          "ms": 163.71810000000005
+        },
+        {
+          "invalid": false,
+          "ms": 170.3181999999997
+        }
+      ],
+      "heapUsedBytes": 165913024,
+      "rssBytes": 250773504,
+      "applicationFiles": 83,
+      "backgroundCalls": 243,
+      "leavesPerForm": 243,
+      "declarationFiles": 90,
+      "loadedFiles": 227,
+      "evidence": [
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1009.5704,
+      "warmMs": [
+        4.7003000000001975,
+        3.626600000000053,
+        1.8730000000000473,
+        1.6719000000000506,
+        0.792699999999968
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 270.3284000000001
+        },
+        {
+          "invalid": false,
+          "ms": 185.45799999999986
+        },
+        {
+          "invalid": false,
+          "ms": 200.13630000000012
+        },
+        {
+          "invalid": false,
+          "ms": 208.40499999999975
+        },
+        {
+          "invalid": false,
+          "ms": 274.3726999999999
+        },
+        {
+          "invalid": false,
+          "ms": 287.69399999999996
+        }
+      ],
+      "heapUsedBytes": 179245312,
+      "rssBytes": 250638336,
+      "applicationFiles": 83,
+      "backgroundCalls": 243,
+      "leavesPerForm": 243,
+      "declarationFiles": 90,
+      "loadedFiles": 227,
+      "evidence": [
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 952.2711,
+      "warmMs": [
+        3.4040999999999713,
+        2.0739000000000942,
+        1.7013999999999214,
+        1.5515000000000327,
+        1.0523000000000593
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 217.7276999999999
+        },
+        {
+          "invalid": false,
+          "ms": 168.60799999999995
+        },
+        {
+          "invalid": false,
+          "ms": 174.24260000000004
+        },
+        {
+          "invalid": false,
+          "ms": 185.00160000000005
+        },
+        {
+          "invalid": false,
+          "ms": 179.92869999999994
+        },
+        {
+          "invalid": false,
+          "ms": 217.52210000000014
+        }
+      ],
+      "heapUsedBytes": 159075240,
+      "rssBytes": 246984704,
+      "applicationFiles": 83,
+      "backgroundCalls": 243,
+      "leavesPerForm": 243,
+      "declarationFiles": 90,
+      "loadedFiles": 227,
+      "evidence": [
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 992.9771,
+      "warmMs": [
+        3.4384000000000015,
+        1.868099999999913,
+        1.4389999999998508,
+        1.69399999999996,
+        1.0901000000001204
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 228.53059999999982
+        },
+        {
+          "invalid": false,
+          "ms": 165.29300000000012
+        },
+        {
+          "invalid": false,
+          "ms": 173.57700000000023
+        },
+        {
+          "invalid": false,
+          "ms": 166.08370000000014
+        },
+        {
+          "invalid": false,
+          "ms": 205.83129999999983
+        },
+        {
+          "invalid": false,
+          "ms": 235.8031000000001
+        }
+      ],
+      "heapUsedBytes": 159348520,
+      "rssBytes": 246943744,
+      "applicationFiles": 83,
+      "backgroundCalls": 243,
+      "leavesPerForm": 243,
+      "declarationFiles": 90,
+      "loadedFiles": 227,
+      "evidence": [
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "deep-form",
+        "forms": 1,
+        "depth": 5,
+        "callsPerFile": 3
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 973.6062000000001,
+      "warmMs": [
+        2.7754999999999654,
+        1.6385999999999967,
+        1.3481999999999061,
+        1.3599999999999,
+        0.71550000000002
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 249.07070000000022
+        },
+        {
+          "invalid": false,
+          "ms": 197.1359
+        },
+        {
+          "invalid": false,
+          "ms": 164.36860000000001
+        },
+        {
+          "invalid": false,
+          "ms": 179.2745
+        },
+        {
+          "invalid": false,
+          "ms": 229.82359999999971
+        },
+        {
+          "invalid": false,
+          "ms": 260.85170000000016
+        }
+      ],
+      "heapUsedBytes": 179384336,
+      "rssBytes": 253345792,
+      "applicationFiles": 83,
+      "backgroundCalls": 243,
+      "leavesPerForm": 243,
+      "declarationFiles": 90,
+      "loadedFiles": 227,
+      "evidence": [
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726,
+        726
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1203.1894,
+      "warmMs": [
+        3.5774999999998727,
+        1.9653000000000702,
+        1.4214999999999236,
+        1.5686000000000604,
+        1.1822000000001935
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 397.7716999999998
+        },
+        {
+          "invalid": false,
+          "ms": 278.74299999999994
+        },
+        {
+          "invalid": false,
+          "ms": 236.33439999999973
+        },
+        {
+          "invalid": false,
+          "ms": 219.62969999999996
+        },
+        {
+          "invalid": false,
+          "ms": 221.09360000000015
+        },
+        {
+          "invalid": false,
+          "ms": 212.0972999999999
+        }
+      ],
+      "heapUsedBytes": 220077960,
+      "rssBytes": 308072448,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1307.0215,
+      "warmMs": [
+        3.2034000000001015,
+        2.010099999999966,
+        1.6440000000000055,
+        1.9202000000000226,
+        1.500400000000127
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 394.34590000000003
+        },
+        {
+          "invalid": false,
+          "ms": 277.68769999999995
+        },
+        {
+          "invalid": false,
+          "ms": 255.48210000000017
+        },
+        {
+          "invalid": false,
+          "ms": 231.7276999999999
+        },
+        {
+          "invalid": false,
+          "ms": 230.06550000000016
+        },
+        {
+          "invalid": false,
+          "ms": 231.01119999999992
+        }
+      ],
+      "heapUsedBytes": 233169872,
+      "rssBytes": 314511360,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1231.5719,
+      "warmMs": [
+        3.0715999999999894,
+        1.9274000000000342,
+        1.753500000000031,
+        1.7722000000001117,
+        1.2166999999999462
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 411.63220000000024
+        },
+        {
+          "invalid": false,
+          "ms": 275.7818000000002
+        },
+        {
+          "invalid": false,
+          "ms": 252.56169999999975
+        },
+        {
+          "invalid": false,
+          "ms": 240.48210000000017
+        },
+        {
+          "invalid": false,
+          "ms": 246.0880000000002
+        },
+        {
+          "invalid": false,
+          "ms": 221.1255000000001
+        }
+      ],
+      "heapUsedBytes": 233162264,
+      "rssBytes": 315338752,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1213.3046,
+      "warmMs": [
+        4.390599999999949,
+        2.6391000000000986,
+        2.4787999999998647,
+        2.548000000000002,
+        2.1678000000001703
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 354.70209999999975
+        },
+        {
+          "invalid": false,
+          "ms": 260.9509000000003
+        },
+        {
+          "invalid": false,
+          "ms": 244.69489999999996
+        },
+        {
+          "invalid": false,
+          "ms": 244.70910000000003
+        },
+        {
+          "invalid": false,
+          "ms": 217.97260000000006
+        },
+        {
+          "invalid": false,
+          "ms": 218.57210000000032
+        }
+      ],
+      "heapUsedBytes": 220238008,
+      "rssBytes": 307613696,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1204.8004,
+      "warmMs": [
+        3.048400000000129,
+        1.7484999999999218,
+        1.394399999999905,
+        1.4944000000000415,
+        1.22849999999994
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 350.32220000000007
+        },
+        {
+          "invalid": false,
+          "ms": 268.6363000000001
+        },
+        {
+          "invalid": false,
+          "ms": 241.9333999999999
+        },
+        {
+          "invalid": false,
+          "ms": 216.42819999999983
+        },
+        {
+          "invalid": false,
+          "ms": 214.79320000000007
+        },
+        {
+          "invalid": false,
+          "ms": 215.43809999999985
+        }
+      ],
+      "heapUsedBytes": 220267688,
+      "rssBytes": 308269056,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-mixed",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3,
+        "mixedValues": true
+      },
+      "operation": "completion",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1381.9478,
+      "warmMs": [
+        3.2083000000000084,
+        1.9610999999999876,
+        1.8789999999999054,
+        2.307499999999891,
+        1.317700000000059
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 417.55229999999983
+        },
+        {
+          "invalid": false,
+          "ms": 277.8483000000001
+        },
+        {
+          "invalid": false,
+          "ms": 248.4441999999999
+        },
+        {
+          "invalid": false,
+          "ms": 255.30179999999973
+        },
+        {
+          "invalid": false,
+          "ms": 228.10969999999998
+        },
+        {
+          "invalid": false,
+          "ms": 236.50210000000015
+        }
+      ],
+      "heapUsedBytes": 233414904,
+      "rssBytes": 317427712,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170,
+        1170
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1021.1133,
+      "warmMs": [
+        1.6376000000000204,
+        0.8068000000000666,
+        0.689200000000028,
+        0.7111999999999625,
+        0.5917999999999211
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 199.5567000000001
+        },
+        {
+          "invalid": false,
+          "ms": 150.5236
+        },
+        {
+          "invalid": false,
+          "ms": 124.60200000000009
+        },
+        {
+          "invalid": false,
+          "ms": 114.06579999999985
+        },
+        {
+          "invalid": false,
+          "ms": 121.66489999999976
+        },
+        {
+          "invalid": false,
+          "ms": 110.33920000000035
+        }
+      ],
+      "heapUsedBytes": 143540736,
+      "rssBytes": 225976320,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined"
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1004.6132999999999,
+      "warmMs": [
+        1.9185999999999694,
+        0.74350000000004,
+        0.5424000000000433,
+        0.637599999999793,
+        0.6533999999999196
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 209.25260000000003
+        },
+        {
+          "invalid": false,
+          "ms": 166.29300000000012
+        },
+        {
+          "invalid": false,
+          "ms": 120.94970000000012
+        },
+        {
+          "invalid": false,
+          "ms": 108.44969999999967
+        },
+        {
+          "invalid": false,
+          "ms": 107.35210000000006
+        },
+        {
+          "invalid": false,
+          "ms": 103.57769999999982
+        }
+      ],
+      "heapUsedBytes": 142947496,
+      "rssBytes": 227131392,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined"
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 996.8312,
+      "warmMs": [
+        1.868199999999888,
+        0.975400000000036,
+        0.7449000000001433,
+        0.7851000000000568,
+        0.9282000000000608
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 228.65609999999992
+        },
+        {
+          "invalid": false,
+          "ms": 151
+        },
+        {
+          "invalid": false,
+          "ms": 127.1869999999999
+        },
+        {
+          "invalid": false,
+          "ms": 112.76560000000018
+        },
+        {
+          "invalid": false,
+          "ms": 114.89570000000003
+        },
+        {
+          "invalid": false,
+          "ms": 111.52869999999984
+        }
+      ],
+      "heapUsedBytes": 143238120,
+      "rssBytes": 225456128,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined"
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1035.4497000000001,
+      "warmMs": [
+        1.336999999999989,
+        0.6124999999999545,
+        0.5266999999998916,
+        0.6416999999999007,
+        0.5830000000000837
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 204.6244999999999
+        },
+        {
+          "invalid": false,
+          "ms": 153.52970000000005
+        },
+        {
+          "invalid": false,
+          "ms": 129.45679999999993
+        },
+        {
+          "invalid": false,
+          "ms": 116.79899999999998
+        },
+        {
+          "invalid": false,
+          "ms": 112.44950000000017
+        },
+        {
+          "invalid": false,
+          "ms": 105.32090000000017
+        }
+      ],
+      "heapUsedBytes": 142908456,
+      "rssBytes": 226246656,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined"
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1026.8281,
+      "warmMs": [
+        1.4895000000001346,
+        0.8145999999999276,
+        0.667699999999968,
+        0.8592000000001008,
+        0.7927999999999429
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 216.88779999999997
+        },
+        {
+          "invalid": false,
+          "ms": 148.1993
+        },
+        {
+          "invalid": false,
+          "ms": 127.4568999999999
+        },
+        {
+          "invalid": false,
+          "ms": 114.38909999999987
+        },
+        {
+          "invalid": false,
+          "ms": 111.82640000000038
+        },
+        {
+          "invalid": false,
+          "ms": 105.9693000000002
+        }
+      ],
+      "heapUsedBytes": 143436096,
+      "rssBytes": 225939456,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined"
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "hover",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1005.7163,
+      "warmMs": [
+        2.033999999999878,
+        1.029700000000048,
+        0.8813000000000102,
+        1.0175000000001546,
+        1.0342000000000553
+      ],
+      "editedMs": [
+        {
+          "invalid": false,
+          "ms": 217.49760000000015
+        },
+        {
+          "invalid": false,
+          "ms": 148.56860000000006
+        },
+        {
+          "invalid": false,
+          "ms": 132.9266
+        },
+        {
+          "invalid": false,
+          "ms": 112.76269999999977
+        },
+        {
+          "invalid": false,
+          "ms": 121.55060000000003
+        },
+        {
+          "invalid": false,
+          "ms": 110.17219999999998
+        }
+      ],
+      "heapUsedBytes": 143098824,
+      "rssBytes": 224415744,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined",
+        "const value: string | undefined"
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 994.6428,
+      "warmMs": [
+        0.9725999999998294,
+        0.5264999999999418,
+        0.14360000000010587,
+        0.10639999999989413,
+        0.1273999999998523
+      ],
+      "editedMs": [
+        {
+          "invalid": true,
+          "ms": 434.5386000000001
+        },
+        {
+          "invalid": false,
+          "ms": 126.96489999999994
+        },
+        {
+          "invalid": true,
+          "ms": 271.96299999999974
+        },
+        {
+          "invalid": false,
+          "ms": 109.85879999999997
+        },
+        {
+          "invalid": true,
+          "ms": 233.18989999999985
+        },
+        {
+          "invalid": false,
+          "ms": 98.29220000000032
+        }
+      ],
+      "heapUsedBytes": 185947960,
+      "rssBytes": 259092480,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        []
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1010.8982000000001,
+      "warmMs": [
+        0.8459000000000287,
+        0.4533999999998741,
+        0.12789999999995416,
+        0.09310000000004948,
+        0.1088999999999487
+      ],
+      "editedMs": [
+        {
+          "invalid": true,
+          "ms": 417.23159999999984
+        },
+        {
+          "invalid": false,
+          "ms": 131.89480000000003
+        },
+        {
+          "invalid": true,
+          "ms": 278.88419999999996
+        },
+        {
+          "invalid": false,
+          "ms": 110.75910000000022
+        },
+        {
+          "invalid": true,
+          "ms": 239.8194999999996
+        },
+        {
+          "invalid": false,
+          "ms": 94.86169999999993
+        }
+      ],
+      "heapUsedBytes": 185750448,
+      "rssBytes": 257847296,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        []
+      ],
+      "trial": 0
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1029.3855,
+      "warmMs": [
+        1.0755000000001473,
+        0.412900000000036,
+        0.1771000000001095,
+        0.1505000000001928,
+        0.3248000000000957
+      ],
+      "editedMs": [
+        {
+          "invalid": true,
+          "ms": 450.7288000000001
+        },
+        {
+          "invalid": false,
+          "ms": 131.8164999999999
+        },
+        {
+          "invalid": true,
+          "ms": 286.88560000000007
+        },
+        {
+          "invalid": false,
+          "ms": 103.15129999999999
+        },
+        {
+          "invalid": true,
+          "ms": 234.93539999999985
+        },
+        {
+          "invalid": false,
+          "ms": 99.80790000000025
+        }
+      ],
+      "heapUsedBytes": 183185080,
+      "rssBytes": 262041600,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        []
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 1014.8298,
+      "warmMs": [
+        0.8017999999999574,
+        0.3029999999998836,
+        0.11299999999982901,
+        0.0864000000001397,
+        0.1048000000000684
+      ],
+      "editedMs": [
+        {
+          "invalid": true,
+          "ms": 430.89120000000025
+        },
+        {
+          "invalid": false,
+          "ms": 135.7838999999999
+        },
+        {
+          "invalid": true,
+          "ms": 298.3912999999998
+        },
+        {
+          "invalid": false,
+          "ms": 108.02379999999994
+        },
+        {
+          "invalid": true,
+          "ms": 231.16529999999966
+        },
+        {
+          "invalid": false,
+          "ms": 103.33590000000004
+        }
+      ],
+      "heapUsedBytes": 171612960,
+      "rssBytes": 258916352,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        []
+      ],
+      "trial": 1
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "variant": "guarded",
+      "typescript": "5.9.3",
+      "coldMs": 999.2868,
+      "warmMs": [
+        1.3222000000000662,
+        0.6164000000001124,
+        0.173200000000179,
+        0.12570000000005166,
+        0.5868000000000393
+      ],
+      "editedMs": [
+        {
+          "invalid": true,
+          "ms": 440.23299999999995
+        },
+        {
+          "invalid": false,
+          "ms": 158.9085
+        },
+        {
+          "invalid": true,
+          "ms": 290.0605999999998
+        },
+        {
+          "invalid": false,
+          "ms": 147.6217999999999
+        },
+        {
+          "invalid": true,
+          "ms": 259.91499999999996
+        },
+        {
+          "invalid": false,
+          "ms": 101.16340000000037
+        }
+      ],
+      "heapUsedBytes": 185339536,
+      "rssBytes": 258027520,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        []
+      ],
+      "trial": 2
+    },
+    {
+      "workload": {
+        "id": "thirty-forms",
+        "forms": 30,
+        "depth": 3,
+        "callsPerFile": 3
+      },
+      "operation": "diagnostics",
+      "variant": "current",
+      "typescript": "5.9.3",
+      "coldMs": 1749.8410000000001,
+      "warmMs": [
+        1.3763000000003558,
+        0.6356999999998152,
+        0.24870000000009895,
+        0.1392000000000735,
+        0.140400000000227
+      ],
+      "editedMs": [
+        {
+          "invalid": true,
+          "ms": 630.4366
+        },
+        {
+          "invalid": false,
+          "ms": 168.15769999999975
+        },
+        {
+          "invalid": true,
+          "ms": 405.0136000000002
+        },
+        {
+          "invalid": false,
+          "ms": 167.75750000000016
+        },
+        {
+          "invalid": true,
+          "ms": 471.0293999999999
+        },
+        {
+          "invalid": false,
+          "ms": 198.0003999999999
+        }
+      ],
+      "heapUsedBytes": 185607088,
+      "rssBytes": 258351104,
+      "applicationFiles": 301,
+      "backgroundCalls": 810,
+      "leavesPerForm": 27,
+      "declarationFiles": 90,
+      "loadedFiles": 445,
+      "evidence": [
+        [],
+        [],
+        [],
+        [],
+        [],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        [],
+        [
+          2345
+        ],
+        []
+      ],
+      "trial": 2
+    }
+  ]
+}

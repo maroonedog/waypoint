@@ -6,11 +6,13 @@
 // written from memory, because a reference that is approximately right is
 // worse than none: a reader trusts it and stops reading the types.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import ApiEntry from "../components/ApiEntry.astro";
 
 const entryPoints = [
+  ["@maroonedog/waypoint/resolver-valibot", "valibotFormResolver", "Valibot descriptors and typed issue codes."],
   ["@maroonedog/waypoint/react", "useField · useRows · useFormStatus · FormProvider · <Field>", "What a screen imports."],
   ["@maroonedog/waypoint/vue", "useField · useRows · useFormStatus · FormProvider · <Field>", "The same, for Vue 3, against the same registry."],
   ["@maroonedog/waypoint", "FormAdapter · FormIssue · FormPathTo · FormPathOver", "The contract and the path types. No dependencies."],
@@ -190,7 +192,7 @@ await form.submit(save);`,
       { name: "submit", type: "(handler) => Promise<SubmitOutcome>", note: "{ submitted, blockedBy }. Judges the whole root and sends that validated snapshot; later edits stay in the form." },
       { name: "adoptIssues", type: "(issues) => void", note: "The setError of this library. Merged into every pass, so they are counted and reported; one submit is refused by them and consumes them." },
       { name: "reset", type: "(defaultValues?) => void", note: "" },
-      { name: "validate", type: "() => MaybeAsync<FormIssue[]>", note: "Judges now, not on the microtask." },
+      { name: "validate", type: "(paths?) => MaybeAsync<FormIssue[]>", note: "Judges now. Omit paths for the whole form; concrete paths request partial execution when the adapter supports it. Issues outside the executed scopes are preserved." },
       { name: "readRoot", type: "() => unknown", note: "A root being edited is a draft, so it is not a T." },
       { name: "errorCount / submitting / submitCount / validating", type: "CellSource<…>", note: "Subscribe directly, outside React if you like." },
       { name: "descriptors / tree", type: "—", note: "What the validator declared, flat and as a tree." },
@@ -233,7 +235,7 @@ const components = [
     summary:
       "Layer 1: draws the whole form. It walks the registered fields in declaration order and renders each one through the widget registry — so an application writes a widget per KIND of input rather than a component per field, and a field added to the schema appears, labelled from its title, validated and blocking the submit, with no component edited. It ships no input of its own; an empty registry draws nothing. The price is that its paths are read out of the descriptor tree and bound to row indices at run time, which makes this the one layer where a path is not checked by the compiler. There is one running on the showcase, with all three of its files.",
     signature: `<AutoForm only?={["form:billing"]} renderList?={(binding, rows) => …} />`,
-    href: "/showcase/#autoform",
+    href: servedPath("/showcase/#autoform"),
     hrefLabel: "See one running",
   },
 ];
@@ -402,7 +404,7 @@ const slugOf = (name: string): string =>
 
   <h3 id="FormPath">The registry, and the view-layer paths</h3>
   <p>
-    <a class="link" href="/paths/"
+    <a class="link" href={servedPath("/paths/")}
       >How the registry works →</a
     >
   </p>

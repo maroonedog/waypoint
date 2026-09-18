@@ -47,6 +47,7 @@ const CHECK_PREFIX = /\b(?:check|Check)[A-Z][A-Za-z0-9_]*/g;
  * hide what it corresponds to.
  */
 const FOREIGN_NAMES = new Map([
+  ["checkAsync", "Valibot's public asynchronous validation action"],
   ["checkDCE", "the React DevTools global hook requires this member by name"],
 ]);
 

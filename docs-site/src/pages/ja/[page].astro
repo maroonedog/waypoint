@@ -14,6 +14,7 @@
 // ===========================================================================
 import Base from "../../layouts/Base.astro";
 import { UNTRANSLATED, type Untranslated } from "../../i18n/untranslated.js";
+import { servedPath } from "../../i18n/locales.mjs";
 
 export function getStaticPaths() {
   return UNTRANSLATED.map((one) => ({ params: { page: one.slug }, props: one }));
@@ -34,7 +35,7 @@ const { route, title, about } = Astro.props as Untranslated;
 
   <p class="note">
     <strong>読むなら英語版へどうぞ。</strong>{" "}
-    <a class="link" href={route} hreflang="en" lang="en">{title}（英語）→</a>
+    <a class="link" href={servedPath(route)} hreflang="en" lang="en">{title}（英語）→</a>
   </p>
 
 

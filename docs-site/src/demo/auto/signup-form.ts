@@ -9,10 +9,8 @@
 // refuses to invent "Email address" out of `email` — casing, wording and
 // language are the application's to decide.
 //
-// A third form registered on this site, after `form` (the demos) and
-// `application` (the showcase). Three keys in one compilation is the
-// arrangement qualified paths exist for, and it costs nothing to be honest
-// about: every path below says which form it belongs to.
+// The demo owns a distinct registration key so its shape does not merge
+// with a signup form imported by another example on the same site.
 // ===========================================================================
 import { z } from "zod";
 import { zodFormResolver } from "@maroonedog/waypoint/resolver-zod";
@@ -42,7 +40,7 @@ export const signupAdapter = zodFormResolver(signupSchema);
 
 declare module "@maroonedog/waypoint" {
   interface WaypointForms {
-    signup: typeof signupAdapter;
+    autoSignup: typeof signupAdapter;
   }
 }
 

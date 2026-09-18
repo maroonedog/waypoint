@@ -20,6 +20,7 @@
 // every attribute off the schema and nothing was listening to them. A form
 // that looks complete and ignores typing is worse than one that is late.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import ShowcaseScreen from "../demo/ShowcaseScreen.tsx";
@@ -246,7 +247,7 @@ import { panelIdOf } from "../demo/section-panel.ts";
     package resolving to source, so editing the runtime reloads the page —{" "}
     <code>npm run example:showcase</code>, then <code>localhost:5179</code>. The
     other five are on the
-    <a class="link" href="/examples/">Examples</a> page.
+    <a class="link" href={servedPath("/examples/")}>Examples</a> page.
   </p>
 
   <p class="caption">

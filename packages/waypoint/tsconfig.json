@@ -2,14 +2,35 @@
   "//": "The build, as one command. Every entry point in the `exports` map is referenced here, plus `./src/dom`, which is not one — nothing in the map reaches it, and `./react` and `./vue` each re-export every public name it holds. `tsc -b` works out the order from the references rather than from a chain of `&&` in package.json that a reader has to trust. `files: []` because this config compiles nothing itself — it only says what the package is made of.",
   "files": [],
   "references": [
-    { "path": "./src/contract" },
-    { "path": "./src/core" },
-    { "path": "./src/dom" },
-    { "path": "./src/react" },
-    { "path": "./src/vue" },
-    { "path": "./src/resolver-standard" },
-    { "path": "./src/resolver-zod" },
-    { "path": "./src/resolver-luq" },
-    { "path": "./src/store-zustand" }
+    {
+      "path": "./src/contract"
+    },
+    {
+      "path": "./src/core"
+    },
+    {
+      "path": "./src/dom"
+    },
+    {
+      "path": "./src/react"
+    },
+    {
+      "path": "./src/vue"
+    },
+    {
+      "path": "./src/resolver-standard"
+    },
+    {
+      "path": "./src/resolver-zod"
+    },
+    {
+      "path": "./src/resolver-luq"
+    },
+    {
+      "path": "./src/store-zustand"
+    },
+    {
+      "path": "./src/resolver-valibot"
+    }
   ]
 }

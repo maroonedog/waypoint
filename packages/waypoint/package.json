@@ -54,7 +54,11 @@
       "types": "./dist/store-zustand/index.d.ts",
       "default": "./dist/store-zustand/index.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./resolver-valibot": {
+      "types": "./dist/resolver-valibot/index.d.ts",
+      "default": "./dist/resolver-valibot/index.js"
+    }
   },
   "typesVersions": {
     "*": {
@@ -78,6 +82,9 @@
       ],
       "store-zustand": [
         "dist/store-zustand/index.d.ts"
+      ],
+      "resolver-valibot": [
+        "dist/resolver-valibot/index.d.ts"
       ]
     }
   },
@@ -105,11 +112,17 @@
   },
   "dependencies": {},
   "peerDependencies": {
+    "@maroonedog/luq": "^2.9.0",
     "react": ">=18",
     "vue": ">=3.5.0",
-    "zod": "^4.2.0"
+    "zod": "^4.2.0",
+    "valibot": "^1.5.0",
+    "@valibot/to-json-schema": "^1.8.0"
   },
   "peerDependenciesMeta": {
+    "@maroonedog/luq": {
+      "optional": true
+    },
     "react": {
       "optional": true
     },
@@ -117,6 +130,12 @@
       "optional": true
     },
     "zod": {
+      "optional": true
+    },
+    "valibot": {
+      "optional": true
+    },
+    "@valibot/to-json-schema": {
       "optional": true
     }
   }

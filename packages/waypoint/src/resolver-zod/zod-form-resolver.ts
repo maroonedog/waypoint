@@ -39,7 +39,9 @@ import type {
   FormFieldDescriptor,
   FormIssue,
   MaybeAsync,
+  PartialValidationResult,
 } from "../contract/index.js";
+import { isPending } from "../contract/index.js";
 import {
   mapStandardVerdict,
   standardFormResolver,
@@ -52,6 +54,11 @@ import { zodResultToFormIssues } from "./zod-issues-to-form-issues.js";
 
 /** What zod needs said to it before it will describe a schema holding a Date. */
 const ZOD_LIBRARY_OPTIONS = { unrepresentable: "any" } as const;
+
+export interface ZodFormOptions {
+  /** Validate selected top-level subtrees on edits; root refinements fall back to full validation. */
+  readonly partial?: boolean;
+}
 
 /**
  * The bounds `.int()` writes for itself. They are the range of a JavaScript
@@ -116,7 +123,8 @@ function refineZodField(
  * declaration, and there is no narrower set to offer.
  */
 export function zodFormResolver<S extends z.ZodObject>(
-  schema: S
+  schema: S,
+  options: ZodFormOptions = {}
 ): FormAdapter<z.infer<S>, FieldPath<z.infer<S>>, z.core.$ZodIssueCode> {
   const described = standardFormResolver(schema, {
     libraryOptions: ZOD_LIBRARY_OPTIONS,
@@ -125,7 +133,43 @@ export function zodFormResolver<S extends z.ZodObject>(
   const overrides = new Map<string, ZodFieldOverride>();
   collectZodOverrides(schema, "", overrides);
 
+  const validate = (root: unknown): MaybeAsync<readonly FormIssue<z.core.$ZodIssueCode>[]> =>
+    mapStandardVerdict(schema["~standard"].validate(root), zodResultToFormIssues);
+  const fullResult = (root: unknown): MaybeAsync<PartialValidationResult<z.core.$ZodIssueCode>> => {
+    const outcome = validate(root);
+    const wrap = (issues: readonly FormIssue<z.core.$ZodIssueCode>[]): PartialValidationResult<z.core.$ZodIssueCode> =>
+      ({ paths: [""], issues });
+    return isPending(outcome) ? outcome.then(wrap) : wrap(outcome);
+  };
+  const validatePartial = (root: unknown, paths: readonly string[]): MaybeAsync<PartialValidationResult<z.core.$ZodIssueCode>> => {
+    if (root === null || typeof root !== "object" || Array.isArray(root) || paths.length === 0)
+      return fullResult(root);
+    const prototype = Object.getPrototypeOf(root);
+    if (prototype !== Object.prototype && prototype !== null) return fullResult(root);
+    const shape = schema.shape;
+    const keys = [...new Set(paths.map(path => path.split(/[.\[]/, 1)[0] ?? ""))];
+    if (keys.some(key => !Object.prototype.hasOwnProperty.call(shape, key)) ||
+        Object.keys(root).some(key => !Object.prototype.hasOwnProperty.call(shape, key)))
+      return fullResult(root);
+    let selected: z.ZodObject;
+    try {
+      // Zod refuses pick on an object with refinements. Keep that rule intact
+      // rather than dropping root checks when constructing a smaller schema.
+      selected = schema.pick(Object.fromEntries(keys.map(key => [key, true])) as never);
+    } catch {
+      return fullResult(root);
+    }
+    const subject = Object.fromEntries(keys
+      .filter(key => Object.prototype.hasOwnProperty.call(root, key))
+      .map(key => [key, (root as Record<string, unknown>)[key]]));
+    const outcome = mapStandardVerdict(selected["~standard"].validate(subject), zodResultToFormIssues);
+    const wrap = (issues: readonly FormIssue<z.core.$ZodIssueCode>[]): PartialValidationResult<z.core.$ZodIssueCode> =>
+      ({ paths: keys, issues });
+    return isPending(outcome) ? outcome.then(wrap) : wrap(outcome);
+  };
+
   return {
+    ...(options.partial === true ? { validatePartial } : {}),
     fields: described.fields.map((field) =>
       refineZodField(field, overrides.get(field.path))
     ),

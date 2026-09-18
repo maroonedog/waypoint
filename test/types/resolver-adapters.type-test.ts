@@ -107,7 +107,10 @@ assertExact<Exact<FormPaths<typeof zodAdapter>, FormPaths<typeof luqAdapter>>>(
 // is now read off the validator. The explicit argument above is kept only
 // because the two adapters are compared against one another and pinning both
 // sides is the point of that comparison.
-const inferredLuqAdapter = luqFormResolver(toStandardJsonSchema(orderValidator));
+const inferredLuqAdapter = luqFormResolver(toStandardJsonSchema(orderValidator), {
+  partial: true,
+  dependencies: { owner: ["quantity"] },
+});
 assertExact<Exact<FormValues<typeof inferredLuqAdapter>, Order>>(true);
 assertExact<Exact<FormPaths<typeof inferredLuqAdapter>, OrderPaths>>(true);
 

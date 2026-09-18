@@ -1,5 +1,5 @@
 {
-  "//": "The `./resolver-luq` entry. It never names luq in a type position either, and it no longer walks a JSON Schema of its own — `./resolver-standard` does that for every vendor, so this project references it and keeps only the issue mapping the spec has no room for.",
+  "//": "The resolver uses Luq's public partial-plan API and reuses the Standard Schema descriptor conversion.",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "lib": ["ES2020", "DOM"],

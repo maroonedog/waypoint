@@ -1,11 +1,9 @@
 // ===========================================================================
 // create-field-handle.ts — one field's reads, writes and verdicts.
 //
-// `validate` and `issuesFor` are the same computation the form runs, filtered
-// to this path. That is a correctness argument rather than a simplification: a
-// runtime with a separate per-field engine gives a conditionally rendered
-// field a different verdict depending on which engine produced it, and the
-// difference shows up only once a field is unmounted.
+// `validate` and `issuesFor` ask the adapter for this path and return its issues.
+// The adapter owns dependency expansion, so a partial verdict can include
+// affected siblings without giving mounted fields a different set of rules.
 //
 // `issuesFor` writes nothing at all. Asking what a value WOULD produce is not
 // the same as putting it in the form, and a probe that mutated the store would
@@ -14,9 +12,9 @@
 //
 // A FIELD REPORTS MOMENTS; IT DOES NOT DECIDE THEM. `setValue` says "change"
 // and `markTouched` says "blur", and whether either turns into a pass is
-// `validateOn`, which lives on the form. It has to: one pass judges the whole
-// root, so a field that decided for itself would be overruled by every other
-// field's edit. `setParticipating` asks unconditionally through a different
+// `validateOn`, which lives on the form. Dependent fields can be judged together,
+// so a field-local trigger would not isolate its rules. `setParticipating`
+// asks unconditionally through a different
 // member, because switching a subtree off changes which issues BLOCK rather
 // than what any value is.
 // ===========================================================================
@@ -56,8 +54,7 @@ export interface FieldHandleRequest {
   readonly requestValidation: () => void;
   /**
    * Asks for a pass if `validateOn` wants one at this moment. The decision
-   * belongs to the form and not to the field, because one pass judges the
-   * whole root and there is no per-field pass a field could gate.
+   * belongs to the form; the adapter decides which dependencies to judge.
    */
   readonly requestValidationAt: (
     moment: "change" | "blur",

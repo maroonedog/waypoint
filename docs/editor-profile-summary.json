@@ -1,0 +1,1120 @@
+{
+  "before": {
+    "totalMs": 2659.19,
+    "samples": 1660,
+    "selected": [
+      {
+        "name": "getCandidateSignaturesForStringLiteralCompletions",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51459,
+        "selfUs": 0,
+        "inclusiveUs": 2293097,
+        "selfPercent": 0,
+        "inclusivePercent": 86.23
+      },
+      {
+        "name": "isTypeAssignableTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68430,
+        "selfUs": 8063,
+        "inclusiveUs": 1548750,
+        "selfPercent": 0.3,
+        "inclusivePercent": 58.24
+      },
+      {
+        "name": "recursiveTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70231,
+        "selfUs": 155837,
+        "inclusiveUs": 1425235,
+        "selfPercent": 5.86,
+        "inclusivePercent": 53.6
+      },
+      {
+        "name": "inferTypes",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 73143,
+        "selfUs": 26759,
+        "inclusiveUs": 1482498,
+        "selfPercent": 1.01,
+        "inclusivePercent": 55.75
+      },
+      {
+        "name": "inferTypeArguments",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 80425,
+        "selfUs": 0,
+        "inclusiveUs": 1429014,
+        "selfPercent": 0,
+        "inclusivePercent": 53.74
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": 0,
+        "selfUs": 118117,
+        "inclusiveUs": 118117,
+        "selfPercent": 4.44,
+        "inclusivePercent": 4.44
+      }
+    ],
+    "self": [
+      {
+        "name": "post",
+        "url": "node:inspector",
+        "line": 112,
+        "selfUs": 163674,
+        "inclusiveUs": 165279,
+        "selfPercent": 6.16,
+        "inclusivePercent": 6.22
+      },
+      {
+        "name": "recursiveTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70231,
+        "selfUs": 155837,
+        "inclusiveUs": 1425235,
+        "selfPercent": 5.86,
+        "inclusivePercent": 53.6
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": 0,
+        "selfUs": 118117,
+        "inclusiveUs": 118117,
+        "selfPercent": 4.44,
+        "inclusivePercent": 4.44
+      },
+      {
+        "name": "some",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 2684,
+        "selfUs": 107205,
+        "inclusiveUs": 160668,
+        "selfPercent": 4.03,
+        "inclusivePercent": 6.04
+      },
+      {
+        "name": "instantiateTypeWithAlias",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68200,
+        "selfUs": 73631,
+        "inclusiveUs": 1503981,
+        "selfPercent": 2.77,
+        "inclusivePercent": 56.56
+      },
+      {
+        "name": "instantiateTypeWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68232,
+        "selfUs": 71481,
+        "inclusiveUs": 1502749,
+        "selfPercent": 2.69,
+        "inclusivePercent": 56.51
+      },
+      {
+        "name": "checkTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69353,
+        "selfUs": 70324,
+        "inclusiveUs": 1526540,
+        "selfPercent": 2.64,
+        "inclusivePercent": 57.41
+      },
+      {
+        "name": "isRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69658,
+        "selfUs": 66218,
+        "inclusiveUs": 1464486,
+        "selfPercent": 2.49,
+        "inclusivePercent": 55.07
+      },
+      {
+        "name": "getTemplateLiteralType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 66578,
+        "selfUs": 61492,
+        "inclusiveUs": 81490,
+        "selfPercent": 2.31,
+        "inclusivePercent": 3.06
+      },
+      {
+        "name": "getConditionalType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67161,
+        "selfUs": 58675,
+        "inclusiveUs": 1493585,
+        "selfPercent": 2.21,
+        "inclusivePercent": 56.17
+      },
+      {
+        "name": "propertiesRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 71272,
+        "selfUs": 58246,
+        "inclusiveUs": 1400671,
+        "selfPercent": 2.19,
+        "inclusivePercent": 52.67
+      },
+      {
+        "name": "popActiveMapper",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 78084,
+        "selfUs": 57242,
+        "inclusiveUs": 57242,
+        "selfPercent": 2.15,
+        "inclusivePercent": 2.15
+      },
+      {
+        "name": "getPropertyOfType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 63862,
+        "selfUs": 52400,
+        "inclusiveUs": 80074,
+        "selfPercent": 1.97,
+        "inclusivePercent": 3.01
+      },
+      {
+        "name": "getTypeFromTypeNode",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67711,
+        "selfUs": 50062,
+        "inclusiveUs": 775651,
+        "selfPercent": 1.88,
+        "inclusivePercent": 29.17
+      },
+      {
+        "name": "clearActiveMapperCaches",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 78097,
+        "selfUs": 48517,
+        "inclusiveUs": 48517,
+        "selfPercent": 1.82,
+        "inclusivePercent": 1.82
+      },
+      {
+        "name": "structuredTypeRelatedToWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70448,
+        "selfUs": 44025,
+        "inclusiveUs": 1407836,
+        "selfPercent": 1.66,
+        "inclusivePercent": 52.94
+      },
+      {
+        "name": "structuredTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70378,
+        "selfUs": 40405,
+        "inclusiveUs": 1409488,
+        "selfPercent": 1.52,
+        "inclusivePercent": 53
+      },
+      {
+        "name": "(anonymous)",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 72009,
+        "selfUs": 35231,
+        "inclusiveUs": 36958,
+        "selfPercent": 1.32,
+        "inclusivePercent": 1.39
+      },
+      {
+        "name": "instantiateType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68190,
+        "selfUs": 33993,
+        "inclusiveUs": 1490087,
+        "selfPercent": 1.28,
+        "inclusivePercent": 56.04
+      },
+      {
+        "name": "getUnmatchedProperties",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 72967,
+        "selfUs": 32784,
+        "inclusiveUs": 85919,
+        "selfPercent": 1.23,
+        "inclusivePercent": 3.23
+      }
+    ],
+    "inclusive": [
+      {
+        "name": "(root)",
+        "url": "",
+        "line": 0,
+        "selfUs": 0,
+        "inclusiveUs": 2659190,
+        "selfPercent": 0,
+        "inclusivePercent": 100
+      },
+      {
+        "name": "measureEditorService",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 18,
+        "selfUs": 0,
+        "inclusiveUs": 2541048,
+        "selfPercent": 0,
+        "inclusivePercent": 95.56
+      },
+      {
+        "name": "(anonymous)",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 0,
+        "selfUs": 0,
+        "inclusiveUs": 2541048,
+        "selfPercent": 0,
+        "inclusivePercent": 95.56
+      },
+      {
+        "name": "run",
+        "url": "node:internal/modules/esm/module_job",
+        "line": 265,
+        "selfUs": 0,
+        "inclusiveUs": 2541048,
+        "selfPercent": 0,
+        "inclusivePercent": 95.56
+      },
+      {
+        "name": "getCompletionsAtPosition2",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 153131,
+        "selfUs": 0,
+        "inclusiveUs": 2375769,
+        "selfPercent": 0,
+        "inclusivePercent": 89.34
+      },
+      {
+        "name": "request",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 81,
+        "selfUs": 0,
+        "inclusiveUs": 2375769,
+        "selfPercent": 0,
+        "inclusivePercent": 89.34
+      },
+      {
+        "name": "timed",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 87,
+        "selfUs": 0,
+        "inclusiveUs": 2375769,
+        "selfPercent": 0,
+        "inclusivePercent": 89.34
+      },
+      {
+        "name": "getStringLiteralCompletions",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 170866,
+        "selfUs": 0,
+        "inclusiveUs": 2297971,
+        "selfPercent": 0,
+        "inclusivePercent": 86.42
+      },
+      {
+        "name": "getCompletionsAtPosition",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 166872,
+        "selfUs": 0,
+        "inclusiveUs": 2297971,
+        "selfPercent": 0,
+        "inclusivePercent": 86.42
+      },
+      {
+        "name": "getStringLiteralCompletionEntries",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 171025,
+        "selfUs": 0,
+        "inclusiveUs": 2294703,
+        "selfPercent": 0,
+        "inclusivePercent": 86.29
+      },
+      {
+        "name": "getResolvedSignature",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81978,
+        "selfUs": 1593,
+        "inclusiveUs": 2293097,
+        "selfPercent": 0.06,
+        "inclusivePercent": 86.23
+      },
+      {
+        "name": "getResolvedSignatureWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51534,
+        "selfUs": 0,
+        "inclusiveUs": 2293097,
+        "selfPercent": 0,
+        "inclusivePercent": 86.23
+      },
+      {
+        "name": "runWithoutResolvedSignatureCaching",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51485,
+        "selfUs": 0,
+        "inclusiveUs": 2293097,
+        "selfPercent": 0,
+        "inclusivePercent": 86.23
+      },
+      {
+        "name": "getCandidateSignaturesForStringLiteralCompletions",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51459,
+        "selfUs": 0,
+        "inclusiveUs": 2293097,
+        "selfPercent": 0,
+        "inclusivePercent": 86.23
+      },
+      {
+        "name": "getStringLiteralCompletionsFromSignature",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 171150,
+        "selfUs": 0,
+        "inclusiveUs": 2293097,
+        "selfPercent": 0,
+        "inclusivePercent": 86.23
+      },
+      {
+        "name": "resolveCallExpression",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81459,
+        "selfUs": 0,
+        "inclusiveUs": 2291504,
+        "selfPercent": 0,
+        "inclusivePercent": 86.17
+      },
+      {
+        "name": "resolveSignature",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81959,
+        "selfUs": 0,
+        "inclusiveUs": 2291504,
+        "selfPercent": 0,
+        "inclusivePercent": 86.17
+      },
+      {
+        "name": "(anonymous)",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51462,
+        "selfUs": 0,
+        "inclusiveUs": 2286754,
+        "selfPercent": 0,
+        "inclusivePercent": 85.99
+      },
+      {
+        "name": "runWithInferenceBlockedFromSourceNode",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51513,
+        "selfUs": 0,
+        "inclusiveUs": 2286754,
+        "selfPercent": 0,
+        "inclusivePercent": 85.99
+      },
+      {
+        "name": "chooseOverload",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81250,
+        "selfUs": 1584,
+        "inclusiveUs": 2286279,
+        "selfPercent": 0.06,
+        "inclusivePercent": 85.98
+      },
+      {
+        "name": "resolveCall",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81066,
+        "selfUs": 0,
+        "inclusiveUs": 2286279,
+        "selfPercent": 0,
+        "inclusivePercent": 85.98
+      },
+      {
+        "name": "isTypeAssignableTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68430,
+        "selfUs": 8063,
+        "inclusiveUs": 1548750,
+        "selfPercent": 0.3,
+        "inclusivePercent": 58.24
+      },
+      {
+        "name": "isTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69273,
+        "selfUs": 29408,
+        "inclusiveUs": 1542339,
+        "selfPercent": 1.11,
+        "inclusivePercent": 58
+      },
+      {
+        "name": "checkTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69353,
+        "selfUs": 70324,
+        "inclusiveUs": 1526540,
+        "selfPercent": 2.64,
+        "inclusivePercent": 57.41
+      },
+      {
+        "name": "getTypeOfSymbol",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 61468,
+        "selfUs": 16931,
+        "inclusiveUs": 1507870,
+        "selfPercent": 0.64,
+        "inclusivePercent": 56.7
+      },
+      {
+        "name": "instantiateTypeWithAlias",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68200,
+        "selfUs": 73631,
+        "inclusiveUs": 1503981,
+        "selfPercent": 2.77,
+        "inclusivePercent": 56.56
+      },
+      {
+        "name": "instantiateTypeWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68232,
+        "selfUs": 71481,
+        "inclusiveUs": 1502749,
+        "selfPercent": 2.69,
+        "inclusivePercent": 56.51
+      },
+      {
+        "name": "getConditionalType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67161,
+        "selfUs": 58675,
+        "inclusiveUs": 1493585,
+        "selfPercent": 2.21,
+        "inclusivePercent": 56.17
+      },
+      {
+        "name": "instantiateType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68190,
+        "selfUs": 33993,
+        "inclusiveUs": 1490087,
+        "selfPercent": 1.28,
+        "inclusivePercent": 56.04
+      },
+      {
+        "name": "inferTypes",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 73143,
+        "selfUs": 26759,
+        "inclusiveUs": 1482498,
+        "selfPercent": 1.01,
+        "inclusivePercent": 55.75
+      },
+      {
+        "name": "getConditionalTypeInstantiation",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68173,
+        "selfUs": 31031,
+        "inclusiveUs": 1479160,
+        "selfPercent": 1.17,
+        "inclusivePercent": 55.62
+      },
+      {
+        "name": "isRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69658,
+        "selfUs": 66218,
+        "inclusiveUs": 1464486,
+        "selfPercent": 2.49,
+        "inclusivePercent": 55.07
+      },
+      {
+        "name": "inferFromTypes",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 73152,
+        "selfUs": 17358,
+        "inclusiveUs": 1457316,
+        "selfPercent": 0.65,
+        "inclusivePercent": 54.8
+      },
+      {
+        "name": "inferTypeArguments",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 80425,
+        "selfUs": 0,
+        "inclusiveUs": 1429014,
+        "selfPercent": 0,
+        "inclusivePercent": 53.74
+      },
+      {
+        "name": "recursiveTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70231,
+        "selfUs": 155837,
+        "inclusiveUs": 1425235,
+        "selfPercent": 5.86,
+        "inclusivePercent": 53.6
+      }
+    ]
+  },
+  "after": {
+    "totalMs": 1986.904,
+    "samples": 1213,
+    "selected": [
+      {
+        "name": "getCandidateSignaturesForStringLiteralCompletions",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51459,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "isTypeAssignableTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68430,
+        "selfUs": 12717,
+        "inclusiveUs": 458371,
+        "selfPercent": 0.64,
+        "inclusivePercent": 23.07
+      },
+      {
+        "name": "recursiveTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70231,
+        "selfUs": 54445,
+        "inclusiveUs": 299602,
+        "selfPercent": 2.74,
+        "inclusivePercent": 15.08
+      },
+      {
+        "name": "inferTypeArguments",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 80425,
+        "selfUs": 0,
+        "inclusiveUs": 747760,
+        "selfPercent": 0,
+        "inclusivePercent": 37.63
+      },
+      {
+        "name": "inferTypes",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 73143,
+        "selfUs": 23011,
+        "inclusiveUs": 120311,
+        "selfPercent": 1.16,
+        "inclusivePercent": 6.06
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": 0,
+        "selfUs": 89923,
+        "inclusiveUs": 89923,
+        "selfPercent": 4.53,
+        "inclusivePercent": 4.53
+      }
+    ],
+    "self": [
+      {
+        "name": "post",
+        "url": "node:inspector",
+        "line": 112,
+        "selfUs": 149486,
+        "inclusiveUs": 151092,
+        "selfPercent": 7.52,
+        "inclusivePercent": 7.6
+      },
+      {
+        "name": "(garbage collector)",
+        "url": "",
+        "line": 0,
+        "selfUs": 89923,
+        "inclusiveUs": 89923,
+        "selfPercent": 4.53,
+        "inclusivePercent": 4.53
+      },
+      {
+        "name": "instantiateTypeWithAlias",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68200,
+        "selfUs": 74775,
+        "inclusiveUs": 1636862,
+        "selfPercent": 3.76,
+        "inclusivePercent": 82.38
+      },
+      {
+        "name": "instantiateTypeWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68232,
+        "selfUs": 72440,
+        "inclusiveUs": 1636862,
+        "selfPercent": 3.65,
+        "inclusivePercent": 82.38
+      },
+      {
+        "name": "checkTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69353,
+        "selfUs": 71513,
+        "inclusiveUs": 421037,
+        "selfPercent": 3.6,
+        "inclusivePercent": 21.19
+      },
+      {
+        "name": "getTemplateLiteralType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 66578,
+        "selfUs": 67064,
+        "inclusiveUs": 82119,
+        "selfPercent": 3.38,
+        "inclusivePercent": 4.13
+      },
+      {
+        "name": "getTypeFromTypeNode",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67711,
+        "selfUs": 59142,
+        "inclusiveUs": 875734,
+        "selfPercent": 2.98,
+        "inclusivePercent": 44.08
+      },
+      {
+        "name": "getConditionalType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67161,
+        "selfUs": 58808,
+        "inclusiveUs": 1645509,
+        "selfPercent": 2.96,
+        "inclusivePercent": 82.82
+      },
+      {
+        "name": "recursiveTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 70231,
+        "selfUs": 54445,
+        "inclusiveUs": 299602,
+        "selfPercent": 2.74,
+        "inclusivePercent": 15.08
+      },
+      {
+        "name": "isRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69658,
+        "selfUs": 49185,
+        "inclusiveUs": 347745,
+        "selfPercent": 2.48,
+        "inclusivePercent": 17.5
+      },
+      {
+        "name": "popActiveMapper",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 78084,
+        "selfUs": 46612,
+        "inclusiveUs": 46612,
+        "selfPercent": 2.35,
+        "inclusivePercent": 2.35
+      },
+      {
+        "name": "instantiateType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68190,
+        "selfUs": 45288,
+        "inclusiveUs": 1622909,
+        "selfPercent": 2.28,
+        "inclusivePercent": 81.68
+      },
+      {
+        "name": "clearActiveMapperCaches",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 78097,
+        "selfUs": 38300,
+        "inclusiveUs": 38300,
+        "selfPercent": 1.93,
+        "inclusivePercent": 1.93
+      },
+      {
+        "name": "getMappedType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67842,
+        "selfUs": 29230,
+        "inclusiveUs": 1176839,
+        "selfPercent": 1.47,
+        "inclusivePercent": 59.23
+      },
+      {
+        "name": "getConditionalTypeInstantiation",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68173,
+        "selfUs": 28452,
+        "inclusiveUs": 1635596,
+        "selfPercent": 1.43,
+        "inclusivePercent": 82.32
+      },
+      {
+        "name": "isTypeRelatedTo",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 69273,
+        "selfUs": 27716,
+        "inclusiveUs": 451583,
+        "selfPercent": 1.39,
+        "inclusivePercent": 22.73
+      },
+      {
+        "name": "getStringLiteralType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67598,
+        "selfUs": 27315,
+        "inclusiveUs": 27315,
+        "selfPercent": 1.37,
+        "inclusivePercent": 1.37
+      },
+      {
+        "name": "getConditionalFlowTypeOfType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 64968,
+        "selfUs": 25264,
+        "inclusiveUs": 103801,
+        "selfPercent": 1.27,
+        "inclusivePercent": 5.22
+      },
+      {
+        "name": "getPropertyOfType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 63862,
+        "selfUs": 24670,
+        "inclusiveUs": 49197,
+        "selfPercent": 1.24,
+        "inclusivePercent": 2.48
+      },
+      {
+        "name": "inferFromTypes",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 73152,
+        "selfUs": 23384,
+        "inclusiveUs": 94592,
+        "selfPercent": 1.18,
+        "inclusivePercent": 4.76
+      }
+    ],
+    "inclusive": [
+      {
+        "name": "(root)",
+        "url": "",
+        "line": 0,
+        "selfUs": 0,
+        "inclusiveUs": 1986904,
+        "selfPercent": 0,
+        "inclusivePercent": 100
+      },
+      {
+        "name": "measureEditorService",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 18,
+        "selfUs": 0,
+        "inclusiveUs": 1896981,
+        "selfPercent": 0,
+        "inclusivePercent": 95.47
+      },
+      {
+        "name": "(anonymous)",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 0,
+        "selfUs": 0,
+        "inclusiveUs": 1896981,
+        "selfPercent": 0,
+        "inclusivePercent": 95.47
+      },
+      {
+        "name": "run",
+        "url": "node:internal/modules/esm/module_job",
+        "line": 265,
+        "selfUs": 0,
+        "inclusiveUs": 1896981,
+        "selfPercent": 0,
+        "inclusivePercent": 95.47
+      },
+      {
+        "name": "getCompletionsAtPosition2",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 153131,
+        "selfUs": 0,
+        "inclusiveUs": 1745889,
+        "selfPercent": 0,
+        "inclusivePercent": 87.87
+      },
+      {
+        "name": "request",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 126,
+        "selfUs": 0,
+        "inclusiveUs": 1745889,
+        "selfPercent": 0,
+        "inclusivePercent": 87.87
+      },
+      {
+        "name": "timed",
+        "url": "file:///C:/projects/form-contract/bench/editor/measure-service.mjs",
+        "line": 132,
+        "selfUs": 0,
+        "inclusiveUs": 1745889,
+        "selfPercent": 0,
+        "inclusivePercent": 87.87
+      },
+      {
+        "name": "getCompletionsAtPosition",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 166872,
+        "selfUs": 0,
+        "inclusiveUs": 1664126,
+        "selfPercent": 0,
+        "inclusivePercent": 83.75
+      },
+      {
+        "name": "getStringLiteralCompletions",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 170866,
+        "selfUs": 0,
+        "inclusiveUs": 1662570,
+        "selfPercent": 0,
+        "inclusivePercent": 83.68
+      },
+      {
+        "name": "resolveCallExpression",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81459,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "resolveSignature",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81959,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "getResolvedSignature",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81978,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "getResolvedSignatureWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51534,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "runWithoutResolvedSignatureCaching",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51485,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "getCandidateSignaturesForStringLiteralCompletions",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51459,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "getStringLiteralCompletionsFromSignature",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 171150,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "getStringLiteralCompletionEntries",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 171025,
+        "selfUs": 0,
+        "inclusiveUs": 1658775,
+        "selfPercent": 0,
+        "inclusivePercent": 83.49
+      },
+      {
+        "name": "chooseOverload",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81250,
+        "selfUs": 0,
+        "inclusiveUs": 1655928,
+        "selfPercent": 0,
+        "inclusivePercent": 83.34
+      },
+      {
+        "name": "resolveCall",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 81066,
+        "selfUs": 0,
+        "inclusiveUs": 1655928,
+        "selfPercent": 0,
+        "inclusivePercent": 83.34
+      },
+      {
+        "name": "(anonymous)",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51462,
+        "selfUs": 0,
+        "inclusiveUs": 1653104,
+        "selfPercent": 0,
+        "inclusivePercent": 83.2
+      },
+      {
+        "name": "runWithInferenceBlockedFromSourceNode",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 51513,
+        "selfUs": 0,
+        "inclusiveUs": 1653104,
+        "selfPercent": 0,
+        "inclusivePercent": 83.2
+      },
+      {
+        "name": "getConditionalType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67161,
+        "selfUs": 58808,
+        "inclusiveUs": 1645509,
+        "selfPercent": 2.96,
+        "inclusivePercent": 82.82
+      },
+      {
+        "name": "instantiateTypeWithAlias",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68200,
+        "selfUs": 74775,
+        "inclusiveUs": 1636862,
+        "selfPercent": 3.76,
+        "inclusivePercent": 82.38
+      },
+      {
+        "name": "instantiateTypeWorker",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68232,
+        "selfUs": 72440,
+        "inclusiveUs": 1636862,
+        "selfPercent": 3.65,
+        "inclusivePercent": 82.38
+      },
+      {
+        "name": "getConditionalTypeInstantiation",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68173,
+        "selfUs": 28452,
+        "inclusiveUs": 1635596,
+        "selfPercent": 1.43,
+        "inclusivePercent": 82.32
+      },
+      {
+        "name": "instantiateType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68190,
+        "selfUs": 45288,
+        "inclusiveUs": 1622909,
+        "selfPercent": 2.28,
+        "inclusivePercent": 81.68
+      },
+      {
+        "name": "mapType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 74514,
+        "selfUs": 7357,
+        "inclusiveUs": 1622813,
+        "selfPercent": 0.37,
+        "inclusivePercent": 81.68
+      },
+      {
+        "name": "mapTypeWithAlias",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 74538,
+        "selfUs": 4917,
+        "inclusiveUs": 1622813,
+        "selfPercent": 0.25,
+        "inclusivePercent": 81.68
+      },
+      {
+        "name": "(anonymous)",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 68183,
+        "selfUs": 18230,
+        "inclusiveUs": 1616115,
+        "selfPercent": 0.92,
+        "inclusivePercent": 81.34
+      },
+      {
+        "name": "instantiateList",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67813,
+        "selfUs": 9999,
+        "inclusiveUs": 1608824,
+        "selfPercent": 0.5,
+        "inclusivePercent": 80.97
+      },
+      {
+        "name": "instantiateTypes",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67830,
+        "selfUs": 7433,
+        "inclusiveUs": 1608824,
+        "selfPercent": 0.37,
+        "inclusivePercent": 80.97
+      },
+      {
+        "name": "getTypeOfSymbol",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 61468,
+        "selfUs": 8130,
+        "inclusiveUs": 1603660,
+        "selfPercent": 0.41,
+        "inclusivePercent": 80.71
+      },
+      {
+        "name": "getMappedType",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 67842,
+        "selfUs": 29230,
+        "inclusiveUs": 1176839,
+        "selfPercent": 1.47,
+        "inclusivePercent": 59.23
+      },
+      {
+        "name": "map",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 2486,
+        "selfUs": 2007,
+        "inclusiveUs": 1110965,
+        "selfPercent": 0.1,
+        "inclusivePercent": 55.91
+      },
+      {
+        "name": "getTypeOfInstantiatedSymbol",
+        "url": "file:///C:/projects/form-contract/node_modules/typescript/lib/typescript.js",
+        "line": 61408,
+        "selfUs": 1678,
+        "inclusiveUs": 920348,
+        "selfPercent": 0.08,
+        "inclusivePercent": 46.32
+      }
+    ]
+  }
+}

@@ -28,6 +28,7 @@
 // `drawn` were likewise produced by running the zod resolver and
 // buildInputProps, not typed out.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 
@@ -131,9 +132,37 @@ import type * as z from "zod";
 
 <Base
   title="The contract — waypoint"
-  description="A form needs a flat list of fields and a schema is a tree. Two members are the whole contract — a descriptor per leaf and one whole-root verdict — and the value type and the path union survive them."
+  description="A form adapter supplies descriptors and whole-root validation, with optional partial execution. Value and path types survive the adapter boundary."
 >
   <h1>The contract</h1>
+
+  <h2 id="valibot">Use Valibot</h2>
+  <Code code={`npm install valibot @valibot/to-json-schema`} label="peer dependencies" lang="sh" />
+  <Code code={`import * as v from "valibot";
+import { valibotFormResolver } from "@maroonedog/waypoint/resolver-valibot";
+
+const adapter = valibotFormResolver(v.object({
+  email: v.pipe(v.string(), v.email("Enter a valid email")),
+}));
+
+declare module "@maroonedog/waypoint" {
+  interface WaypointForms { form: typeof adapter }
+}`} label="Valibot adapter" />
+  <p>Uses the official JSON Schema converter for descriptors and preserves Valibot's
+    issue <code>type</code> as a typed <code>issue.code</code>. All validation issues
+    are collected even when global abort settings are enabled.</p>
+  <p>Forms edit and submit input values, not transformed output. Parse the submitted
+    value yourself when you need Valibot's transformed result.</p>
+  <p>For async schemas or fields the converter cannot represent, pass
+    <code>{"{ fields }"}</code> explicitly. Synchronous schemas can also pass
+    <code>libraryOptions</code> to the converter. Without descriptors, the generic
+    resolver warns and returns no fields; validation remains active.</p>
+  <Code code={`const shape = v.object({ email: v.string() });
+const asyncSchema = v.pipeAsync(shape,
+  v.checkAsync(async (value) => await isAvailable(value.email), "Taken"));
+const adapter = valibotFormResolver(asyncSchema, {
+  fields: valibotFormResolver(shape).fields,
+});`} label="Async validation (isAvailable is your server call)" />
 
   <p class="lead">A resolver turns a schema into field descriptors and a whole-root validator. Bindings use the descriptors for labels, input constraints, and accessibility attributes.</p>
 
@@ -160,11 +189,15 @@ import type * as z from "zod";
 
   <p class="note">Render the error element even when empty so its live region can announce later updates. Automated accessibility checks do not replace testing with assistive technology.</p>
 
-  <h2>Two members</h2>
+  <h2>Required members and partial execution</h2>
 
   <Code code={resolver} label="type: FormAdapter" />
 
   <p class="caption">Pass a resolver explicitly when creating the form. Its contract consists of field descriptors and validation.</p>
+  <p>An optional <code>validatePartial(root, paths, signal?)</code> can execute
+    only affected rules. It returns complete issue lists for replacement subtrees,
+    including dependencies. See <a class="link" href={servedPath("/validation/")}>partial validation</a>
+    for resolver support and fallback behavior.</p>
 
   <h2>Neutral by construction</h2>
 
@@ -200,7 +233,7 @@ import type * as z from "zod";
     The contract is neutral about direction: a type-first validator passes the
     type its rules were written against, a schema-first one passes what its
     schema infers, and both arrive as the same form.{" "}
-    <a class="link" href="/paths/"
+    <a class="link" href={servedPath("/paths/")}
       >How a path gets its type →</a
     >
   </p>
@@ -250,7 +283,7 @@ import type * as z from "zod";
     <code>zodFormResolver</code> passes it on every call. The generic resolver
     forwards such an option but never invents one: it is the vendor's own
     vocabulary, and an unknown library may reject a key it does not know.{" "}
-    <a class="link" href="/start/"
+    <a class="link" href={servedPath("/start/")}
       >What each entry point gives you →</a
     >
   </p>

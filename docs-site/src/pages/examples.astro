@@ -21,6 +21,7 @@
 // dependencies this site does not carry and should not take on to draw a page
 // about somebody else's API.
 // ===========================================================================
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import {
@@ -101,9 +102,13 @@ const COMMANDS = [
   { name: "two-forms", port: 5183, here: "#two-forms" },
   { name: "wizard", port: 5184, here: "#wizard" },
   { name: "auto-form", port: 5186, here: "#auto-form" },
+  { name: "async-validation", port: 5187, here: undefined },
   { name: "playground", port: 5178, here: undefined },
   { name: "nested-arrays", port: 5181, here: undefined },
 ];
+
+/** Where a row points: an anchor stays on this page, a route needs the base. */
+const hrefFor = (here: string) => (here.startsWith("#") ? here : servedPath(here));
 ---
 
 <Base
@@ -120,7 +125,7 @@ const COMMANDS = [
     <code>npm run test:types</code> alongside the library, so one that stopped
     being what this page describes would fail the build. The biggest, a
     designed Material Design 3 screen, has a page of its own:{" "}
-    <a class="link" href="/showcase/">Showcase</a>.
+    <a class="link" href={servedPath("/showcase/")}>Showcase</a>.
   </p>
 
   <p class="caption">
@@ -321,7 +326,7 @@ const COMMANDS = [
                 {one.here === undefined ? (
                   "command only"
                 ) : (
-                  <a class="link" href={one.here}>
+                  <a class="link" href={hrefFor(one.here)}>
                     on this site
                   </a>
                 )}

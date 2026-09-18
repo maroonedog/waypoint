@@ -2,7 +2,7 @@
 # publish.yml — publishes @maroonedog/waypoint to npm, BY HAND ONLY.
 #
 # `workflow_dispatch` is the only trigger, and that is deliberate rather than
-# provisional: nothing here has ever been published, and a workflow that
+# provisional: a workflow that
 # publishes on push turns every merge into a release decision somebody made
 # without noticing. Adding a `push:` trigger to this file is a release-policy
 # change, not a convenience — it belongs in its own reviewed commit.

@@ -29,7 +29,7 @@
 // verdict wait behind another round trip of the validator's, which for an
 // async adapter is exactly the wait the server response just ended.
 // ===========================================================================
-import type { FormIssue, MaybeAsync } from "../../contract/index.js";
+import { isPending, type FormIssue, type MaybeAsync, type PartialValidationResult } from "../../contract/index.js";
 import type { FormCellStore } from "../store/form-cell-store.types.js";
 import {
   ROOT_CELL,
@@ -43,7 +43,7 @@ import {
 } from "../store/cell-key.js";
 import { createCellStore } from "../store/create-cell-store.js";
 import { assertConcretePath } from "../path/assert-concrete-path.js";
-import { ancestorPathsOf } from "../path/path-relation.js";
+import { ancestorPathsOf, isAncestorPath } from "../path/path-relation.js";
 import { declaredPathOf } from "../path/declared-path-of.js";
 import { buildDescriptorTree } from "../descriptors/build-descriptor-tree.js";
 import { createDescriptorIndex } from "../descriptors/descriptor-index.js";
@@ -110,16 +110,47 @@ export function createForm<T, TPath extends string = string>(
       publishBlockingIssues(store, blockingOf(merged));
     });
   };
-  const judgeRoot = (root: unknown): MaybeAsync<readonly FormIssue[]> =>
-    adapter.validate(root);
-  const scheduler = createValidationScheduler({
+  const within = (path: string, scopes: readonly string[]): boolean =>
+    scopes.some(scope => scope === "" || scope === path || isAncestorPath(scope, path));
+  const resultOf = (
+    outcome: MaybeAsync<readonly FormIssue[]>
+  ): MaybeAsync<PartialValidationResult> => {
+    const wrap = (issues: readonly FormIssue[]): PartialValidationResult => ({ paths: [""], issues });
+    return isPending(outcome) ? outcome.then(wrap) : wrap(outcome);
+  };
+  const judge = (
+    root: unknown,
+    paths?: readonly string[],
+    signal?: Parameters<typeof adapter.validate>[1]
+  ): MaybeAsync<PartialValidationResult> => {
+    if (paths === undefined || paths.length === 0 || adapter.validatePartial === undefined ||
+        lastProduced.some(issue => issue.path === ""))
+      return resultOf(adapter.validate(root, signal));
+    const outcome = adapter.validatePartial(root, paths, signal);
+    const verified = (result: PartialValidationResult): PartialValidationResult => {
+      for (const path of result.paths) assertConcretePath(path);
+      if (paths.some(path => !within(path, result.paths)) ||
+          result.issues.some(issue => !within(issue.path, result.paths))) {
+        throw new TypeError("Partial validation must cover requested paths and contain only covered issues.");
+      }
+      return result;
+    };
+    return isPending(outcome) ? outcome.then(verified) : verified(outcome);
+  };
+  const scheduler = createValidationScheduler<PartialValidationResult>({
     store,
-    judge: (signal) => adapter.validate(store.read(ROOT_CELL), signal),
-    commit: commitVerdict,
-    // Arity, read once. An adapter that declared one parameter never causes an
-    // AbortController to be constructed — see form-adapter.types.ts.
-    cancelsSupersededPasses: adapter.validate.length >= 2,
+    judge: (signal, paths) => judge(store.read(ROOT_CELL), paths, signal),
+    commit: result => commitVerdict([
+      ...lastProduced.filter(issue => !within(issue.path, result.paths)),
+      ...result.issues,
+    ]),
+    // Construct controllers only when a validation method accepts a signal.
+    cancelsSupersededPasses: adapter.validate.length >= 2 || (adapter.validatePartial?.length ?? 0) >= 3,
   });
+  const issuesOf = (outcome: MaybeAsync<PartialValidationResult>): MaybeAsync<readonly FormIssue[]> =>
+    isPending(outcome) ? outcome.then(result => result.issues) : outcome.issues;
+  const runValidation = (paths?: readonly string[]): MaybeAsync<readonly FormIssue[]> =>
+    issuesOf(scheduler.runNow(paths));
 
   const initialRoot = seedRootValue(descriptors, options.defaultValues);
   seedFormCells({
@@ -160,8 +191,8 @@ export function createForm<T, TPath extends string = string>(
   };
 
   /**
-   * One pass judges the whole root, so this is the form's decision and the
-   * field only reports which moment it is at, and which path it was.
+   * The form decides when to judge; the adapter decides how much to judge.
+   * The field reports the moment and the changed path.
    *
    * TWO CLAUSES MAKE "blur" AND "submit" USABLE RATHER THAN MERELY PRESENT,
    * and they are the same clause twice. Once the form has refused a submit,
@@ -182,12 +213,12 @@ export function createForm<T, TPath extends string = string>(
     path: string
   ): void => {
     if (moment === validateOn) {
-      scheduler.request();
+      scheduler.request([path]);
       return;
     }
     if (moment !== "change") return;
     if ((store.read(submitCountCell) ?? 0) > 0 || complaintNearby(path)) {
-      scheduler.request();
+      scheduler.request([path]);
     }
   };
 
@@ -241,8 +272,8 @@ export function createForm<T, TPath extends string = string>(
           initialRoot,
           path,
           descriptor: index.at(path),
-          judgeRoot,
-          runValidation: scheduler.runNow,
+          judgeRoot: root => issuesOf(judge(root, [path])),
+          runValidation: () => runValidation([path]),
           requestValidation: scheduler.request,
           requestValidationAt,
           forgetAdoptedAround,
@@ -327,7 +358,7 @@ export function createForm<T, TPath extends string = string>(
       const adoptedWhenPressed = adopted.adoptionCount();
       return submitForm({
         store,
-        judgeNow: () => scheduler.runNow(),
+        judgeNow: () => runValidation(),
         blockingOf: (produced) => blockingOf(adopted.mergedWith(produced)),
         handler,
       }).finally(() => {
@@ -353,6 +384,9 @@ export function createForm<T, TPath extends string = string>(
     },
 
     readRoot: () => store.read(ROOT_CELL),
-    validate: () => scheduler.runNow(),
+    validate: paths => {
+      if (paths !== undefined) for (const path of paths) assertConcretePath(path);
+      return runValidation(paths);
+    },
   };
 }

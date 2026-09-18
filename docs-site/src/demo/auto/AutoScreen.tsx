@@ -54,7 +54,7 @@ export default function AutoScreen(): ReactElement {
   const [submitted, setSubmitted] = useState<unknown>(undefined);
   const form = useCreateForm(() => ({
     adapter: signupAdapter,
-    key: "signup",
+    key: "autoSignup",
     defaultValues: structuredClone(EMPTY_SIGNUP),
   }));
 

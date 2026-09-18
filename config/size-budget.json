@@ -40,16 +40,16 @@
     {
       "id": "@maroonedog/waypoint/resolver-zod",
       "entry": "export * from \"@maroonedog/waypoint/resolver-zod\";",
-      "minified": 6601,
-      "gzipped": 2596,
-      "budget": 2856
+      "minified": 7400,
+      "gzipped": 2905,
+      "budget": 3196
     },
     {
       "id": "@maroonedog/waypoint/resolver-luq",
       "entry": "export * from \"@maroonedog/waypoint/resolver-luq\";",
-      "minified": 5189,
-      "gzipped": 2136,
-      "budget": 2350
+      "minified": 5906,
+      "gzipped": 2499,
+      "budget": 2749
     },
     {
       "id": "resolver-standard (standardFormResolver alone)",

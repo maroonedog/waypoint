@@ -16,6 +16,7 @@
 // dropped its per-validator adapters at v1. Both are gone rather than softened.
 // ===========================================================================
 import TypeAndInstance from "../components/TypeAndInstance.astro";
+import { servedPath } from "../i18n/locales.mjs";
 import Base from "../layouts/Base.astro";
 import Code from "../components/Code.astro";
 import LiveForm from "../demo/LiveForm.tsx";
@@ -235,13 +236,13 @@ const CAN: readonly (readonly [string, string, string, boolean])[] = [
   ],
   [
     "Debounce the validator",
-    "There is no debounceMs. One pass judges the whole root, so a delay on the pass would delay the required-field message along with the network rule. Debounce inside the async rule; the second argument to adapter.validate is the AbortSignal a superseded pass is cancelled with.",
+    "There is no debounceMs. A pass can include synchronous and asynchronous rules, so a delay on the pass would delay the required-field message along with the network rule. Debounce inside the async rule; the second argument to adapter.validate is the AbortSignal a superseded pass is cancelled with.",
     "/validation/",
     true,
   ],
   [
     "Several files at once, or a maximum file size",
-    'kind: "file" is ONE file. A multi-file pick is one event replacing a whole list, and rows() offers append, remove and move with no replace-the-list edit. Byte bounds are dropped rather than carried, because constraints.minLength already means characters and array elements. Draw the multiple input yourself and keep the list with rows().',
+    'kind: "file" is ONE file. A multi-file pick is one event replacing a whole list, and rows() offers insert, remove and move with no replace-the-list edit. Byte bounds are dropped rather than carried, because constraints.minLength already means characters and array elements. Draw the multiple input yourself and keep the list with rows().',
     "",
     true,
   ],
@@ -305,11 +306,11 @@ const TRY = [
   <div class="mt-7 flex flex-wrap gap-3">
     <a
       class="rounded-[3px] bg-primary px-5 py-2.5 text-sm font-medium text-on-primary"
-      href="/runtime/">See how it behaves →</a
+      href={servedPath("/runtime/")}>See how it behaves →</a
     >
     <a
       class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
-      href="/start/">Start</a
+      href={servedPath("/start/")}>Start</a
     >
     <a
       class="rounded-[3px] border border-outline px-5 py-2.5 text-sm font-medium"
@@ -336,18 +337,13 @@ const TRY = [
     </p>
   </section>
 
-  <!-- HOW TO OBTAIN IT, ON THE PAGE WHERE THE DECISION IS MADE. Nothing is
-       published, so there is no install line to print and the honest route is
-       a clone — which was a page away, on /start/, reachable from a landing
-       page that at desktop width carried no in-site navigation at all. A
-       reader deciding whether to adopt an unpublished library needs to see
-       what obtaining it costs before they are asked to want it. -->
   <p class="caption mt-6">
-    <strong>Nothing is published yet.</strong> There is no
-    npm install to print, no version to pin and nobody has run this in
-    production. What there is, is a clone:
+    <strong>Initial release line: 0.1.0.</strong> Production adoption is not
+    established and APIs may change during 0.x. Install the package for use;
+    clone the repository if you have access and want to develop it.
   </p>
-  <Code code={clone} label="shell: clone it" lang="sh" flush />
+  <Code code="npm install @maroonedog/waypoint" label="shell: install" lang="sh" flush />
+  <Code code={clone} label="shell: source checkout (repository access required)" lang="sh" flush />
 
   <!-- THE CODE COMES BEFORE THE ARGUMENT, and this was in the wrong order for
        a while: the hero ran name, tagline, eighty words on why it works, and
@@ -465,7 +461,7 @@ const TRY = [
                   ) : (
                     <a
                       class="link"
-                      href={where}
+                      href={servedPath(where)}
                     >
                       →
                     </a>
@@ -500,7 +496,7 @@ const TRY = [
     </div>
     <p class="caption">
       Every hook and component, with its real signature, is on{" "}
-      <a class="link" href="/api/">API</a>.
+      <a class="link" href={servedPath("/api/")}>API</a>.
     </p>
   </section>
 
@@ -678,7 +674,7 @@ const TRY = [
 
     <p class="caption">
       Every integer here is gated: CI fails when one of them moves.{" "}
-      <a class="link" href="/benchmark/"
+      <a class="link" href={servedPath("/benchmark/")}
         >What the benchmark can and cannot see →</a
       >
     </p>
@@ -688,15 +684,15 @@ const TRY = [
   <section class="rounded-[3px] border border-outline-variant p-6">
     <p class="label">Where it stands</p>
     <p class="mt-3">
-      <strong>Nothing has ever been published — the publish workflow is
-      manual-dispatch only and has never been run — and nobody has run it in
-      production.</strong>
+      <strong>Initial release line: 0.1.0. Releases are explicit and production
+      adoption is not established.</strong>
     </p>
     <p class="caption">
-      353 tests, the thirteen compile-time programs <code>test:types</code> runs,
-      and a screen that uses all of it. Two limits: a field whose key contains a
-      dot cannot be addressed, and the validation pass judges the whole root on
-      every settled change.
+      Runtime tests, compile-time programs and interactive examples verify the
+      behavior. A field whose key contains a dot cannot be addressed. Validation
+      uses the whole root by default; optional partial execution depends on the
+      adapter. See <a class="link" href={servedPath("/validation/")}>validation</a> for scope
+      and dependency handling.
     </p>
   </section>
   <section id="type-registration">

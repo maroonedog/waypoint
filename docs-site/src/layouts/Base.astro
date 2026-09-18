@@ -26,7 +26,7 @@
 // ===========================================================================
 import "../styles.css";
 import "../lab.css";
-import { TRANSLATED, localeOf, routeOf } from "../i18n/locales.mjs";
+import { TRANSLATED, localeOf, routeOf, servedPath } from "../i18n/locales.mjs";
 
 interface Props {
   readonly title: string;
@@ -59,16 +59,16 @@ const locale: "en" | "ja" = localeOf(Astro.url.pathname);
 const route = routeOf(Astro.url.pathname);
 const hasJapanese = TRANSLATED.includes(route);
 
-/** The same route in the other language. */
-const inLocale = (target: "en" | "ja", path: string): string =>
-  target === "ja" ? `/ja${path}` : path;
+/** The path the same route is served at in the given language. */
+const servedInLocale = (target: "en" | "ja", route: string): string =>
+  servedPath(target === "ja" ? `/ja${route}` : route);
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const alternates = hasJapanese
   ? [
-      { hreflang: "en", href: new URL(route, Astro.site).href },
-      { hreflang: "ja", href: new URL(inLocale("ja", route), Astro.site).href },
-      { hreflang: "x-default", href: new URL(route, Astro.site).href },
+      { hreflang: "en", href: new URL(servedInLocale("en", route), Astro.site).href },
+      { hreflang: "ja", href: new URL(servedInLocale("ja", route), Astro.site).href },
+      { hreflang: "x-default", href: new URL(servedInLocale("en", route), Astro.site).href },
     ]
   : [];
 
@@ -170,8 +170,8 @@ const here = Astro.url.pathname;
     <meta property="og:url" content={canonical} />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="sitemap" href="/sitemap-index.xml" />
+    <link rel="icon" href={servedPath("/favicon.svg")} type="image/svg+xml" />
+    <link rel="sitemap" href={servedPath("/sitemap-index.xml")} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href={FACES} rel="stylesheet" />
@@ -207,7 +207,7 @@ const here = Astro.url.pathname;
              second accessible name on one link is one more thing a screen
              reader reads out for no gain. -->
         <a
-          href={inLocale(locale, "/")}
+          href={servedInLocale(locale, "/")}
           class="site-wordmark flex shrink-0 items-center gap-2 font-mono text-sm font-medium text-on-surface"
         >
           <svg
@@ -232,7 +232,7 @@ const here = Astro.url.pathname;
               <div>
                 <p class="label">{t(section.group)}</p>
                 <ul>{section.items.map((item) => {
-                  const href = inLocale(locale, item.href);
+                  const href = servedInLocale(locale, item.href);
                   return <li><a href={href} aria-current={here === href ? "page" : undefined}>{t(item.label)}</a></li>;
                 })}</ul>
               </div>
@@ -254,7 +254,7 @@ const here = Astro.url.pathname;
         <p class="header-language shrink-0 font-mono text-[0.8125rem]">
           <a
             class="text-on-surface-variant underline-offset-4 hover:underline"
-            href={inLocale(locale === "ja" ? "en" : "ja", route)}
+            href={servedInLocale(locale === "ja" ? "en" : "ja", route)}
             hreflang={locale === "ja" ? "en" : "ja"}
             lang={locale === "ja" ? "en" : "ja"}
           >
@@ -296,7 +296,7 @@ const here = Astro.url.pathname;
                 <p class="label">{t(section.group)}</p>
                 <ul class="mt-2 grid gap-0.5">
                   {section.items.map((item) => {
-                    const href = inLocale(locale, item.href);
+                    const href = servedInLocale(locale, item.href);
                     return (
                     <li>
                       {/* The one place the mark's geometry is used. Hollow on
